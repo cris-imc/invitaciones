@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Comfortaa:wght@500;700&family=Baloo+2:wght@800&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #DDE6F2; overflow: hidden; }
+  a { color: #FF5FB2; text-decoration: none; }
+  a:hover { color: #1B1F33; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes ykMarq { to { transform: translate3d(-50%, 0, 0); } }
+  @keyframes ykMarqRev { from { transform: translate3d(-50%, 0, 0); } to { transform: translate3d(0, 0, 0); } }
+  @keyframes ykBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes ykSparkle { 0%, 100% { transform: scale(.6) rotate(0deg); opacity: .4; } 50% { transform: scale(1.1) rotate(45deg); opacity: 1; } }
+  @keyframes ykFlutter { 0%, 100% { transform: translateY(0) scaleX(1); } 25% { transform: translateY(-8px) scaleX(.6); } 50% { transform: translateY(-4px) scaleX(1); } 75% { transform: translateY(-10px) scaleX(.6); } }
+  @keyframes ykBubble { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+  @keyframes ykRing { 0%, 100% { transform: rotate(0); } 10% { transform: rotate(-12deg); } 20% { transform: rotate(12deg); } 30% { transform: rotate(-8deg); } 40% { transform: rotate(8deg); } 50% { transform: rotate(0); } }
+  @keyframes ykEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  @keyframes ykSignal { 0%, 100% { opacity: .3; } 50% { opacity: 1; } }
+  @media (min-width: 1024px) {
+    [data-spread] { display: grid !important; grid-template-columns: 1fr 1fr !important; align-items: center; column-gap: 72px; }
+    [data-spread] > [data-page] { max-width: 560px; width: 100%; }
+    [data-spread] > [data-page="l"] { justify-self: end; }
+    [data-spread] > [data-page="r"] { justify-self: start; }
+    [data-hero-name] { font-size: min(11vw, 170px, 14vh) !important; }
+    [data-photo-frame] { max-width: 900px !important; margin-left: auto; margin-right: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: var(--bg, #DDE6F2); color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif;">
+
+  <sc-if value="{{ vistaInvitacion }}" hint-placeholder-val="{{ true }}">
+
+  <div ref="{{ setScroller }}" data-scroller="1" style="position: absolute; inset: 0; overflow-y: hidden; overflow-x: hidden;">
+
+    <!-- 0 · BIENVENIDA · pantalla de celular con SMS -->
+    <div data-tone="light" data-screen-label="Bienvenida" style="position: sticky; top: 0; height: 100vh; z-index: 0; overflow: hidden; background: var(--bg, #DDE6F2); color: var(--ink, #1B1F33);">
+      <div ref="{{ setHero }}" style="position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: calc(14px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom)); box-sizing: border-box; will-change: transform;">
+        <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+          <div data-drift="4" style="position: absolute; left: -10%; top: 8%; width: 60vw; max-width: 420px; height: 60vw; max-height: 420px; border-radius: 50%; background: var(--acc2, #C7A6FF); opacity: .5;"></div>
+          <div data-drift="-6" style="position: absolute; right: -14%; bottom: 10%; width: 70vw; max-width: 480px; height: 70vw; max-height: 480px; border-radius: 50%; background: var(--acc3, #8FD3FF); opacity: .55;"></div>
+          <sc-for list="{{ sparkles }}" as="s" hint-placeholder-count="8">
+            <svg viewBox="0 0 40 40" data-drift="{{ s.drift }}" style="position: absolute; left: {{ s.x }}; top: {{ s.y }}; width: {{ s.size }}; animation: ykSparkle {{ s.dur }} ease-in-out infinite; animation-delay: {{ s.delay }};"><path d="M20 0 C21 13 27 19 40 20 C27 21 21 27 20 40 C19 27 13 21 0 20 C13 19 19 13 20 0 Z" fill="{{ s.c }}"></path></svg>
+          </sc-for>
+          <svg viewBox="0 0 60 44" data-drift="8" style="position: absolute; left: 10%; top: 18%; width: clamp(40px, 11vw, 64px); animation: ykFlutter 2.2s ease-in-out infinite;"><path d="M30 22 C22 4 4 0 4 14 C4 26 18 30 30 22 Z" fill="var(--acc, #FF5FB2)" stroke="var(--ink, #1B1F33)" stroke-width="2"></path><path d="M30 22 C38 4 56 0 56 14 C56 26 42 30 30 22 Z" fill="var(--acc2, #C7A6FF)" stroke="var(--ink, #1B1F33)" stroke-width="2"></path><path d="M30 22 C24 30 10 40 10 34 C10 28 22 24 30 22 Z" fill="var(--acc3, #8FD3FF)" stroke="var(--ink, #1B1F33)" stroke-width="2"></path><path d="M30 22 C36 30 50 40 50 34 C50 28 38 24 30 22 Z" fill="var(--acc3, #8FD3FF)" stroke="var(--ink, #1B1F33)" stroke-width="2"></path><line x1="30" y1="14" x2="30" y2="32" stroke="var(--ink, #1B1F33)" stroke-width="2.5"></line></svg>
+        </div>
+
+        <div style="position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: 'VT323', monospace; font-size: 18px; line-height: 1; background: var(--chrome, #F4F6FA); border: 2px solid var(--ink, #1B1F33); border-radius: 999px; padding: 6px 14px; box-shadow: inset 0 -6px 0 rgba(27,31,51,.12);">
+          <span style="display: flex; align-items: flex-end; gap: 2px;"><span style="width: 4px; height: 6px; background: var(--ink, #1B1F33);"></span><span style="width: 4px; height: 9px; background: var(--ink, #1B1F33);"></span><span style="width: 4px; height: 12px; background: var(--ink, #1B1F33); animation: ykSignal 1.4s ease-in-out infinite;"></span><span style="width: 4px; height: 15px; background: var(--ink, #1B1F33); animation: ykSignal 1.4s ease-in-out .3s infinite;"></span></span>
+          <span>MIS QUINCE · 00/10</span>
+          <span style="display: flex; align-items: center; gap: 2px;"><span style="width: 22px; height: 11px; border: 2px solid var(--ink, #1B1F33); border-radius: 2px; padding: 1px; box-sizing: border-box; display: flex; gap: 1px;"><span style="flex: 1; background: var(--acc4, #7DF29B);"></span><span style="flex: 1; background: var(--acc4, #7DF29B);"></span><span style="flex: 1; background: var(--acc4, #7DF29B);"></span></span><span style="width: 3px; height: 5px; background: var(--ink, #1B1F33); border-radius: 0 1px 1px 0;"></span></span>
+        </div>
+
+        <div style="position: relative; z-index: 2; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; text-align: center;">
+          <span ref="{{ setKicker }}" style="font-family: 'VT323', monospace; font-size: 20px; line-height: 1; background: var(--lcd, #C9E4A8); color: var(--ink, #1B1F33); padding: 6px 14px; border: 2px solid var(--ink, #1B1F33); border-radius: 6px;">1 mensaje nuevo ✉ <span style="animation: ykBlink 1s steps(1) infinite;">_</span></span>
+          <h1 data-hero-name="1" style="margin: 0; font-family: 'Baloo 2', cursive; font-weight: 800; font-size: min(clamp(56px, 18vw, 160px), 15vh); line-height: .9; letter-spacing: -.02em; display: flex; flex-direction: column; align-items: center; color: var(--ink, #1B1F33); background: linear-gradient(180deg, #FFFFFF 0 48%, var(--chrome2, #B9C3D6) 48% 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-stroke: 2px var(--ink, #1B1F33); paint-order: stroke fill;">
+            <sc-if value="{{ nombreCorto }}" hint-placeholder-val="{{ true }}">
+              <span style="overflow: hidden; display: block;"><span data-piece="1" style="display: block; color: transparent;">valentina</span></span>
+            </sc-if>
+            <sc-if value="{{ nombreLargo }}" hint-placeholder-val="{{ false }}">
+              <span style="overflow: hidden; display: block; font-size: .72em;"><span data-piece="1" style="display: block; color: transparent;">maría</span></span>
+              <span style="overflow: hidden; display: block; font-size: .72em;"><span data-piece="1" style="display: block; color: transparent;">florencia</span></span>
+            </sc-if>
+          </h1>
+          <div style="display: flex; align-items: center; gap: 10px; background: var(--acc, #FF5FB2); color: #FFFFFF; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; padding: 8px 18px; font-weight: 700; font-size: clamp(14px, 4vw, 20px); box-shadow: inset 0 6px 0 rgba(255,255,255,.35), 3px 3px 0 var(--ink, #1B1F33);">✧ cumple 15 ✧</div>
+          <div style="display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 520px; align-items: flex-start;">
+            <span style="background: #FFFFFF; border: 2px solid var(--ink, #1B1F33); border-radius: 18px 18px 18px 4px; padding: 8px 14px; font-size: 13px; font-weight: 700; line-height: 1.4; text-align: left;">sáb 15 · mayo · 2027 · 21:00<br><span style="color: var(--acc, #FF5FB2);">Palacio Sans Souci · Victoria</span></span>
+            <span style="align-self: flex-end; background: var(--acc3, #8FD3FF); border: 2px solid var(--ink, #1B1F33); border-radius: 18px 18px 4px 18px; padding: 8px 14px; font-size: 13px; font-weight: 700; line-height: 1.4; text-align: right;">pase nº 027 · 3 personas</span>
+          </div>
+        </div>
+
+        <div style="position: relative; z-index: 2; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center;">
+          <p style="margin: 0; font-weight: 700; font-size: clamp(13px, 3.6vw, 17px); line-height: 1.45; max-width: 36ch; background: #FFFFFF; border: 2px solid var(--ink, #1B1F33); border-radius: 18px; padding: 8px 14px;">Familia Gómez: tienen 1 invitación sin leer. Respondan antes de que se corte la señal :)</p>
+          <button onClick="{{ open }}" style="min-height: 54px; width: 100%; max-width: 360px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: var(--acc4, #7DF29B); color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 15px; padding: 2px 22px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: inset 0 6px 0 rgba(255,255,255,.5), 4px 4px 0 var(--ink, #1B1F33);" style-hover="background: var(--acc, #FF5FB2); color: #FFFFFF;">abrir mensaje ▸</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 01 · SAVE THE DATE · agenda del celular -->
+    <section data-tone="dark" data-screen-label="Save the Date" style="position: relative; z-index: 1; min-height: 100vh; background: var(--acc2, #C7A6FF); color: var(--ink, #1B1F33); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px;"><span data-xin="1" data-dist="-40">01 — guardá la fecha</span><span data-xin="1" data-dist="40">01/10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="background: var(--lcd, #C9E4A8); border: 3px solid var(--ink, #1B1F33); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; font-family: 'VT323', monospace; line-height: .9; box-shadow: inset 0 0 0 4px rgba(27,31,51,.08);">
+            <span data-xin="1" data-dist="-160" style="font-size: clamp(110px, 36vw, 260px);">15</span>
+            <span data-xin="1" data-dist="160" data-delay="120" style="font-size: clamp(44px, 14vw, 100px); text-align: right;">MAYO</span>
+            <span data-xin="1" data-dist="-160" data-delay="240" style="font-size: clamp(44px, 14vw, 100px);">2027</span>
+          </div>
+          <div data-xin="1" data-delay="360" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 13px;">
+            <span>sábado · 21:00 h</span>
+            <a href="#" style="color: #FFFFFF; background: var(--ink, #1B1F33); border-radius: 999px; padding: 12px 18px; min-height: 24px;">+ agenda</a>
+          </div>
+        </div>
+        <div data-page="r" data-photo-frame="1" ref="{{ setPhotoWrap }}" data-xin="1" data-delay="200" data-dist="0" style="position: relative; width: 100%; aspect-ratio: 4 / 5; box-sizing: border-box; overflow: hidden; background: repeating-linear-gradient(135deg, #8A90A8 0 8px, #9AA0B8 8px 16px); border: 3px solid var(--ink, #1B1F33); border-radius: 22px; box-shadow: 0 0 0 8px var(--chrome, #F4F6FA), 0 0 0 10px var(--ink, #1B1F33);">
+          <svg width="100%" height="100%" style="position: absolute; inset: 0; pointer-events: none;">
+            <defs><pattern id="ykHtPhoto" patternUnits="userSpaceOnUse" width="10" height="10"><rect ref="{{ setHtDot }}" x="0" y="0" width="10" height="10" fill="#C7A6FF"></rect></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#ykHtPhoto)"></rect>
+          </svg>
+          <span style="position: absolute; left: 12px; top: 10px; font-family: 'VT323', monospace; font-size: 18px; background: rgba(27,31,51,.7); color: #FFFFFF; padding: 2px 8px; border-radius: 4px;">IMG_0015.JPG · 0.3 MP</span>
+          <span style="position: absolute; left: 12px; bottom: 10px; font-weight: 700; font-size: 11px; color: #FFFFFF; background: rgba(27,31,51,.7); padding: 4px 10px; border-radius: 999px;">FOTO · portadaImagenFondo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · COUNTDOWN · reloj LCD -->
+    <section data-tone="dark" data-screen-label="Countdown" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #1B1F33); color: #FFFFFF; padding: 60px 0 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; overflow: hidden;">
+      <div style="padding: 0 max(20px, calc((100% - 1100px) / 2)); display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; color: var(--acc4, #7DF29B);"><span data-xin="1" data-dist="-40">02 — faltan</span><span data-xin="1" data-dist="40">02/10</span></div>
+      <div style="overflow: hidden; background: var(--acc, #FF5FB2); color: #FFFFFF; padding: 8px 0;">
+        <div ref="{{ setMarq1 }}" style="display: flex; width: max-content; animation: ykMarq 16s linear infinite; font-weight: 700; font-size: 20px; white-space: nowrap;">
+          <span style="padding-right: 36px;">días ✧ horas ✧ minutos ✧ segundos ✧ hasta el 15 de mayo ✧</span>
+          <span style="padding-right: 36px;">días ✧ horas ✧ minutos ✧ segundos ✧ hasta el 15 de mayo ✧</span>
+        </div>
+      </div>
+      <div data-spread="1" style="padding: 0 max(20px, calc((100% - 1100px) / 2)); display: flex; flex-direction: column;">
+        <div data-page="l" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <sc-for list="{{ cuenta }}" as="c" hint-placeholder-count="4">
+            <div data-xin="1" data-dist="{{ c.dist }}" data-delay="{{ c.delay }}" style="position: relative; background: var(--lcd, #C9E4A8); color: var(--ink, #1B1F33); border: 3px solid var(--chrome2, #B9C3D6); border-radius: 14px; padding: 14px 12px 12px; display: flex; flex-direction: column; gap: 4px; overflow: hidden; box-shadow: inset 0 0 0 4px rgba(27,31,51,.08);">
+              <span ref="{{ c.ref }}" style="font-family: 'VT323', monospace; font-size: clamp(64px, 20vw, 150px); line-height: .9; display: inline-block;">--</span>
+              <span style="font-family: 'VT323', monospace; font-size: 18px;">{{ c.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="overflow: hidden; border-top: 2px solid var(--acc4, #7DF29B); border-bottom: 2px solid var(--acc4, #7DF29B); padding: 8px 0;">
+        <div ref="{{ setMarq2 }}" style="display: flex; width: max-content; animation: ykMarqRev 16s linear infinite; font-family: 'VT323', monospace; font-size: 20px; white-space: nowrap; color: var(--acc4, #7DF29B);">
+          <span style="padding-right: 36px;">PALACIO SANS SOUCI · VICTORIA · BUENOS AIRES · 21:00 · DRESS CODE: Y2K GLAM ·</span>
+          <span style="padding-right: 36px;">PALACIO SANS SOUCI · VICTORIA · BUENOS AIRES · 21:00 · DRESS CODE: Y2K GLAM ·</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · FRASE · chat -->
+    <section data-tone="light" data-screen-label="Frase" style="position: relative; z-index: 1; min-height: 100vh; background: var(--acc3, #8FD3FF); color: var(--ink, #1B1F33); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px;"><span data-xin="1" data-dist="-40">03 — unas palabras</span><span data-xin="1" data-dist="40">03/10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start; width: 100%;">
+          <span style="font-family: 'VT323', monospace; font-size: 16px; opacity: .7;">vale · 21:00</span>
+          <h2 ref="{{ setPhrase }}" style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(24px, 6.6vw, 52px); line-height: 1.2; max-width: 18ch; background: #FFFFFF; border: 3px solid var(--ink, #1B1F33); border-radius: 26px 26px 26px 6px; padding: 18px 22px; box-shadow: 5px 5px 0 var(--ink, #1B1F33);">
+            <span data-w="1">quince</span> <span data-w="1">años</span> <span data-w="1">de</span> <span data-w="1" style="color: var(--acc, #FF5FB2);">canciones</span> <span data-w="1">a</span> <span data-w="1">todo</span> <span data-w="1">volumen.</span> <span data-w="1">esta</span> <span data-w="1">noche,</span> <span data-w="1" style="color: var(--acc2b, #8A5CF5);">la</span> <span data-w="1" style="color: var(--acc2b, #8A5CF5);">mía</span> <span data-w="1">✧</span>
+          </h2>
+        </div>
+        <div data-page="r" data-xin="1" data-delay="900" data-dist="60" style="align-self: flex-end; background: var(--acc4, #7DF29B); border: 3px solid var(--ink, #1B1F33); border-radius: 26px 26px 6px 26px; padding: 12px 18px; max-width: 320px; font-weight: 700; font-size: 14px; animation: ykBubble 4s ease-in-out infinite;">frasePersonalizadaTexto <span style="opacity: .6;">· enviado ✓✓</span></div>
+      </div>
+      <div style="position: relative; display: flex; justify-content: space-between; align-items: center; font-family: 'VT323', monospace; font-size: 18px;"><span>vale · xv</span><span>escribiendo<span style="animation: ykBlink .8s steps(1) infinite;">...</span></span></div>
+    </section>
+
+    <!-- 04 · CUÁNDO Y DÓNDE · contactos, pineado -->
+    <sc-if value="{{ modoLateral }}" hint-placeholder-val="{{ true }}">
+    <div data-pan="1" data-screen-label="Cuándo y dónde" style="position: relative; z-index: 1; height: 300vh;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--bg, #DDE6F2);">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform;">
+          <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3">
+            <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: {{ p.bg }}; color: var(--ink, #1B1F33);">
+              <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px;"><span>04 — {{ p.kicker }}</span><span>{{ p.folio }}</span></div>
+              <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 18px;">
+                <div data-page="l" style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-family: 'VT323', monospace; font-size: 18px;">{{ p.sub }}</span>
+                  <h2 style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(34px, 9.5vw, 80px); line-height: 1; letter-spacing: -.03em; -webkit-text-stroke: 1.5px var(--ink, #1B1F33); paint-order: stroke fill; color: #FFFFFF;">{{ p.titulo }}</h2>
+                </div>
+                <div data-page="r" style="background: #FFFFFF; border: 3px solid var(--ink, #1B1F33); border-radius: 22px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 6px 6px 0 {{ p.acc }};">
+                  <sc-for list="{{ p.lineas }}" as="l" hint-placeholder-count="3">
+                    <div style="display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 2px dotted var(--chrome2, #B9C3D6); font-size: 14px; line-height: 1.4;"><span style="font-family: 'VT323', monospace; font-size: 17px; opacity: .8; flex: 0 0 auto;">{{ l.k }}</span><span style="text-align: right; font-weight: 700;">{{ l.v }}</span></div>
+                  </sc-for>
+                  <a href="#" style="margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 0 16px; color: #FFFFFF; background: var(--ink, #1B1F33); font-weight: 700; font-size: 14px;">{{ p.cta }} ▸</a>
+                </div>
+              </div>
+              <div style="position: relative; display: flex; justify-content: space-between; align-items: center; font-family: 'VT323', monospace; font-size: 16px; opacity: .8;"><span>{{ p.pie }}</span><span>deslizá ▸▸</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: var(--ink, #1B1F33);">
+          <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3"><span data-dot="{{ $index }}" style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span></sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- 04 · vertical -->
+    <sc-if value="{{ modoVertical }}" hint-placeholder-val="{{ false }}">
+    <section data-tone="light" data-screen-label="Cuándo y dónde" style="position: relative; z-index: 1; background: var(--bg, #DDE6F2); color: var(--ink, #1B1F33); padding: 0 max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box;">
+      <div style="position: sticky; top: 0; z-index: 0; padding-top: 60px; padding-bottom: 20px; background: var(--bg, #DDE6F2); display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px;"><span>04 — cuándo y dónde</span><span>04/10</span></div>
+        <h2 style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(34px, 9.5vw, 80px); line-height: 1; letter-spacing: -.03em; -webkit-text-stroke: 1.5px var(--ink, #1B1F33); paint-order: stroke fill; color: #FFFFFF;">Palacio Sans Souci</h2>
+        <span style="font-family: 'VT323', monospace; font-size: 18px;">Alsina 1035 · Victoria · Buenos Aires</span>
+      </div>
+      <div style="position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; padding-top: 28vh;">
+        <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3">
+          <div data-xin="1" data-dist="{{ p.dist }}" data-rot="{{ p.rot }}" style="background: #FFFFFF; border: 3px solid var(--ink, #1B1F33); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: 6px 6px 0 {{ p.acc }};">
+            <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 17px; opacity: .8;"><span>{{ p.kicker }}</span><span>{{ p.folio }}</span></div>
+            <span style="font-weight: 700; font-size: clamp(22px, 6vw, 40px); line-height: 1.1; letter-spacing: -.02em;">{{ p.titulo }}</span>
+            <sc-for list="{{ p.lineas }}" as="l" hint-placeholder-count="3">
+              <div style="display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 2px dotted var(--chrome2, #B9C3D6); font-size: 14px; line-height: 1.4;"><span style="font-family: 'VT323', monospace; font-size: 17px; opacity: .8; flex: 0 0 auto;">{{ l.k }}</span><span style="text-align: right; font-weight: 700;">{{ l.v }}</span></div>
+            </sc-for>
+            <a href="#" style="margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 0 16px; color: #FFFFFF; background: var(--ink, #1B1F33); font-weight: 700; font-size: 14px;">{{ p.cta }} ▸</a>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- 05 · CHECK-IN · responder SMS -->
+    <section data-tone="light" data-screen-label="Check-in" style="position: relative; z-index: 1; min-height: 100vh; background: var(--acc, #FF5FB2); color: var(--ink, #1B1F33); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; color: #FFFFFF;"><span data-xin="1" data-dist="-40">05 — responder</span><span data-xin="1" data-dist="40">05/10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 12px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(40px, 11vw, 96px); line-height: .98; letter-spacing: -.03em; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #1B1F33); paint-order: stroke fill;">¿venís?<br><span style="color: var(--acc4, #7DF29B);">respondé</span></h2>
+          <p data-xin="1" data-delay="120" style="margin: 0; font-weight: 700; font-size: 14px; line-height: 1.5; max-width: 40ch; color: #FFFFFF;">Hasta el 15 de abril. Menores de 12 no abonan; de 12 a 17, precio adolescente.</p>
+        </div>
+        <div data-page="r" ref="{{ setCoupon }}" data-xin="1" data-delay="160" data-dist="80" style="position: relative; background: var(--chrome, #F4F6FA); color: var(--ink, #1B1F33); border: 3px solid var(--ink, #1B1F33); border-radius: 26px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; box-shadow: inset 0 8px 0 #FFFFFF, 7px 7px 0 var(--ink, #1B1F33);">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'VT323', monospace; font-size: 18px; background: var(--lcd, #C9E4A8); border: 2px solid var(--ink, #1B1F33); border-radius: 8px; padding: 6px 12px;"><span>nuevo SMS · para: vale</span><span ref="{{ setStatus }}">borrador</span></div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-family: 'VT323', monospace; font-size: 17px;">de:<input value="Familia Gómez" readOnly="{{ true }}" style="min-height: 48px; border: 2px solid var(--ink, #1B1F33); border-radius: 12px; background: #FFFFFF; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 16px; color: var(--ink, #1B1F33); padding: 0 14px; outline: none;"></label>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-family: 'VT323', monospace; font-size: 17px;">asistencia:
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button onClick="{{ pickYes }}" ref="{{ setYes }}" style="min-height: 48px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: var(--acc4, #7DF29B); color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; box-shadow: inset 0 5px 0 rgba(255,255,255,.5);">sí, voy ✧</button>
+              <button onClick="{{ pickNo }}" ref="{{ setNo }}" style="min-height: 48px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: #FFFFFF; color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer;">no puedo</button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <label style="display: flex; flex-direction: column; gap: 6px; font-family: 'VT323', monospace; font-size: 17px;">personas:<div style="display: flex; align-items: center; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: #FFFFFF; min-height: 48px;"><button onClick="{{ dec }}" style="width: 44px; min-height: 44px; border: 0; background: transparent; font-weight: 700; font-size: 22px; color: var(--ink, #1B1F33); cursor: pointer;">−</button><span ref="{{ setCount }}" style="flex: 1; text-align: center; font-family: 'VT323', monospace; font-size: 30px; color: var(--acc, #FF5FB2);">3</span><button onClick="{{ inc }}" style="width: 44px; min-height: 44px; border: 0; background: transparent; font-weight: 700; font-size: 22px; color: var(--ink, #1B1F33); cursor: pointer;">+</button></div></label>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-family: 'VT323', monospace; font-size: 17px;">restricciones:<input placeholder="Sin TACC, vegano…" style="min-height: 48px; border: 2px solid var(--ink, #1B1F33); border-radius: 12px; background: #FFFFFF; font-family: 'Comfortaa', sans-serif; font-weight: 500; font-size: 14px; color: var(--ink, #1B1F33); padding: 0 12px; outline: none; width: 100%; box-sizing: border-box;"></label>
+          </div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-family: 'VT323', monospace; font-size: 17px;">mensaje para vale:<textarea rows="2" placeholder="Opcional" style="border: 2px solid var(--ink, #1B1F33); border-radius: 12px; background: #FFFFFF; font-family: 'Comfortaa', sans-serif; font-weight: 500; font-size: 14px; color: var(--ink, #1B1F33); padding: 10px 12px; outline: none; resize: none; width: 100%; box-sizing: border-box;"></textarea></label>
+          <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 17px;"><span>adolescente (12–17)</span><span>$ 15.000</span></div>
+          <button onClick="{{ confirm }}" style="min-height: 54px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: var(--acc, #FF5FB2); color: #FFFFFF; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; box-shadow: inset 0 6px 0 rgba(255,255,255,.35), 4px 4px 0 var(--ink, #1B1F33);" style-hover="background: var(--ink, #1B1F33);">enviar ▸</button>
+          <div ref="{{ setSticker }}" style="position: absolute; right: 12px; bottom: 78px; width: 132px; aspect-ratio: 1; opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px); pointer-events: none;">
+            <svg viewBox="0 0 100 100" style="position: absolute; inset: 0;">
+              <path d="M50 4 C58 4 62 10 70 10 C78 10 84 16 84 24 C84 32 92 36 92 44 C92 52 96 58 92 64 C88 70 90 78 84 82 C78 86 76 94 68 94 C60 94 56 100 50 96 C44 100 40 94 32 94 C24 94 22 86 16 82 C10 78 12 70 8 64 C4 58 8 52 8 44 C8 36 16 32 16 24 C16 16 22 10 30 10 C38 10 42 4 50 4 Z" fill="var(--acc4, #7DF29B)" stroke="var(--ink, #1B1F33)" stroke-width="3"></path>
+              <text x="50" y="46" text-anchor="middle" style="font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 13px; fill: var(--ink, #1B1F33);">enviado</text>
+              <text x="50" y="66" text-anchor="middle" style="font-family: 'VT323', monospace; font-size: 22px; fill: var(--ink, #1B1F33);">✓✓</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 · ÁLBUM · galería MMS -->
+    <div data-pan="1" data-screen-label="Álbum" style="position: relative; z-index: 1; height: 240vh;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: #F7F5F0; color: #1B1F33;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 200vw; will-change: transform;">
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px;">
+            <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; color: #6E6A78;"><span>06 — galería</span><span>hoja 01/02 · 06/10</span></div>
+            <h2 style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(34px, 9.5vw, 80px); line-height: 1; letter-spacing: -.03em;">fotos.mms</h2>
+            <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px;">
+              <sc-for list="{{ fotos }}" as="f" hint-placeholder-count="5">
+                <div data-sheet="1" style="grid-column: {{ f.col }}; grid-row: {{ f.row }}; position: relative; overflow: hidden; border: 3px solid #1B1F33; border-radius: 14px; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); min-height: 0; box-shadow: 4px 4px 0 {{ f.acc }};">
+                  <div data-colorwash="1" style="position: absolute; inset: 0; background: {{ f.tint }}; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear;"></div>
+                  <span style="position: absolute; left: 8px; bottom: 6px; font-family: 'VT323', monospace; font-size: 16px; color: #1B1F33;">IMG_{{ f.n }}.jpg</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 17px; color: #6E6A78;"><span>galeriaPrincipalFotos · 5 por hoja</span><span>deslizá ▸▸</span></div>
+          </div>
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: #EFEBE3;">
+            <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; color: #6E6A78;"><span ref="{{ setAlbumKicker }}">hoja 02/02 — después de la fiesta</span><span>06/10</span></div>
+            <h2 style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(34px, 9.5vw, 80px); line-height: 1; letter-spacing: -.03em;">momentos<br><span style="color: var(--acc, #FF5FB2);">de la noche</span></h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 600px;">
+              <div style="aspect-ratio: 1; border: 3px solid #1B1F33; border-radius: 14px; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); box-shadow: 4px 4px 0 var(--acc, #FF5FB2);"></div>
+              <div style="aspect-ratio: 1; border: 3px solid #1B1F33; border-radius: 14px; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); box-shadow: 4px 4px 0 var(--acc3, #8FD3FF);"></div>
+              <div style="aspect-ratio: 1; border: 3px dashed #1B1F33; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 34px;">+</div>
+            </div>
+            <p style="margin: 0; font-weight: 700; font-size: 14px; line-height: 1.5; color: #6E6A78; max-width: 40ch;">Acá van las fotos que suban los invitados. Se habilita cuando termine la fiesta.</p>
+          </div>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: #1B1F33;">
+          <span data-dot="0" style="width: 12px; height: 12px; border-radius: 50%; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span>
+          <span data-dot="1" style="width: 12px; height: 12px; border-radius: 50%; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 · MÚSICA · ringtone -->
+    <section data-tone="dark" data-screen-label="Música" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #1B1F33); color: #FFFFFF; padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; color: var(--acc4, #7DF29B);"><span data-xin="1" data-dist="-40">07 — ringtone</span><span data-xin="1" data-dist="40">07/10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 16px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(40px, 11vw, 96px); line-height: .98; letter-spacing: -.03em;">¿qué tema<br><span style="color: var(--acc4, #7DF29B);">suena?</span></h2>
+          <div data-xin="1" data-delay="120" style="display: flex; align-items: center; gap: 16px;">
+            <svg viewBox="0 0 40 40" style="width: 44px; height: 44px; animation: ykRing 2.4s ease-in-out infinite; transform-origin: 50% 0;"><path d="M20 4 C12 4 8 10 8 18 V26 L4 32 H36 L32 26 V18 C32 10 28 4 20 4 Z" fill="var(--acc, #FF5FB2)" stroke="#FFFFFF" stroke-width="2"></path><circle cx="20" cy="36" r="3" fill="#FFFFFF"></circle></svg>
+            <div style="display: flex; align-items: flex-end; gap: 5px; height: 40px;">
+              <span style="width: 10px; height: 100%; background: var(--acc, #FF5FB2); border-radius: 5px; transform-origin: bottom; animation: ykEq 1.1s ease-in-out infinite;"></span><span style="width: 10px; height: 100%; background: var(--acc2, #C7A6FF); border-radius: 5px; transform-origin: bottom; animation: ykEq 1.1s ease-in-out .18s infinite;"></span><span style="width: 10px; height: 100%; background: var(--acc3, #8FD3FF); border-radius: 5px; transform-origin: bottom; animation: ykEq 1.1s ease-in-out .36s infinite;"></span><span style="width: 10px; height: 100%; background: var(--acc4, #7DF29B); border-radius: 5px; transform-origin: bottom; animation: ykEq 1.1s ease-in-out .54s infinite;"></span><span style="width: 10px; height: 100%; background: #FFFFFF; border-radius: 5px; transform-origin: bottom; animation: ykEq 1.1s ease-in-out .72s infinite;"></span>
+            </div>
+          </div>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 12px;">
+          <div data-xin="1" data-delay="160" data-dist="60" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input placeholder="Título" style="min-height: 48px; border: 2px solid #FFFFFF; border-radius: 999px; background: transparent; color: #FFFFFF; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 14px; padding: 0 16px; outline: none; min-width: 0;">
+            <input placeholder="Artista" style="min-height: 48px; border: 2px solid #FFFFFF; border-radius: 999px; background: transparent; color: #FFFFFF; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 14px; padding: 0 16px; outline: none; min-width: 0;">
+          </div>
+          <button data-xin="1" data-delay="220" style="min-height: 50px; border: 2px solid var(--acc4, #7DF29B); border-radius: 999px; background: var(--acc4, #7DF29B); color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 15px; cursor: pointer; box-shadow: inset 0 6px 0 rgba(255,255,255,.5);" style-hover="background: var(--acc, #FF5FB2); border-color: var(--acc, #FF5FB2); color: #FFFFFF;">sugerir canción ▸</button>
+          <div data-xin="1" data-delay="280" style="display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{ canciones }}" as="c" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #FFFFFF; color: var(--ink, #1B1F33); border-radius: 18px;">
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="font-family: 'VT323', monospace; font-size: 20px; color: {{ c.acc }};">♪{{ c.n }}</span><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 16px; line-height: 1.1;">{{ c.t }}</span><span style="font-family: 'VT323', monospace; font-size: 16px; opacity: .7;">{{ c.a }}</span></div></div>
+                <button onClick="{{ c.vote }}" style="min-height: 44px; min-width: 64px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: {{ c.acc }}; color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 14px; cursor: pointer; padding: 0 12px;">▲ {{ c.v }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 · REGALOS · recarga de saldo -->
+    <section data-tone="light" data-screen-label="Regalos" style="position: relative; z-index: 1; min-height: 100vh; background: var(--bg, #DDE6F2); color: var(--ink, #1B1F33); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px;"><span data-xin="1" data-dist="-40">08 — recargar saldo</span><span data-xin="1" data-dist="40">08/10</span></div>
+      <div data-spread="1" style="display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 14px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(40px, 11vw, 96px); line-height: .98; letter-spacing: -.03em; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #1B1F33); paint-order: stroke fill;">tu regalo<br><span style="color: var(--acc2, #C7A6FF);">es venir</span></h2>
+          <p data-xin="1" data-delay="120" style="margin: 0; font-weight: 700; font-size: 14px; line-height: 1.5; max-width: 40ch;">Si además querés recargarme saldo para mi viaje a Disney, acá están los datos.</p>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 14px;">
+          <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+            <div data-xin="1" data-dist="{{ b.dist }}" data-delay="{{ b.delay }}" style="background: #FFFFFF; border: 3px solid var(--ink, #1B1F33); border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: 6px 6px 0 {{ b.acc }};">
+              <div style="display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 17px; opacity: .8;"><span>{{ b.k }}</span><span>{{ b.banco }}</span></div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 2px dotted var(--chrome2, #B9C3D6); padding-bottom: 8px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-family: 'VT323', monospace; font-size: 15px; opacity: .7;">alias</span><span style="font-weight: 700; font-size: 17px; line-height: 1.1;">{{ b.alias }}</span></div><button onClick="{{ b.copyAlias }}" style="min-height: 44px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: {{ b.acc }}; color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 12px; padding: 0 14px; cursor: pointer;">{{ b.aliasLabel }}</button></div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-family: 'VT323', monospace; font-size: 15px; opacity: .7;">cbu</span><span style="font-family: 'VT323', monospace; font-size: 20px; word-break: break-all;">{{ b.cbu }}</span></div><button onClick="{{ b.copyCbu }}" style="min-height: 44px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: {{ b.acc }}; color: var(--ink, #1B1F33); font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 12px; padding: 0 14px; cursor: pointer; flex: 0 0 auto;">{{ b.cbuLabel }}</button></div>
+              <span style="font-family: 'VT323', monospace; font-size: 16px; opacity: .7;">titular · {{ b.titular }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 · QUIZ · test de revista -->
+    <section data-tone="light" data-screen-label="Quiz" style="position: relative; z-index: 1; min-height: 100vh; background: var(--acc4, #7DF29B); color: var(--ink, #1B1F33); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px;"><span data-xin="1" data-dist="-40">09 — test</span><span data-xin="1" data-dist="40">09/10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 12px;">
+          <span data-xin="1" style="align-self: flex-start; background: var(--ink, #1B1F33); color: #FFFFFF; border-radius: 999px; font-family: 'VT323', monospace; font-size: 18px; padding: 6px 16px;">pregunta <span ref="{{ setQn }}">1</span>/3</span>
+          <h2 ref="{{ setQ }}" data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: clamp(28px, 8vw, 68px); line-height: 1.05; letter-spacing: -.03em; max-width: 16ch;">¿cuál es mi tono de llamada?</h2>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ opciones }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.pick }}" style="min-height: 54px; border: 2px solid var(--ink, #1B1F33); border-radius: 999px; background: {{ o.bg }}; color: {{ o.fg }}; font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 15px; text-align: left; padding: 0 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; box-shadow: 3px 3px 0 var(--ink, #1B1F33);"><span>{{ o.t }}</span><span style="font-family: 'VT323', monospace; font-size: 18px;">{{ o.tag }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · TU PASE · bluetooth -->
+    <section data-tone="dark" data-screen-label="Tu pase" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #1B1F33); color: #FFFFFF; padding: 60px max(20px, calc((100% - 1100px) / 2)) calc(28px + env(safe-area-inset-bottom)); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 22px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-family: 'VT323', monospace; font-size: 18px; color: var(--acc3, #8FD3FF);"><span data-xin="1" data-dist="-40">10 — tu pase</span><span data-xin="1" data-dist="40">10/10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" data-xin="1" data-dist="-60" style="display: flex; flex-direction: column; gap: 16px; align-items: flex-start;">
+          <div style="position: relative; width: min(100%, 300px); aspect-ratio: 1; background: #FFFFFF; padding: 16px; box-sizing: border-box; border: 3px solid var(--acc3, #8FD3FF); border-radius: 22px; box-shadow: 0 0 0 8px var(--chrome, #F4F6FA), 0 0 0 10px var(--ink, #1B1F33);">
+            <svg viewBox="0 0 21 21" width="100%" height="100%" shape-rendering="crispEdges" style="display: block;">
+              <path fill="#1B1F33" d="M0 0h7v7H0zM1 1v5h5V1zM2 2h3v3H2zM14 0h7v7h-7zM15 1v5h5V1zM16 2h3v3h-3zM0 14h7v7H0zM1 15v5h5v-5zM2 16h3v3H2zM8 0h1v1H8zM10 0h1v2h-1zM12 0h1v1h-1zM8 2h2v1H8zM11 2h2v1h-2zM8 4h1v1H8zM10 4h2v1h-2zM8 6h1v1H8zM12 6h1v1h-1zM10 5h1v3h-1zM0 8h1v1H0zM2 8h2v1H2zM5 8h1v1H5zM8 8h1v2H8zM10 8h1v1h-1zM12 8h2v1h-2zM15 8h1v1h-1zM17 8h1v1h-1zM19 8h2v1h-2zM0 10h2v1H0zM3 10h1v1H3zM5 10h1v1H5zM9 10h2v1H9zM12 10h1v1h-1zM14 10h2v1h-2zM17 10h2v1h-2zM20 10h1v1h-1zM1 12h1v1H1zM3 12h3v1H3zM8 12h1v1H8zM10 12h2v1h-2zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM19 12h2v1h-2zM8 14h1v1H8zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h3v1h-3zM18 14h1v1h-1zM20 14h1v1h-1zM8 16h2v1H8zM11 16h1v1h-1zM14 16h1v1h-1zM16 16h3v1h-3zM20 16h1v1h-1zM8 18h1v1H8zM10 18h2v1h-2zM13 18h1v1h-1zM15 18h1v1h-1zM17 18h2v1h-2zM8 20h1v1H8zM10 20h1v1h-1zM12 20h2v1h-2zM15 20h2v1h-2zM19 20h2v1h-2z"></path>
+            </svg>
+            <span style="position: absolute; left: 0; right: 0; bottom: -30px; text-align: center; font-family: 'VT323', monospace; font-size: 17px; color: var(--acc3, #8FD3FF);">QrDeIngreso · emparejar</span>
+          </div>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 14px; padding-top: 16px;">
+          <div data-xin="1" data-delay="100" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;">
+            <div style="display: flex; flex-direction: column;"><span style="font-family: 'VT323', monospace; font-size: 17px; color: var(--acc3, #8FD3FF);">pase nº</span><span style="font-family: 'VT323', monospace; font-size: clamp(80px, 24vw, 170px); line-height: .85; color: var(--acc4, #7DF29B);">027</span></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; text-align: right;"><span style="font-family: 'VT323', monospace; font-size: 17px; color: var(--acc3, #8FD3FF);">mesa</span><span style="font-family: 'VT323', monospace; font-size: clamp(56px, 16vw, 110px); line-height: .85; color: var(--acc, #FF5FB2);">12</span></div>
+          </div>
+          <div data-xin="1" data-delay="160" style="display: flex; flex-direction: column; background: var(--lcd, #C9E4A8); color: var(--ink, #1B1F33); border: 3px solid var(--chrome2, #B9C3D6); border-radius: 14px; padding: 6px 14px;">
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 2px dotted rgba(27,31,51,.3); font-size: 14px;"><span style="font-family: 'VT323', monospace; font-size: 17px;">sector</span><span style="font-weight: 700;">Pista · Mesa 12</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; border-bottom: 2px dotted rgba(27,31,51,.3); font-size: 14px;"><span style="font-family: 'VT323', monospace; font-size: 17px; flex: 0 0 auto;">estacionamiento</span><span style="text-align: right; line-height: 1.4; font-weight: 700;">En el salón, con valet sin cargo.</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 9px 0; font-size: 14px;"><span style="font-family: 'VT323', monospace; font-size: 17px; flex: 0 0 auto;">transporte</span><span style="text-align: right; line-height: 1.4; font-weight: 700;">Combi desde Belgrano 19:45 h, vuelve 05:00 h.</span></div>
+          </div>
+        </div>
+      </div>
+      <div data-xin="1" data-delay="220" style="position: relative; display: flex; flex-direction: column; gap: 14px;">
+        <span style="font-weight: 700; font-size: clamp(22px, 6vw, 40px); line-height: 1.1; letter-spacing: -.02em;">nos vemos ✧ tkm — vale</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'VT323', monospace; font-size: 17px; color: var(--acc3, #8FD3FF); border-top: 2px dotted rgba(255,255,255,.3); padding-top: 12px;"><span>altainvitacion.com</span><span onClick="{{ replay }}" style="cursor: pointer; color: #FFFFFF;">◂ volver al inicio</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- riel -->
+  <div ref="{{ setRail }}" style="position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom)); opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--ink, #1B1F33); border-left: 2px solid currentColor;">
+    <span ref="{{ setRailTop }}" style="writing-mode: vertical-rl; font-family: 'VT323', monospace; font-size: 18px;">00</span>
+    <span ref="{{ setRailBar }}" style="position: absolute; left: -2px; top: 0; width: 4px; height: 0%; background: var(--acc, #FF5FB2); border-radius: 2px; transition: height 200ms linear;"></span>
+    <span ref="{{ setRailLabel }}" style="writing-mode: vertical-rl; font-family: 'VT323', monospace; font-size: 16px;">bienvenida</span>
+  </div>
+
+  <!-- burbuja -->
+  <div ref="{{ setBubble }}" style="position: absolute; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 4; display: flex; align-items: center; gap: 10px; background: #FFFFFF; color: var(--ink, #1B1F33); border: 2px solid var(--ink, #1B1F33); border-radius: 999px; padding: 0 16px 0 6px; min-height: 48px; font-weight: 700; font-size: 11px; box-shadow: 3px 3px 0 var(--ink, #1B1F33); opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 600ms cubic-bezier(.16,1,.3,1);">
+    <span style="width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--acc, #FF5FB2); border: 2px solid var(--ink, #1B1F33); font-family: 'VT323', monospace; font-size: 18px; color: #FFFFFF;">27</span>
+    <span>pase 027 · 3 personas</span>
+  </div>
+
+  <!-- música -->
+  <button ref="{{ setMusicBtn }}" onClick="{{ toggleMusic }}" style="position: absolute; right: 56px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 4; width: 52px; height: 52px; border-radius: 50%; border: 2px solid var(--ink, #1B1F33); background: var(--acc4, #7DF29B); color: var(--ink, #1B1F33); cursor: pointer; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding: 0 0 15px; box-shadow: inset 0 5px 0 rgba(255,255,255,.5), 3px 3px 0 var(--ink, #1B1F33); opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 600ms cubic-bezier(.16,1,.3,1);">
+    <span data-eq="1" style="width: 4px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; transform: scaleY(.3);"></span><span data-eq="1" style="width: 4px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; transform: scaleY(.6);"></span><span data-eq="1" style="width: 4px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; transform: scaleY(.4);"></span>
+  </button>
+
+  <!-- preloader · encendiendo -->
+  <div ref="{{ setLoader }}" style="position: absolute; inset: 0; z-index: 9; display: grid; grid-template-columns: repeat(4, 1fr);">
+    <div data-col="1" style="background: var(--acc, #FF5FB2); transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: var(--acc2, #C7A6FF); transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: var(--acc3, #8FD3FF); transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: var(--acc4, #7DF29B); transform-origin: top; will-change: transform;"></div>
+    <div ref="{{ setCounter }}" style="position: absolute; right: 22px; bottom: calc(22px + env(safe-area-inset-bottom)); font-family: 'VT323', monospace; font-size: clamp(64px, 18vw, 140px); color: var(--ink, #1B1F33); line-height: 1;">0%</div>
+    <div style="position: absolute; left: 22px; top: calc(22px + env(safe-area-inset-top)); font-family: 'VT323', monospace; font-size: 20px; color: var(--ink, #1B1F33);">Y2K · encendiendo<span style="animation: ykBlink .7s steps(1) infinite;">_</span></div>
+  </div>
+
+  </sc-if>
+
+  <!-- HANDOFF -->
+  <sc-if value="{{ vistaHandoff }}" hint-placeholder-val="{{ false }}">
+  <div style="position: absolute; inset: 0; overflow: auto; background: #DDE6F2; color: #1B1F33; padding: 40px max(22px, calc((100% - 760px) / 2)) 80px; font-family: 'Comfortaa', sans-serif; font-size: 13px; line-height: 1.6;">
+    <div style="font-family: 'VT323', monospace; font-size: 18px; color: #FF5FB2;">handoff — Y2K · colección tipográfica editorial</div>
+    <h1 style="margin: 12px 0 28px; font-family: 'Baloo 2', cursive; font-weight: 800; font-size: 72px; line-height: .95; letter-spacing: -.02em; color: #FFFFFF; -webkit-text-stroke: 2px #1B1F33; paint-order: stroke fill;">y2k
+>
+    <h2 style="margin: 0 0 10px; font-weight: 700; font-size: 24px;">fuentes</h2>
+    <p style="margin: 0 0 24px;"><strong>Baloo 2</strong> 800 (nombre y titulares, siempre en minúscula): redonda e inflada, con relleno "cromo" de dos bandas (blanco / gris azulado) + trazo 2 px tinta. <strong>Comfortaa</strong> 500–700 (texto, botones, burbujas). <strong>VT323</strong> (pantalla LCD: kickers, folios, contador, datos técnicos).</p>
+    <h2 style="margin: 0 0 10px; font-weight: 700; font-size: 24px;">variantes</h2>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
+      <sc-for list="{{ variantesInfo }}" as="v" hint-placeholder-count="5">
+        <div style="display: grid; grid-template-columns: 110px repeat(6, 1fr); gap: 4px; align-items: center; font-family: 'VT323', monospace; font-size: 14px;">
+          <span style="font-family: 'Comfortaa', sans-serif; font-weight: 700; font-size: 13px;">{{ v.nombre }}</span>
+          <span style="background: {{ v.bg }}; border: 1px solid #1B1F33; padding: 6px 2px; text-align: center;">{{ v.bg }}</span>
+          <span style="background: {{ v.acc }}; padding: 6px 2px; text-align: center;">{{ v.acc }}</span>
+          <span style="background: {{ v.acc2 }}; padding: 6px 2px; text-align: center;">{{ v.acc2 }}</span>
+          <span style="background: {{ v.acc3 }}; padding: 6px 2px; text-align: center;">{{ v.acc3 }}</span>
+          <span style="background: {{ v.acc4 }}; padding: 6px 2px; text-align: center;">{{ v.acc4 }}</span>
+          <span style="background: {{ v.lcd }}; border: 1px solid #1B1F33; padding: 6px 2px; text-align: center;">{{ v.lcd }}</span>
+        </div>
+      </sc-for>
+      <span style="font-size: 11px; opacity: .7;">columnas: fondo · acento 1 (rosa: check-in, CTA) · acento 2 (lila: Save the Date) · acento 3 (celeste: Frase) · acento 4 (verde: quiz, sí) · LCD. Tinta #1B1F33, cromo #F4F6FA / #B9C3D6 y neutros del álbum fijos.</span>
+    </div>
+    <h2 style="margin: 0 0 10px; font-weight: 700; font-size: 24px;">recursos</h2>
+    <pre style="margin: 0 0 24px; padding: 14px; background: #1B1F33; color: #C9E4A8; font-family: 'VT323', monospace; font-size: 17px; line-height: 1.4; white-space: pre-wrap; overflow: auto;">barra de estado:   píldora cromo con señal (4 barras, las dos altas titilan) y batería (3 celdas verdes)
+LCD:               fondo #C9E4A8 + inset box-shadow 4px al 8 %; dígitos VT323
+burbujas SMS:      radius 18/18/18/4 (recibido) y 18/18/4/18 (enviado); bordes 2–3 px tinta
+cromo del nombre:  linear-gradient(180deg, #FFF 0 48%, #B9C3D6 48% 100%) + background-clip text + text-stroke 2px
+sparkles:          path de 4 puntas (40×40), 8 instancias que escalan .6↔1.1 y rotan 45°, con data-drift
+mariposa:          4 alas (path) + cuerpo (line); aletea con scaleX .6↔1 en 2.2 s
+botones 3D:        inset 0 6px 0 blanco al 35–50 % + sombra dura 3–4 px tinta
+pixel de foto:     pattern 10×10 con rect que encoge 10 → 0 según progreso; estático 4 px
+sello enviado:     flor de 12 pétalos verde + "enviado ✓✓"</pre>
+    <h2 style="margin: 0 0 10px; font-weight: 700; font-size: 24px;">animaciones clave</h2>
+    <div style="display: flex; flex-direction: column; border-top: 2px solid #1B1F33; margin-bottom: 24px;">
+      <sc-for list="{{ animaciones }}" as="a" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 10px 0; border-bottom: 2px dotted #B9C3D6;"><span style="font-weight: 700;">{{ a.n }}</span><span style="font-size: 12px;">{{ a.d }}</span></div>
+      </sc-for>
+    </div>
+    <h2 style="margin: 0 0 10px; font-weight: 700; font-size: 24px;">convenciones</h2>
+    <p style="margin: 0;">data-xin + data-dist (+ data-delay, + data-rot) en entradas; data-w en la frase; data-drift en discos, sparkles y mariposa; data-tone / data-screen-label por pantalla; data-scroller, data-pan / data-strip / data-dot en paneles; data-piece en el nombre; data-colorwash en el álbum. Reduced-motion: sin parpadeos, sparkles ni aleteo; reveals en estado final.</p>
+  </div>
+  </sc-if>
+</div></x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932},&quot;variante&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;bubblegum&quot;,&quot;options&quot;:[&quot;bubblegum&quot;,&quot;frutilla&quot;,&quot;cielo&quot;,&quot;lima&quot;,&quot;lavanda&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Color&quot;},&quot;nombreLargo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Portada&quot;},&quot;scrollVertical&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cuándo y dónde&quot;},&quot;ceremonia&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cuándo y dónde&quot;},&quot;postEvento&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Estado&quot;},&quot;vista&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;invitacion&quot;,&quot;options&quot;:[&quot;invitacion&quot;,&quot;handoff&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;onConfirmed&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(data: {attending: boolean; count: number}) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  refs = {};
+  state = { count: 3, yes: true, confirmed: false, votes: [23, 11, 6], q: 0, picked: -1, music: false, copied: {} };
+  set(k) { return (el) => { this.refs[k] = el; }; }
+
+  static VARIANTES = {
+    bubblegum: { nombre: 'Bubblegum', bg: '#DDE6F2', acc: '#FF5FB2', acc2: '#C7A6FF', acc2b: '#8A5CF5', acc3: '#8FD3FF', acc4: '#7DF29B', lcd: '#C9E4A8' },
+    frutilla:  { nombre: 'Frutilla',  bg: '#FFE3EE', acc: '#FF3D8A', acc2: '#FFB3D1', acc2b: '#D9257A', acc3: '#FFD6A8', acc4: '#B8F28A', lcd: '#FFF0B8' },
+    cielo:     { nombre: 'Cielo',     bg: '#E4F3FF', acc: '#3FA9FF', acc2: '#B5E1FF', acc2b: '#1E6FD9', acc3: '#C9B8FF', acc4: '#7DF29B', lcd: '#D6F2FF' },
+    lima:      { nombre: 'Lima',      bg: '#EAF7DD', acc: '#8BE03A', acc2: '#FFF176', acc2b: '#5CA31A', acc3: '#8FD3FF', acc4: '#FF9ECF', lcd: '#DDF7B8' },
+    lavanda:   { nombre: 'Lavanda',   bg: '#EEE6FF', acc: '#A66CFF', acc2: '#FFB8E6', acc2b: '#7A3FE0', acc3: '#B8F0FF', acc4: '#C9F27D', lcd: '#E6DBFF' },
+  };
+
+  static QUIZ = [
+    { q: '¿cuál es mi tono de llamada?', o: ['Nokia tune', 'Crazy Frog', 'Toxic'], ok: 2 },
+    { q: '¿qué materia odio en el colegio?', o: ['Matemática', 'Química', 'Historia'], ok: 1 },
+    { q: '¿a dónde quiero viajar a los 18?', o: ['Nueva York', 'Disney', 'Tokio'], ok: 1 },
+  ];
+
+  renderVals() {
+    const p = this.props;
+    const vertical = !!p.scrollVertical, ceremonia = p.ceremonia !== false, vista = p.vista || 'invitacion', long = !!p.nombreLargo;
+    const V = Component.VARIANTES;
+    const P = 'var(--acc, #FF5FB2)', L = 'var(--acc2, #C7A6FF)', C = 'var(--acc3, #8FD3FF)', G = 'var(--acc4, #7DF29B)';
+    const cols = ['#FFFFFF', P, L, C, G];
+    const sparkles = [[8, 8, 26], [84, 12, 20], [22, 36, 14], [70, 28, 30], [92, 48, 16], [6, 56, 20], [50, 6, 12], [40, 44, 10]].map(([x, y, s], i) => ({ x: x + '%', y: y + '%', size: s + 'px', c: cols[i % 5], dur: (2 + (i % 3) * .5).toFixed(1) + 's', delay: (i * .3).toFixed(2) + 's', drift: [4, -6, 8, -4, 6, -8, 3, 5][i] }));
+
+    const cuenta = [
+      { label: 'días', ref: this.set('d'), dist: -80, delay: 0 }, { label: 'horas', ref: this.set('h'), dist: 80, delay: 100 },
+      { label: 'min', ref: this.set('m'), dist: -80, delay: 200 }, { label: 'seg', ref: this.set('s'), dist: 80, delay: 300 },
+    ];
+
+    const salon = { kicker: 'contacto 1', sub: 'el salón', titulo: 'Palacio Sans Souci', bg: 'var(--bg, #DDE6F2)', acc: P, cta: 'cómo llegar', pie: 'Alsina 1035 · Victoria · Buenos Aires', dist: -80, rot: -3,
+      lineas: [{ k: 'recepción', v: '21:00 h' }, { k: 'dirección', v: 'Alsina 1035, Victoria' }, { k: 'dress code', v: 'Y2K glam' }] };
+    const cer = { kicker: 'contacto 2', sub: 'la ceremonia', titulo: 'Misa de acción de gracias', bg: 'var(--acc2, #C7A6FF)', acc: C, cta: 'cómo llegar', pie: 'Parroquia San Isidro Labrador · 19:00 h', dist: 80, rot: 3,
+      lineas: [{ k: 'hora', v: '19:00 h' }, { k: 'dirección', v: 'Av. del Libertador 16200, San Isidro' }, { k: 'llegá', v: '15 min antes' }] };
+    const crono = { kicker: 'contacto 3', sub: 'cronograma', titulo: 'La noche', bg: 'var(--acc3, #8FD3FF)', acc: G, cta: '+ agenda', pie: 'cronogramaEventos · 5 momentos', dist: -80, rot: -2,
+      lineas: [{ k: '21:00', v: 'Recepción' }, { k: '22:00', v: 'Entrada y vals' }, { k: '23:00', v: 'Cena' }, { k: '00:30', v: 'Carnaval carioca' }, { k: '05:00', v: 'Cierre' }] };
+    const paneles = ceremonia ? [salon, cer, crono] : [salon, crono];
+    paneles.forEach((x, i) => { x.folio = String(i + 1).padStart(2, '0') + '/' + String(paneles.length).padStart(2, '0'); });
+
+    const tints = ['rgba(255,95,178,.5)', 'rgba(143,211,255,.55)', 'rgba(199,166,255,.55)', 'rgba(125,242,155,.5)', 'rgba(255,95,178,.35)'];
+    const fotos = [
+      { n: '0015', col: '1 / 4', row: '1 / 3', tint: tints[0], acc: P }, { n: '0016', col: '4 / 7', row: '1 / 2', tint: tints[1], acc: C },
+      { n: '0017', col: '4 / 6', row: '2 / 3', tint: tints[2], acc: L }, { n: '0018', col: '6 / 7', row: '2 / 3', tint: tints[3], acc: G },
+      { n: '0019', col: '1 / 7', row: '3 / 4', tint: tints[4], acc: P },
+    ];
+
+    const songs = [['Toxic', 'Britney Spears', P], ['Tacones rojos', 'Sebastián Yatra', C], ['Bzrp Session #53', 'Bizarrap, Shakira', G]];
+    const canciones = songs.map(([t, a, acc], i) => ({ n: i + 1, t, a, acc, v: this.state.votes[i], vote: () => this.setState((s) => { const votes = s.votes.slice(); votes[i]++; return { votes }; }) }));
+
+    const cp = this.state.copied;
+    const mk = (id, k, banco, alias, cbu, titular, dist, delay, acc) => ({ k, banco, alias, cbu, titular, dist, delay, acc,
+      aliasLabel: cp[id + 'a'] ? 'copiado ✓' : 'copiar', cbuLabel: cp[id + 'c'] ? 'copiado ✓' : 'copiar',
+      copyAlias: () => this.copy(id + 'a', alias), copyCbu: () => this.copy(id + 'c', cbu) });
+    const bancos = [
+      mk('r', 'regalo · viaje a Disney', 'Banco Galicia', 'VALE.QUINCE.Y2K', '0070099030004012345678', 'Carolina Pérez', 60, 160, P),
+      mk('t', 'pago de tarjeta', 'Mercado Pago', 'FIESTA.VALE.XV', '0000003100012345678901', 'Martín Suárez', -60, 240, C),
+    ];
+
+    const Q = Component.QUIZ[this.state.q];
+    const opciones = Q.o.map((t, i) => {
+      const picked = this.state.picked === i, ok = i === Q.ok, done = this.state.picked >= 0;
+      return { t, pick: () => this.answer(i), bg: picked ? (ok ? 'var(--ink, #1B1F33)' : P) : '#FFFFFF', fg: picked ? '#FFFFFF' : 'var(--ink, #1B1F33)',
+        tag: done ? (ok ? '✓ sí!' : (picked ? 'casi' : '')) : String.fromCharCode(97 + i) + ')' };
+    });
+
+    const animaciones = [
+      { n: 'encendiendo', d: 'contador 0→100 % en 1000 ms con cursor _; cortina 4 columnas (rosa, lila, celeste, verde) scaleY 1→0, 500 ms, stagger 80 ms, cubic-bezier(.7,0,.2,1)' },
+      { n: 'nombre', d: 'translateY 320px→0 + opacity, 1400 ms, cubic-bezier(.16,1,.3,1); arranca 260 ms tras la cortina' },
+      { n: 'letras vivas', d: 'cada 3200 ms una letra "rebota": scale 1→1.2→1 + rotate ±8°, 500 ms, cubic-bezier(.34,1.56,.64,1)' },
+      { n: 'sparkles', d: '8 destellos scale .6↔1.1 + rotate 0↔45°, 2–3 s, delay i×300 ms, con data-drift; mariposa aletea 2.2 s' },
+      { n: 'barra de estado', d: 'dos barras de señal titilan opacity .3↔1 en 1.4 s' },
+      { n: 'hero fijo', d: 'sticky top:0; translateY 0.08 × scroll; discos data-drift 4 / −6 + mouse/giroscopio' },
+      { n: 'entradas (data-xin)', d: 'opacity 0→1 + translateX(dist) (+ rotate(rot)), 900 ms, cubic-bezier(.16,1,.3,1); disparo a 0.92 vh' },
+      { n: 'agenda', d: '15 / MAYO / 2027 con dist −160 / +160 / −160 y delays 0 / 120 / 240 ms' },
+      { n: 'foto pixel', d: 'píxel del pattern 10 → 0 según progreso en viewport (0.15→0.75); estático 4 px' },
+      { n: 'marquesinas', d: '80 px/s, dos direcciones; pausadas con reduced-motion' },
+      { n: 'reloj LCD', d: 'cuatro pantallas entran alternadas ±80 px; segundos cambian secos (sin transición)' },
+      { n: 'chat (data-w)', d: 'palabra: opacity 0→1 + scale .8→1, 400 ms, stagger 90 ms, rebote; "escribiendo..." parpadea' },
+      { n: 'paneles pineados', d: 'strip translateX = −p × (n−1) × vw con suavizado 0.14 por frame; punto activo opacity 1' },
+      { n: 'enviado ✓✓', d: 'flor: scale 1.9→1, translateY −120→0, rotate 18→−8 °, 700 ms, cubic-bezier(.34,1.56,.64,1)' },
+      { n: 'ringtone', d: 'campana rotate ±12° con rebote 2.4 s' },
+      { n: 'álbum color', d: 'colorwash opacity 0→1 por foto según cercanía al centro horizontal (|dx| < 0.35 vw)' },
+    ];
+
+    return {
+      vistaInvitacion: vista === 'invitacion', vistaHandoff: vista === 'handoff',
+      nombreCorto: !long, nombreLargo: long, modoLateral: !vertical, modoVertical: vertical,
+      sparkles, cuenta, paneles, fotos, canciones, bancos, opciones, animaciones, variantesInfo: Object.values(V),
+      setRoot: this.set('root'), setScroller: this.set('scroller'), setHero: this.set('hero'), setKicker: this.set('kicker'),
+      setPhotoWrap: this.set('photoWrap'), setHtDot: this.set('htDot'), setMarq1: this.set('marq1'), setMarq2: this.set('marq2'),
+      setPhrase: this.set('phrase'), setCoupon: this.set('coupon'), setStatus: this.set('status'), setSticker: this.set('sticker'),
+      setYes: this.set('yes'), setNo: this.set('no'), setCount: this.set('count'), setAlbumKicker: this.set('albumKicker'),
+      setQn: this.set('qn'), setQ: this.set('qEl'),
+      setRail: this.set('rail'), setRailTop: this.set('railTop'), setRailLabel: this.set('railLabel'), setRailBar: this.set('railBar'),
+      setBubble: this.set('bubble'), setMusicBtn: this.set('musicBtn'), setLoader: this.set('loader'), setCounter: this.set('counter'),
+      open: () => this.open(), replay: () => this.replay(), confirm: () => this.confirm(),
+      pickYes: () => this.setState({ yes: true }), pickNo: () => this.setState({ yes: false }),
+      inc: () => this.setState((s) => ({ count: Math.min(9, s.count + 1) })), dec: () => this.setState((s) => ({ count: Math.max(1, s.count - 1) })),
+      toggleMusic: () => this.setState((s) => ({ music: !s.music })),
+    };
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.applyVariant(); this.prepareReveals(); this.preparePhrase(); this.tick();
+    this.timer = setInterval(() => this.tick(), 1000);
+    this.ticker = setInterval(() => this.frame(), 16);
+    this.onMouse = (e) => { this.mouse = { x: e.clientX / window.innerWidth - .5, y: e.clientY / window.innerHeight - .5 }; };
+    window.addEventListener('mousemove', this.onMouse, { passive: true });
+    this.applyPost(); this.frame();
+  }
+  componentDidUpdate(prev) {
+    if (prev.variante !== this.props.variante) this.applyVariant();
+    if (prev.scrollVertical !== this.props.scrollVertical || prev.ceremonia !== this.props.ceremonia || prev.nombreLargo !== this.props.nombreLargo) {
+      this.reveals = null; this.pans = null; this.drifts = null;
+      setTimeout(() => { this.prepareReveals(); this.introPieces(true); this.frame(); }, 30);
+    }
+    if (prev.postEvento !== this.props.postEvento) this.applyPost();
+    this.syncState();
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer); clearInterval(this.ticker); clearInterval(this.letterTimer);
+    window.removeEventListener('mousemove', this.onMouse);
+    if (this.attached && this.onScroll) this.attached.removeEventListener('scroll', this.onScroll);
+  }
+
+  applyVariant() {
+    const v = Component.VARIANTES[this.props.variante] || Component.VARIANTES.bubblegum, r = this.refs.root; if (!r) return;
+    ['bg', 'acc', 'acc2', 'acc2b', 'acc3', 'acc4', 'lcd'].forEach((k) => r.style.setProperty('--' + k, v[k]));
+    r.style.setProperty('--ink', '#1B1F33'); r.style.setProperty('--chrome', '#F4F6FA'); r.style.setProperty('--chrome2', '#B9C3D6');
+  }
+  applyPost() {
+    const sc = this.refs.scroller; if (!sc) return;
+    const post = !!this.props.postEvento;
+    Array.from(sc.children).forEach((el) => { const l = el.dataset.screenLabel; if (l === 'Álbum' || l === 'Bienvenida') return; el.style.display = post ? 'none' : ''; });
+    if (this.refs.albumKicker) this.refs.albumKicker.textContent = post ? 'hoja 02/02 — momentos' : 'hoja 02/02 — después de la fiesta';
+  }
+  syncState() {
+    const { yes, no, count, status, coupon } = this.refs;
+    if (yes) yes.style.background = this.state.yes ? 'var(--acc4, #7DF29B)' : '#FFFFFF';
+    if (no) no.style.background = !this.state.yes ? 'var(--acc4, #7DF29B)' : '#FFFFFF';
+    if (count) count.textContent = this.state.count;
+    if (status) status.textContent = this.state.confirmed ? 'enviado ✓✓' : 'borrador';
+    if (coupon) coupon.style.borderColor = this.state.confirmed ? 'var(--acc4, #7DF29B)' : 'var(--ink, #1B1F33)';
+    const btn = this.refs.musicBtn;
+    if (btn) btn.querySelectorAll('[data-eq]').forEach((b, i) => { b.style.animation = this.state.music && !this.reduced ? 'ykEq 1s ease-in-out ' + (i * .18) + 's infinite' : 'none'; });
+    if (this.refs.qn) this.refs.qn.textContent = this.state.q + 1;
+    if (this.refs.qEl) this.refs.qEl.textContent = Component.QUIZ[this.state.q].q;
+  }
+
+  preloader() {
+    const { loader, counter } = this.refs; if (!loader) return;
+    const cols = Array.from(loader.querySelectorAll('[data-col]'));
+    if (this.reduced) { loader.style.display = 'none'; this.introPieces(true); return; }
+    const t0 = performance.now();
+    const step = (t) => { const p = Math.min(1, (t - t0) / 1000); if (counter) counter.textContent = Math.round(p * 100) + '%'; if (p < 1) requestAnimationFrame(step); else this.curtain(cols, loader); };
+    requestAnimationFrame(step);
+  }
+  curtain(cols, loader) {
+    if (this.refs.counter) this.refs.counter.style.opacity = 0;
+    cols.forEach((c, i) => { c.style.transition = 'transform 500ms cubic-bezier(.7,0,.2,1) ' + (i * 80) + 'ms'; c.style.transform = 'scaleY(0)'; });
+    setTimeout(() => { loader.style.display = 'none'; }, 800);
+    setTimeout(() => this.introPieces(), 260);
+  }
+
+  introPieces(instant) {
+    const hero = this.refs.hero; if (!hero) return;
+    const pieces = Array.from(hero.querySelectorAll('[data-piece]'));
+    pieces.forEach((p, i) => {
+      if (!p.dataset.split) this.splitLetters(p);
+      if (instant || this.reduced) { p.style.transform = 'none'; p.style.opacity = 1; return; }
+      p.style.transition = 'none'; p.style.transform = 'translate3d(0,320px,0)'; p.style.opacity = 0;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        p.style.transition = 'transform 1400ms cubic-bezier(.16,1,.3,1) ' + (i * 150) + 'ms, opacity 900ms ease ' + (i * 150) + 'ms';
+        p.style.transform = 'translate3d(0,0,0)'; p.style.opacity = 1;
+      }));
+    });
+    this.fitName();
+    const k = this.refs.kicker;
+    if (k && !instant && !this.reduced) { k.style.opacity = 0; k.style.transition = 'opacity 800ms ease 900ms'; requestAnimationFrame(() => { k.style.opacity = 1; }); }
+    clearInterval(this.letterTimer);
+    if (!this.reduced) this.letterTimer = setInterval(() => this.bounceLetter(), 3200);
+  }
+  fitName() {
+    const hero = this.refs.hero; if (!hero) return;
+    const h1 = hero.querySelector('[data-hero-name]'); if (!h1) return;
+    if (h1.dataset.fs == null) h1.dataset.fs = h1.style.fontSize || '';
+    h1.style.fontSize = h1.dataset.fs;
+    const avail = (h1.parentElement ? h1.parentElement.clientWidth : h1.clientWidth) - 4; if (!(avail > 0)) return;
+    const widest = Math.max.apply(null, Array.from(h1.querySelectorAll('[data-piece]')).map((p) => p.scrollWidth));
+    if (widest > avail) { const cur = parseFloat(getComputedStyle(h1).fontSize); h1.style.fontSize = Math.floor(cur * avail / widest * .98) + 'px'; }
+  }
+  splitLetters(piece) {
+    piece.dataset.split = '1';
+    const bg = getComputedStyle(piece.closest('[data-hero-name]')).backgroundImage;
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          Array.from(n.textContent).forEach((ch) => {
+            if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+            const w = document.createElement('span'); w.dataset.letter = '1'; w.textContent = ch;
+            w.style.cssText = 'display:inline-block;will-change:transform;background:' + bg + ';-webkit-background-clip:text;background-clip:text;color:transparent;';
+            frag.appendChild(w);
+          });
+          n.parentNode.replaceChild(frag, n);
+        } else if (n.nodeType === 1) walk(n);
+      });
+    };
+    walk(piece);
+  }
+  bounceLetter() {
+    const hero = this.refs.hero; if (!hero || this.bouncing) return;
+    const letters = Array.from(hero.querySelectorAll('[data-letter]')).filter((l) => /\p{L}/u.test(l.textContent));
+    if (!letters.length) return;
+    const w = letters[Math.floor(Math.random() * letters.length)], rot = Math.random() < .5 ? -8 : 8;
+    this.bouncing = 1;
+    w.style.transition = 'transform 250ms cubic-bezier(.16,1,.3,1)'; w.style.transform = 'scale(1.2) rotate(' + rot + 'deg)';
+    setTimeout(() => { w.style.transition = 'transform 500ms cubic-bezier(.34,1.56,.64,1)'; w.style.transform = 'none'; }, 260);
+    setTimeout(() => { this.bouncing = 0; }, 800);
+  }
+
+  open() {
+    const sc = this.refs.scroller; if (!sc) return;
+    sc.style.overflowY = 'auto'; this.opened = 1;
+    if (this.reduced) sc.scrollTop = sc.clientHeight; else this.smoothTo(sc, sc.clientHeight, 1100);
+    setTimeout(() => { ['rail', 'bubble', 'musicBtn'].forEach((k) => { const el = this.refs[k]; if (el) { el.style.opacity = 1; el.style.transform = 'none'; } }); }, 700);
+    this.askGyro();
+  }
+  replay() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.smoothTo(sc, 0, 900);
+    setTimeout(() => { sc.style.overflowY = 'hidden'; this.opened = 0; ['rail', 'bubble', 'musicBtn'].forEach((k) => { const el = this.refs[k]; if (el) el.style.opacity = 0; }); this.introPieces(); }, 950);
+  }
+  smoothTo(sc, y, ms) {
+    const y0 = sc.scrollTop, t0 = performance.now(), ease = (t) => 1 - Math.pow(1 - t, 4);
+    const step = (t) => { const p = Math.min(1, (t - t0) / ms); sc.scrollTop = y0 + (y - y0) * ease(p); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+  askGyro() {
+    if (this.gyro || typeof DeviceOrientationEvent === 'undefined') return;
+    const start = () => { this.gyro = 1; window.addEventListener('deviceorientation', (e) => { if (e.gamma == null) return; this.mouse = { x: Math.max(-.5, Math.min(.5, e.gamma / 60)), y: Math.max(-.5, Math.min(.5, (e.beta - 45) / 90)) }; }, { passive: true }); };
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().then((r) => { if (r === 'granted') start(); }).catch(() => {});
+    else if ('ontouchstart' in window) start();
+  }
+
+  attach(sc) {
+    if (this.attached === sc) return;
+    this.attached = sc; this.onScroll = () => this.frame();
+    sc.addEventListener('scroll', this.onScroll, { passive: true }); window.addEventListener('resize', () => { this.onScroll(); this.fitName(); });
+  }
+  frame() { try { this.frameBody(); } catch (e) { if (!this.errLogged) { this.errLogged = 1; console.error(e); } } }
+  frameBody() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.attach(sc);
+    if (!this.preStarted && this.refs.loader && this.refs.hero) { this.preStarted = 1; this.preloader(); }
+    const vh = sc.clientHeight, vw = sc.clientWidth, y = sc.scrollTop;
+    if (!this.pans) this.pans = Array.from(sc.querySelectorAll('[data-pan]'));
+    if (!this.reveals) this.prepareReveals();
+    this.checkReveals(vh);
+
+    const hero = this.refs.hero;
+    if (hero) {
+      const m = this.mouse || { x: 0, y: 0 }, par = window.innerWidth >= 1024 || this.gyro ? m : { x: 0, y: 0 };
+      hero.style.transform = 'translate3d(0,' + (y * 0.08) + 'px,0)';
+      if (!this.drifts) this.drifts = Array.from(hero.querySelectorAll('[data-drift]')).filter((d) => !(d.getAttribute('style') || '').includes('animation:'));
+      const k = Math.min(1, y / vh);
+      this.drifts.forEach((d) => { const f = parseFloat(d.dataset.drift) || 0; d.style.transform = 'translate3d(' + (par.x * f * 1.5) + 'px,' + (k * f * 8 + par.y * f) + 'px,0)'; });
+    }
+
+    if (!this.panPos) this.panPos = [];
+    this.pans.forEach((pan, pi) => {
+      const strip = pan.querySelector('[data-strip]'); if (!strip) return;
+      const n = strip.children.length, span = pan.offsetHeight - vh;
+      const p = span > 0 ? Math.min(1, Math.max(0, (y - pan.offsetTop) / span)) : 0;
+      const prev = this.panPos[pi], eased = prev == null || this.reduced ? p : prev + (p - prev) * 0.14;
+      this.panPos[pi] = Math.abs(p - eased) < .0004 ? p : eased;
+      strip.style.transform = 'translate3d(' + (-eased * (n - 1) * vw) + 'px,0,0)';
+      const active = Math.min(n - 1, Math.round(eased * (n - 1)));
+      pan.querySelectorAll('[data-dot]').forEach((d, i) => { d.style.opacity = i === active ? '1' : '.3'; });
+      strip.querySelectorAll('[data-sheet]').forEach((s) => {
+        const r = s.getBoundingClientRect(), dx = Math.abs((r.left + r.width / 2) / vw - .5);
+        const wash = s.querySelector('[data-colorwash]'); if (wash) wash.style.opacity = Math.max(0, Math.min(1, 1 - (dx - .1) / .3));
+      });
+    });
+
+    const pw = this.refs.photoWrap, dot = this.refs.htDot;
+    if (pw && dot) {
+      const r = pw.getBoundingClientRect(), prog = 1 - (r.top + r.height / 2) / vh;
+      const t = this.reduced ? .6 : Math.min(1, Math.max(0, (prog - .15) / .6));
+      const sz = Math.round(10 * (1 - t)); dot.setAttribute('width', sz); dot.setAttribute('height', sz);
+    }
+    [this.refs.marq1, this.refs.marq2].forEach((m) => { if (m && !m.dataset.timed) { const w = m.scrollWidth / 2; if (w) { m.style.animationDuration = (w / 80).toFixed(1) + 's'; m.dataset.timed = '1'; } } });
+    this.updateRail(sc);
+  }
+  updateRail(sc) {
+    const max = sc.scrollHeight - sc.clientHeight, p = max > 0 ? Math.min(1, sc.scrollTop / max) : 0;
+    if (this.refs.railBar) this.refs.railBar.style.height = (p * 100) + '%';
+    const secs = Array.from(sc.children).filter((s) => s.style.display !== 'none');
+    const mid = sc.scrollTop + sc.clientHeight / 2; let cur = secs[0], idx = 0;
+    secs.forEach((s, i) => { if (s.offsetTop <= mid) { cur = s; idx = i; } });
+    if (!cur) return;
+    const label = (cur.dataset.screenLabel || '').toLowerCase();
+    if (this.refs.railLabel && this.refs.railLabel.textContent !== label) this.refs.railLabel.textContent = label;
+    if (this.refs.railTop) this.refs.railTop.textContent = String(idx).padStart(2, '0');
+    let tone = cur.dataset.tone;
+    if (!tone) { const strip = cur.querySelector('[data-strip]'); if (strip) { const i = Math.min(strip.children.length - 1, Math.round(Math.abs(parseFloat(strip.style.transform.replace(/[^-\d.]/g, '')) || 0) / (sc.clientWidth || 1))); tone = strip.children[i] ? strip.children[i].dataset.tone : 'light'; } }
+    const rail = this.refs.rail; if (rail) rail.style.color = tone === 'dark' ? '#FFFFFF' : 'var(--ink, #1B1F33)';
+  }
+
+  prepareReveals() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.reveals = Array.from(sc.querySelectorAll('[data-xin]')).filter((el) => !el.dataset.shown);
+    this.reveals.forEach((el) => {
+      if (this.reduced) { el.dataset.shown = '1'; return; }
+      const d = el.dataset.dist != null ? parseFloat(el.dataset.dist) : 60, rot = parseFloat(el.dataset.rot || 0);
+      el.dataset.base = el.style.transform || '';
+      el.style.opacity = 0;
+      el.style.transform = 'translate3d(' + d + 'px,' + (d === 0 ? 40 : 0) + 'px,0) rotate(' + rot + 'deg)';
+      el.style.transition = 'opacity 700ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1)';
+      el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+    });
+  }
+  preparePhrase() {
+    const ph = this.refs.phrase; if (!ph || this.reduced) return;
+    this.words = Array.from(ph.querySelectorAll('[data-w]'));
+    this.words.forEach((w) => { w.style.display = 'inline-block'; w.style.opacity = 0; w.style.transform = 'scale(.8)'; w.style.transition = 'opacity 400ms ease, transform 400ms cubic-bezier(.34,1.56,.64,1)'; });
+  }
+  checkReveals(vh) {
+    const pending = this.reveals || [];
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const el = pending[i];
+      if (!el.isConnected) { pending.splice(i, 1); continue; }
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) { el.style.opacity = 1; el.style.transform = el.dataset.base || 'none'; el.dataset.shown = '1'; pending.splice(i, 1); }
+    }
+    const ph = this.refs.phrase;
+    if (ph && !this.phraseDone && this.words) {
+      const r = ph.getBoundingClientRect();
+      if (r.top < vh * 0.8 && r.bottom > 0) { this.phraseDone = 1; this.words.forEach((w, i) => { w.style.transitionDelay = (i * 90) + 'ms'; w.style.opacity = 1; w.style.transform = 'none'; }); }
+    }
+  }
+
+  tick() {
+    const ms = Math.max(0, new Date('2027-05-15T21:00:00') - new Date());
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60, p = (n) => String(n).padStart(2, '0');
+    if (this.refs.d) this.refs.d.textContent = d;
+    if (this.refs.h) this.refs.h.textContent = p(h);
+    if (this.refs.m) this.refs.m.textContent = p(m);
+    if (this.refs.s) this.refs.s.textContent = p(s);
+  }
+
+  confirm() {
+    if (this.state.confirmed) return;
+    this.setState({ confirmed: true });
+    const st = this.refs.sticker;
+    if (st) { st.style.transition = this.reduced ? 'none' : 'transform 700ms cubic-bezier(.34,1.56,.64,1), opacity 300ms ease'; st.style.opacity = 1; st.style.transform = 'rotate(-8deg) scale(1) translateY(0)'; }
+    if (typeof this.props.onConfirmed === 'function') this.props.onConfirmed({ attending: this.state.yes, count: this.state.count });
+  }
+  answer(i) {
+    if (this.state.picked >= 0) return;
+    this.setState({ picked: i });
+    setTimeout(() => this.setState((s) => ({ picked: -1, q: (s.q + 1) % Component.QUIZ.length })), 1400);
+  }
+  copy(id, text) {
+    try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
+    this.setState((s) => ({ copied: Object.assign({}, s.copied, { [id]: true }) }));
+    setTimeout(() => this.setState((s) => { const c = Object.assign({}, s.copied); delete c[id]; return { copied: c }; }), 1600);
+  }
+}
+</script>
+</body>
+</html>

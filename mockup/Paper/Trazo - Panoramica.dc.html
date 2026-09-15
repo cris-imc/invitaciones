@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* En el port va tal cual, con la ruta canónica del repo:
+   @font-face{ font-family:'Final Parade Script';
+               src:url('/fonts/final-parade-script.woff2') format('woff2');
+               font-weight:400; font-display:swap; }
+   Acá la cara se registra en componentDidMount resuelta contra el documento,
+   porque el canvas del mockup no sirve la raíz del proyecto. */
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:#E9E4DA;font-family:'Jost',sans-serif;color:#514842;}
+a{color:#514842;text-decoration:none;}
+a:hover{color:#8A756D;}
+@keyframes desdobla{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes prensado{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes splashSale{from{opacity:1}to{opacity:0}}
+@keyframes portadaSube{from{transform:translateY(24px)}to{transform:translateY(0)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
+</style>
+</helmet>
+
+<div style="max-width:1520px;margin:0 auto;padding:26px 20px 90px;">
+
+  <div style="max-width:880px;margin:0 0 22px;">
+    <p style="font:500 10px/1 'Jost',sans-serif;letter-spacing:.39em;text-transform:uppercase;color:#8A756D;margin:0 0 12px;">Papel prensado &middot; Familia 04</p>
+    <h1 style="font:300 46px/1.05 'Cormorant Garamond',serif;margin:0 0 10px;color:#3C3A35;">Trazo</h1>
+    <p style="font:300 15px/1.75 'Jost',sans-serif;color:#6A6058;margin:0 0 14px;max-width:70ch;text-wrap:pretty;">La informal de la colección. Mismo papel y mismo relieve que Prensa, pero la hoja está recorrida por trazos sueltos: una línea larga y curva pegada a un borde, sangrando arriba y abajo; la corta cerrando la esquina contraria; corazones a mano alzada y dos destellos. Nada de botánica. Como el trazo es tinta plana y va como máscara, lo que cambia por variante es el color de la línea: la misma familia pasa de cuaderno a lápiz de color sin regenerar una sola pieza.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;">
+      <span style="font:300 12px 'Jost',sans-serif;letter-spacing:.06em;color:#6A6058;background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:7px 12px;">9 piezas de trazo &middot; 101 KB</span>
+      <span style="font:300 12px 'Jost',sans-serif;letter-spacing:.06em;color:#6A6058;background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:7px 12px;">Entrada 1200 ms &middot; rotateY 6°</span>
+      <span style="font:300 12px 'Jost',sans-serif;letter-spacing:.06em;color:#6A6058;background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:7px 12px;">Luz desde arriba a la derecha &middot; giro ±3°</span>
+      <span style="font:300 12px 'Jost',sans-serif;letter-spacing:.06em;color:#6A6058;background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:7px 12px;">Fondo fijo &middot; sin parallax</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:14px 16px;background:#2C2722;border-radius:12px;margin-bottom:6px;">
+    <span style="font:500 9.5px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#A2958A;">Papel</span>
+    <sc-for list="{{ variantChips }}" as="vc" hint-placeholder-count="5">
+      <button onClick="{{ vc.pick }}" style="{{ vc.style }}">{{ vc.label }}</button>
+    </sc-for>
+    <div style="flex:1;min-width:10px;"></div>
+    <span style="font:500 9.5px 'Jost',sans-serif;letter-spacing:.24em;text-transform:uppercase;color:#A2958A;">Invitada</span>
+    <sc-for list="{{ guestChips }}" as="gc" hint-placeholder-count="2">
+      <button onClick="{{ gc.pick }}" style="{{ gc.style }}">{{ gc.label }}</button>
+    </sc-for>
+    <button onClick="{{ toggleXV }}" style="{{ xvBtnStyle }}">XV</button>
+    <button onClick="{{ togglePost }}" style="{{ postBtnStyle }}">Post&middot;evento</button>
+    <div style="display:flex;gap:6px;background:#17140F;border-radius:999px;padding:4px;">
+      <button onClick="{{ setMobile }}" style="{{ mobileBtnStyle }}">Celular</button>
+      <button onClick="{{ setDesktop }}" style="{{ desktopBtnStyle }}">Escritorio</button>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:center;padding:24px 0 6px;">
+    <div style="{{ outerFrameStyle }}">
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <div style="height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <div style="width:104px;height:15px;background:#000;border-radius:12px;"></div>
+        </div>
+      </sc-if>
+      <div style="{{ screenStyle }}">
+        <div style="{{ styles.fondoFijo }}"></div>
+
+        <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ false }}">
+          <aside style="{{ styles.deskCol }}">
+            <div style="{{ styles.deskSheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div style="{{ styles.garabatoLargoDer }}"></div>
+              <div style="{{ styles.corazonChico }}"></div>
+              <p style="{{ styles.kicker }}">{{ copy.kicker }}</p>
+              <h2 style="{{ styles.namesDesk }}"><span style="{{ styles.nameLine }}">{{ nombre1 }}</span><sc-if value="{{ esBoda }}" hint-placeholder-val="{{ true }}"><span style="{{ styles.amp }}">&amp;</span></sc-if><sc-if value="{{ esBoda }}" hint-placeholder-val="{{ true }}"><span style="{{ styles.nameLine }}">{{ nombre2 }}</span></sc-if></h2>
+              <div style="{{ styles.fileteCorto }}"></div>
+              <p style="{{ styles.dataText }}">{{ data.fechaLarga }}</p>
+              <p style="{{ styles.dataText }}">{{ data.ciudad }}</p>
+              <div style="{{ styles.deskNavWrap }}">
+                <svg viewBox="0 0 220 8" width="100%" height="8" aria-hidden="true" style="{{ styles.svgRule }}">
+                  <line x1="0" y1="4" x2="96" y2="4" stroke="currentColor" stroke-width=".75"></line>
+                  <circle cx="110" cy="4" r="1.5" fill="currentColor"></circle>
+                  <line x1="124" y1="4" x2="220" y2="4" stroke="currentColor" stroke-width=".75"></line>
+                </svg>
+                <nav style="{{ styles.navList }}">
+                  <sc-for list="{{ navItems }}" as="nv" hint-placeholder-count="9">
+                    <button onClick="{{ nv.go }}" style="{{ nv.style }}">{{ nv.n }}. {{ nv.label }}</button>
+                  </sc-for>
+                </nav>
+              </div>
+            </div>
+          </aside>
+        </sc-if>
+
+        <div style="{{ styles.scrollArea }}" onScroll="{{ onScroll }}" ref="{{ scrollRef }}">
+
+          <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+            <section data-sec="00" data-screen-label="Portada" style="{{ styles.sheetWrap }}">
+              <div style="{{ styles.portadaSheet }}">
+                <div style="{{ styles.filete }}"></div>
+                <div style="{{ styles.plieguePR }}"></div>
+                <div style="{{ styles.plieguePL }}"></div>
+                <div style="{{ styles.garabatoLargo }}"></div>
+                <div style="{{ styles.destello1 }}"></div>
+                <div style="{{ styles.destello3 }}"></div>
+                <div style="{{ styles.garabatoCorto }}"></div>
+                <div data-reveal style="{{ styles.reveal }}">
+                  <div style="{{ styles.corazonChico }}"></div>
+                  <p style="{{ styles.kicker }}">{{ copy.kicker }}</p>
+                </div>
+                <h2 data-reveal data-delay="120" style="{{ styles.namesMob }}"><span style="{{ styles.nameLine }}">{{ nombre1 }}</span><sc-if value="{{ esBoda }}" hint-placeholder-val="{{ true }}"><span style="{{ styles.amp }}">&amp;</span></sc-if><sc-if value="{{ esBoda }}" hint-placeholder-val="{{ true }}"><span style="{{ styles.nameLine }}">{{ nombre2 }}</span></sc-if></h2>
+                <div data-reveal data-delay="240" style="{{ styles.portadaDatos }}">
+                  <div style="{{ styles.fileteCorto }}"></div>
+                  <p style="{{ styles.dataText }}">{{ data.fechaLarga }}</p>
+                  <p style="{{ styles.dataText }}">{{ data.ciudad }}</p>
+                </div>
+              </div>
+            </section>
+          </sc-if>
+
+          <sc-if value="{{ preEvento }}" hint-placeholder-val="{{ true }}">
+          <div>
+          <section data-sec="01" data-screen-label="01 La cuenta regresiva" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconReloj }}"></div>
+                <p style="{{ styles.secNum }}">01.</p>
+                <h3 style="{{ styles.secTitle }}">La cuenta regresiva</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <p style="{{ styles.kicker }}">Faltan</p>
+                <div style="{{ styles.cdMarcoWrap }}">
+                  <div style="{{ styles.marcoCircular }}"></div>
+                  <p style="{{ styles.bigNum }}">{{ dias }}</p>
+                </div>
+                <p style="{{ styles.kicker }}">d&iacute;as</p>
+                <svg viewBox="0 0 220 8" width="140" height="8" aria-hidden="true" style="{{ styles.svgRuleCenter }}">
+                  <line x1="0" y1="4" x2="96" y2="4" stroke="currentColor" stroke-width=".75"></line>
+                  <circle cx="110" cy="4" r="1.5" fill="currentColor"></circle>
+                  <line x1="124" y1="4" x2="220" y2="4" stroke="currentColor" stroke-width=".75"></line>
+                </svg>
+                <p style="{{ styles.dataText }}">{{ data.fechaLarga }} &middot; {{ data.hora }} hs</p>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="02" data-screen-label="02 La frase" style="{{ styles.bleedSection }}">
+            <div data-reveal style="{{ styles.reveal }}">
+              <div style="{{ styles.corazonGrandeCentro }}"></div>
+              <p style="{{ styles.secNum }}">02.</p>
+              <p style="{{ styles.frase }}">{{ copy.fraseUno }}</p>
+              <p style="{{ styles.fraseScript }}">{{ copy.fraseDos }}</p>
+              <p style="{{ styles.bodyText }}">{{ copy.fraseTres }}</p>
+            </div>
+          </section>
+
+          <section data-sec="03" data-screen-label="03 El evento" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconIglesia }}"></div>
+                <p style="{{ styles.secNum }}">03.</p>
+                <h3 style="{{ styles.secTitle }}">El evento</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <sc-if value="{{ esBoda }}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <p style="{{ styles.kicker }}">Ceremonia</p>
+                    <p style="{{ styles.venueName }}">{{ data.ceremoniaNombre }}</p>
+                    <p style="{{ styles.dataText }}">{{ data.ceremoniaHora }} hs &middot; {{ data.ceremoniaDireccion }}</p>
+                    <a href="#" style="{{ styles.linkBtn }}">C&oacute;mo llegar</a>
+                    <div style="{{ styles.hairline }}"></div>
+                  </div>
+                </sc-if>
+                <p style="{{ styles.kicker }}">Fiesta</p>
+                <p style="{{ styles.venueName }}">{{ data.lugarNombre }}</p>
+                <p style="{{ styles.dataText }}">{{ data.hora }} hs &middot; {{ data.direccion }}</p>
+                <a href="#" style="{{ styles.linkBtn }}">C&oacute;mo llegar</a>
+              </div>
+              <div data-reveal data-delay="240" style="{{ styles.revealTail }}">
+                <div style="{{ styles.hairline }}"></div>
+                <p style="{{ styles.kicker }}">Cronograma</p>
+                <div style="{{ styles.timeline }}">
+                  <span style="{{ styles.timelineAxis }}"></span>
+                  <sc-for list="{{ crono }}" as="cr" hint-placeholder-count="5">
+                    <div data-reveal style="{{ cr.rowStyle }}">
+                      <span style="{{ styles.cronoDot }}"></span>
+                      <span style="{{ styles.cronoHora }}">{{ cr.hora }}</span>
+                      <span style="{{ styles.cronoLabel }}">{{ cr.label }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="{{ styles.hairline }}"></div>
+                <p style="{{ styles.kicker }}">Dress code</p>
+                <p style="{{ styles.bodyText }}">{{ data.dressCode }}</p>
+                <div style="{{ styles.faqWrap }}">
+                  <sc-for list="{{ faqRows }}" as="fq" hint-placeholder-count="4">
+                    <div style="{{ styles.faqRow }}">
+                      <button onClick="{{ fq.toggle }}" style="{{ styles.faqBtn }}"><span>{{ fq.q }}</span><span style="{{ fq.signStyle }}">+</span></button>
+                      <sc-if value="{{ fq.open }}" hint-placeholder-val="{{ false }}">
+                        <p style="{{ styles.faqAnswer }}">{{ fq.a }}</p>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </section>
+          </div>
+          </sc-if>
+
+          <section data-sec="04" data-screen-label="04 El álbum" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconPolaroids }}"></div>
+                <p style="{{ styles.secNum }}">04.</p>
+                <h3 style="{{ styles.secTitle }}">El &aacute;lbum</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <div style="{{ styles.miniToggle }}">
+                  <button onClick="{{ setCarrusel }}" style="{{ carruselBtnStyle }}">carrusel</button>
+                  <button onClick="{{ setSolapadas }}" style="{{ solapadasBtnStyle }}">solapadas</button>
+                </div>
+                <div style="{{ styles.albumWrap }}">
+                  <sc-for list="{{ album }}" as="al" hint-placeholder-count="3">
+                    <div style="{{ al.style }}">
+                      <div style="{{ styles.fotoPlaceholder }}"><span style="{{ styles.fotoLabel }}">{{ al.label }}</span></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <p style="{{ styles.caption }}">galeriaPrincipalFotos &middot; albumStyle: {{ albumStyleLabel }}</p>
+              </div>
+            </div>
+          </section>
+
+          <sc-if value="{{ preEvento }}" hint-placeholder-val="{{ true }}">
+          <div>
+          <section data-sec="05" data-screen-label="05 El mapa" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconAuto }}"></div>
+                <p style="{{ styles.secNum }}">05.</p>
+                <h3 style="{{ styles.secTitle }}">El mapa</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <div style="{{ styles.mapCard }}"><span style="{{ styles.fotoLabel }}">MAPA &middot; mapUrl</span></div>
+                <p style="{{ styles.dataText }}">{{ data.direccion }} &middot; {{ data.ciudad }}</p>
+                <a href="#" style="{{ styles.btnSolid }}">Abrir en Google Maps</a>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="06" data-screen-label="06 Tu confirmación" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconTarjeta }}"></div>
+                <p style="{{ styles.secNum }}">06.</p>
+                <h3 style="{{ styles.secTitle }}">Tu confirmaci&oacute;n</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <p style="{{ styles.kicker }}">Quedan</p>
+                <p style="{{ styles.bigNum }}">{{ rsvpDays }}</p>
+                <p style="{{ styles.kicker }}">d&iacute;as para confirmar tu asistencia</p>
+              </div>
+              <div data-reveal data-delay="240" style="{{ styles.revealTail }}">
+                <sc-if value="{{ notConfirmed }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ styles.formWrap }}">
+                    <p style="{{ styles.fieldLabel }}">{{ guest.name }} &middot; pase {{ guest.orderNumber }} &middot; {{ guest.expectedCount }} lugares</p>
+                    <div style="{{ styles.rsvpRow }}">
+                      <button onClick="{{ setAsisteSi }}" style="{{ asisteSiStyle }}">S&iacute;, voy</button>
+                      <button onClick="{{ setAsisteNo }}" style="{{ asisteNoStyle }}">No podr&eacute;</button>
+                    </div>
+                    <p style="{{ styles.fieldLabel }}">Cu&aacute;ntos somos</p>
+                    <div style="{{ styles.rsvpRow }}">
+                      <button onClick="{{ menos }}" style="{{ styles.stepBtn }}">&minus;</button>
+                      <span style="{{ styles.stepNum }}">{{ cantidad }}</span>
+                      <button onClick="{{ mas }}" style="{{ styles.stepBtn }}">+</button>
+                      <span style="{{ styles.stepHint }}">de {{ guest.expectedCount }}</span>
+                    </div>
+                    <p style="{{ styles.fieldLabel }}">Restricciones alimentarias</p>
+                    <input placeholder="Vegetariano, cel&iacute;aco, alergias…" style="{{ styles.input }}">
+                    <button onClick="{{ confirmar }}" style="{{ styles.btnSolid }}">Confirmar asistencia</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ confirmed }}" hint-placeholder-val="{{ false }}">
+                  <div style="{{ styles.confirmWrap }}">
+                    <div style="{{ styles.iconSobre }}"></div>
+                    <p style="{{ styles.confirmado }}">Confirmado</p>
+                    <p style="{{ styles.dataText }}">{{ cantidad }} de {{ guest.expectedCount }} lugares</p>
+                  </div>
+                  <sc-if value="{{ paseOn }}" hint-placeholder-val="{{ true }}">
+                    <div style="{{ styles.paseCard }}">
+                      <div style="{{ styles.paseLeft }}">
+                        <p style="{{ styles.kicker }}">Pase de ingreso</p>
+                        <p style="{{ styles.paseNum }}">{{ guest.orderNumber }}</p>
+                        <p style="{{ styles.dataText }}">Mesa {{ guest.mesa }}</p>
+                        <p style="{{ styles.bodyText }}">Present&aacute; tu pase al ingresar.</p>
+                      </div>
+                      <div style="{{ styles.qrBox }}">
+                        <sc-for list="{{ qrCells }}" as="qc" hint-placeholder-count="36">
+                          <span style="{{ qc.style }}"></span>
+                        </sc-for>
+                      </div>
+                    </div>
+                  </sc-if>
+                </sc-if>
+              </div>
+            </div>
+          </section>
+
+          <sc-if value="{{ triviaOn }}" hint-placeholder-val="{{ true }}">
+            <section data-screen-label="Quiz opcional" style="{{ styles.sheetWrap }}">
+              <div style="{{ styles.sheet }}">
+                <div style="{{ styles.filete }}"></div>
+                <div style="{{ styles.plieguePR }}"></div>
+                <div style="{{ styles.plieguePL }}"></div>
+                <div data-reveal style="{{ styles.reveal }}">
+                  <p style="{{ styles.kicker }}">Quiz &middot; triviaHabilitada</p>
+                  <p style="{{ styles.venueName }}">{{ copy.triviaPregunta }}</p>
+                  <sc-for list="{{ quizOptions }}" as="qo" hint-placeholder-count="3">
+                    <button onClick="{{ qo.pick }}" style="{{ qo.style }}">{{ qo.text }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </section>
+          </sc-if>
+
+          <section data-sec="07" data-screen-label="07 Regalos" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconRegalo }}"></div>
+                <p style="{{ styles.secNum }}">07.</p>
+                <h3 style="{{ styles.secTitle }}">Regalos</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <p style="{{ styles.bodyText }}">{{ copy.regaloMensaje }}</p>
+                <sc-for list="{{ bankCards }}" as="bk" hint-placeholder-count="2">
+                  <div style="{{ styles.bankCard }}">
+                    <p style="{{ styles.kicker }}">{{ bk.titulo }}</p>
+                    <sc-for list="{{ bk.rows }}" as="br" hint-placeholder-count="3">
+                      <div style="{{ styles.bankRow }}"><span style="{{ styles.bankKey }}">{{ br.k }}</span><span style="{{ styles.bankVal }}">{{ br.v }}</span></div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="08" data-screen-label="08 La música" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconNota }}"></div>
+                <p style="{{ styles.secNum }}">08.</p>
+                <h3 style="{{ styles.secTitle }}">Suger&iacute; una canci&oacute;n</h3>
+              </div>
+              <div data-reveal data-delay="120" style="{{ styles.revealTail }}">
+                <p style="{{ styles.bodyText }}">{{ copy.musica }}</p>
+                <input placeholder="Canci&oacute;n &middot; artista" style="{{ styles.input }}">
+                <button style="{{ styles.btnSolid }}">Sumar a la playlist</button>
+                <div style="{{ styles.hairline }}"></div>
+                <button onClick="{{ togglePlay }}" style="{{ styles.btnGhost }}">{{ musicBtnLabel }}</button>
+                <sc-for list="{{ songs }}" as="sg" hint-placeholder-count="2">
+                  <div style="{{ styles.songItem }}">
+                    <span style="{{ styles.songTitle }}">{{ sg.t }}</span>
+                    <span style="{{ styles.songArtist }}">{{ sg.a }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </section>
+          </div>
+          </sc-if>
+
+          <section data-sec="09" data-screen-label="09 Cierre" style="{{ styles.sheetWrap }}">
+            <div style="{{ styles.sheet }}">
+              <div style="{{ styles.garabatoCortoIzq }}"></div>
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <div data-reveal style="{{ styles.reveal }}">
+                <div style="{{ styles.iconConfeti }}"></div>
+                <p style="{{ styles.secNum }}">09.</p>
+                <div style="{{ styles.monogramWrap }}">
+                  <svg viewBox="0 0 88 110" width="78" height="98" aria-hidden="true" style="{{ styles.monogramOrn }}">
+                    <ellipse cx="44" cy="55" rx="40" ry="52" fill="none" stroke="currentColor" stroke-width=".75"></ellipse>
+                    <ellipse cx="44" cy="55" rx="34" ry="46" fill="none" stroke="currentColor" stroke-width=".4"></ellipse>
+                  </svg>
+                  <span style="{{ styles.monogramLetters }}">{{ monograma }}</span>
+                </div>
+                <p style="{{ styles.fraseScript }}">Gracias por estar</p>
+                <p style="{{ styles.credit }}">Invitaci&oacute;n hecha en <a href="https://altainvitacion.com" style="{{ styles.creditLink }}">altainvitacion.com</a></p>
+              </div>
+            </div>
+          </section>
+
+          <div style="{{ styles.scrollTail }}"></div>
+        </div>
+
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ styles.navPill }}">
+            <sc-for list="{{ pillItems }}" as="pi" hint-placeholder-count="5">
+              <button onClick="{{ pi.go }}" style="{{ pi.style }}"><span style="{{ pi.iconoStyle }}"></span><span style="{{ pi.labelStyle }}">{{ pi.label }}</span></button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ splashVisible }}" hint-placeholder-val="{{ true }}">
+          <div style="{{ styles.splash }}">
+            <div style="{{ styles.splashSheet }}">
+              <div style="{{ styles.filete }}"></div>
+              <div style="{{ styles.plieguePR }}"></div>
+              <div style="{{ styles.plieguePL }}"></div>
+              <p style="{{ styles.kicker }}">{{ copy.kicker }}</p>
+              <p style="{{ styles.splashName }}">{{ nombresLinea }}</p>
+              <div style="{{ styles.fileteCorto }}"></div>
+              <p style="{{ styles.dataText }}">{{ data.fechaLarga }} &middot; {{ data.ciudad }}</p>
+              <button onClick="{{ abrir }}" style="{{ styles.splashBtn }}">Abrir invitaci&oacute;n</button>
+            </div>
+          </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </div>
+
+  <p style="text-align:center;font:300 12.5px 'Jost',sans-serif;color:#8A756D;margin:10px 0 0;">{{ frameHint }}</p>
+
+  <div style="max-width:1100px;margin:64px auto 0;">
+    <h2 style="font:300 30px/1.2 'Cormorant Garamond',serif;margin:0 0 6px;color:#514842;">Handoff</h2>
+    <p style="font:300 14px/1.7 'Jost',sans-serif;color:#6A6058;margin:0 0 26px;">Variantes, fuentes y cada animación con duración, easing, stagger y ángulo.</p>
+
+    <h3 style="font:500 10px 'Jost',sans-serif;letter-spacing:.39em;text-transform:uppercase;color:#8A756D;margin:0 0 12px;">Variantes &mdash; el papel es el mismo; cambia el color del trazo</h3>
+    <div style="display:grid;gap:10px;margin-bottom:34px;">
+      <sc-for list="{{ handoffVariants }}" as="hv" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:minmax(120px,1fr) repeat(5,minmax(0,1fr));gap:8px;align-items:center;background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:12px 14px;">
+          <span style="font:400 13px 'Jost',sans-serif;color:#514842;">{{ hv.name }}</span>
+          <sc-for list="{{ hv.swatches }}" as="sw" hint-placeholder-count="5">
+            <span style="display:flex;align-items:center;gap:7px;font:300 10.5px 'Jost',sans-serif;color:#6A6058;"><span style="{{ sw.chip }}"></span>{{ sw.hex }}</span>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+
+    <h3 style="font:500 10px 'Jost',sans-serif;letter-spacing:.39em;text-transform:uppercase;color:#8A756D;margin:0 0 12px;">Tipografía</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:34px;">
+      <div style="background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:16px 18px;">
+        <p style="font:300 26px 'Cormorant Garamond',serif;margin:0 0 6px;color:#514842;">Cormorant Garamond 300</p>
+        <p style="font:300 12.5px/1.7 'Jost',sans-serif;color:#6A6058;margin:0;">Nombres de portada 38 px, número del countdown 86 px / line-height 0,9, numeración de sección 26 px con punto.</p>
+      </div>
+      <div style="background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:16px 18px;">
+        <p style="font:400 30px 'Final Parade Script',cursive;margin:0 0 6px;color:#514842;">Final Parade Script</p>
+        <p style="font:300 12.5px/1.7 'Jost',sans-serif;color:#6A6058;margin:0;">Del repo. Ruta canónica /fonts/final-parade-script.woff2 (en el mockup se suma ./fonts/… de respaldo) — no está en Google Fonts. Tinta plana 34 px en títulos de sección, el &amp; de la portada y la frase de cierre. Nunca en relieve estándar ni por debajo de 28 px.</p>
+      </div>
+      <div style="background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:16px 18px;">
+        <p style="font:400 18px 'Jost',sans-serif;letter-spacing:.39em;text-transform:uppercase;margin:0 0 6px;color:#514842;">Jost 300</p>
+        <p style="font:300 12.5px/1.7 'Jost',sans-serif;color:#6A6058;margin:0;">Kickers 10 px / 0,39 em, datos 13 px / 0,16 em en mayúsculas, texto corrido 15 px / 1,75 (nunca menos de 14 px).</p>
+      </div>
+    </div>
+
+    <h3 style="font:500 10px 'Jost',sans-serif;letter-spacing:.39em;text-transform:uppercase;color:#8A756D;margin:0 0 12px;">Animaciones</h3>
+    <div style="display:grid;gap:8px;margin-bottom:34px;">
+      <sc-for list="{{ handoffAnims }}" as="ha" hint-placeholder-count="8">
+        <div style="display:grid;grid-template-columns:minmax(140px,1fr) minmax(0,.6fr) minmax(0,1.2fr) minmax(0,2fr);gap:12px;background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:12px 14px;">
+          <span style="font:400 12.5px 'Jost',sans-serif;color:#514842;">{{ ha.name }}</span>
+          <span style="font:400 12px 'Jost',sans-serif;color:#8A756D;">{{ ha.dur }}</span>
+          <span style="font:300 11.5px 'Jost',sans-serif;color:#6A6058;">{{ ha.easing }}</span>
+          <span style="font:300 12px/1.55 'Jost',sans-serif;color:#6A6058;">{{ ha.detail }}</span>
+        </div>
+      </sc-for>
+    </div>
+
+    <h3 style="font:500 10px 'Jost',sans-serif;letter-spacing:.39em;text-transform:uppercase;color:#8A756D;margin:0 0 12px;">Los 10 slots de doodle en Prensa</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;margin-bottom:34px;">
+      <sc-for list="{{ handoffDoodles }}" as="hd" hint-placeholder-count="10">
+        <div style="background:#FAF6EF;border:1px solid #DFD5C7;border-radius:3px;padding:12px 14px;">
+          <p style="font:500 10px 'Jost',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#8A756D;margin:0 0 4px;">{{ hd.slot }}</p>
+          <p style="font:300 12.5px/1.5 'Jost',sans-serif;color:#514842;margin:0;">{{ hd.what }}</p>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#2C2722;border-radius:8px;padding:20px 24px;">
+      <p style="font:400 13px 'Jost',sans-serif;color:#F4ECE2;margin:0 0 10px;">Notas de port</p>
+      <sc-for list="{{ portNotes }}" as="pn" hint-placeholder-count="8">
+        <p style="font:300 12.5px/1.7 'Jost',sans-serif;color:#C4B8AE;margin:0 0 7px;">{{ pn }}</p>
+      </sc-for>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;albumStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;carrusel&quot;,&quot;solapadas&quot;],&quot;default&quot;:&quot;carrusel&quot;,&quot;tsType&quot;:&quot;'carrusel' | 'solapadas'&quot;,&quot;section&quot;:&quot;Álbum&quot;},&quot;triviaHabilitada&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Secciones&quot;},&quot;mostrarPase&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Secciones&quot;}}">
+class Component extends DCLogic {
+  EVENT = new Date('2027-04-17T20:00:00-03:00').getTime();
+  RSVP_LIMIT = new Date('2027-03-20T23:59:00-03:00').getTime();
+  SH = '112,106,94';
+
+  // El papel no cambia: lo que cambia por variante es el color del trazo,
+  // así la misma familia pasa de cuaderno a lápiz de color sin regenerar una sola pieza.
+  PAPER = '#F6F1E9';
+  PAPER2 = '#EFE8DC';
+  VARIANTS = [
+    { id:'grafito',   name:'Grafito',   hex:'#3C3A35', paper:'#F6F1E9', paper2:'#EFE8DC' },
+    { id:'tinta',     name:'Tinta',     hex:'#2E3A4A', paper:'#F6F1E9', paper2:'#EFE8DC' },
+    { id:'terracota', name:'Terracota', hex:'#8A5340', paper:'#F6F1E9', paper2:'#EFE8DC' },
+    { id:'verde',     name:'Verde',     hex:'#3F5347', paper:'#F6F1E9', paper2:'#EFE8DC' },
+    { id:'ciruela',   name:'Ciruela',   hex:'#54364A', paper:'#F6F1E9', paper2:'#EFE8DC' }
+  ];
+  INK = '#3C3A35';
+  INK_SOFT = '#7E7A70';
+
+  GUESTS = [
+    { name:'Valentina', expectedCount:2, status:'PENDIENTE', orderNumber:'014', mesa:'07' },
+    { name:'María Florencia', expectedCount:4, status:'PENDIENTE', orderNumber:'041', mesa:'12' }
+  ];
+
+  DATA = {
+    novia:'Valentina', novio:'Tomás', quinceanera:'Delfina',
+    fechaCorta:'17 · 04 · 2027', fechaLarga:'Sábado 17 de abril de 2027', ciudad:'Córdoba', hora:'20:00',
+    lugarNombre:'Estancia La Candelaria', direccion:'Camino a La Calera km 14',
+    ceremoniaNombre:'Iglesia de los Capuchinos', ceremoniaDireccion:'Buenos Aires 693', ceremoniaHora:'17:30',
+    dressCode:'Elegante. Los caminos son de tierra: tacos bajos recomendados.',
+    regaloMensaje:'Tu presencia es el regalo. Si además querés ayudarnos con el viaje, te dejamos los datos.',
+    triviaPregunta:'¿Dónde fue la primera cita?'
+  };
+
+  // Cronograma alterno para la versión XV: misma familia, otra fiesta.
+  CRONO_XV = [
+    { hora:'21:00', label:'Recepción' },
+    { hora:'21:40', label:'Mi entrada' },
+    { hora:'23:30', label:'El vals' },
+    { hora:'01:00', label:'Carnaval carioca' },
+    { hora:'04:30', label:'Cierre' }
+  ];
+  CRONO = [
+    { hora:'17:30', label:'Ceremonia religiosa' },
+    { hora:'19:30', label:'Recepción y brindis' },
+    { hora:'20:30', label:'Cena bajo los árboles' },
+    { hora:'23:30', label:'Fiesta' },
+    { hora:'04:00', label:'Último tren a casa' }
+  ];
+
+  FAQ = [
+    { q:'¿Dónde estaciono?', a:'Hay estacionamiento libre dentro del predio, con personal hasta las cinco de la mañana.' },
+    { q:'¿Dónde me alojo?', a:'Tarifa especial reservada en Hotel Azur y en Selina Nueva Córdoba, a veinte minutos del salón.' },
+    { q:'¿Cómo llego?', a:'Sale una combi desde el Patio Olmos a las 16:45 y vuelve a las 3:00 y a las 5:00.' },
+    { q:'¿Podemos llevar a los chicos?', a:'Sí. Hay niñera y menú infantil desde las 20:30 hasta el final de la fiesta.' }
+  ];
+
+  BANKS = [
+    { titulo:'Regalo · transferencia', rows:[{k:'Alias',v:'vale.y.tomi.boda'},{k:'CBU',v:'0720 1234 8800 0012 3456 78'},{k:'Titular',v:'Valentina Aguirre'}] },
+    { titulo:'Valor de tarjeta', rows:[{k:'Adulto',v:'$28.000'},{k:'Niño 4 a 11',v:'$14.000'},{k:'Alias',v:'tarjeta.valetomi'}] }
+  ];
+
+  SONGS = [ { t:'Cómo estás', a:'Los Espíritus' }, { t:'La Vie en Rose', a:'Édith Piaf' } ];
+
+  ICONS = {
+    anillos:{ f:'anillos', ar:'290/332' }, reloj:{ f:'reloj', ar:'265/269' },
+    iglesia:{ f:'iglesia', ar:'269/362' }, copas:{ f:'copas', ar:'261/360' },
+    polaroids:{ f:'polaroids', ar:'281/271' }, auto:{ f:'auto', ar:'367/223' },
+    tarjeta:{ f:'tarjeta', ar:'256/300' }, regalo:{ f:'regalo', ar:'249/293' },
+    nota:{ f:'nota-musical', ar:'202/253' }, confeti:{ f:'confeti', ar:'268/319' },
+    sobre:{ f:'sobre', ar:'261/276' }
+  };
+
+  SECTIONS = [
+    { n:'01', label:'La cuenta regresiva' }, { n:'02', label:'La frase' }, { n:'03', label:'El evento' },
+    { n:'04', label:'El álbum' }, { n:'05', label:'El mapa' }, { n:'06', label:'Tu confirmación' },
+    { n:'07', label:'Regalos' }, { n:'08', label:'La música' }, { n:'09', label:'Cierre' }
+  ];
+  PILLS = [
+    { n:'01', label:'Fecha',  icono:'reloj' },
+    { n:'03', label:'Evento', icono:'iglesia' },
+    { n:'04', label:'Álbum',  icono:'polaroids' },
+    { n:'06', label:'RSVP',   icono:'tarjeta' },
+    { n:'08', label:'Música', icono:'nota' }
+  ];
+
+  state = {
+    variantId:'lino', device:'mobile', opened:false, closing:false, guest:0, scrollY:0, now:Date.now(),
+    asiste:null, cantidad:2, confirmed:false, openRow:null, playing:false, albumStyle:null, quiz:null,
+    post:false, xv:false, barHidden:false, activeSec:'00'
+  };
+
+  // Ruta canónica para el port (así resuelve en Next.js): /templates/iconos-linea/<pieza>.webp.
+  // En el mockup se escribe relativa al archivo porque el canvas no sirve la raíz del proyecto.
+  PIEZAS = { iconos:'/templates/iconos-linea/', trazo:'/templates/trazo/' };
+  componentDidMount(){
+    // La @font-face del helmet usa la ruta canónica /fonts/final-parade-script.woff2 (la del port).
+    // El canvas del mockup no sirve la raíz, así que acá se registra la misma fuente resuelta
+    // contra el documento; en Next.js esto no corre porque la cara ya cargó.
+    if(window.FontFace){
+      // Si quedó una cara en error apuntando a la raíz (mockups viejos en el mismo documento), se descarta.
+      try{
+        for(const sheet of Array.from(document.styleSheets)){
+          let rules; try{ rules = sheet.cssRules; }catch(e){ continue; }
+          if(!rules) continue;
+          for(let i=rules.length-1;i>=0;i--){
+            const r = rules[i];
+            if(r.cssText && r.cssText.indexOf('final-parade-script') >= 0) sheet.deleteRule(i);
+          }
+        }
+      }catch(e){}
+      const url = new URL('./fonts/final-parade-script.woff2', document.baseURI).href;
+      const st = document.createElement('style');
+      st.textContent = "@font-face{font-family:'Final Parade Script';src:url('"+url+"') format('woff2');font-weight:400;font-display:swap;}";
+      document.head.appendChild(st);
+      const face = new FontFace('Final Parade Script', "url('"+url+"')", { weight:'400' });
+      face.load().then(ff=>{ document.fonts.add(ff); window.__fpFont = 'ok'; this.forceUpdate(); }).catch(e=>{ window.__fpFont = 'fail:'+e; });
+    }
+    this.tick = setInterval(()=>this.setState({ now:Date.now() }), 30000);
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  componentWillUnmount(){
+    clearInterval(this.tick); if(this.io) this.io.disconnect();
+    if(this.barTimer) clearTimeout(this.barTimer); if(this.closeTimer) clearTimeout(this.closeTimer);
+  }
+
+  setScrollRef = (el)=>{
+    if(!el || el===this.scrollEl) return;
+    this.scrollEl = el;
+    requestAnimationFrame(()=>this.setupIO());
+  };
+
+  setupIO(){
+    const root = this.scrollEl;
+    if(!root || !('IntersectionObserver' in window)) return;
+    if(this.io) this.io.disconnect();
+    if(this.reduced){
+      root.querySelectorAll('[data-reveal]').forEach(n=>{ n.style.opacity='1'; n.style.transform='none'; });
+      return;
+    }
+    this.io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(!e.isIntersecting) return;
+        const t = e.target, d = Number(t.dataset.delay||0);
+        t.style.transition = 'opacity 1.2s cubic-bezier(.22,.61,.36,1) '+d+'ms, transform .35s cubic-bezier(.22,.61,.36,1) '+d+'ms';
+        t.style.opacity = '1';
+        t.style.transform = 'none';
+        this.io.unobserve(t);
+      });
+    }, { root, threshold:0.15 });
+    root.querySelectorAll('[data-reveal]').forEach(n=>this.io.observe(n));
+  }
+
+  onScroll = (e)=>{
+    const top = e.currentTarget.scrollTop;
+    if(this.barTimer) clearTimeout(this.barTimer);
+    this.barTimer = setTimeout(()=>this.setState({ barHidden:false }), 370);
+    if(this.raf) return;
+    this.raf = requestAnimationFrame(()=>{
+      this.raf = null;
+      let activa = this.state.activeSec;
+      const el = this.scrollEl;
+      if(el){
+        el.querySelectorAll('[data-sec]').forEach(sec=>{ if(sec.offsetTop - 40 <= top) activa = sec.dataset.sec; });
+      }
+      this.setState({ scrollY:top, barHidden: top > 40, activeSec: activa });
+    });
+  };
+
+  shade(hex, pct){
+    const n = parseInt(hex.slice(1),16);
+    const f = 1 + pct/100;
+    const c = [ (n>>16)&255, (n>>8)&255, n&255 ].map(v=>Math.max(0,Math.min(255,Math.round(v*f))));
+    return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');
+  }
+
+  grain(freq, op){
+    return "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='f'><feTurbulence type='fractalNoise' baseFrequency='"+freq+"' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='200' height='200' filter='url(%23f)' opacity='"+op+"'/></svg>\")";
+  }
+
+  // Luz que gira: el ángulo de reposo es -135° (luz desde arriba a la derecha) y oscila ±3° con el scroll.
+  relieve(scrollY, refuerzo){
+    const a = (-135 + (this.reduced ? 0 : 3*Math.sin(scrollY/260))) * Math.PI/180;
+    const m = refuerzo ? 1.5 : 1.4;
+    const dx = m*Math.cos(a), dy = m*Math.sin(a);
+    const sh = this.SH;
+    const aDark = refuerzo ? .80 : .55, aLight = refuerzo ? 1 : .92, aDrop = refuerzo ? .26 : .20;
+    const dropX = (-dx*(refuerzo?2:1.43)).toFixed(2), dropY = (-dy*(refuerzo?2.7:2.14)).toFixed(2);
+    return dx.toFixed(2)+'px '+dy.toFixed(2)+'px 0 rgba('+sh+','+aDark+'), '
+         + (-dx).toFixed(2)+'px '+(-dy).toFixed(2)+'px 0 rgba(255,255,255,'+aLight+'), '
+         + dropX+'px '+dropY+'px '+(refuerzo?'5px':'4px')+' rgba('+sh+','+aDrop+')';
+  }
+
+  icon(name, w){
+    const i = this.ICONS[name];
+    const u = './templates/iconos-linea/'+i.f+'.webp';
+    return { width:w||'19%', aspectRatio:i.ar, margin:'0 auto 10px', background:this.INK,
+      WebkitMask:'url('+u+') no-repeat center / contain',
+      mask:'url('+u+') no-repeat center / contain', pointerEvents:'none' };
+  }
+
+  // Piezas de trazo: tinta plana, así que van como máscara CSS y toman el color de la variante.
+  trazo(file, w, ar, extra, color){
+    const u = './templates/trazo/'+file+'.webp';
+    return { position:'absolute', width:w, aspectRatio:ar, background:color,
+      WebkitMask:'url('+u+') no-repeat center / contain',
+      mask:'url('+u+') no-repeat center / contain', pointerEvents:'none', zIndex:0, ...extra };
+  }
+
+  buildStyles(v, isDesktop, scrollY){
+    const serif = "'Cormorant Garamond',serif", script = "'Final Parade Script',cursive", sans = "'Jost',sans-serif";
+    const sh = this.SH, ink = this.INK, inkSoft = this.INK_SOFT;
+    const rel = this.relieve(scrollY, false);
+    const relFuerte = this.relieve(scrollY, true);
+    const paperGrain = { backgroundColor:v.paper, backgroundImage:this.grain('0.85','0.30'), backgroundBlendMode:'multiply' };
+    const sheetSkin = { backgroundColor:v.paper, backgroundImage:this.grain('1.1','0.22'), backgroundBlendMode:'multiply',
+      boxShadow:'-1.41px 1.41px 4px rgba('+sh+',.40)',
+      clipPath:'polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px))' };
+    const kicker = { fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.39em', textTransform:'uppercase', color:inkSoft, margin:'0 0 10px' };
+    const dataText = { fontFamily:sans, fontWeight:400, fontSize:'13px', letterSpacing:'.16em', textTransform:'uppercase', color:ink, margin:'0 0 8px' };
+    const pad = isDesktop ? '44px 54px 38px' : '32px 26px 28px';
+
+    return {
+      fondoFijo: { position:'absolute', inset:0, ...paperGrain, pointerEvents:'none' },
+      deskCol: { position:'relative', width:'440px', flexShrink:0, height:'900px', padding:'26px 22px', display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' },
+      deskSheet: { position:'relative', width:'94%', aspectRatio:'301/432', ...sheetSkin, padding:'34px 30px 26px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' },
+
+      filete: { position:'absolute', inset:'14px', border:'0.5px solid rgba('+sh+',.34)', borderRadius:'6px', pointerEvents:'none' },
+      plieguePR: { position:'absolute', top:0, right:0, width:'26px', height:'26px', background:'linear-gradient(225deg, rgba('+sh+',.34), transparent)', pointerEvents:'none' },
+      plieguePL: { position:'absolute', bottom:0, left:0, width:'26px', height:'26px', background:'linear-gradient(45deg, rgba('+sh+',.34), transparent)', pointerEvents:'none' },
+
+      scrollArea: isDesktop
+        ? { position:'relative', flex:1, height:'900px', overflowY:'auto' }
+        : { position:'relative', height:'908px', overflowY:'auto', scrollbarWidth:'none' },
+      scrollTail: { height: isDesktop ? '30px' : '92px' },
+
+      topBar: { position:'sticky', top:0, zIndex:6, height:'38px', display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 18px',
+        background:'rgba('+parseInt(v.paper.slice(1,3),16)+','+parseInt(v.paper.slice(3,5),16)+','+parseInt(v.paper.slice(5,7),16)+',.94)',
+        backdropFilter:'blur(6px)', borderBottom:'1px solid rgba('+sh+',.28)', color:ink,
+        opacity: this.state.barHidden ? 0 : 1, transform:'translateY('+(this.state.barHidden ? -18 : 0)+'px)',
+        transition:'opacity '+(this.state.barHidden?300:350)+'ms ease, transform '+(this.state.barHidden?300:350)+'ms ease' },
+      topBarItem: { fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.39em', textTransform:'uppercase', color:ink },
+      svgRule: { color:'rgba('+sh+',.7)' },
+      svgRuleCenter: { color:'rgba('+sh+',.7)', display:'block', margin:'18px auto' },
+
+      sheetWrap: { position:'relative', padding: isDesktop ? '11px 3% 11px' : '11px 3%' },
+      bleedSection: { position:'relative', padding: isDesktop ? '64px 8% 64px' : '48px 8%', textAlign:'center' },
+      sheet: { position:'relative', ...sheetSkin, padding:pad, textAlign:'center' },
+      portadaSheet: { position:'relative', aspectRatio:'301/432', ...sheetSkin, padding:pad, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center' },
+
+      reveal: this.reduced ? {} : { opacity:0, transform:'perspective(800px) rotateY(6deg) translateY(10px)', transformOrigin:'left center' },
+      revealTail: this.reduced ? {} : { opacity:0, transform:'perspective(800px) rotateY(6deg) translateY(10px)', transformOrigin:'left center' },
+
+      kicker, dataText,
+      portadaDatos: this.reduced
+        ? { position:'relative', zIndex:1, maxWidth:'64%', margin:'0 auto' }
+        : { position:'relative', zIndex:1, maxWidth:'64%', margin:'0 auto', opacity:0, transform:'perspective(800px) rotateY(6deg) translateY(10px)', transformOrigin:'left center' },
+      secNum: { fontFamily:serif, fontWeight:300, fontSize:'26px', lineHeight:1, color:ink, margin:'0 0 8px' },
+      // La script va apenas inclinada (-2,5°); la tapa y la portada de bienvenida van rectas.
+      secTitle: { fontFamily:script, fontWeight:400, fontSize:'34px', lineHeight:1.25, color:ink, margin:'0 0 22px', display:'inline-block', transform:'rotate(-2.5deg)' },
+      bodyText: { fontFamily:sans, fontWeight:300, fontSize:'15px', lineHeight:1.75, color:ink, margin:'0 auto 16px', maxWidth:'46ch' },
+      caption: { fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.16em', textTransform:'uppercase', color:inkSoft, margin:'14px 0 0' },
+
+      // El garabato largo va pegado a un borde lateral, sangrando arriba y abajo; el corto cierra la esquina contraria.
+      garabatoLargo: this.trazo('garabato-largo','30%','176/1168',{ left:'-17%', top:'-6%' }, v.hex),
+      garabatoLargoDer: this.trazo('garabato-largo','30%','176/1168',{ right:'-17%', top:'-4%', transform:'scaleX(-1)' }, v.hex),
+      garabatoCorto: this.trazo('garabato-corto','46%','584/161',{ right:'-16%', bottom:'3%' }, v.hex),
+      garabatoCortoIzq: this.trazo('garabato-corto','40%','584/161',{ left:'-15%', bottom:'4%' }, v.hex),
+      corazonGrande: this.trazo('corazon-grande','13%','196/238',{ right:'12%', top:'8%', position:'relative', margin:'0 auto 10px' }, v.hex),
+      corazonGrandeCentro: this.trazo('corazon-grande','12%','196/238',{ position:'relative', margin:'0 auto 12px' }, v.hex),
+      corazonChico: this.trazo('corazon-chico','8%','134/148',{ position:'relative', margin:'0 auto 12px' }, v.hex),
+      destello1: this.trazo('destello-1','7%','126/185',{ left:'9%', top:'9%' }, v.hex),
+      destello3: this.trazo('destello-3','5%','72/96',{ right:'10%', top:'16%' }, v.hex),
+      marcoCircular: this.trazo('marco-circular','58%','632/674',{ left:'50%', top:'50%', transform:'translate(-50%,-50%)', zIndex:0 }, v.hex),
+      iconAnillos: this.icon('anillos','22%'), iconAnillosCentro: this.icon('anillos','16%'),
+      iconReloj: this.icon('reloj'), iconIglesia: this.icon('iglesia'), iconPolaroids: this.icon('polaroids'),
+      iconAuto: this.icon('auto','22%'), iconTarjeta: this.icon('tarjeta'), iconRegalo: this.icon('regalo'),
+      iconNota: this.icon('nota','15%'), iconConfeti: this.icon('confeti'), iconSobre: this.icon('sobre','16%'),
+
+      namesDesk: { fontFamily:serif, fontWeight:300, fontSize:'38px', lineHeight:1.12, margin:'0 0 14px', color:this.shade(v.paper,-4), textShadow:rel, display:'flex', flexDirection:'column', alignItems:'center' },
+      namesMob: { maxWidth:'64%', marginLeft:'auto', marginRight:'auto', fontFamily:serif, fontWeight:300, fontSize:'38px', lineHeight:1.12, margin:'0 auto 14px', color:this.shade(v.paper,-4), textShadow:rel, display:'flex', flexDirection:'column', alignItems:'center' },
+      nameLine: { display:'block' },
+      amp: { fontFamily:script, fontWeight:400, fontSize:'34px', lineHeight:1.2, color:ink, textShadow:'none', margin:'2px 0' },
+      fileteCorto: { width:'38px', height:'0.5px', background:'rgba('+sh+',.6)', margin:'14px auto 16px' },
+
+      cdMarcoWrap: { position:'relative', width:'200px', height:'150px', margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'center' },
+      bigNum: { position:'relative', zIndex:1, fontFamily:serif, fontWeight:300, fontSize:'86px', lineHeight:.9, color:this.shade(v.paper,-4), textShadow:rel, margin:'6px 0 8px' },
+
+      frase: { fontFamily:serif, fontWeight:300, fontStyle:'italic', fontSize: isDesktop ? '34px' : '28px', lineHeight:1.35, color:ink, margin:'0 auto 6px', maxWidth:'26ch' },
+      fraseScript: { fontFamily:script, fontWeight:400, fontSize:'34px', lineHeight:1.3, color:ink, margin:'0 0 8px', display:'inline-block', transform:'rotate(-2.5deg)' },
+
+      venueName: { fontFamily:serif, fontWeight:400, fontStyle:'italic', fontSize:'26px', lineHeight:1.2, color:ink, margin:'0 0 8px' },
+      linkBtn: { display:'inline-flex', alignItems:'center', minHeight:'44px', fontFamily:sans, fontWeight:400, fontSize:'11px', letterSpacing:'.24em', textTransform:'uppercase', color:ink, borderBottom:'0.5px solid rgba('+sh+',.7)' },
+      hairline: { height:'0.5px', background:'rgba('+sh+',.3)', margin:'22px 0' },
+
+      timeline: { position:'relative', textAlign:'left', maxWidth:'380px', margin:'0 auto' },
+      timelineAxis: { position:'absolute', left:'74px', top:'10px', bottom:'10px', width:'0.5px', background:'rgba('+sh+',.45)' },
+      cronoDot: { width:'3px', height:'3px', borderRadius:'50%', background:v.hex, flexShrink:0 },
+      cronoHora: { fontFamily:sans, fontWeight:400, fontSize:'13px', letterSpacing:'.16em', color:inkSoft, width:'62px', textAlign:'right', flexShrink:0, order:-1 },
+      cronoLabel: { fontFamily:serif, fontWeight:400, fontStyle:'italic', fontSize:'20px', color:ink },
+
+      faqWrap: { textAlign:'left', maxWidth:'420px', margin:'18px auto 0' },
+      faqRow: { borderBottom:'0.5px solid rgba('+sh+',.3)' },
+      faqBtn: { width:'100%', minHeight:'48px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:'12px', background:'none', border:'none', padding:'14px 0', cursor:'pointer', textAlign:'left', fontFamily:sans, fontWeight:300, fontSize:'15px', color:ink },
+      faqAnswer: { fontFamily:sans, fontWeight:300, fontSize:'15px', lineHeight:1.75, color:inkSoft, margin:'0 0 16px', transformOrigin:'top', animation:'desdobla .4s cubic-bezier(.22,.61,.36,1) both' },
+
+      miniToggle: { display:'flex', gap:'4px', justifyContent:'center', marginBottom:'18px' },
+      albumWrap: { display:'flex', gap:'12px', overflowX:'auto', padding:'4px 2px 10px', scrollbarWidth:'none' },
+      fotoPlaceholder: { width:'100%', aspectRatio:'0.78', display:'flex', alignItems:'center', justifyContent:'center', padding:'10px', textAlign:'center',
+        backgroundColor:v.paper2, backgroundImage:'repeating-linear-gradient(135deg, rgba('+sh+',.13) 0 1px, transparent 1px 7px)' },
+      fotoLabel: { fontFamily:sans, fontWeight:400, fontSize:'9px', letterSpacing:'.16em', lineHeight:1.7, textTransform:'uppercase', color:inkSoft, overflowWrap:'anywhere' },
+
+      mapCard: { height: isDesktop ? '240px' : '170px', display:'flex', alignItems:'center', justifyContent:'center',
+        backgroundColor:v.paper2, backgroundImage:'repeating-linear-gradient(0deg, rgba('+sh+',.12) 0 0.5px, transparent 0.5px 26px), repeating-linear-gradient(90deg, rgba('+sh+',.12) 0 0.5px, transparent 0.5px 26px)',
+        border:'0.5px solid rgba('+sh+',.34)', marginBottom:'18px' },
+
+      formWrap: { maxWidth:'420px', margin:'0 auto', textAlign:'left' },
+      fieldLabel: { fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.39em', textTransform:'uppercase', color:inkSoft, margin:'18px 0 8px' },
+      rsvpRow: { display:'flex', alignItems:'center', gap:'8px', flexWrap:'wrap' },
+      stepBtn: { width:'48px', height:'48px', background:'transparent', border:'0.5px solid rgba('+sh+',.5)', color:ink, fontFamily:sans, fontSize:'18px', cursor:'pointer' },
+      stepNum: { fontFamily:serif, fontWeight:300, fontSize:'32px', color:ink, minWidth:'34px', textAlign:'center' },
+      stepHint: { fontFamily:sans, fontWeight:300, fontSize:'14px', color:inkSoft },
+      input: { width:'100%', minHeight:'48px', padding:'0 14px', marginBottom:'12px', background:v.paper2, border:'0.5px solid rgba('+sh+',.34)', fontFamily:sans, fontWeight:300, fontSize:'15px', color:ink },
+      btnSolid: { display:'inline-flex', alignItems:'center', justifyContent:'center', minHeight:'48px', padding:'0 26px', background:ink, color:v.paper, border:'none', fontFamily:sans, fontWeight:400, fontSize:'11.5px', letterSpacing:'.24em', textTransform:'uppercase', cursor:'pointer' },
+      btnGhost: { display:'inline-flex', alignItems:'center', justifyContent:'center', minHeight:'48px', padding:'0 22px', marginBottom:'6px', whiteSpace:'nowrap', background:'transparent', color:ink, border:'0.5px solid rgba('+sh+',.5)', fontFamily:sans, fontWeight:400, fontSize:'11px', letterSpacing:'.24em', textTransform:'uppercase', cursor:'pointer' },
+
+      confirmWrap: { padding:'8px 0 4px' },
+      confirmado: { fontFamily:serif, fontWeight:300, fontSize:'54px', lineHeight:1, letterSpacing:'.04em', color:this.shade(v.paper,3), margin:'8px 0 10px',
+        textShadow:'0 -1px 0 rgba(255,255,255,.90), 0 1px 1px rgba('+sh+',.50), 0 2px 3px rgba('+sh+',.12)',
+        animation: this.reduced ? 'none' : 'prensado .5s cubic-bezier(.22,.61,.36,1) both' },
+
+      paseCard: { display:'flex', alignItems:'center', gap:'18px', marginTop:'22px', padding:'18px 20px', textAlign:'left', background:v.paper2, border:'0.5px solid rgba('+sh+',.34)' },
+      paseLeft: { flex:1, minWidth:0 },
+      paseNum: { fontFamily:serif, fontWeight:300, fontSize:'46px', lineHeight:1, color:ink, margin:'0 0 6px' },
+      qrBox: { width:'96px', height:'96px', display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:'2px', flexShrink:0, padding:'6px', border:'0.5px solid rgba('+sh+',.34)' },
+
+      bankCard: { padding:'18px 20px', margin:'0 auto 14px', maxWidth:'420px', textAlign:'left', background:v.paper2, border:'0.5px solid rgba('+sh+',.34)' },
+      bankRow: { display:'flex', alignItems:'baseline', justifyContent:'space-between', gap:'12px', padding:'9px 0', borderBottom:'0.5px solid rgba('+sh+',.22)' },
+      bankKey: { fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.39em', textTransform:'uppercase', color:inkSoft },
+      bankVal: { fontFamily:sans, fontWeight:300, fontSize:'15px', color:ink, textAlign:'right', overflowWrap:'anywhere' },
+
+      songItem: { display:'flex', alignItems:'baseline', justifyContent:'center', gap:'10px', padding:'12px 0', borderBottom:'0.5px solid rgba('+sh+',.22)' },
+      songTitle: { fontFamily:serif, fontWeight:400, fontStyle:'italic', fontSize:'20px', color:ink },
+      songArtist: { fontFamily:sans, fontWeight:300, fontSize:'14px', color:inkSoft },
+
+      monogramWrap: { position:'relative', width:'78px', height:'98px', display:'flex', alignItems:'center', justifyContent:'center', margin:'6px auto 18px' },
+      monogramOrn: { position:'absolute', inset:0, color:'rgba('+sh+',.7)' },
+      monogramLetters: { position:'relative', fontFamily:serif, fontWeight:300, fontSize:'22px', letterSpacing:'.18em', color:ink },
+      credit: { fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.39em', textTransform:'uppercase', color:inkSoft, margin:0 },
+      creditLink: { color:ink, borderBottom:'0.5px solid rgba('+sh+',.5)' },
+
+      deskNavWrap: { marginTop:'auto', width:'100%' },
+      navList: { display:'flex', flexDirection:'column', alignItems:'center', gap:'2px', marginTop:'14px' },
+      navPill: { position:'absolute', left:'50%', bottom:'18px', transform:'translateX(-50%)', display:'flex', gap:'2px', padding:'5px',
+        backgroundColor:v.paper, boxShadow:'-1.41px 1.41px 8px rgba('+sh+',.34)', border:'0.5px solid rgba('+sh+',.28)', zIndex:7, maxWidth:'calc(100% - 26px)' },
+
+      splash: { position:'absolute', inset:0, zIndex:9, display:'flex', alignItems:'center', justifyContent:'center', padding:'16px 3%', ...paperGrain,
+        animation: (this.state.closing && !this.reduced) ? 'splashSale .9s ease both' : 'none' },
+      splashSheet: { position:'relative', width:'100%', maxWidth:'340px', aspectRatio:'301/432', ...sheetSkin, padding:'40px 28px 34px',
+        display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', textAlign:'center' },
+      // Portada de bienvenida: el nombre del invitado en Final Parade, tinta plana y recto.
+      splashName: { fontFamily:script, fontWeight:400, fontSize:'56px', lineHeight:1.06, color:this.INK, margin:'2px 0 4px' },
+      splashBtn: { minHeight:'48px', marginTop:'26px', padding:'0 28px', background:this.INK, color:v.paper, border:'none',
+        fontFamily:sans, fontWeight:400, fontSize:'11.5px', letterSpacing:'.24em', textTransform:'uppercase', cursor:'pointer' },
+
+      portadaEntra: (this.state.opened && !this.reduced) ? { animation:'portadaSube .9s cubic-bezier(.22,.61,.36,1) both' } : {},
+      relFuerteDemo: { textShadow:relFuerte }
+    };
+  }
+
+  pickVariant(id){ this.setState({ variantId:id }); }
+  pickGuest(i){ this.setState({ guest:i, opened:false, closing:false, confirmed:false, asiste:null, cantidad:this.GUESTS[i].expectedCount>2?2:this.GUESTS[i].expectedCount }); }
+  abrir(){
+    this.setState({ closing:true });
+    this.closeTimer = setTimeout(()=>this.setState({ opened:true, closing:false }), 900);
+  }
+  goTo(n){
+    const el = this.scrollEl; if(!el) return;
+    const target = el.querySelector('[data-sec="'+n+'"]');
+    if(target) el.scrollTo({ top: target.offsetTop - 8, behavior:'smooth' });
+  }
+
+  renderVals(){
+    const v = this.VARIANTS.find(x=>x.id===this.state.variantId) || this.VARIANTS[0];
+    const isDesktop = this.state.device==='desktop';
+    const isMobile = !isDesktop;
+    const styles = this.buildStyles(v, isDesktop, this.state.scrollY);
+    const sans = "'Jost',sans-serif";
+    const ink = this.INK, inkSoft = this.INK_SOFT, sh = this.SH;
+    const guest = this.GUESTS[this.state.guest];
+    // La misma familia sirve para casamiento y para XV: cambia la copy, los nombres,
+    // el cronograma y la ceremonia. Nada de la piel (papel, relieve, ornamento) se toca.
+    const xv = this.state.xv;
+    const crono = xv ? this.CRONO_XV : this.CRONO;
+    const copy = xv
+      ? { kicker:'Mis XV', fraseUno:'Cumplir quince es una excusa hermosa', fraseDos:'para juntar a todos', fraseTres:'los que me vieron crecer.',
+          triviaPregunta:'¿Cuál fue mi primer viaje sola?',
+          regaloMensaje:'Tu presencia es el mejor regalo. Si querés sumar algo más, te dejo los datos.',
+          musica:'Hay canciones que no pueden faltar. ¿Cuál sumarías a mi noche?',
+          quizOptions:['A Bariloche con el colegio','A Mendoza con mis primas','A Brasil con mi mamá'] }
+      : { kicker:'¡Nos casamos!', fraseUno:'Elegimos la letra, el papel y el día.', fraseDos:'Solo falta tu nombre', fraseTres:'en la lista de los que estuvieron.',
+          triviaPregunta:'¿Dónde fue la primera cita?',
+          regaloMensaje:'Tu presencia es el regalo. Si además querés ayudarnos con el viaje, te dejamos los datos.',
+          musica:'Hay canciones que no pueden faltar. ¿Cuál sumarías a nuestra noche?',
+          quizOptions:['Un bar de Güemes','El cine','Un casamiento ajeno'] };
+    const albumStyle = this.state.albumStyle || this.props.albumStyle || 'carrusel';
+    const solapadas = albumStyle==='solapadas';
+
+    const chip = (on)=>({ fontFamily:sans, fontWeight:400, fontSize:'11.5px', letterSpacing:'.04em', padding:'8px 13px', borderRadius:'999px', cursor:'pointer',
+      background: on ? '#F4ECE2' : 'transparent', color: on ? '#2C2722' : '#A2958A', border:'1px solid '+(on ? '#F4ECE2' : '#463F38') });
+    const toggleBtn = (on)=>({ fontFamily:sans, fontWeight:400, fontSize:'11.5px', padding:'8px 16px', borderRadius:'999px', border:'none', cursor:'pointer',
+      background: on ? '#F4ECE2' : 'transparent', color: on ? '#2C2722' : '#A2958A' });
+    const mini = (on)=>({ fontFamily:sans, fontWeight:400, fontSize:'9.5px', letterSpacing:'.24em', textTransform:'uppercase', padding:'9px 12px', cursor:'pointer',
+      background: on ? ink : 'transparent', color: on ? v.paper : inkSoft, border:'0.5px solid rgba('+sh+','+(on?'.6':'.34')+')' });
+
+    const dias = Math.max(0, Math.floor((this.EVENT - this.state.now)/86400000));
+    const qrSeed = [1,0,1,1,0,1, 0,1,1,0,1,0, 1,1,0,1,1,1, 0,1,1,1,0,1, 1,0,1,0,1,0, 1,1,0,1,1,1];
+
+    return {
+      data: this.DATA, guest, styles, copy,
+      esBoda: !xv, esXV: xv,
+      nombre1: xv ? this.DATA.quinceanera : this.DATA.novia,
+      nombre2: this.DATA.novio,
+      nombresLinea: xv ? this.DATA.quinceanera : this.DATA.novia+' & '+this.DATA.novio,
+      monograma: xv ? 'D' : 'V · T',
+      xvBtnStyle: chip(xv),
+      toggleXV: ()=>this.setState(s=>({ xv:!s.xv, quiz:null })), isDesktop, isMobile, dias,
+      splashVisible: isMobile && (!this.state.opened || this.state.closing),
+      preEvento: !this.state.post,
+      triviaOn: this.props.triviaHabilitada ?? true,
+      paseOn: this.props.mostrarPase ?? true,
+      albumStyleLabel: albumStyle,
+      rsvpDays: Math.max(0, Math.floor((this.RSVP_LIMIT - this.state.now)/86400000)),
+      cantidad: this.state.cantidad,
+      confirmed: this.state.confirmed, notConfirmed: !this.state.confirmed,
+      frameHint: isMobile
+        ? 'Celular 430 × 932 · splash quieto: la hoja se desvanece en 900 ms y la portada sube 24 px.'
+        : 'Escritorio 1440 × 900 · una hoja A grande fija a la izquierda, cada sección en su propia hoja a la derecha.',
+
+      variantChips: this.VARIANTS.map(x=>({ label:x.name, pick:()=>this.pickVariant(x.id), style:chip(x.id===this.state.variantId) })),
+      guestChips: this.GUESTS.map((g,i)=>({ label:g.name, pick:()=>this.pickGuest(i), style:chip(i===this.state.guest) })),
+      mobileBtnStyle: toggleBtn(isMobile), desktopBtnStyle: toggleBtn(isDesktop),
+      postBtnStyle: chip(this.state.post),
+      togglePost: ()=>this.setState(s=>({ post:!s.post })),
+      setMobile: ()=>this.setState({ device:'mobile' }),
+      setDesktop: ()=>this.setState({ device:'desktop', opened:true }),
+      abrir: ()=>this.abrir(),
+      onScroll: this.onScroll, scrollRef: this.setScrollRef,
+
+      navItems: this.SECTIONS.map(s=>({ n:s.n, label:s.label, go:()=>this.goTo(s.n),
+        style:{ background:'none', border:'none', padding:'5px 2px', cursor:'pointer', fontFamily:sans, fontWeight:400, fontSize:'10px', letterSpacing:'.39em', textTransform:'uppercase', color:inkSoft } })),
+      // El ítem de la sección en pantalla se abre: además del ícono despliega su nombre.
+      pillItems: this.PILLS.map(p=>{
+        const activo = this.state.activeSec === p.n;
+        return { label:p.label, go:()=>this.goTo(p.n), activo,
+          style:{ minHeight:'48px', padding:'0 10px', display:'flex', alignItems:'center', gap: activo ? '7px' : '0',
+            background: activo ? v.paper2 : 'none', border:'none', cursor:'pointer' },
+          iconoStyle:{ width:'20px', aspectRatio:'1', flexShrink:0, background:ink,
+            WebkitMask:'url(./templates/iconos-linea/'+this.ICONS[p.icono].f+'.webp) no-repeat center / contain',
+            mask:'url(./templates/iconos-linea/'+this.ICONS[p.icono].f+'.webp) no-repeat center / contain' },
+          labelStyle:{ maxWidth: activo ? '90px' : '0px', opacity: activo ? 1 : 0, overflow:'hidden', whiteSpace:'nowrap',
+            transition:'max-width .3s cubic-bezier(.22,.61,.36,1), opacity .3s ease',
+            fontFamily:sans, fontWeight:400, fontSize:'9.5px', letterSpacing:'.24em', textTransform:'uppercase', color:ink } };
+      }),
+
+      crono: crono.map((c,i)=>({ hora:c.hora, label:c.label, rowStyle:{ display:'flex', alignItems:'center', gap:'12px', padding:'11px 0',
+        opacity: this.reduced ? 1 : 0, transform: this.reduced ? 'none' : 'perspective(800px) rotateY(6deg) translateY(10px)' }, })),
+
+      faqRows: this.FAQ.map((f,i)=>({ q:f.q, a:f.a, open:this.state.openRow===i, toggle:()=>this.setState(s=>({ openRow: s.openRow===i ? null : i })),
+        signStyle:{ fontFamily:sans, fontWeight:300, fontSize:'18px', color:inkSoft, transform: this.state.openRow===i ? 'rotate(45deg)' : 'none', transition:'transform .3s ease' } })),
+
+      album: [0,1,2].map(i=>({ label:'FOTO '+(i+1)+' · galeriaPrincipalFotos',
+        style: solapadas
+          ? { width:'190px', flexShrink:0, background:v.paper, padding:'10px 10px 26px', boxShadow:'-1.41px 1.41px 4px rgba('+sh+',.40)', marginLeft: i ? '-56px' : 0, zIndex: 3-i }
+          : { width:'190px', flexShrink:0, background:v.paper, padding:'10px 10px 26px', boxShadow:'-1.41px 1.41px 4px rgba('+sh+',.40)' } })),
+
+      quizOptions: copy.quizOptions.map((t,i)=>({ text:t, pick:()=>this.setState({ quiz:i }),
+        style:{ display:'block', width:'100%', maxWidth:'420px', margin:'0 auto 8px', minHeight:'48px', padding:'12px 16px', cursor:'pointer', textAlign:'left',
+          fontFamily:sans, fontWeight:300, fontSize:'15px', color: this.state.quiz===i ? v.paper : ink,
+          background: this.state.quiz===i ? ink : 'transparent', border:'0.5px solid rgba('+sh+',.34)' } })),
+
+      bankCards: this.BANKS,
+      songs: this.SONGS,
+      musicBtnLabel: this.state.playing ? 'Pausar la música' : 'Poné play',
+      togglePlay: ()=>this.setState(s=>({ playing:!s.playing })),
+      qrCells: qrSeed.map(on=>({ style:{ background: on ? ink : 'transparent' } })),
+
+      setCarrusel: ()=>this.setState({ albumStyle:'carrusel' }),
+      setSolapadas: ()=>this.setState({ albumStyle:'solapadas' }),
+      carruselBtnStyle: mini(!solapadas), solapadasBtnStyle: mini(solapadas),
+
+      asisteSiStyle: { flex:1, minHeight:'48px', minWidth:'130px', cursor:'pointer', fontFamily:sans, fontWeight:400, fontSize:'11.5px', letterSpacing:'.24em', textTransform:'uppercase',
+        background: this.state.asiste==='si' ? ink : 'transparent', color: this.state.asiste==='si' ? v.paper : ink, border:'0.5px solid rgba('+sh+',.5)' },
+      asisteNoStyle: { flex:1, minHeight:'48px', minWidth:'130px', cursor:'pointer', fontFamily:sans, fontWeight:400, fontSize:'11.5px', letterSpacing:'.24em', textTransform:'uppercase',
+        background: this.state.asiste==='no' ? ink : 'transparent', color: this.state.asiste==='no' ? v.paper : ink, border:'0.5px solid rgba('+sh+',.5)' },
+      setAsisteSi: ()=>this.setState({ asiste:'si' }), setAsisteNo: ()=>this.setState({ asiste:'no' }),
+      menos: ()=>this.setState(s=>({ cantidad:Math.max(1,s.cantidad-1) })),
+      mas: ()=>this.setState(s=>({ cantidad:Math.min(guest.expectedCount,s.cantidad+1) })),
+      confirmar: ()=>this.setState({ confirmed:true }),
+
+      outerFrameStyle: isMobile
+        ? { width:'458px', maxWidth:'100%', background:'#0C0B09', borderRadius:'46px', padding:'14px', boxShadow:'0 30px 60px rgba(0,0,0,.45)', display:'flex', flexDirection:'column' }
+        : { width:'1440px', maxWidth:'100%' },
+      screenStyle: isMobile
+        ? { position:'relative', height:'908px', borderRadius:'32px', overflow:'hidden', background:v.paper }
+        : { position:'relative', display:'flex', height:'900px', overflow:'hidden', background:v.paper, boxShadow:'0 30px 70px rgba(0,0,0,.18)' },
+
+      handoffVariants: this.VARIANTS.map(x=>({ name:x.name, swatches:[x.hex,x.paper,x.paper2,this.INK,this.INK_SOFT].map(h=>({ hex:h,
+        chip:{ display:'block', width:'14px', height:'14px', borderRadius:'2px', background:h, border:'0.5px solid rgba(0,0,0,.15)', flexShrink:0 } })) })),
+
+      handoffAnims: [
+        { name:'Entrada de sección', dur:'1200 ms (giro 350 ms)', easing:'cubic-bezier(.22,.61,.36,1)', detail:'opacity 0→1 junto con perspective(800px) rotateY(6deg) translateY(10px) → rotateY(0) translateY(0). IntersectionObserver al 15 %, una sola vez, root = contenedor de scroll. Stagger 120 ms entre los bloques de una misma hoja (data-delay). Nunca stagger por letra.' },
+        { name:'Salida del splash', dur:'900 ms', easing:'ease (hoja) / cubic-bezier(.22,.61,.36,1) (portada)', detail:'La hoja del splash se desvanece de opacity 1 a 0 y la portada sube translateY(24px) → 0. No vuela, no se rompe, no hay platina: el splash es quieto.' },
+        { name:'Luz que gira', dur:'continuo (rAF)', easing:'lineal sobre sin(scrollY/260)', detail:'Ángulo de reposo −135° (luz desde arriba a la derecha), amplitud ±3°, radio 1,4 px: dx = 1,4·cos(a), dy = 1,4·sin(a) en la capa oscura y el par claro en el ángulo opuesto. Se apaga con prefers-reduced-motion.' },
+        { name:'Pastilla inferior', dur:'300 ms', easing:'cubic-bezier(.22,.61,.36,1) / ease', detail:'Los cinco ítems muestran sólo su ícono de línea (20 px, máscara CSS con la tinta). El de la sección que está en pantalla se abre: max-width 0 → 90 px y opacity 0 → 1 en el nombre, y el fondo pasa al papel alterno. La sección activa se resuelve en el mismo rAF del scroll.' },
+        { name:'Acordeón de detalles', dur:'400 ms', easing:'cubic-bezier(.22,.61,.36,1)', detail:'scaleY 0→1 con transform-origin top; el signo + rota 45° en 300 ms.' },
+        { name:'CONFIRMADO', dur:'500 ms', easing:'cubic-bezier(.22,.61,.36,1)', detail:'Relieve HUECO (prensado hacia adentro) creciendo de scale .96 a 1 con opacity 0→1. Sin sello, sin color, sin confeti.' },
+        { name:'Cronograma', dur:'1200 ms', easing:'cubic-bezier(.22,.61,.36,1)', detail:'Cada hito usa la misma entrada de sección con 120 ms de stagger. No hay entrada lateral: el registro de la colección es un solo gesto repetido.' },
+        { name:'Ornamento', dur:'—', easing:'—', detail:'Quieto: transform none, opacity 1, blend normal. Entra con el fundido de la sección que lo contiene y se queda. Cero rotación, cero parallax, cero brillos.' }
+      ],
+
+      handoffDoodles: [
+        { slot:'D1 · portada', what:'garabato-largo.webp al 30 %, pegado al borde izquierdo (left −9 %), sangrando arriba y abajo.' },
+        { slot:'D2 · portada', what:'garabato-corto.webp al 46 % cerrando la esquina inferior derecha, más los destellos 1 y 3 y el corazón chico arriba del kicker.' },
+        { slot:'D3 · marco de la foto', what:'Margen de papel de 10 px alrededor de cada foto del álbum (foto pegada), con la sombra de hoja.' },
+        { slot:'D4 · marco de la foto', what:'Segundo margen: 26 px al pie de la polaroid, como el borde ancho de un papel fotográfico.' },
+        { slot:'D5 · pliegue', what:'Esquina plegada superior derecha, 26 px: clip-path + gradiente a 225°.' },
+        { slot:'D6 · pliegue', what:'Esquina plegada inferior izquierda, 26 px: clip-path + gradiente a 45°.' },
+        { slot:'D7 · ícono de sección', what:'Uno por sección del set compartido, 19 % del ancho, centrado arriba del número: reloj, anillos, iglesia, polaroids, auto, tarjeta, regalo, nota-musical, confeti.' },
+        { slot:'D8 · countdown', what:'marco-circular.webp al 58 % rodeando el número, la única pieza que se usa centrada (y sólo ahí).' },
+        { slot:'D9 · RSVP', what:'sobre.webp como máscara, 16 %, sobre el CONFIRMADO en relieve hueco.' },
+        { slot:'D10 · cierre', what:'Monograma en óvalo doble de 0,75 px, SVG inline, con las iniciales en serif 300.' }
+      ],
+
+      portNotes: [
+        '1. Base a copiar: ModernoTemplate.tsx. La guía técnica §2.1 es explícita en NO usar ChicTemplate.tsx ni NeonTemplate.tsx como base. Prensa es tema claro: al invertir colores hay que revisar cada color: / text-[#…] contra su fondo real (§3.5).',
+        '2. Componentes compartidos de src/components/invitation/v2/: Countdown, RSVPWizardV2, BottomNavPill, SongSuggestion (variant "moderno"), Album (switch por albumStyle entre AlbumCarousel y AlbumPolaroidCascade, tope de 4 fotos), ProgressiveQuiz y SectionWrapper. Acá están maquetados a mano sólo para mostrar el diseño.',
+        '3. Theming: --t-acc y --t-acc2 en esta colección NO son un color de acento, son la TINTA (#514842) y la tinta suave (#8A756D); lo que cambia por variante es el papel. Definirlos, más --c-accent, --t-bg, --t-surface y --t-muted, en los dos wrappers (§3.2), y por ser tema claro definir literalmente --chic-ink con la tinta (§3.4).',
+        '4. Variantes por script (§2.4): las cinco cambian sólo paper/paper2 (Lino, Hueso, Arena, Piedra, Humo) y mantienen tinta y sombra. El chequeo de §3.6 acá se invierte: lo que tiene que ser distinto entre archivos es el hex del papel, y --t-acc es el mismo a propósito porque la colección es monocroma. Dejarlo anotado en el script para que la próxima auditoría no lo lea como bug.',
+        '5. Rutas: en el mockup las máscaras van relativas (./templates/…) porque el canvas no sirve la raíz del proyecto; la ruta canónica del port está en la constante PIEZAS. Piezas: sólo /templates/iconos-linea/ (12 archivos, 225 KB). Son tinta plana, así que van como máscara CSS con background en la tinta —nunca como <img>— con alt="", aria-hidden="true" y pointer-events:none. Las de herbario van al revés (<img> con el duotono de filtros del INVENTARIO); no mezclar los dos métodos.',
+        '6. La script es del repo: @font-face a /fonts/final-parade-script.woff2 en el mockup y next/font/local en producción, usada como var(--font-final-parade, \'Final Parade Script\'), cursive. No pedirla a Google Fonts ni sustituirla.',
+        '7. Los dos pliegues van como ::before/::after de la hoja en React (acá son dos divs para que el editor pueda seleccionarlos); el grano de página va en un elemento position:fixed detrás de todo y no se mueve: no hay ningún elemento con factor de parallax distinto de 1.',
+        '8. Campos usados: nombreNovio, nombreNovia, fecha, ciudad, lugarNombre, direccion, hora, mapUrl, ceremonia*, galeriaPrincipalFotos, albumStyle, cronogramaEventos, portadaDressCode, infoAlojamiento/Estacionamiento/Transporte, regalo*, pagoTarjeta*, precioNino, triviaHabilitada, sugerenciaMusicaHabilitada, rsvpDaysBeforeEvent, albumCompartidoHabilitado (estado post-evento). De Guest: name, expectedCount, status, orderNumber.'
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

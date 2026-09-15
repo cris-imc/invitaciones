@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400;1,700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #0B0B0D; overflow: hidden; }
+  a { color: #C9A24A; text-decoration: none; }
+  a:hover { color: #F2EEE6; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes nrMarq { to { transform: translate3d(-50%, 0, 0); } }
+  @keyframes nrMarqRev { from { transform: translate3d(-50%, 0, 0); } to { transform: translate3d(0, 0, 0); } }
+  @keyframes nrFlicker { 0%, 100% { opacity: 1; } 92% { opacity: 1; } 93% { opacity: .82; } 94% { opacity: 1; } 97% { opacity: .9; } 98% { opacity: 1; } }
+  @keyframes nrSmoke { 0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; } 20% { opacity: .35; } 100% { transform: translate3d(30px, -180px, 0) scale(2.2); opacity: 0; } }
+  @keyframes nrReel { to { transform: rotate(360deg); } }
+  @keyframes nrEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  @keyframes nrBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+  @keyframes nrGrain { 0% { transform: translate(0, 0); } 25% { transform: translate(-2%, 1%); } 50% { transform: translate(1%, -2%); } 75% { transform: translate(-1%, -1%); } 100% { transform: translate(2%, 1%); } }
+  @media (min-width: 1024px) {
+    [data-spread] { display: grid !important; grid-template-columns: 1fr 1fr !important; align-items: center; column-gap: 72px; }
+    [data-spread] > [data-page] { max-width: 560px; width: 100%; }
+    [data-spread] > [data-page="l"] { justify-self: end; }
+    [data-spread] > [data-page="r"] { justify-self: start; }
+    [data-hero-name] { font-size: min(11vw, 180px, 13vh) !important; }
+    [data-photo-frame] { max-width: 900px !important; margin-left: auto; margin-right: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); font-family: 'Courier Prime', monospace;">
+
+  <sc-if value="{{ vistaInvitacion }}" hint-placeholder-val="{{ true }}">
+
+  <div ref="{{ setScroller }}" data-scroller="1" style="position: absolute; inset: 0; overflow-y: hidden; overflow-x: hidden;">
+
+    <!-- 0 · BIENVENIDA · foco, persiana, humo -->
+    <div data-tone="dark" data-screen-label="Bienvenida" style="position: sticky; top: 0; height: 100vh; z-index: 0; overflow: hidden; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6);">
+      <div ref="{{ setHero }}" style="position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: calc(18px + env(safe-area-inset-top)) max(20px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); box-sizing: border-box; will-change: transform;">
+        <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+          <div ref="{{ setSpot }}" style="position: absolute; left: 50%; top: 40%; width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax; background: radial-gradient(circle at center, rgba(242,238,230,.16) 0, rgba(242,238,230,.06) 18%, transparent 34%); will-change: transform;"></div>
+          <div data-drift="6" style="position: absolute; left: -10%; right: -10%; top: 0; bottom: 0; background: repeating-linear-gradient(174deg, transparent 0 46px, rgba(242,238,230,.05) 46px 58px); mask-image: linear-gradient(90deg, transparent, #000 40%, #000 60%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 40%, #000 60%, transparent);"></div>
+          <sc-for list="{{ smoke }}" as="s" hint-placeholder-count="4">
+            <span style="position: absolute; left: {{ s.x }}; bottom: 22%; width: 60px; height: 60px; border-radius: 50%; background: radial-gradient(circle, rgba(242,238,230,.5), transparent 70%); animation: nrSmoke {{ s.dur }} ease-out infinite; animation-delay: {{ s.delay }};"></span>
+          </sc-for>
+          <svg width="100%" height="100%" style="position: absolute; inset: -4%; width: 108%; height: 108%; opacity: .12; animation: nrGrain .4s steps(1) infinite;"><defs><pattern id="nrGrain" patternUnits="userSpaceOnUse" width="6" height="6"><circle cx="1" cy="2" r=".6" fill="#F2EEE6"></circle><circle cx="4" cy="5" r=".5" fill="#F2EEE6"></circle></pattern></defs><rect width="100%" height="100%" fill="url(#nrGrain)"></rect></svg>
+        </div>
+
+        <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);">
+          <span>Escena 00 · Toma 1</span>
+          <span style="text-align: right;">Nº 00 / 10</span>
+        </div>
+
+        <div style="position: relative; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 0; text-align: center; animation: nrFlicker 9s linear infinite;">
+          <span ref="{{ setKicker }}" style="font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--acc, #C9A24A);">— Una producción de —</span>
+          <h1 data-hero-name="1" style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: min(clamp(56px, 18vw, 170px), 13vh); line-height: .92; letter-spacing: -.02em; display: flex; flex-direction: column; align-items: center; color: var(--ink, #F2EEE6);">
+            <sc-if value="{{ nombreCorto }}" hint-placeholder-val="{{ true }}">
+              <span style="overflow: hidden; display: block;"><span data-piece="1" style="display: block;">Valentina</span></span>
+              <span style="overflow: hidden; display: block; font-size: .3em; line-height: 1.2;"><span data-piece="1" style="display: block; font-weight: 400; font-style: italic; color: var(--acc, #C9A24A);">y</span></span>
+              <span style="overflow: hidden; display: block;"><span data-piece="1" style="display: block;">Tomás</span></span>
+            </sc-if>
+            <sc-if value="{{ nombreLargo }}" hint-placeholder-val="{{ false }}">
+              <span style="overflow: hidden; display: block; font-size: .62em;"><span data-piece="1" style="display: block;">María Florencia</span></span>
+              <span style="overflow: hidden; display: block; font-size: .3em; line-height: 1.2;"><span data-piece="1" style="display: block; font-weight: 400; font-style: italic; color: var(--acc, #C9A24A);">y</span></span>
+              <span style="overflow: hidden; display: block; font-size: .62em;"><span data-piece="1" style="display: block;">Juan Ignacio</span></span>
+            </sc-if>
+          </h1>
+          <span style="font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(18px, 5vw, 28px); color: var(--ink, #F2EEE6);">en «La noche más larga»</span>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; font-size: 12px; line-height: 1.5; text-align: left; border-top: 1px solid rgba(242,238,230,.3); padding-top: 10px; letter-spacing: .04em;">
+            <span>SÁBADO 20 · 03 · 2027 · 18:30<br><span style="color: var(--acc, #C9A24A);">Estancia La Paz · Córdoba</span></span>
+            <span style="text-align: right;">PASE Nº 014<br><span style="color: var(--acc, #C9A24A);">2 personas</span></span>
+          </div>
+        </div>
+
+        <div style="position: relative; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center;">
+          <p style="margin: 0; font-size: clamp(13px, 3.6vw, 16px); line-height: 1.5; max-width: 40ch;">Familia Pereyra: la ciudad duerme, nosotros no. Los necesitamos en la primera fila.</p>
+          <button onClick="{{ open }}" style="min-height: 54px; width: 100%; max-width: 360px; border: 1px solid var(--acc, #C9A24A); background: transparent; color: var(--acc, #C9A24A); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; padding: 0 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px;" style-hover="background: var(--acc, #C9A24A); color: var(--bg, #0B0B0D);">Abrir invitación<span style="animation: nrBlink 1s steps(1) infinite;">_</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 01 · SAVE THE DATE · cartel de cine -->
+    <section data-tone="light" data-screen-label="Save the Date" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #F2EEE6); color: var(--bg, #0B0B0D); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">01 — Guardá la fecha</span><span data-xin="1" data-dist="40">01 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 14px;">
+          <span data-xin="1" style="font-size: 12px; letter-spacing: .3em; text-transform: uppercase; text-align: center;">Estreno mundial</span>
+          <div style="display: flex; flex-direction: column; font-family: 'Playfair Display', serif; font-weight: 900; line-height: .9; text-align: center;">
+            <span data-xin="1" data-dist="-160" style="font-size: clamp(110px, 36vw, 260px); letter-spacing: -.04em;">20</span>
+            <span data-xin="1" data-dist="160" data-delay="120" style="font-size: clamp(40px, 12vw, 90px); font-style: italic; font-weight: 400;">de marzo</span>
+            <span data-xin="1" data-dist="-160" data-delay="240" style="font-size: clamp(40px, 12vw, 90px); color: var(--acc2, #8E1B2C);">2027</span>
+          </div>
+          <div data-xin="1" data-delay="360" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; border-top: 2px solid var(--bg, #0B0B0D); border-bottom: 2px solid var(--bg, #0B0B0D); padding: 10px 0;">
+            <span>Sábado · función única · 18:30 h</span>
+            <a href="#" style="color: var(--ink, #F2EEE6); background: var(--bg, #0B0B0D); padding: 12px 18px; min-height: 24px;">Reservar en calendario</a>
+          </div>
+        </div>
+        <div data-page="r" data-photo-frame="1" ref="{{ setPhotoWrap }}" data-xin="1" data-delay="200" data-dist="0" style="position: relative; width: 100%; aspect-ratio: 4 / 5; box-sizing: border-box; overflow: hidden; background: repeating-linear-gradient(135deg, #3A3A3E 0 8px, #2A2A2E 8px 16px); border: 14px solid var(--bg, #0B0B0D); border-left-width: 26px; border-right-width: 26px;">
+          <div style="position: absolute; left: -26px; top: 0; bottom: 0; width: 26px; background: repeating-linear-gradient(180deg, transparent 0 10px, var(--ink, #F2EEE6) 10px 22px, transparent 22px 32px); background-position: 6px 0; background-size: 14px 32px; background-repeat: repeat-y; opacity: .9;"></div>
+          <div style="position: absolute; right: -26px; top: 0; bottom: 0; width: 26px; background: repeating-linear-gradient(180deg, transparent 0 10px, var(--ink, #F2EEE6) 10px 22px, transparent 22px 32px); background-position: 6px 0; background-size: 14px 32px; background-repeat: repeat-y; opacity: .9;"></div>
+          <svg width="100%" height="100%" style="position: absolute; inset: 0; pointer-events: none;">
+            <defs><pattern id="nrHtPhoto" patternUnits="userSpaceOnUse" width="10" height="10"><circle ref="{{ setHtDot }}" cx="5" cy="5" r="7.2" fill="#0B0B0D"></circle></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#nrHtPhoto)"></rect>
+          </svg>
+          <span style="position: absolute; left: 12px; bottom: 10px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink, #F2EEE6);">FOTO · portadaImagenFondo · B/N</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · COUNTDOWN · claqueta -->
+    <section data-tone="dark" data-screen-label="Countdown" style="position: relative; z-index: 1; min-height: 100vh; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); padding: 60px 0 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; overflow: hidden;">
+      <div style="padding: 0 max(20px, calc((100% - 1100px) / 2)); display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);"><span data-xin="1" data-dist="-40">02 — Cuenta regresiva</span><span data-xin="1" data-dist="40">02 / 10</span></div>
+      <div style="overflow: hidden; background: repeating-linear-gradient(-45deg, var(--ink, #F2EEE6) 0 22px, var(--bg, #0B0B0D) 22px 44px); height: 26px;"></div>
+      <div data-spread="1" style="padding: 0 max(20px, calc((100% - 1100px) / 2)); display: flex; flex-direction: column;">
+        <div data-page="l" style="grid-column: 1 / -1; background: #17171A; border: 2px solid var(--ink, #F2EEE6); padding: 16px 14px; display: flex; flex-direction: column; gap: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; border-bottom: 1px solid rgba(242,238,230,.3); padding-bottom: 8px;"><span>Prod. Valentina &amp; Tomás</span><span>Dir. el destino</span></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <sc-for list="{{ cuenta }}" as="c" hint-placeholder-count="4">
+              <div data-xin="1" data-dist="{{ c.dist }}" data-delay="{{ c.delay }}" style="border: 1px solid rgba(242,238,230,.3); padding: 14px 12px 12px; display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #C9A24A);">{{ c.label }}</span>
+                <span ref="{{ c.ref }}" style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(52px, 17vw, 130px); line-height: .9; display: inline-block; letter-spacing: -.03em;">—</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; border-top: 1px solid rgba(242,238,230,.3); padding-top: 8px;"><span>Escena 02</span><span>Toma <span ref="{{ setTake }}">1</span></span></div>
+        </div>
+      </div>
+      <div style="overflow: hidden; border-top: 1px solid rgba(242,238,230,.3); border-bottom: 1px solid rgba(242,238,230,.3); padding: 8px 0;">
+        <div ref="{{ setMarq2 }}" style="display: flex; width: max-content; animation: nrMarqRev 16s linear infinite; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; white-space: nowrap; color: var(--acc, #C9A24A);">
+          <span style="padding-right: 36px;">Estancia La Paz · Ascochinga · Córdoba · 18:30 h · Black tie ·</span>
+          <span style="padding-right: 36px;">Estancia La Paz · Ascochinga · Córdoba · 18:30 h · Black tie ·</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · FRASE · intertítulo -->
+    <section data-tone="dark" data-screen-label="Frase" style="position: relative; z-index: 1; min-height: 100vh; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; overflow: hidden;">
+      <div style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.8) 100%);"></div>
+      <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);"><span data-xin="1" data-dist="-40">03 — Intertítulo</span><span data-xin="1" data-dist="40">03 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px; align-items: center;">
+        <div data-page="l" style="border: 1px solid rgba(242,238,230,.4); padding: 30px 22px; width: 100%; max-width: 560px; box-sizing: border-box; text-align: center; box-shadow: inset 0 0 0 6px var(--bg, #0B0B0D), inset 0 0 0 7px rgba(242,238,230,.25);">
+          <h2 ref="{{ setPhrase }}" style="margin: 0; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(26px, 7vw, 56px); line-height: 1.2;">
+            <span data-w="1">Después</span> <span data-w="1">de</span> <span data-w="1" style="color: var(--acc, #C9A24A);">doce</span> <span data-w="1" style="color: var(--acc, #C9A24A);">años</span> <span data-w="1">de</span> <span data-w="1">mates</span> <span data-w="1">compartidos,</span> <span data-w="1">elegimos</span> <span data-w="1" style="font-weight: 700; font-style: normal;">decirlo</span> <span data-w="1" style="font-weight: 700; font-style: normal;">en</span> <span data-w="1" style="font-weight: 700; font-style: normal;">voz</span> <span data-w="1" style="font-weight: 700; font-style: normal;">alta.</span>
+          </h2>
+        </div>
+        <div data-page="r" data-xin="1" data-delay="900" data-dist="60" style="font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--acc, #C9A24A);">frasePersonalizadaTexto</div>
+      </div>
+      <div style="position: relative; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: rgba(242,238,230,.6);"><span>Valentina &amp; Tomás</span><span>Rollo 3</span></div>
+    </section>
+
+    <!-- 04 · CUÁNDO Y DÓNDE · escenas, pineado -->
+    <sc-if value="{{ modoLateral }}" hint-placeholder-val="{{ true }}">
+    <div data-pan="1" data-screen-label="Cuándo y dónde" style="position: relative; z-index: 1; height: 300vh;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--bg, #0B0B0D);">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform;">
+          <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3">
+            <div data-tone="{{ p.tone }}" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: {{ p.bg }}; color: {{ p.fg }};">
+              <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: {{ p.acc }};"><span>04 — {{ p.kicker }}</span><span>{{ p.folio }}</span></div>
+              <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 18px;">
+                <div data-page="l" style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: {{ p.acc }};">{{ p.sub }}</span>
+                  <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(44px, 13vw, 110px); line-height: .92; letter-spacing: -.02em;">{{ p.titulo }}</h2>
+                </div>
+                <div data-page="r" style="border: 1px solid currentColor; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px;">
+                  <sc-for list="{{ p.lineas }}" as="l" hint-placeholder-count="3">
+                    <div style="display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px dotted currentColor; font-size: 14px; line-height: 1.4;"><span style="font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 3px;">{{ l.k }}</span><span style="text-align: right; font-weight: 700;">{{ l.v }}</span></div>
+                  </sc-for>
+                  <a href="#" style="margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; color: {{ p.bg }}; background: {{ p.fg }}; font-weight: 700; font-size: 12px; letter-spacing: .24em; text-transform: uppercase;">{{ p.cta }}<span>→</span></a>
+                </div>
+              </div>
+              <div style="position: relative; display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; opacity: .7;"><span>{{ p.pie }}</span><span>Deslizá →</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2;">
+          <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3"><span data-dot="{{ $index }}" style="width: 24px; height: 2px; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span></sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- 04 · vertical -->
+    <sc-if value="{{ modoVertical }}" hint-placeholder-val="{{ false }}">
+    <section data-tone="dark" data-screen-label="Cuándo y dónde" style="position: relative; z-index: 1; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); padding: 0 max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box;">
+      <div style="position: sticky; top: 0; z-index: 0; padding-top: 60px; padding-bottom: 20px; background: var(--bg, #0B0B0D); display: flex; flex-direction: column; gap: 8px;">
+        <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);"><span>04 — Cuándo y dónde</span><span>04 / 10</span></div>
+        <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(44px, 13vw, 110px); line-height: .92; letter-spacing: -.02em;">Estancia La Paz</h2>
+        <span style="font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--acc, #C9A24A);">Ruta E-53 km 13 · Ascochinga · Córdoba</span>
+      </div>
+      <div style="position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; padding-top: 28vh;">
+        <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3">
+          <div data-xin="1" data-dist="{{ p.dist }}" data-rot="{{ p.rot }}" style="background: {{ p.bg }}; color: {{ p.fg }}; border: 1px solid var(--ink, #F2EEE6); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: {{ p.acc }};"><span>{{ p.kicker }}</span><span>{{ p.folio }}</span></div>
+            <span style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(28px, 8vw, 48px); line-height: 1;">{{ p.titulo }}</span>
+            <sc-for list="{{ p.lineas }}" as="l" hint-placeholder-count="3">
+              <div style="display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px dotted currentColor; font-size: 14px; line-height: 1.4;"><span style="font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 3px;">{{ l.k }}</span><span style="text-align: right; font-weight: 700;">{{ l.v }}</span></div>
+            </sc-for>
+            <a href="#" style="margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; color: {{ p.bg }}; background: {{ p.fg }}; font-weight: 700; font-size: 12px; letter-spacing: .24em; text-transform: uppercase;">{{ p.cta }}<span>→</span></a>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- 05 · CHECK-IN · expediente -->
+    <section data-tone="light" data-screen-label="Check-in" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #F2EEE6); color: var(--bg, #0B0B0D); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">05 — Expediente</span><span data-xin="1" data-dist="40">05 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 12px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(44px, 13vw, 110px); line-height: .92; letter-spacing: -.02em;">¿Testigo<br><span style="font-style: italic; font-weight: 400; color: var(--acc2, #8E1B2C);">o cómplice?</span></h2>
+          <p data-xin="1" data-delay="120" style="margin: 0; font-size: 14px; line-height: 1.6; max-width: 42ch;">Confirmá hasta el 20 de febrero. Menores de 12 no abonan; de 12 a 17, precio adolescente.</p>
+        </div>
+        <div data-page="r" ref="{{ setCoupon }}" data-xin="1" data-delay="160" data-dist="80" style="position: relative; background: #FFFDF8; color: var(--bg, #0B0B0D); border: 1px solid var(--bg, #0B0B0D); padding: 22px 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; border-bottom: 2px solid var(--bg, #0B0B0D); padding-bottom: 12px;"><span>Caso Nº 014</span><span ref="{{ setStatus }}" style="border: 1px solid currentColor; padding: 3px 8px;">Pendiente</span></div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;">Nombre y apellido<input value="Familia Pereyra" readOnly="{{ true }}" style="min-height: 48px; border: 0; border-bottom: 1px solid var(--bg, #0B0B0D); background: transparent; font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 17px; color: var(--bg, #0B0B0D); padding: 0; outline: none;"></label>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;">Asistencia
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button onClick="{{ pickYes }}" ref="{{ setYes }}" style="min-height: 48px; border: 1px solid var(--bg, #0B0B0D); background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer;">Sí, vamos</button>
+              <button onClick="{{ pickNo }}" ref="{{ setNo }}" style="min-height: 48px; border: 1px solid var(--bg, #0B0B0D); background: transparent; color: var(--bg, #0B0B0D); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; cursor: pointer;">No puedo</button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;">Personas<div style="display: flex; align-items: center; border-bottom: 1px solid var(--bg, #0B0B0D); min-height: 48px;"><button onClick="{{ dec }}" style="width: 44px; min-height: 44px; border: 0; background: transparent; font-size: 22px; color: var(--bg, #0B0B0D); cursor: pointer;">−</button><span ref="{{ setCount }}" style="flex: 1; text-align: center; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 26px;">2</span><button onClick="{{ inc }}" style="width: 44px; min-height: 44px; border: 0; background: transparent; font-size: 22px; color: var(--bg, #0B0B0D); cursor: pointer;">+</button></div></label>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;">Restricciones<input placeholder="Sin TACC, vegano…" style="min-height: 48px; border: 0; border-bottom: 1px solid var(--bg, #0B0B0D); background: transparent; font-family: 'Courier Prime', monospace; font-size: 15px; color: var(--bg, #0B0B0D); padding: 0; outline: none; width: 100%; box-sizing: border-box;"></label>
+          </div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;">Declaración para los novios<textarea rows="2" placeholder="Opcional" style="border: 0; border-bottom: 1px solid var(--bg, #0B0B0D); background: transparent; font-family: 'Courier Prime', monospace; font-size: 15px; color: var(--bg, #0B0B0D); padding: 8px 0; outline: none; resize: none; width: 100%; box-sizing: border-box;"></textarea></label>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .14em; text-transform: uppercase;"><span>Adolescente (12–17)</span><span>$ 18.000</span></div>
+          <button onClick="{{ confirm }}" style="min-height: 54px; border: 0; background: var(--acc2, #8E1B2C); color: var(--ink, #F2EEE6); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; cursor: pointer;" style-hover="background: var(--bg, #0B0B0D);">Firmar y confirmar</button>
+          <div ref="{{ setSticker }}" style="position: absolute; right: 12px; bottom: 78px; width: 150px; height: 70px; opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px); pointer-events: none; border: 3px solid var(--acc2, #8E1B2C); color: var(--acc2, #8E1B2C); display: flex; align-items: center; justify-content: center; font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 16px; letter-spacing: .2em; text-transform: uppercase; box-shadow: inset 0 0 0 3px #FFFDF8, inset 0 0 0 4px var(--acc2, #8E1B2C);">Confirmado</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 · ÁLBUM · tira de fotogramas -->
+    <div data-pan="1" data-screen-label="Álbum" style="position: relative; z-index: 1; height: 240vh;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: #F7F5F0; color: #0B0B0D;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 200vw; will-change: transform;">
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #6E6A78;"><span>06 — Fotogramas</span><span>Rollo 01 / 02 · 06 / 10</span></div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(40px, 11vw, 90px); line-height: .92; letter-spacing: -.02em;">Detrás de <span style="font-style: italic; font-weight: 400;">escena</span></h2>
+            <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; max-width: 900px; background: #0B0B0D; padding: 8px; border-top: 12px dotted #F7F5F0; border-bottom: 12px dotted #F7F5F0;">
+              <sc-for list="{{ fotos }}" as="f" hint-placeholder-count="5">
+                <div data-sheet="1" style="grid-column: {{ f.col }}; grid-row: {{ f.row }}; position: relative; overflow: hidden; background: repeating-linear-gradient(135deg, #8A8680 0 8px, #9E9A93 8px 16px); min-height: 0;">
+                  <div data-colorwash="1" style="position: absolute; inset: 0; background: {{ f.tint }}; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear;"></div>
+                  <span style="position: absolute; left: 8px; bottom: 6px; font-size: 10px; letter-spacing: .14em; color: #F2EEE6;">FOTO {{ f.n }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #6E6A78;"><span>galeriaPrincipalFotos · 5 por hoja</span><span>Deslizá →</span></div>
+          </div>
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: #EFEBE3;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #6E6A78;"><span ref="{{ setAlbumKicker }}">Rollo 02 / 02 — después del evento</span><span>06 / 10</span></div>
+            <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(40px, 11vw, 90px); line-height: .92; letter-spacing: -.02em;">Momentos<br><span style="font-style: italic; font-weight: 400; color: var(--acc2, #8E1B2C);">de la noche</span></h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; max-width: 600px; background: #0B0B0D; padding: 8px;">
+              <div style="aspect-ratio: 1; background: repeating-linear-gradient(135deg, #8A8680 0 8px, #9E9A93 8px 16px);"></div>
+              <div style="aspect-ratio: 1; background: repeating-linear-gradient(135deg, #8A8680 0 8px, #9E9A93 8px 16px);"></div>
+              <div style="aspect-ratio: 1; border: 1px dashed #F2EEE6; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 30px; color: #F2EEE6;">+</div>
+            </div>
+            <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #6E6A78; max-width: 42ch;">Acá van las fotos que suban los invitados. Se habilita cuando termine la fiesta.</p>
+          </div>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: #0B0B0D;">
+          <span data-dot="0" style="width: 24px; height: 2px; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span>
+          <span data-dot="1" style="width: 24px; height: 2px; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 · MÚSICA · banda sonora -->
+    <section data-tone="dark" data-screen-label="Música" style="position: relative; z-index: 1; min-height: 100vh; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);"><span data-xin="1" data-dist="-40">07 — Banda sonora</span><span data-xin="1" data-dist="40">07 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 16px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(44px, 13vw, 110px); line-height: .92; letter-spacing: -.02em;">¿Qué tema<br><span style="font-style: italic; font-weight: 400; color: var(--acc, #C9A24A);">cierra la película?</span></h2>
+          <div data-xin="1" data-delay="120" style="display: flex; align-items: center; gap: 16px;">
+            <span style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--ink, #F2EEE6); box-sizing: border-box; position: relative; animation: nrReel 4s linear infinite;"><span style="position: absolute; left: 50%; top: 4px; width: 2px; height: 16px; margin-left: -1px; background: var(--ink, #F2EEE6);"></span><span style="position: absolute; left: 50%; bottom: 4px; width: 2px; height: 16px; margin-left: -1px; background: var(--ink, #F2EEE6);"></span><span style="position: absolute; top: 50%; left: 4px; height: 2px; width: 16px; margin-top: -1px; background: var(--ink, #F2EEE6);"></span><span style="position: absolute; top: 50%; right: 4px; height: 2px; width: 16px; margin-top: -1px; background: var(--ink, #F2EEE6);"></span></span>
+            <span style="flex: 1; height: 1px; background: rgba(242,238,230,.4);"></span>
+            <span style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--acc, #C9A24A); box-sizing: border-box; position: relative; animation: nrReel 4s linear infinite;"><span style="position: absolute; left: 50%; top: 4px; width: 2px; height: 16px; margin-left: -1px; background: var(--acc, #C9A24A);"></span><span style="position: absolute; left: 50%; bottom: 4px; width: 2px; height: 16px; margin-left: -1px; background: var(--acc, #C9A24A);"></span><span style="position: absolute; top: 50%; left: 4px; height: 2px; width: 16px; margin-top: -1px; background: var(--acc, #C9A24A);"></span><span style="position: absolute; top: 50%; right: 4px; height: 2px; width: 16px; margin-top: -1px; background: var(--acc, #C9A24A);"></span></span>
+          </div>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 12px;">
+          <div data-xin="1" data-delay="160" data-dist="60" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input placeholder="Título" style="min-height: 48px; border: 1px solid var(--ink, #F2EEE6); background: transparent; color: var(--ink, #F2EEE6); font-family: 'Courier Prime', monospace; font-size: 15px; padding: 0 14px; outline: none; min-width: 0;">
+            <input placeholder="Artista" style="min-height: 48px; border: 1px solid var(--ink, #F2EEE6); background: transparent; color: var(--ink, #F2EEE6); font-family: 'Courier Prime', monospace; font-size: 15px; padding: 0 14px; outline: none; min-width: 0;">
+          </div>
+          <button data-xin="1" data-delay="220" style="min-height: 50px; border: 1px solid var(--acc, #C9A24A); background: var(--acc, #C9A24A); color: var(--bg, #0B0B0D); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 12px; letter-spacing: .3em; text-transform: uppercase; cursor: pointer;" style-hover="background: var(--ink, #F2EEE6); border-color: var(--ink, #F2EEE6);">Sugerir canción</button>
+          <div data-xin="1" data-delay="280" style="display: flex; flex-direction: column;">
+            <sc-for list="{{ canciones }}" as="c" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px dotted rgba(242,238,230,.4);">
+                <div style="display: flex; align-items: baseline; gap: 12px; min-width: 0;"><span style="font-size: 11px; color: var(--acc, #C9A24A);">{{ c.n }}</span><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 19px; line-height: 1.1;">{{ c.t }}</span><span style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .7;">{{ c.a }}</span></div></div>
+                <button onClick="{{ c.vote }}" style="min-height: 44px; min-width: 64px; border: 1px solid var(--ink, #F2EEE6); background: transparent; color: var(--ink, #F2EEE6); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 13px; cursor: pointer; padding: 0 12px;">↑ {{ c.v }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 · REGALOS -->
+    <section data-tone="light" data-screen-label="Regalos" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #F2EEE6); color: var(--bg, #0B0B0D); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">08 — Regalos</span><span data-xin="1" data-dist="40">08 / 10</span></div>
+      <div data-spread="1" style="display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 14px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(44px, 13vw, 110px); line-height: .92; letter-spacing: -.02em;">Tu presencia<br><span style="font-style: italic; font-weight: 400; color: var(--acc2, #8E1B2C);">es el regalo</span></h2>
+          <p data-xin="1" data-delay="120" style="margin: 0; font-size: 14px; line-height: 1.6; max-width: 42ch;">Si además querés ayudarnos con la luna de miel en Salta, dejamos los datos.</p>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 14px;">
+          <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+            <div data-xin="1" data-dist="{{ b.dist }}" data-delay="{{ b.delay }}" style="background: #FFFDF8; border: 1px solid var(--bg, #0B0B0D); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; justify-content: space-between; font-size: 10px; letter-spacing: .22em; text-transform: uppercase;"><span>{{ b.k }}</span><span>{{ b.banco }}</span></div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px dotted var(--bg, #0B0B0D); padding-bottom: 8px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 10px; letter-spacing: .22em; text-transform: uppercase; opacity: .7;">Alias</span><span style="font-family: 'Playfair Display', serif; font-weight: 700; font-size: 20px; line-height: 1.1;">{{ b.alias }}</span></div><button onClick="{{ b.copyAlias }}" style="min-height: 44px; border: 1px solid var(--bg, #0B0B0D); background: transparent; color: var(--bg, #0B0B0D); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 0 14px; cursor: pointer;" style-hover="background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6);">{{ b.aliasLabel }}</button></div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-size: 10px; letter-spacing: .22em; text-transform: uppercase; opacity: .7;">CBU</span><span style="font-size: 14px; word-break: break-all;">{{ b.cbu }}</span></div><button onClick="{{ b.copyCbu }}" style="min-height: 44px; border: 1px solid var(--bg, #0B0B0D); background: transparent; color: var(--bg, #0B0B0D); font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 0 14px; cursor: pointer; flex: 0 0 auto;" style-hover="background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6);">{{ b.cbuLabel }}</button></div>
+              <span style="font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .7;">Titular · {{ b.titular }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 · QUIZ · interrogatorio -->
+    <section data-tone="dark" data-screen-label="Quiz" style="position: relative; z-index: 1; min-height: 100vh; background: var(--acc2, #8E1B2C); color: var(--ink, #F2EEE6); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">09 — Interrogatorio</span><span data-xin="1" data-dist="40">09 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 12px;">
+          <span data-xin="1" style="align-self: flex-start; border: 1px solid var(--ink, #F2EEE6); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; padding: 8px 14px;">Pregunta <span ref="{{ setQn }}">1</span> / 3</span>
+          <h2 ref="{{ setQ }}" data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(34px, 9.5vw, 80px); line-height: 1; max-width: 16ch;">¿Dónde fue la primera cita?</h2>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ opciones }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.pick }}" style="min-height: 54px; border: 1px solid var(--ink, #F2EEE6); background: {{ o.bg }}; color: {{ o.fg }}; font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 15px; text-align: left; padding: 0 18px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px;"><span>{{ o.t }}</span><span style="font-size: 11px; letter-spacing: .2em; text-transform: uppercase;">{{ o.tag }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · TU PASE · créditos finales -->
+    <section data-tone="dark" data-screen-label="Tu pase" style="position: relative; z-index: 1; min-height: 100vh; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); padding: 60px max(20px, calc((100% - 1100px) / 2)) calc(28px + env(safe-area-inset-bottom)); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 22px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);"><span data-xin="1" data-dist="-40">10 — Créditos finales</span><span data-xin="1" data-dist="40">10 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" data-xin="1" data-dist="-60" style="display: flex; flex-direction: column; gap: 16px; align-items: flex-start;">
+          <div style="position: relative; width: min(100%, 300px); aspect-ratio: 1; background: var(--ink, #F2EEE6); padding: 16px; box-sizing: border-box; border: 1px solid var(--acc, #C9A24A); box-shadow: 0 0 0 8px var(--bg, #0B0B0D), 0 0 0 9px var(--acc, #C9A24A);">
+            <svg viewBox="0 0 21 21" width="100%" height="100%" shape-rendering="crispEdges" style="display: block;">
+              <path fill="#0B0B0D" d="M0 0h7v7H0zM1 1v5h5V1zM2 2h3v3H2zM14 0h7v7h-7zM15 1v5h5V1zM16 2h3v3h-3zM0 14h7v7H0zM1 15v5h5v-5zM2 16h3v3H2zM8 0h1v1H8zM10 0h1v2h-1zM12 0h1v1h-1zM8 2h2v1H8zM11 2h2v1h-2zM8 4h1v1H8zM10 4h2v1h-2zM8 6h1v1H8zM12 6h1v1h-1zM10 5h1v3h-1zM0 8h1v1H0zM2 8h2v1H2zM5 8h1v1H5zM8 8h1v2H8zM10 8h1v1h-1zM12 8h2v1h-2zM15 8h1v1h-1zM17 8h1v1h-1zM19 8h2v1h-2zM0 10h2v1H0zM3 10h1v1H3zM5 10h1v1H5zM9 10h2v1H9zM12 10h1v1h-1zM14 10h2v1h-2zM17 10h2v1h-2zM20 10h1v1h-1zM1 12h1v1H1zM3 12h3v1H3zM8 12h1v1H8zM10 12h2v1h-2zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM19 12h2v1h-2zM8 14h1v1H8zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h3v1h-3zM18 14h1v1h-1zM20 14h1v1h-1zM8 16h2v1H8zM11 16h1v1h-1zM14 16h1v1h-1zM16 16h3v1h-3zM20 16h1v1h-1zM8 18h1v1H8zM10 18h2v1h-2zM13 18h1v1h-1zM15 18h1v1h-1zM17 18h2v1h-2zM8 20h1v1H8zM10 20h1v1h-1zM12 20h2v1h-2zM15 20h2v1h-2zM19 20h2v1h-2z"></path>
+            </svg>
+            <span style="position: absolute; left: 0; right: 0; bottom: -28px; text-align: center; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A);">QrDeIngreso</span>
+          </div>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 14px; padding-top: 14px;">
+          <div data-xin="1" data-delay="100" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;">
+            <div style="display: flex; flex-direction: column;"><span style="font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #C9A24A);">Pase Nº</span><span style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(64px, 20vw, 150px); line-height: .9; letter-spacing: -.03em;">014</span></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; text-align: right;"><span style="font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #C9A24A);">Butaca</span><span style="font-family: 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(40px, 12vw, 90px); line-height: .9; color: var(--acc, #C9A24A);">07</span></div>
+          </div>
+          <div data-xin="1" data-delay="160" style="display: flex; flex-direction: column; border-top: 1px solid var(--acc, #C9A24A);">
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px dotted rgba(242,238,230,.4); font-size: 13px;"><span style="font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--acc, #C9A24A); padding-top: 2px;">Sector · Mesa</span><span style="font-weight: 700;">Galería · Mesa 07</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px dotted rgba(242,238,230,.4); font-size: 13px;"><span style="font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--acc, #C9A24A); flex: 0 0 auto; padding-top: 2px;">Alojamiento</span><span style="text-align: right; line-height: 1.45;">Posada La Paz, tarifa "Valentina y Tomás" hasta el 1 de marzo.</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px dotted rgba(242,238,230,.4); font-size: 13px;"><span style="font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--acc, #C9A24A); flex: 0 0 auto; padding-top: 2px;">Estacionamiento</span><span style="text-align: right; line-height: 1.45;">Dentro de la estancia, sin cargo.</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; font-size: 13px;"><span style="font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--acc, #C9A24A); flex: 0 0 auto; padding-top: 2px;">Transporte</span><span style="text-align: right; line-height: 1.45;">Combi desde Nueva Córdoba 17:00 h, vuelve 04:30 h.</span></div>
+          </div>
+        </div>
+      </div>
+      <div data-xin="1" data-delay="220" style="display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center;">
+        <span style="font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(56px, 16vw, 120px); line-height: .9; letter-spacing: .1em;">FIN</span>
+        <span style="font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(16px, 4.4vw, 22px);">…o el principio. — V &amp; T</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--acc, #C9A24A); border-top: 1px solid rgba(242,238,230,.3); padding-top: 12px;"><span>altainvitacion.com</span><span onClick="{{ replay }}" style="cursor: pointer; color: var(--ink, #F2EEE6);">Rebobinar ↺</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- riel -->
+  <div ref="{{ setRail }}" style="position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom)); opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--acc, #C9A24A); border-left: 1px solid currentColor;">
+    <span ref="{{ setRailTop }}" style="writing-mode: vertical-rl; font-size: 11px; letter-spacing: .2em;">00</span>
+    <span ref="{{ setRailBar }}" style="position: absolute; left: -1px; top: 0; width: 2px; height: 0%; background: currentColor; transition: height 200ms linear;"></span>
+    <span ref="{{ setRailLabel }}" style="writing-mode: vertical-rl; font-size: 10px; letter-spacing: .28em; text-transform: uppercase;">Bienvenida</span>
+  </div>
+
+  <!-- burbuja -->
+  <div ref="{{ setBubble }}" style="position: absolute; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 4; display: flex; align-items: center; gap: 10px; background: var(--bg, #0B0B0D); color: var(--ink, #F2EEE6); border: 1px solid var(--acc, #C9A24A); padding: 0 16px 0 6px; min-height: 48px; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 600ms cubic-bezier(.16,1,.3,1);">
+    <span style="width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--acc, #C9A24A); font-family: 'Playfair Display', serif; font-weight: 900; font-size: 14px; color: var(--acc, #C9A24A);">14</span>
+    <span>Pase Nº 014 · 2 personas</span>
+  </div>
+
+  <!-- música -->
+  <button ref="{{ setMusicBtn }}" onClick="{{ toggleMusic }}" style="position: absolute; right: 56px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 4; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--acc, #C9A24A); background: var(--bg, #0B0B0D); color: var(--acc, #C9A24A); cursor: pointer; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding: 0 0 15px; opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 600ms cubic-bezier(.16,1,.3,1);">
+    <span data-eq="1" style="width: 3px; height: 16px; background: currentColor; transform-origin: bottom; transform: scaleY(.3);"></span><span data-eq="1" style="width: 3px; height: 16px; background: currentColor; transform-origin: bottom; transform: scaleY(.6);"></span><span data-eq="1" style="width: 3px; height: 16px; background: currentColor; transform-origin: bottom; transform: scaleY(.4);"></span>
+  </button>
+
+  <!-- preloader · cuenta de cabecera -->
+  <div ref="{{ setLoader }}" style="position: absolute; inset: 0; z-index: 9; display: grid; grid-template-columns: repeat(4, 1fr);">
+    <div data-col="1" style="background: #17171A; transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: #0B0B0D; transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: #17171A; transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: #0B0B0D; transform-origin: top; will-change: transform;"></div>
+    <div style="position: absolute; left: 50%; top: 50%; width: min(60vw, 320px); aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; border: 2px solid var(--ink, #F2EEE6); box-sizing: border-box; pointer-events: none;"><span style="position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: rgba(242,238,230,.5);"></span><span style="position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(242,238,230,.5);"></span></div>
+    <div ref="{{ setCounter }}" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(90px, 28vw, 200px); color: var(--ink, #F2EEE6); line-height: 1;">8</div>
+    <div style="position: absolute; left: 22px; top: calc(22px + env(safe-area-inset-top)); font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #C9A24A);">Noir · Cabecera de rollo</div>
+  </div>
+
+  </sc-if>
+
+  <!-- HANDOFF -->
+  <sc-if value="{{ vistaHandoff }}" hint-placeholder-val="{{ false }}">
+  <div style="position: absolute; inset: 0; overflow: auto; background: #F2EEE6; color: #0B0B0D; padding: 40px max(22px, calc((100% - 760px) / 2)) 80px; font-family: 'Courier Prime', monospace; font-size: 13px; line-height: 1.6;">
+    <div style="font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #8E1B2C;">Handoff — Noir · Colección Tipográfica Editorial</div>
+    <h1 style="margin: 12px 0 28px; font-family: 'Playfair Display', serif; font-weight: 900; font-size: 64px; line-height: .9; letter-spacing: -.02em;">Noir</h1>
+    <h2 style="margin: 0 0 10px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 26px;">Fuentes</h2>
+    <p style="margin: 0 0 24px;"><strong>Playfair Display</strong> 900 (display) + italic 400 (contrapunto): la Didona de cartel de cine. <strong>Courier Prime</strong> 400/700 (todo lo demás, incluidos kickers y folios): la máquina de escribir del expediente. Sin tercera fuente.</p>
+    <h2 style="margin: 0 0 10px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 26px;">Variantes</h2>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
+      <sc-for list="{{ variantesInfo }}" as="v" hint-placeholder-count="5">
+        <div style="display: grid; grid-template-columns: 110px repeat(4, 1fr); gap: 4px; align-items: center; font-size: 10px;">
+          <span style="font-size: 13px; font-weight: 700;">{{ v.nombre }}</span>
+          <span style="background: {{ v.bg }}; padding: 6px 2px; text-align: center; color: #F2EEE6;">{{ v.bg }}</span>
+          <span style="background: {{ v.ink }}; border: 1px solid #0B0B0D; padding: 6px 2px; text-align: center;">{{ v.ink }}</span>
+          <span style="background: {{ v.acc }}; padding: 6px 2px; text-align: center;">{{ v.acc }}</span>
+          <span style="background: {{ v.acc2 }}; padding: 6px 2px; text-align: center; color: #F2EEE6;">{{ v.acc2 }}</span>
+        </div>
+      </sc-for>
+      <span style="font-size: 11px; opacity: .7;">columnas: fondo · tinta (marfil) · acento (oro: kickers, riel, botón) · acento 2 (rojo sangre: sello, quiz, confirmar). Neutros del álbum en gris de fotograma, fijos.</span>
+    </div>
+    <h2 style="margin: 0 0 10px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 26px;">Recursos</h2>
+    <pre style="margin: 0 0 24px; padding: 14px; background: #0B0B0D; color: #F2EEE6; font-family: 'Courier Prime', monospace; font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow: auto;">foco:              radial-gradient 140vmax al 16 % marfil, sigue mouse/giroscopio (translate); en celular sin permiso, deriva suave
+persiana:          repeating-linear-gradient 174° 46px/12px al 5 %, con mask lateral; data-drift 6
+humo:              4 discos radial-gradient que suben 180 px y escalan ×2.2 en 5–8 s (solo transform + opacity)
+grano:             pattern SVG 6×6 con 2 puntos, opacity .12, salta de posición en steps(1) cada 400 ms
+parpadeo:          bloque central opacity 1 → .82 → 1 en 9 s (keyframes al 93 % y 97 %)
+tira de film:      bordes 26 px con perforaciones (repeating-linear-gradient vertical); álbum con borde dotted 12px
+claqueta:          franja repeating-linear-gradient −45° marfil/negro 22 px
+sello:             rectángulo doble filete rojo "CONFIRMADO" rotado −8°
+cabecera de rollo: círculo con cruz y cuenta 8 → 1 antes de la cortina
+halftone foto:     pattern 10×10, circle r 7.2 → 0 según progreso; estático r = 3</pre>
+    <h2 style="margin: 0 0 10px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 26px;">Animaciones clave</h2>
+    <div style="display: flex; flex-direction: column; border-top: 2px solid #0B0B0D; margin-bottom: 24px;">
+      <sc-for list="{{ animaciones }}" as="a" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px dotted #0B0B0D;"><span style="font-weight: 700;">{{ a.n }}</span><span style="font-size: 12px;">{{ a.d }}</span></div>
+      </sc-for>
+    </div>
+    <h2 style="margin: 0 0 10px; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 26px;">Convenciones</h2>
+    <p style="margin: 0;">data-xin + data-dist (+ data-delay, + data-rot) en entradas; data-w en la frase; data-drift en la persiana; data-tone / data-screen-label por pantalla; data-scroller, data-pan / data-strip / data-dot en paneles; data-piece en el nombre; data-colorwash en el álbum. Reduced-motion: foco fijo, sin humo ni grano ni parpadeo; reveals en estado final.</p>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932},&quot;variante&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;clasico&quot;,&quot;options&quot;:[&quot;clasico&quot;,&quot;esmeralda&quot;,&quot;azul&quot;,&quot;burdeos&quot;,&quot;plata&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Color&quot;},&quot;nombreLargo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Portada&quot;},&quot;scrollVertical&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cuándo y dónde&quot;},&quot;ceremonia&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cuándo y dónde&quot;},&quot;postEvento&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Estado&quot;},&quot;vista&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;invitacion&quot;,&quot;options&quot;:[&quot;invitacion&quot;,&quot;handoff&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;onConfirmed&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(data: {attending: boolean; count: number}) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  refs = {};
+  state = { count: 2, yes: true, confirmed: false, votes: [12, 7, 3], q: 0, picked: -1, music: false, copied: {} };
+  set(k) { return (el) => { this.refs[k] = el; }; }
+
+  static VARIANTES = {
+    clasico:  { nombre: 'Clásico',  bg: '#0B0B0D', ink: '#F2EEE6', acc: '#C9A24A', acc2: '#8E1B2C' },
+    esmeralda:{ nombre: 'Esmeralda',bg: '#0A1210', ink: '#EDF1EA', acc: '#C9A24A', acc2: '#1F5C46' },
+    azul:     { nombre: 'Medianoche', bg: '#0A0E1A', ink: '#EEF0F4', acc: '#B8C4D8', acc2: '#1F3A8A' },
+    burdeos:  { nombre: 'Burdeos',  bg: '#120608', ink: '#F4ECE8', acc: '#D9B26A', acc2: '#7A1E2E' },
+    plata:    { nombre: 'Plata',    bg: '#111114', ink: '#F5F5F5', acc: '#C8C8CC', acc2: '#3A3A44' },
+  };
+
+  static QUIZ = [
+    { q: '¿Dónde fue la primera cita?', o: ['Un bar de Güemes', 'El cine del Patio Olmos', 'La Cañada, de noche'], ok: 2 },
+    { q: '¿Quién dijo "te quiero" primero?', o: ['Valentina', 'Tomás', 'Lo dijeron a la vez'], ok: 1 },
+    { q: '¿Cuántos mates por día toman juntos?', o: ['Uno, a la mañana', 'Dos termos', 'Perdieron la cuenta'], ok: 2 },
+  ];
+
+  renderVals() {
+    const p = this.props;
+    const vertical = !!p.scrollVertical, ceremonia = p.ceremonia !== false, vista = p.vista || 'invitacion', long = !!p.nombreLargo;
+    const V = Component.VARIANTES;
+    const G = 'var(--acc, #C9A24A)', R = 'var(--acc2, #8E1B2C)', K = 'var(--bg, #0B0B0D)', I = 'var(--ink, #F2EEE6)';
+    const smoke = [[22, 6, 0], [30, 7.5, 1.8], [26, 5.2, 3.2], [34, 8, 4.6]].map(([x, d, dl]) => ({ x: x + '%', dur: d + 's', delay: dl + 's' }));
+
+    const cuenta = [
+      { label: 'Días', ref: this.set('d'), dist: -80, delay: 0 }, { label: 'Horas', ref: this.set('h'), dist: 80, delay: 100 },
+      { label: 'Minutos', ref: this.set('m'), dist: -80, delay: 200 }, { label: 'Segundos', ref: this.set('s'), dist: 80, delay: 300 },
+    ];
+
+    const salon = { kicker: 'Escena 1', sub: 'Exterior · noche', titulo: 'Estancia La Paz', tone: 'dark', bg: K, fg: I, acc: G, cta: 'Cómo llegar', pie: 'Ruta E-53 km 13 · Ascochinga · Córdoba', dist: -80, rot: -3,
+      lineas: [{ k: 'Recepción', v: '20:30 h' }, { k: 'Dirección', v: 'Ruta E-53 km 13, Ascochinga' }, { k: 'Dress code', v: 'Black tie' }] };
+    const cer = { kicker: 'Escena 2', sub: 'Interior · atardecer', titulo: 'Capilla Santa Ana', tone: 'light', bg: I, fg: K, acc: R, cta: 'Cómo llegar', pie: 'En la misma estancia · 18:30 h', dist: 80, rot: 3,
+      lineas: [{ k: 'Hora', v: '18:30 h' }, { k: 'Dirección', v: 'Capilla de la estancia' }, { k: 'Llegá', v: '15 min antes' }] };
+    const crono = { kicker: 'Escena 3', sub: 'Guion de la noche', titulo: 'Secuencia final', tone: 'dark', bg: R, fg: I, acc: I, cta: 'Agregar al calendario', pie: 'cronogramaEventos · 5 momentos', dist: -80, rot: -2,
+      lineas: [{ k: '18:30', v: 'Ceremonia' }, { k: '20:30', v: 'Recepción' }, { k: '22:00', v: 'Cena' }, { k: '00:00', v: 'Baile' }, { k: '04:00', v: 'Fin' }] };
+    const paneles = ceremonia ? [salon, cer, crono] : [salon, crono];
+    paneles.forEach((x, i) => { x.folio = String(i + 1).padStart(2, '0') + ' / ' + String(paneles.length).padStart(2, '0'); });
+
+    const tints = ['rgba(201,162,74,.5)', 'rgba(142,27,44,.5)', 'rgba(201,162,74,.4)', 'rgba(142,27,44,.4)', 'rgba(201,162,74,.5)'];
+    const fotos = [
+      { n: '01', col: '1 / 4', row: '1 / 3', tint: tints[0] }, { n: '02', col: '4 / 7', row: '1 / 2', tint: tints[1] },
+      { n: '03', col: '4 / 6', row: '2 / 3', tint: tints[2] }, { n: '04', col: '6 / 7', row: '2 / 3', tint: tints[3] },
+      { n: '05', col: '1 / 7', row: '3 / 4', tint: tints[4] },
+    ];
+
+    const songs = [['Tu misterioso alguien', 'Miranda!'], ['Flaca', 'Andrés Calamaro'], ['Perfect', 'Ed Sheeran']];
+    const canciones = songs.map(([t, a], i) => ({ n: '0' + (i + 1), t, a, v: this.state.votes[i], vote: () => this.setState((s) => { const votes = s.votes.slice(); votes[i]++; return { votes }; }) }));
+
+    const cp = this.state.copied;
+    const mk = (id, k, banco, alias, cbu, titular, dist, delay) => ({ k, banco, alias, cbu, titular, dist, delay,
+      aliasLabel: cp[id + 'a'] ? 'Copiado' : 'Copiar', cbuLabel: cp[id + 'c'] ? 'Copiado' : 'Copiar',
+      copyAlias: () => this.copy(id + 'a', alias), copyCbu: () => this.copy(id + 'c', cbu) });
+    const bancos = [
+      mk('r', 'Regalo · luna de miel', 'Banco Galicia', 'VALEN.TOMAS.LUNA', '0070099030004012345678', 'Valentina Suárez', 60, 160),
+      mk('t', 'Pago de tarjeta', 'Banco Nación', 'FIESTA.VT.2027', '0110599520000098765432', 'Tomás Herrera', -60, 240),
+    ];
+
+    const Q = Component.QUIZ[this.state.q];
+    const opciones = Q.o.map((t, i) => {
+      const picked = this.state.picked === i, ok = i === Q.ok, done = this.state.picked >= 0;
+      return { t, pick: () => this.answer(i), bg: picked ? (ok ? I : K) : 'transparent', fg: picked ? (ok ? R : I) : I,
+        tag: done ? (ok ? 'Culpable' : (picked ? 'Coartada' : '')) : String.fromCharCode(65 + i) };
+    });
+
+    const animaciones = [
+      { n: 'Cabecera de rollo', d: 'cuenta 8 → 1 en 1000 ms (un número cada 125 ms, sin transición) dentro del círculo con cruz; cortina 4 columnas negro/gris scaleY 1→0, 500 ms, stagger 80 ms' },
+      { n: 'Nombre', d: 'Valentina / y / Tomás: translateY 320px→0 + opacity, 1400 ms, stagger 150 ms, cubic-bezier(.16,1,.3,1)' },
+      { n: 'Letras vivas', d: 'cada 4000 ms una letra "salta" como tecla de máquina: translateY −4 px y opacity .6 durante 90 ms, vuelve seca' },
+      { n: 'Foco', d: 'radial-gradient sigue mouse (escritorio) o giroscopio: translate ±18 vw/vh con suavizado 0.08 por frame; deriva senoidal si no hay permiso' },
+      { n: 'Humo y grano', d: 'humo: 4 discos 5–8 s ease-out (translate + scale + opacity); grano: pattern salta steps(1) cada 400 ms' },
+      { n: 'Parpadeo', d: 'bloque central opacity 1 → .82 → 1 en 9 s' },
+      { n: 'Hero fijo', d: 'sticky top:0; translateY 0.08 × scroll; persiana data-drift 6' },
+      { n: 'Entradas (data-xin)', d: 'opacity 0→1 + translateX(dist) (+ rotate(rot)), 900 ms, cubic-bezier(.16,1,.3,1); disparo a 0.92 vh' },
+      { n: 'Cartel', d: '20 / de marzo / 2027 con dist −160 / +160 / −160 y delays 0 / 120 / 240 ms' },
+      { n: 'Foto halftone', d: 'r 7.2 → 0 según progreso en viewport (0.15→0.75); estático r = 3' },
+      { n: 'Claqueta', d: 'dígitos entran alternados ±80 px; segundos sin transición (corte seco); "Toma" sube +1 por minuto' },
+      { n: 'Intertítulo (data-w)', d: 'palabra: opacity 0→1, 500 ms, stagger 130 ms (sin desplazamiento: fundido de cine mudo)' },
+      { n: 'Paneles pineados', d: 'strip translateX = −p × (n−1) × vw con suavizado 0.14 por frame; barra activa opacity 1' },
+      { n: 'Sello CONFIRMADO', d: 'scale 1.9→1, translateY −120→0, rotate 18→−8 °, 700 ms, cubic-bezier(.34,1.56,.64,1)' },
+      { n: 'Álbum color', d: 'colorwash opacity 0→1 por fotograma según cercanía al centro horizontal (|dx| < 0.35 vw)' },
+      { n: 'Carretes', d: 'dos carretes rotate 360° 4 s lineal' },
+    ];
+
+    return {
+      vistaInvitacion: vista === 'invitacion', vistaHandoff: vista === 'handoff',
+      nombreCorto: !long, nombreLargo: long, modoLateral: !vertical, modoVertical: vertical,
+      smoke, cuenta, paneles, fotos, canciones, bancos, opciones, animaciones, variantesInfo: Object.values(V),
+      setRoot: this.set('root'), setScroller: this.set('scroller'), setHero: this.set('hero'), setKicker: this.set('kicker'), setSpot: this.set('spot'), setTake: this.set('take'),
+      setPhotoWrap: this.set('photoWrap'), setHtDot: this.set('htDot'), setMarq2: this.set('marq2'),
+      setPhrase: this.set('phrase'), setCoupon: this.set('coupon'), setStatus: this.set('status'), setSticker: this.set('sticker'),
+      setYes: this.set('yes'), setNo: this.set('no'), setCount: this.set('count'), setAlbumKicker: this.set('albumKicker'),
+      setQn: this.set('qn'), setQ: this.set('qEl'),
+      setRail: this.set('rail'), setRailTop: this.set('railTop'), setRailLabel: this.set('railLabel'), setRailBar: this.set('railBar'),
+      setBubble: this.set('bubble'), setMusicBtn: this.set('musicBtn'), setLoader: this.set('loader'), setCounter: this.set('counter'),
+      open: () => this.open(), replay: () => this.replay(), confirm: () => this.confirm(),
+      pickYes: () => this.setState({ yes: true }), pickNo: () => this.setState({ yes: false }),
+      inc: () => this.setState((s) => ({ count: Math.min(9, s.count + 1) })), dec: () => this.setState((s) => ({ count: Math.max(1, s.count - 1) })),
+      toggleMusic: () => this.setState((s) => ({ music: !s.music })),
+    };
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.applyVariant(); this.prepareReveals(); this.preparePhrase(); this.tick();
+    this.timer = setInterval(() => this.tick(), 1000);
+    this.ticker = setInterval(() => this.frame(), 16);
+    this.onMouse = (e) => { this.mouse = { x: e.clientX / window.innerWidth - .5, y: e.clientY / window.innerHeight - .5 }; };
+    window.addEventListener('mousemove', this.onMouse, { passive: true });
+    this.applyPost(); this.frame();
+  }
+  componentDidUpdate(prev) {
+    if (prev.variante !== this.props.variante) this.applyVariant();
+    if (prev.scrollVertical !== this.props.scrollVertical || prev.ceremonia !== this.props.ceremonia || prev.nombreLargo !== this.props.nombreLargo) {
+      this.reveals = null; this.pans = null; this.drifts = null;
+      setTimeout(() => { this.prepareReveals(); this.introPieces(true); this.frame(); }, 30);
+    }
+    if (prev.postEvento !== this.props.postEvento) this.applyPost();
+    this.syncState();
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer); clearInterval(this.ticker); clearInterval(this.letterTimer);
+    window.removeEventListener('mousemove', this.onMouse);
+    if (this.attached && this.onScroll) this.attached.removeEventListener('scroll', this.onScroll);
+  }
+
+  applyVariant() {
+    const v = Component.VARIANTES[this.props.variante] || Component.VARIANTES.clasico, r = this.refs.root; if (!r) return;
+    ['bg', 'ink', 'acc', 'acc2'].forEach((k) => r.style.setProperty('--' + k, v[k]));
+  }
+  applyPost() {
+    const sc = this.refs.scroller; if (!sc) return;
+    const post = !!this.props.postEvento;
+    Array.from(sc.children).forEach((el) => { const l = el.dataset.screenLabel; if (l === 'Álbum' || l === 'Bienvenida') return; el.style.display = post ? 'none' : ''; });
+    if (this.refs.albumKicker) this.refs.albumKicker.textContent = post ? 'Rollo 02 / 02 — Momentos' : 'Rollo 02 / 02 — después del evento';
+  }
+  syncState() {
+    const { yes, no, count, status, coupon } = this.refs;
+    if (yes) { yes.style.background = this.state.yes ? 'var(--bg, #0B0B0D)' : 'transparent'; yes.style.color = this.state.yes ? 'var(--ink, #F2EEE6)' : 'var(--bg, #0B0B0D)'; }
+    if (no) { no.style.background = !this.state.yes ? 'var(--bg, #0B0B0D)' : 'transparent'; no.style.color = !this.state.yes ? 'var(--ink, #F2EEE6)' : 'var(--bg, #0B0B0D)'; }
+    if (count) count.textContent = this.state.count;
+    if (status) { status.textContent = this.state.confirmed ? 'Confirmado' : 'Pendiente'; status.style.color = this.state.confirmed ? 'var(--acc2, #8E1B2C)' : ''; }
+    const btn = this.refs.musicBtn;
+    if (btn) btn.querySelectorAll('[data-eq]').forEach((b, i) => { b.style.animation = this.state.music && !this.reduced ? 'nrEq 1s ease-in-out ' + (i * .18) + 's infinite' : 'none'; });
+    if (this.refs.qn) this.refs.qn.textContent = this.state.q + 1;
+    if (this.refs.qEl) this.refs.qEl.textContent = Component.QUIZ[this.state.q].q;
+  }
+
+  preloader() {
+    const { loader, counter } = this.refs; if (!loader) return;
+    const cols = Array.from(loader.querySelectorAll('[data-col]'));
+    if (this.reduced) { loader.style.display = 'none'; this.introPieces(true); return; }
+    const t0 = performance.now();
+    const step = (t) => { const p = Math.min(1, (t - t0) / 1000); if (counter) counter.textContent = Math.max(1, 8 - Math.floor(p * 8)); if (p < 1) requestAnimationFrame(step); else this.curtain(cols, loader); };
+    requestAnimationFrame(step);
+  }
+  curtain(cols, loader) {
+    Array.from(loader.children).forEach((c) => { if (!c.dataset.col) c.style.opacity = 0; });
+    cols.forEach((c, i) => { c.style.transition = 'transform 500ms cubic-bezier(.7,0,.2,1) ' + (i * 80) + 'ms'; c.style.transform = 'scaleY(0)'; });
+    setTimeout(() => { loader.style.display = 'none'; }, 800);
+    setTimeout(() => this.introPieces(), 260);
+  }
+
+  introPieces(instant) {
+    const hero = this.refs.hero; if (!hero) return;
+    const pieces = Array.from(hero.querySelectorAll('[data-piece]'));
+    pieces.forEach((p, i) => {
+      if (!p.dataset.split) this.splitLetters(p);
+      if (instant || this.reduced) { p.style.transform = 'none'; p.style.opacity = 1; return; }
+      p.style.transition = 'none'; p.style.transform = 'translate3d(0,320px,0)'; p.style.opacity = 0;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        p.style.transition = 'transform 1400ms cubic-bezier(.16,1,.3,1) ' + (i * 150) + 'ms, opacity 900ms ease ' + (i * 150) + 'ms';
+        p.style.transform = 'translate3d(0,0,0)'; p.style.opacity = 1;
+      }));
+    });
+    this.fitName();
+    const k = this.refs.kicker;
+    if (k && !instant && !this.reduced) { k.style.opacity = 0; k.style.transition = 'opacity 800ms ease 900ms'; requestAnimationFrame(() => { k.style.opacity = 1; }); }
+    clearInterval(this.letterTimer);
+    if (!this.reduced) this.letterTimer = setInterval(() => this.tapLetter(), 4000);
+  }
+  fitName() {
+    const hero = this.refs.hero; if (!hero) return;
+    const h1 = hero.querySelector('[data-hero-name]'); if (!h1) return;
+    if (h1.dataset.fs == null) h1.dataset.fs = h1.style.fontSize || '';
+    h1.style.fontSize = h1.dataset.fs;
+    const avail = (h1.parentElement ? h1.parentElement.clientWidth : h1.clientWidth) - 4; if (!(avail > 0)) return;
+    const widest = Math.max.apply(null, Array.from(h1.querySelectorAll('[data-piece]')).map((p) => p.scrollWidth));
+    if (widest > avail) { const cur = parseFloat(getComputedStyle(h1).fontSize); h1.style.fontSize = Math.floor(cur * avail / widest * .98) + 'px'; }
+  }
+  splitLetters(piece) {
+    piece.dataset.split = '1';
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          Array.from(n.textContent).forEach((ch) => {
+            if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+            const w = document.createElement('span'); w.dataset.letter = '1'; w.textContent = ch; w.style.cssText = 'display:inline-block;';
+            frag.appendChild(w);
+          });
+          n.parentNode.replaceChild(frag, n);
+        } else if (n.nodeType === 1) walk(n);
+      });
+    };
+    walk(piece);
+  }
+  tapLetter() {
+    const hero = this.refs.hero; if (!hero) return;
+    const letters = Array.from(hero.querySelectorAll('[data-letter]')).filter((l) => /\p{L}/u.test(l.textContent));
+    if (!letters.length) return;
+    const w = letters[Math.floor(Math.random() * letters.length)];
+    w.style.transition = 'none'; w.style.transform = 'translateY(-4px)'; w.style.opacity = '.6';
+    setTimeout(() => { w.style.transform = 'none'; w.style.opacity = '1'; }, 90);
+  }
+
+  open() {
+    const sc = this.refs.scroller; if (!sc) return;
+    sc.style.overflowY = 'auto'; this.opened = 1;
+    if (this.reduced) sc.scrollTop = sc.clientHeight; else this.smoothTo(sc, sc.clientHeight, 1100);
+    setTimeout(() => { ['rail', 'bubble', 'musicBtn'].forEach((k) => { const el = this.refs[k]; if (el) { el.style.opacity = 1; el.style.transform = 'none'; } }); }, 700);
+    this.askGyro();
+  }
+  replay() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.smoothTo(sc, 0, 900);
+    setTimeout(() => { sc.style.overflowY = 'hidden'; this.opened = 0; ['rail', 'bubble', 'musicBtn'].forEach((k) => { const el = this.refs[k]; if (el) el.style.opacity = 0; }); this.introPieces(); }, 950);
+  }
+  smoothTo(sc, y, ms) {
+    const y0 = sc.scrollTop, t0 = performance.now(), ease = (t) => 1 - Math.pow(1 - t, 4);
+    const step = (t) => { const p = Math.min(1, (t - t0) / ms); sc.scrollTop = y0 + (y - y0) * ease(p); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+  askGyro() {
+    if (this.gyro || typeof DeviceOrientationEvent === 'undefined') return;
+    const start = () => { this.gyro = 1; window.addEventListener('deviceorientation', (e) => { if (e.gamma == null) return; this.mouse = { x: Math.max(-.5, Math.min(.5, e.gamma / 60)), y: Math.max(-.5, Math.min(.5, (e.beta - 45) / 90)) }; }, { passive: true }); };
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().then((r) => { if (r === 'granted') start(); }).catch(() => {});
+    else if ('ontouchstart' in window) start();
+  }
+
+  attach(sc) {
+    if (this.attached === sc) return;
+    this.attached = sc; this.onScroll = () => this.frame();
+    sc.addEventListener('scroll', this.onScroll, { passive: true }); window.addEventListener('resize', () => { this.onScroll(); this.fitName(); });
+  }
+  frame() { try { this.frameBody(); } catch (e) { if (!this.errLogged) { this.errLogged = 1; console.error(e); } } }
+  frameBody() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.attach(sc);
+    if (!this.preStarted && this.refs.loader && this.refs.hero) { this.preStarted = 1; this.preloader(); }
+    const vh = sc.clientHeight, vw = sc.clientWidth, y = sc.scrollTop;
+    if (!this.pans) this.pans = Array.from(sc.querySelectorAll('[data-pan]'));
+    if (!this.reveals) this.prepareReveals();
+    this.checkReveals(vh);
+
+    const hero = this.refs.hero;
+    if (hero) {
+      const live = window.innerWidth >= 1024 || this.gyro;
+      const t = performance.now() / 1000;
+      const target = live && this.mouse ? this.mouse : (this.reduced ? { x: 0, y: 0 } : { x: Math.sin(t * .35) * .22, y: Math.cos(t * .27) * .16 });
+      if (!this.spotPos) this.spotPos = { x: 0, y: 0 };
+      this.spotPos.x += (target.x - this.spotPos.x) * .08; this.spotPos.y += (target.y - this.spotPos.y) * .08;
+      hero.style.transform = 'translate3d(0,' + (y * 0.08) + 'px,0)';
+      if (this.refs.spot) this.refs.spot.style.transform = 'translate3d(' + (this.spotPos.x * vw * .36) + 'px,' + (this.spotPos.y * vh * .36) + 'px,0)';
+      if (!this.drifts) this.drifts = Array.from(hero.querySelectorAll('[data-drift]'));
+      const k = Math.min(1, y / vh);
+      this.drifts.forEach((d) => { const f = parseFloat(d.dataset.drift) || 0; d.style.transform = 'translate3d(' + (this.spotPos.x * f * 3) + 'px,' + (k * f * 8) + 'px,0)'; });
+    }
+
+    if (!this.panPos) this.panPos = [];
+    this.pans.forEach((pan, pi) => {
+      const strip = pan.querySelector('[data-strip]'); if (!strip) return;
+      const n = strip.children.length, span = pan.offsetHeight - vh;
+      const p = span > 0 ? Math.min(1, Math.max(0, (y - pan.offsetTop) / span)) : 0;
+      const prev = this.panPos[pi], eased = prev == null || this.reduced ? p : prev + (p - prev) * 0.14;
+      this.panPos[pi] = Math.abs(p - eased) < .0004 ? p : eased;
+      strip.style.transform = 'translate3d(' + (-eased * (n - 1) * vw) + 'px,0,0)';
+      const active = Math.min(n - 1, Math.round(eased * (n - 1)));
+      pan.querySelectorAll('[data-dot]').forEach((d, i) => { d.style.opacity = i === active ? '1' : '.3'; });
+      const dots = pan.querySelector('[data-dots]'); if (dots && strip.children[active]) dots.style.color = strip.children[active].dataset.tone === 'dark' ? '#F2EEE6' : '#0B0B0D';
+      strip.querySelectorAll('[data-sheet]').forEach((s) => {
+        const r = s.getBoundingClientRect(), dx = Math.abs((r.left + r.width / 2) / vw - .5);
+        const wash = s.querySelector('[data-colorwash]'); if (wash) wash.style.opacity = Math.max(0, Math.min(1, 1 - (dx - .1) / .3));
+      });
+    });
+
+    const pw = this.refs.photoWrap, dot = this.refs.htDot;
+    if (pw && dot) {
+      const r = pw.getBoundingClientRect(), prog = 1 - (r.top + r.height / 2) / vh;
+      const t2 = this.reduced ? .6 : Math.min(1, Math.max(0, (prog - .15) / .6));
+      dot.setAttribute('r', (7.2 * (1 - t2)).toFixed(2));
+    }
+    const m = this.refs.marq2; if (m && !m.dataset.timed) { const w = m.scrollWidth / 2; if (w) { m.style.animationDuration = (w / 80).toFixed(1) + 's'; m.dataset.timed = '1'; } }
+    this.updateRail(sc);
+  }
+  updateRail(sc) {
+    const max = sc.scrollHeight - sc.clientHeight, p = max > 0 ? Math.min(1, sc.scrollTop / max) : 0;
+    if (this.refs.railBar) this.refs.railBar.style.height = (p * 100) + '%';
+    const secs = Array.from(sc.children).filter((s) => s.style.display !== 'none');
+    const mid = sc.scrollTop + sc.clientHeight / 2; let cur = secs[0], idx = 0;
+    secs.forEach((s, i) => { if (s.offsetTop <= mid) { cur = s; idx = i; } });
+    if (!cur) return;
+    const label = cur.dataset.screenLabel || '';
+    if (this.refs.railLabel && this.refs.railLabel.textContent !== label) this.refs.railLabel.textContent = label;
+    if (this.refs.railTop) this.refs.railTop.textContent = String(idx).padStart(2, '0');
+    let tone = cur.dataset.tone;
+    if (!tone) { const strip = cur.querySelector('[data-strip]'); if (strip) { const i = Math.min(strip.children.length - 1, Math.round(Math.abs(parseFloat(strip.style.transform.replace(/[^-\d.]/g, '')) || 0) / (sc.clientWidth || 1))); tone = strip.children[i] ? strip.children[i].dataset.tone : 'light'; } }
+    const rail = this.refs.rail; if (rail) rail.style.color = tone === 'light' ? '#0B0B0D' : 'var(--acc, #C9A24A)';
+  }
+
+  prepareReveals() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.reveals = Array.from(sc.querySelectorAll('[data-xin]')).filter((el) => !el.dataset.shown);
+    this.reveals.forEach((el) => {
+      if (this.reduced) { el.dataset.shown = '1'; return; }
+      const d = el.dataset.dist != null ? parseFloat(el.dataset.dist) : 60, rot = parseFloat(el.dataset.rot || 0);
+      el.dataset.base = el.style.transform || '';
+      el.style.opacity = 0;
+      el.style.transform = 'translate3d(' + d + 'px,' + (d === 0 ? 40 : 0) + 'px,0) rotate(' + rot + 'deg)';
+      el.style.transition = 'opacity 700ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1)';
+      el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+    });
+  }
+  preparePhrase() {
+    const ph = this.refs.phrase; if (!ph || this.reduced) return;
+    this.words = Array.from(ph.querySelectorAll('[data-w]'));
+    this.words.forEach((w) => { w.style.display = 'inline-block'; w.style.opacity = 0; w.style.transition = 'opacity 500ms ease'; });
+  }
+  checkReveals(vh) {
+    const pending = this.reveals || [];
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const el = pending[i];
+      if (!el.isConnected) { pending.splice(i, 1); continue; }
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) { el.style.opacity = 1; el.style.transform = el.dataset.base || 'none'; el.dataset.shown = '1'; pending.splice(i, 1); }
+    }
+    const ph = this.refs.phrase;
+    if (ph && !this.phraseDone && this.words) {
+      const r = ph.getBoundingClientRect();
+      if (r.top < vh * 0.8 && r.bottom > 0) { this.phraseDone = 1; this.words.forEach((w, i) => { w.style.transitionDelay = (i * 130) + 'ms'; w.style.opacity = 1; }); }
+    }
+  }
+
+  tick() {
+    const ms = Math.max(0, new Date('2027-03-20T18:30:00') - new Date());
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60, p = (n) => String(n).padStart(2, '0');
+    if (this.refs.d) this.refs.d.textContent = d;
+    if (this.refs.h) this.refs.h.textContent = p(h);
+    if (this.refs.m) this.refs.m.textContent = p(m);
+    if (this.refs.s) this.refs.s.textContent = p(s);
+    if (this.refs.take) this.refs.take.textContent = (new Date().getMinutes() % 9) + 1;
+  }
+
+  confirm() {
+    if (this.state.confirmed) return;
+    this.setState({ confirmed: true });
+    const st = this.refs.sticker;
+    if (st) { st.style.transition = this.reduced ? 'none' : 'transform 700ms cubic-bezier(.34,1.56,.64,1), opacity 300ms ease'; st.style.opacity = 1; st.style.transform = 'rotate(-8deg) scale(1) translateY(0)'; }
+    if (typeof this.props.onConfirmed === 'function') this.props.onConfirmed({ attending: this.state.yes, count: this.state.count });
+  }
+  answer(i) {
+    if (this.state.picked >= 0) return;
+    this.setState({ picked: i });
+    setTimeout(() => this.setState((s) => ({ picked: -1, q: (s.q + 1) % Component.QUIZ.length })), 1400);
+  }
+  copy(id, text) {
+    try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
+    this.setState((s) => ({ copied: Object.assign({}, s.copied, { [id]: true }) }));
+    setTimeout(() => this.setState((s) => { const c = Object.assign({}, s.copied); delete c[id]; return { copied: c }; }), 1600);
+  }
+}
+</script>
+</body>
+</html>

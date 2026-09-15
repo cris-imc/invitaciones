@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Pinyon+Script&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#151210;-webkit-font-smoothing:antialiased}
+  a{color:#7A2F3A;text-decoration:none}
+  a:hover{color:#A8854E}
+  ::-webkit-scrollbar{width:0;height:0}
+  @keyframes pvSelloL{0%{transform:none;opacity:1}100%{transform:translate(-46px,138px) rotate(-20deg);opacity:0}}
+  @keyframes pvSelloR{0%{transform:none;opacity:1}100%{transform:translate(46px,146px) rotate(20deg);opacity:0}}
+  @keyframes pvSolapa{0%{transform:rotateX(0)}100%{transform:rotateX(-160deg)}}
+  @keyframes pvTarjeta{0%{transform:translateY(40%);opacity:0}100%{transform:translateY(0);opacity:1}}
+  @keyframes pvVelo{0%{opacity:1}100%{opacity:0;visibility:hidden}}
+  @keyframes pvGira{to{transform:rotate(360deg)}}
+  @keyframes pvEstampa{0%{transform:scale(1.4) rotate(-8deg);opacity:0}55%{opacity:1}100%{transform:scale(1) rotate(-8deg);opacity:1}}
+  @keyframes pvHalo{0%{transform:scale(.55);opacity:.45}100%{transform:scale(2.4);opacity:0}}
+  @keyframes pvLuz{0%{transform:translateX(-140%) skewX(-14deg)}100%{transform:translateX(260%) skewX(-14deg)}}
+  @keyframes pvOnda{0%,100%{transform:scaleY(.22)}50%{transform:scaleY(1)}}
+  @keyframes pvFlote{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="font-family:Jost,system-ui,sans-serif;color:#E8DFD4;padding:34px 34px 70px;display:flex;flex-direction:column;gap:26px;min-height:100vh;background:radial-gradient(120% 90% at 50% 0%,#241d18 0%,#141110 70%)">
+
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px">
+    <div>
+      <div style="font-size:10px;letter-spacing:.34em;color:#A8854E;text-transform:uppercase">Colección Papelería Viva · Familia 01 · Casamiento</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:46px;font-weight:300;margin-top:6px;color:#F4EBE2;line-height:1.05">Sobre <span style="font-family:'Pinyon Script',cursive;color:#C88A94">&amp;</span> Sello</div>
+      <div style="font-size:11.5px;letter-spacing:.06em;color:#9A8B7E;margin-top:6px;max-width:560px">Mecanismo Flat · 9 secciones · 10 slots de doodle · piezas pictóricas de <code style="color:#A8854E">/templates/sobre-sello/</code></div>
+    </div>
+    <div style="display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap">
+      <div>
+        <div style="font-size:9px;letter-spacing:.3em;color:#7d6f63;margin-bottom:7px">VISTA</div>
+        <div style="display:flex;gap:4px;padding:4px;border:1px solid #3a322b;border-radius:999px;background:#1d1815">
+          <button onClick="{{ verCel }}" style="{{ btnCel }}">Celular 430 × 932</button>
+          <button onClick="{{ verEsc }}" style="{{ btnEsc }}">Escritorio 1440 × 900</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.3em;color:#7d6f63;margin-bottom:7px">VARIANTE · {{ vNombre }}</div>
+        <div style="display:flex;gap:7px">
+          <sc-for list="{{ paletas }}" as="p" hint-placeholder-count="5">
+            <button onClick="{{ p.set }}" title="{{ p.n }}" style="{{ p.chip }}"></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ esCel }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8d7f72">SPLASH · « VALENTINA »</div>
+      <div style="{{ marco }}">
+        <div style="position:absolute;inset:0;background:var(--t-bg);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;top:0;height:640px;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#7d6d5c">FOTO · portadaImagenFondo</span></div>
+          <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:640px;overflow:hidden;pointer-events:none"><div style="position:absolute;top:0;bottom:0;width:130px;background:linear-gradient(90deg,transparent,rgba(255,244,228,.6),transparent);animation:pvLuz 7s cubic-bezier(.45,0,.55,1) 1.4s infinite"></div></div>
+          <div aria-hidden="true" style="position:absolute;left:18px;right:18px;top:18px;height:604px;border:1px solid rgba(244,235,226,.8)"></div>
+          <div aria-hidden="true" style="position:absolute;left:25px;right:25px;top:25px;height:590px;border:1px solid rgba(244,235,226,.4)"></div>
+          <img src="public/templates/sobre-sello/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;left:-18px;top:-10px;width:152px;pointer-events:none;filter:drop-shadow(0 3px 6px rgba(42,35,32,.18))">
+          <svg viewBox="0 0 430 22" preserveAspectRatio="none" style="position:absolute;left:0;top:614px;width:430px;height:22px;filter:drop-shadow(0 -1px 0 rgba(42,35,32,.12))" aria-hidden="true"><path d="M0,12 L18,7 L36,13 L54,6 L72,14 L90,8 L108,15 L126,7 L144,12 L162,6 L180,13 L198,9 L216,15 L234,7 L252,12 L270,6 L288,14 L306,8 L324,15 L342,7 L360,12 L378,6 L396,13 L414,9 L430,12 L430,22 L0,22 Z" fill="var(--t-bg)"/></svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:292px;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.07em;color:var(--t-ink);line-height:1">DELFINA</div>
+            <div style="font-family:'Pinyon Script',cursive;font-size:36px;color:var(--t-acc);line-height:.62">&amp;</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.07em;color:var(--t-ink);line-height:1">JOAQUÍN</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:14px"><span style="width:46px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.3em;color:var(--t-ink2)">15 · 05 · 2027</span><span style="width:46px;height:1px;background:var(--t-acc2)"></span></div>
+            <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:10px">ESTANCIA LA PAZ · CÓRDOBA</div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;animation:{{ sA.aOv }}">
+          <div aria-hidden="true" style="position:absolute;inset:0;opacity:.55;background:repeating-linear-gradient(0deg,rgba(0,0,0,.02) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(0,0,0,.016) 0 1px,transparent 1px 3px)"></div>
+          <div style="position:relative;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.42em;color:var(--t-ink2);margin-bottom:24px">NOS CASAMOS</div>
+          <div style="position:relative;width:338px;height:232px;perspective:900px">
+            <div style="position:absolute;inset:0;background:var(--t-alt);border:1px solid rgba(0,0,0,.1);box-shadow:0 18px 34px rgba(42,35,32,.16)"></div>
+            <div style="position:absolute;left:14px;right:14px;top:14px;bottom:14px;border:1px solid var(--t-acc2);opacity:.4"></div>
+            <div style="position:absolute;left:0;right:0;top:0;height:130px;transform-origin:top center;animation:{{ sA.aSol }};background:linear-gradient(175deg,var(--t-alt),#e1d5c6);clip-path:polygon(0 0,100% 0,50% 100%)"></div>
+            <div style="position:absolute;left:50%;top:104px;transform:translate(-50%,-50%);width:84px;height:82px">
+              <div style="position:absolute;inset:0;overflow:hidden;clip-path:inset(0 50% 0 0);animation:{{ sA.aSelL }}"><img src="public/templates/sobre-sello/lacre.webp" alt="" aria-hidden="true" style="width:84px;height:82px;object-fit:contain;pointer-events:none"></div>
+              <div style="position:absolute;inset:0;overflow:hidden;clip-path:inset(0 0 0 50%);animation:{{ sA.aSelR }}"><img src="public/templates/sobre-sello/lacre.webp" alt="" aria-hidden="true" style="width:84px;height:82px;object-fit:contain;pointer-events:none"></div>
+            </div>
+            <div style="position:absolute;left:26px;right:26px;top:148px;bottom:-70px;background:var(--t-bg);border:1px solid rgba(0,0,0,.09);box-shadow:0 -6px 20px rgba(42,35,32,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;animation:{{ sA.aTar }}">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:29px;color:var(--t-ink);letter-spacing:.04em">DELFINA</div>
+              <div style="font-family:'Pinyon Script',cursive;font-size:30px;color:var(--t-acc);line-height:.66">&amp;</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:29px;color:var(--t-ink);letter-spacing:.04em">JOAQUÍN</div>
+            </div>
+          </div>
+          <div style="position:relative;margin-top:104px;text-align:center">
+            <div style="font-size:10px;letter-spacing:.32em;color:var(--t-ink2)">PARA</div>
+            <div style="font-family:'Pinyon Script',cursive;font-size:54px;color:var(--t-ink);margin-top:2px;line-height:1.15">Valentina</div>
+            <div style="width:54px;height:1px;background:var(--t-acc2);margin:14px auto 0"></div>
+          </div>
+          <button onClick="{{ abrirA }}" style="{{ btnAbrir }}">ABRIR INVITACIÓN</button>
+        </div>
+      </div>
+      <button onClick="{{ resetA }}" style="{{ btnGhost }}">REPETIR APERTURA</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8d7f72">SPLASH · « MARÍA FLORENCIA »</div>
+      <div style="{{ marco }}">
+        <div style="position:absolute;inset:0;background:var(--t-bg);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;top:0;height:640px;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#7d6d5c">FOTO · portadaImagenFondo</span></div>
+          <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:640px;overflow:hidden;pointer-events:none"><div style="position:absolute;top:0;bottom:0;width:130px;background:linear-gradient(90deg,transparent,rgba(255,244,228,.6),transparent);animation:pvLuz 7s cubic-bezier(.45,0,.55,1) 1.4s infinite"></div></div>
+          <div aria-hidden="true" style="position:absolute;left:18px;right:18px;top:18px;height:604px;border:1px solid rgba(244,235,226,.8)"></div>
+          <div aria-hidden="true" style="position:absolute;left:25px;right:25px;top:25px;height:590px;border:1px solid rgba(244,235,226,.4)"></div>
+          <img src="public/templates/sobre-sello/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;left:-18px;top:-10px;width:152px;pointer-events:none;filter:drop-shadow(0 3px 6px rgba(42,35,32,.18))">
+          <svg viewBox="0 0 430 22" preserveAspectRatio="none" style="position:absolute;left:0;top:614px;width:430px;height:22px;filter:drop-shadow(0 -1px 0 rgba(42,35,32,.12))" aria-hidden="true"><path d="M0,12 L18,7 L36,13 L54,6 L72,14 L90,8 L108,15 L126,7 L144,12 L162,6 L180,13 L198,9 L216,15 L234,7 L252,12 L270,6 L288,14 L306,8 L324,15 L342,7 L360,12 L378,6 L396,13 L414,9 L430,12 L430,22 L0,22 Z" fill="var(--t-bg)"/></svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:292px;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.07em;color:var(--t-ink);line-height:1">DELFINA</div>
+            <div style="font-family:'Pinyon Script',cursive;font-size:36px;color:var(--t-acc);line-height:.62">&amp;</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.07em;color:var(--t-ink);line-height:1">JOAQUÍN</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:14px"><span style="width:46px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.3em;color:var(--t-ink2)">15 · 05 · 2027</span><span style="width:46px;height:1px;background:var(--t-acc2)"></span></div>
+            <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:10px">ESTANCIA LA PAZ · CÓRDOBA</div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 34px;animation:{{ sB.aOv }}">
+          <div aria-hidden="true" style="position:absolute;inset:0;opacity:.55;background:repeating-linear-gradient(0deg,rgba(0,0,0,.02) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(0,0,0,.016) 0 1px,transparent 1px 3px)"></div>
+          <div style="position:relative;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.42em;color:var(--t-ink2);margin-bottom:24px">NOS CASAMOS</div>
+          <div style="position:relative;width:338px;height:232px;perspective:900px">
+            <div style="position:absolute;inset:0;background:var(--t-alt);border:1px solid rgba(0,0,0,.1);box-shadow:0 18px 34px rgba(42,35,32,.16)"></div>
+            <div style="position:absolute;left:14px;right:14px;top:14px;bottom:14px;border:1px solid var(--t-acc2);opacity:.4"></div>
+            <div style="position:absolute;left:0;right:0;top:0;height:130px;transform-origin:top center;animation:{{ sB.aSol }};background:linear-gradient(175deg,var(--t-alt),#e1d5c6);clip-path:polygon(0 0,100% 0,50% 100%)"></div>
+            <div style="position:absolute;left:50%;top:104px;transform:translate(-50%,-50%);width:84px;height:82px">
+              <div style="position:absolute;inset:0;overflow:hidden;clip-path:inset(0 50% 0 0);animation:{{ sB.aSelL }}"><img src="public/templates/sobre-sello/lacre.webp" alt="" aria-hidden="true" style="width:84px;height:82px;object-fit:contain;pointer-events:none"></div>
+              <div style="position:absolute;inset:0;overflow:hidden;clip-path:inset(0 0 0 50%);animation:{{ sB.aSelR }}"><img src="public/templates/sobre-sello/lacre.webp" alt="" aria-hidden="true" style="width:84px;height:82px;object-fit:contain;pointer-events:none"></div>
+            </div>
+            <div style="position:absolute;left:26px;right:26px;top:148px;bottom:-70px;background:var(--t-bg);border:1px solid rgba(0,0,0,.09);box-shadow:0 -6px 20px rgba(42,35,32,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;animation:{{ sB.aTar }}">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:29px;color:var(--t-ink);letter-spacing:.04em">DELFINA</div>
+              <div style="font-family:'Pinyon Script',cursive;font-size:30px;color:var(--t-acc);line-height:.66">&amp;</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:29px;color:var(--t-ink);letter-spacing:.04em">JOAQUÍN</div>
+            </div>
+          </div>
+          <div style="position:relative;margin-top:104px;text-align:center">
+            <div style="font-size:10px;letter-spacing:.32em;color:var(--t-ink2)">PARA</div>
+            <div style="font-family:'Pinyon Script',cursive;font-size:44px;color:var(--t-ink);margin-top:4px;line-height:1.2">María Florencia</div>
+            <div style="width:54px;height:1px;background:var(--t-acc2);margin:14px auto 0"></div>
+          </div>
+          <button onClick="{{ abrirB }}" style="{{ btnAbrir }}">ABRIR INVITACIÓN</button>
+        </div>
+      </div>
+      <button onClick="{{ resetB }}" style="{{ btnGhost }}">REPETIR APERTURA</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8d7f72">INVITACIÓN ABIERTA · 9 SECCIONES + EXTRAS</div>
+      <div style="{{ marco }}">
+        <div id="scC" data-scroll="1" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--t-bg)">
+
+          <section data-sec="portada" data-screen-label="01 Portada" style="position:relative;height:806px;overflow:hidden">
+            <div style="position:absolute;inset:0;overflow:hidden">
+              <div data-par="1" style="position:absolute;left:0;right:0;top:-70px;height:720px;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#7d6d5c">FOTO · portadaImagenFondo</span></div>
+              <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:636px;overflow:hidden;pointer-events:none"><div style="position:absolute;top:0;bottom:0;width:130px;background:linear-gradient(90deg,transparent,rgba(255,244,228,.6),transparent);animation:pvLuz 7s cubic-bezier(.45,0,.55,1) 1.4s infinite"></div></div>
+              <div style="position:absolute;left:18px;right:18px;top:18px;height:600px;border:1px solid rgba(244,235,226,.8);pointer-events:none"></div>
+              <div style="position:absolute;left:25px;right:25px;top:25px;height:586px;border:1px solid rgba(244,235,226,.4);pointer-events:none"></div>
+              <img data-doodle="1" src="public/templates/sobre-sello/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;left:-18px;top:-10px;width:152px;pointer-events:none;filter:drop-shadow(0 3px 6px rgba(42,35,32,.18))">
+              <img data-doodle="2" src="public/templates/sobre-sello/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;right:-18px;top:496px;width:128px;transform:scaleX(-1) rotate(8deg);pointer-events:none;opacity:.95;filter:drop-shadow(0 3px 6px rgba(42,35,32,.18))">
+            </div>
+            <svg viewBox="0 0 430 22" preserveAspectRatio="none" style="position:absolute;left:0;top:610px;width:430px;height:22px;filter:drop-shadow(0 -1px 0 rgba(42,35,32,.12))" aria-hidden="true"><path d="M0,12 L18,7 L36,13 L54,6 L72,14 L90,8 L108,15 L126,7 L144,12 L162,6 L180,13 L198,9 L216,15 L234,7 L252,12 L270,6 L288,14 L306,8 L324,15 L342,7 L360,12 L378,6 L396,13 L414,9 L430,12 L430,22 L0,22 Z" fill="var(--t-bg)"/></svg>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:196px;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.07em;color:var(--t-ink);line-height:1">DELFINA</div>
+              <div style="font-family:'Pinyon Script',cursive;font-size:36px;color:var(--t-acc);line-height:.62">&amp;</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:42px;letter-spacing:.07em;color:var(--t-ink);line-height:1">JOAQUÍN</div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:14px">
+                <span style="width:46px;height:1px;background:var(--t-acc2)"></span>
+                <span style="font-size:11px;letter-spacing:.3em;color:var(--t-ink2)">15 · 05 · 2027</span>
+                <span style="width:46px;height:1px;background:var(--t-acc2)"></span>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="countdown" data-screen-label="02 Countdown" style="position:relative;padding:58px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">02 — LA FECHA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div data-reveal="t" style="display:flex;justify-content:center;margin-bottom:26px">
+              <div style="position:relative;width:152px;height:152px;display:flex;align-items:center;justify-content:center">
+                <div aria-hidden="true" style="position:absolute;inset:0;animation:pvGira 60s linear infinite"><svg width="152" height="152" viewBox="0 0 152 152"><circle cx="76" cy="76" r="67" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><circle cx="76" cy="76" r="59" fill="none" stroke="var(--t-acc2)" stroke-width="1" stroke-dasharray="1 7"/><circle cx="76" cy="9" r="3" fill="var(--t-acc)"/><circle cx="143" cy="76" r="3" fill="var(--t-acc)"/><circle cx="76" cy="143" r="3" fill="var(--t-acc)"/><circle cx="9" cy="76" r="3" fill="var(--t-acc)"/></svg></div>
+                <div style="text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:62px;line-height:1;color:var(--t-ink)">{{ cd.d }}</div><div style="font-size:9.5px;letter-spacing:.3em;color:var(--t-ink2);margin-top:4px">DÍAS</div></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <sc-for list="{{ cd.cajas }}" as="c" hint-placeholder-count="3">
+                <div data-reveal="b" style="position:relative;background:var(--t-bg);border:1px solid rgba(0,0,0,.08);padding:16px 8px 13px;text-align:center;overflow:hidden">
+                  <div aria-hidden="true" style="position:absolute;right:0;top:0;width:16px;height:16px;background:linear-gradient(225deg,var(--t-alt) 50%,rgba(0,0,0,.1) 50%)"></div>
+                  <div style="font-family:'Cormorant Garamond',serif;font-size:32px;line-height:1;color:var(--t-ink);font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                  <div style="font-size:9px;letter-spacing:.24em;color:var(--t-ink2);margin-top:6px">{{ c.l }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div aria-hidden="true" data-doodle="3" style="display:flex;justify-content:center;margin-top:26px;opacity:.55"><svg width="120" height="14" viewBox="0 0 120 14"><path d="M0 7 L48 7 M72 7 L120 7" stroke="var(--t-acc2)" stroke-width="1"/><path d="M60 1 L65 7 L60 13 L55 7 Z" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg></div>
+            <div style="margin-top:22px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">02 / 09</div>
+          </section>
+
+          <section data-sec="frase" data-screen-label="03 Frase" style="position:relative;padding:64px 30px 44px;background:var(--t-bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">03 — LA FRASE</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <img data-doodle="4" src="public/templates/sobre-sello/pluma.webp" alt="" aria-hidden="true" style="position:absolute;right:14px;top:44px;width:86px;opacity:.9;pointer-events:none;animation:pvFlote 7s ease-in-out infinite">
+            <div data-reveal="t" style="text-align:center">
+              <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:27px;line-height:1.45;color:var(--t-ink);text-wrap:pretty">Elegirnos todos los días, y que el mundo sea <span style="font-family:'Pinyon Script',cursive;font-style:normal;font-size:40px;color:var(--t-acc)">testigo</span></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:26px"><span style="width:34px;height:1px;background:var(--t-acc2)"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span><span style="width:34px;height:1px;background:var(--t-acc2)"></span></div>
+            </div>
+            <div style="margin-top:36px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">03 / 09</div>
+          </section>
+
+          <section data-sec="detalles" data-screen-label="04 Detalles" style="position:relative;padding:58px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">04 — EL EVENTO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div aria-hidden="true" data-doodle="5" style="position:absolute;right:16px;top:50px;opacity:.45;pointer-events:none"><svg width="42" height="46" viewBox="0 0 42 46"><path d="M6 4 L18 4 L15 18 L12 18 Z M24 4 L36 4 L33 18 L30 18 Z M13.5 18 L13.5 38 M31.5 18 L31.5 38 M7 40 L20 40 M25 40 L38 40" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg></div>
+            <div data-reveal="b" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.08);padding:22px 20px;margin-bottom:12px">
+              <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-acc)">CEREMONIA</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--t-ink);margin-top:8px">Capilla Santa Rosa</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:6px;line-height:1.6">Camino a Ascochinga s/n, Córdoba<br>Sábado 15 de mayo · 18:00 h</div>
+            </div>
+            <div data-reveal="b" data-delay="90" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.08);padding:22px 20px">
+              <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-acc)">FIESTA</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--t-ink);margin-top:8px">Estancia La Paz</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:6px;line-height:1.6">Av. Los Talas 2100, Ascochinga<br>Desde las 19:30 h</div>
+              <button onClick="{{ irMapa }}" style="min-height:48px;margin-top:14px;padding:0 20px;border:1px solid var(--t-acc);background:none;color:var(--t-acc);font-family:Jost,sans-serif;font-size:10.5px;letter-spacing:.24em;cursor:pointer">CÓMO LLEGAR</button>
+            </div>
+            <div style="margin-top:32px;font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin-bottom:18px">CRONOGRAMA</div>
+            <div style="position:relative">
+              <div aria-hidden="true" style="position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:var(--t-acc2);opacity:.55"></div>
+              <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="5">
+                <div data-reveal="{{ c.lado }}" style="{{ c.fila }}">
+                  <div style="{{ c.celda }}">
+                    <div style="display:inline-block;font-size:11px;letter-spacing:.18em;color:var(--t-bg);background:var(--t-acc);padding:5px 12px;border-radius:999px">{{ c.hora }}</div>
+                    <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--t-ink);margin-top:6px">{{ c.t }}</div>
+                  </div>
+                  <div style="width:36px;display:flex;align-items:center;justify-content:center;flex:none"><span style="width:26px;height:26px;border-radius:50%;background:var(--t-bg);border:1px solid var(--t-acc);display:flex;align-items:center;justify-content:center;color:var(--t-acc);font-size:11px">{{ c.i }}</span></div>
+                  <div style="flex:1"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div data-reveal="b" style="margin-top:30px;border:1px solid var(--t-acc2);padding:20px;text-align:center;background:var(--t-bg)">
+              <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-acc)">DRESS CODE</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--t-ink);margin-top:8px">Elegante de noche</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:6px">Los invitamos a evitar el blanco</div>
+            </div>
+            <div style="margin-top:32px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">04 / 09</div>
+          </section>
+
+          <section data-sec="album" data-screen-label="05 Álbum" style="position:relative;padding:58px 0 44px;background:var(--t-bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin:0 26px 24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">05 — EL ÁLBUM</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div aria-hidden="true" data-doodle="6" style="position:absolute;left:12px;bottom:26px;opacity:.4;pointer-events:none"><svg width="56" height="30" viewBox="0 0 56 30"><path d="M2 26 C18 26 34 20 54 4" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><ellipse cx="14" cy="23" rx="6" ry="3" fill="none" stroke="var(--t-acc2)" stroke-width="1" transform="rotate(-18 14 23)"/><ellipse cx="26" cy="19" rx="6" ry="3" fill="none" stroke="var(--t-acc2)" stroke-width="1" transform="rotate(-24 26 19)"/><ellipse cx="38" cy="13" rx="6" ry="3" fill="none" stroke="var(--t-acc2)" stroke-width="1" transform="rotate(-30 38 13)"/></svg></div>
+            <div style="display:flex;gap:16px;overflow-x:auto;padding:6px 26px 18px;scroll-snap-type:x mandatory">
+              <sc-for list="{{ album }}" as="f" hint-placeholder-count="4">
+                <div data-reveal="b" style="flex:none;width:234px;background:#fff;padding:12px 12px 42px;box-shadow:0 10px 24px rgba(42,35,32,.14);scroll-snap-align:center">
+                  <div style="height:268px;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px"><span style="font-size:9px;letter-spacing:.2em;color:#7d6d5c">{{ f.slot }}</span></div>
+                  <div style="text-align:center;margin-top:12px;font-family:'Pinyon Script',cursive;font-size:22px;color:var(--t-ink2)">{{ f.pie }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin:6px 26px 0;font-size:10px;letter-spacing:.2em;color:var(--t-ink2);text-align:center">albumStyle · carrusel</div>
+            <div style="margin-top:26px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">05 / 09</div>
+          </section>
+
+          <section data-sec="mapa" data-screen-label="06 Mapa" style="position:relative;padding:58px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">06 — EL MAPA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div aria-hidden="true" data-doodle="7" style="position:absolute;right:16px;top:48px;opacity:.42;pointer-events:none"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><path d="M20 8 L24 20 L20 32 L16 20 Z" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg></div>
+            <div data-reveal="b" style="position:relative;height:296px;border:1px solid rgba(0,0,0,.1);background:var(--t-bg);overflow:hidden">
+              <svg viewBox="0 0 380 296" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M-10 70 L400 40" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 170 L400 200" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M90 -10 L120 306" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M270 -10 L250 306" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 240 C120 210 260 260 400 230" stroke="var(--t-acc2)" stroke-width="2" opacity=".5" fill="none"/></svg>
+              <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center"><svg width="30" height="38" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 37 C15 37 28 22 28 14 A13 13 0 1 0 2 14 C2 22 15 37 15 37 Z" fill="var(--t-acc)"/><circle cx="15" cy="14" r="5" fill="var(--t-bg)"/></svg><div style="font-size:10px;letter-spacing:.22em;color:var(--t-ink);margin-top:6px">ESTANCIA LA PAZ</div></div>
+            </div>
+            <a href="https://maps.google.com" target="_blank" rel="noreferrer" style="display:flex;align-items:center;justify-content:center;min-height:48px;margin-top:14px;border:1px solid var(--t-ink);color:var(--t-ink);font-size:10.5px;letter-spacing:.24em">ABRIR EN GOOGLE MAPS · mapUrl</a>
+            <div style="margin-top:30px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">06 / 09</div>
+          </section>
+
+          <section data-sec="extras" data-screen-label="Extras pase e info" style="position:relative;padding:52px 26px 44px;background:var(--t-bg)">
+            <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin-bottom:16px">EXTRA — TU PASE DE INGRESO</div>
+            <div data-reveal="b" style="position:relative;background:var(--t-alt);padding:22px 18px;border:1px dashed var(--t-acc);display:flex;gap:16px;align-items:center">
+              <div style="flex:1">
+                <div style="font-size:9.5px;letter-spacing:.26em;color:var(--t-ink2)">PASE N.º</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:56px;line-height:1;color:var(--t-acc)">042</div>
+                <div style="font-size:14px;color:var(--t-ink);margin-top:8px">Mesa 7 · 2 lugares</div>
+                <div style="font-size:12px;color:var(--t-ink2);margin-top:8px;line-height:1.5">Presentá tu pase al ingresar</div>
+              </div>
+              <div style="flex:none;width:110px;height:110px;background:#fff;padding:7px;display:grid;grid-template-columns:repeat(9,1fr);grid-auto-rows:1fr;gap:1px">
+                <sc-for list="{{ qr }}" as="q" hint-placeholder-count="81"><span style="{{ q.s }}"></span></sc-for>
+              </div>
+            </div>
+
+            <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin:34px 0 12px">EXTRA — BUENO SABER</div>
+            <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+              <div style="border-bottom:1px solid rgba(0,0,0,.12)">
+                <button onClick="{{ f.tog }}" style="width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--t-ink)"><span>{{ f.q }}</span><span style="{{ f.mas }}">+</span></button>
+                <div style="{{ f.panel }}"><div style="padding:0 0 16px;font-size:14px;line-height:1.65;color:var(--t-ink2)">{{ f.a }}</div></div>
+              </div>
+            </sc-for>
+
+            <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin:34px 0 12px">EXTRA — EL QUIZ · triviaHabilitada</div>
+            <div data-reveal="b" style="border:1px solid rgba(0,0,0,.12);padding:20px;background:var(--t-alt)">
+              <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--t-ink);line-height:1.3">¿Dónde fue la primera cita?</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+                <sc-for list="{{ quiz }}" as="q" hint-placeholder-count="3">
+                  <button onClick="{{ q.pick }}" style="{{ q.s }}">{{ q.t }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="rsvp" data-screen-label="07 RSVP" style="position:relative;padding:60px 26px 48px;background:var(--t-acc);overflow:hidden">
+            <div aria-hidden="true" style="position:absolute;left:-14px;top:48px;font-family:'Cormorant Garamond',serif;font-size:132px;line-height:1;color:#fff;opacity:.06;pointer-events:none">RSVP</div>
+            <div style="position:relative;display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.28em;color:rgba(255,255,255,.8)">07 — CONFIRMACIÓN</span><span style="flex:1;height:1px;background:rgba(255,255,255,.4)"></span><span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.75)"></span></div>
+            <div style="position:relative;font-family:'Cormorant Garamond',serif;font-size:34px;color:#F7F0E8;line-height:1.2">¿Nos acompañás?</div>
+            <div style="position:relative;font-size:14px;color:rgba(247,240,232,.86);margin-top:8px;line-height:1.6">Confirmá antes del 30 de marzo de 2027</div>
+            <sc-if value="{{ noConfirmado }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;margin-top:24px;display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.26em;color:rgba(255,255,255,.72);margin-bottom:8px">PASO 1 · ASISTENCIA</div>
+                <div style="display:flex;gap:10px">
+                  <button style="flex:1;min-height:48px;background:#F7F0E8;border:0;color:var(--t-acc);font-family:Jost,sans-serif;font-size:11px;letter-spacing:.2em;cursor:pointer">SÍ, ALLÁ ESTARÉ</button>
+                  <button style="flex:1;min-height:48px;background:none;border:1px solid rgba(255,255,255,.55);color:#F7F0E8;font-family:Jost,sans-serif;font-size:11px;letter-spacing:.2em;cursor:pointer">NO PODRÉ</button>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.26em;color:rgba(255,255,255,.72);margin-bottom:8px">PASO 2 · CANTIDAD · 2 LUGARES</div>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <button style="width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.55);color:#F7F0E8;font-size:18px;cursor:pointer">–</button>
+                  <div style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:26px;color:#F7F0E8;border:1px solid rgba(255,255,255,.3)">2</div>
+                  <button style="width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.55);color:#F7F0E8;font-size:18px;cursor:pointer">+</button>
+                </div>
+                <div style="font-size:12px;color:rgba(247,240,232,.7);margin-top:8px">Menores de 10 años $38.000 · de 11 a 17 $62.000</div>
+              </div>
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.26em;color:rgba(255,255,255,.72);margin-bottom:8px">PASO 3 · RESTRICCIONES</div>
+                <div style="min-height:48px;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;padding:0 14px;font-size:14px;color:rgba(247,240,232,.62)">Vegetariano, sin TACC, alergias…</div>
+              </div>
+              <button onClick="{{ confirmar }}" style="min-height:52px;margin-top:4px;background:#F7F0E8;border:0;color:var(--t-acc);font-family:Jost,sans-serif;font-size:11.5px;letter-spacing:.26em;cursor:pointer">SELLAR MI CONFIRMACIÓN</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ confirmado }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;margin-top:30px;height:262px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+              <div style="position:relative;width:170px;height:170px;display:flex;align-items:center;justify-content:center">
+                <div aria-hidden="true" style="position:absolute;width:170px;height:170px;border-radius:50%;background:rgba(247,240,232,.4);animation:pvHalo .9s cubic-bezier(.16,1,.3,1) forwards"></div>
+                <div style="position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center;animation:pvEstampa .4s cubic-bezier(.16,1,.3,1) forwards">
+                  <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="68" fill="none" stroke="#F7F0E8" stroke-width="2"/><circle cx="75" cy="75" r="60" fill="none" stroke="#F7F0E8" stroke-width="1" stroke-dasharray="2 5"/></svg>
+                  <div style="position:absolute;text-align:center"><div style="font-size:13px;letter-spacing:.2em;color:#F7F0E8">CONFIRMADO</div><div style="font-family:'Pinyon Script',cursive;font-size:26px;color:#F7F0E8;margin-top:2px">Valentina</div></div>
+                </div>
+              </div>
+              <div style="font-size:14px;color:rgba(247,240,232,.88);text-align:center;line-height:1.6">2 lugares reservados · Mesa 7<br>Te esperamos el 15 de mayo</div>
+              <button onClick="{{ resetRsvp }}" style="min-height:44px;padding:0 18px;background:none;border:1px solid rgba(255,255,255,.45);color:#F7F0E8;font-size:10px;letter-spacing:.2em;cursor:pointer">VER EL FORMULARIO</button>
+            </div>
+            </sc-if>
+            <div aria-hidden="true" data-doodle="8" style="position:relative;display:flex;justify-content:center;margin-top:26px;opacity:.5"><svg width="90" height="12" viewBox="0 0 90 12"><path d="M0 6 L34 6 M56 6 L90 6" stroke="#F7F0E8" stroke-width="1"/><circle cx="45" cy="6" r="4" fill="none" stroke="#F7F0E8" stroke-width="1"/></svg></div>
+            <div style="position:relative;margin-top:18px;text-align:center;font-size:9px;letter-spacing:.3em;color:rgba(255,255,255,.65)">07 / 09</div>
+          </section>
+
+          <section data-sec="regalos" data-screen-label="08 Regalos" style="position:relative;padding:60px 26px 44px;background:var(--t-bg);overflow:hidden">
+            <div aria-hidden="true" style="position:absolute;right:-16px;top:140px;font-family:'Cormorant Garamond',serif;font-size:120px;line-height:1;color:var(--t-ink);opacity:.06;pointer-events:none">REGALO</div>
+            <div style="position:relative;display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">08 — EL REGALO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div style="position:relative;font-size:14px;line-height:1.7;color:var(--t-ink2);margin-bottom:18px">Su presencia es nuestro mejor regalo. Si además quieren ayudarnos con la luna de miel, acá están los datos.</div>
+            <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+              <div data-reveal="b" style="position:relative;background:var(--t-alt);border:1px solid rgba(0,0,0,.08);padding:20px;margin-bottom:12px">
+                <div style="font-size:9.5px;letter-spacing:.26em;color:var(--t-acc)">{{ b.tit }}</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--t-ink);margin-top:6px">{{ b.titular }}</div>
+                <div style="font-size:13.5px;color:var(--t-ink2);margin-top:10px;line-height:1.7">{{ b.banco }}<br>CBU {{ b.cbu }}<br>Alias {{ b.alias }}</div>
+                <button style="min-height:44px;margin-top:12px;padding:0 16px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-size:10px;letter-spacing:.2em;cursor:pointer">COPIAR ALIAS</button>
+              </div>
+            </sc-for>
+            <div aria-hidden="true" data-doodle="9" style="position:relative;display:flex;justify-content:center;margin-top:18px"><img src="public/templates/sobre-sello/lazo.webp" alt="" style="width:96px;opacity:.95;pointer-events:none"></div>
+            <div style="position:relative;margin-top:16px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">08 / 09</div>
+          </section>
+
+          <section data-sec="cancion" data-screen-label="09 Canción" style="position:relative;padding:60px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">09 — LA MÚSICA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div style="display:flex;gap:18px;align-items:center">
+              <div style="position:relative;width:126px;height:126px;flex:none">
+                <img src="public/templates/tinta-vinilo/vinilo.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:126px;height:126px;object-fit:contain;pointer-events:none;animation:{{ aVinilo }}">
+                <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px;pointer-events:none"><span style="font-size:8px;letter-spacing:.18em;color:var(--t-ink2)">SUENA AHORA</span></div>
+              </div>
+              <div style="flex:1">
+                <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--t-ink);line-height:1.25">Sugerí una canción</div>
+                <div style="font-size:14px;color:var(--t-ink2);margin-top:6px;line-height:1.6">La que no puede faltar en la pista.</div>
+                <div style="display:flex;gap:3px;align-items:flex-end;height:26px;margin-top:12px">
+                  <sc-for list="{{ ondas }}" as="o" hint-placeholder-count="12"><span style="{{ o.s }}"></span></sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="min-height:48px;margin-top:18px;border:1px solid rgba(0,0,0,.18);background:var(--t-bg);display:flex;align-items:center;padding:0 14px;font-size:14px;color:var(--t-ink2)">Artista y tema…</div>
+            <div style="display:flex;gap:10px;margin-top:10px">
+              <button style="flex:1;min-height:48px;background:var(--t-acc);border:0;color:#F7F0E8;font-family:Jost,sans-serif;font-size:11px;letter-spacing:.22em;cursor:pointer">SUGERIR</button>
+              <button onClick="{{ togSon }}" style="min-height:48px;padding:0 18px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-family:Jost,sans-serif;font-size:11px;letter-spacing:.2em;cursor:pointer">{{ labelSon }}</button>
+            </div>
+            <div style="margin-top:30px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">09 / 09</div>
+          </section>
+
+          <footer style="position:relative;padding:52px 26px 128px;background:var(--t-bg);text-align:center">
+            <div style="font-family:'Pinyon Script',cursive;font-size:46px;color:var(--t-acc);line-height:1.2">Delfina &amp; Joaquín</div>
+            <div aria-hidden="true" data-doodle="10" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px"><span style="width:30px;height:1px;background:var(--t-acc2)"></span><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1 L9 5 L13 7 L9 9 L7 13 L5 9 L1 7 L5 5 Z" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg><span style="width:30px;height:1px;background:var(--t-acc2)"></span></div>
+            <div style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2);margin-top:18px">HECHO CON CARIÑO EN</div>
+            <a href="https://altainvitacion.com" style="font-size:11px;letter-spacing:.24em;color:var(--t-acc)">ALTAINVITACION.COM</a>
+          </footer>
+        </div>
+
+        <div ref="{{ setPill }}" style="position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:4px;padding:11px 14px;border-radius:14px;background-color:var(--t-bg);background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.30'/%3E%3C/svg%3E&quot;);box-shadow:-1.41px 1.41px 4px rgba(var(--t-som),.40),inset 1px 1px 0 rgba(255,255,255,.9),inset -1px -1px 0 rgba(var(--t-som),.3);transition:opacity .3s ease,transform .3s cubic-bezier(.22,.61,.36,1)">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+            <button onClick="{{ n.go }}" aria-label="{{ n.l }}" style="width:56px;height:48px;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:0;cursor:pointer;border-radius:10px">
+              <span aria-hidden="true" style="{{ n.ic }}"></span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8d7f72">ESTADO POST-EVENTO · SOLO ÁLBUM</div>
+      <div style="{{ marco }}">
+        <div data-scroll="1" style="position:absolute;inset:0;overflow-y:auto;background:var(--t-bg);padding:0 0 40px">
+          <div style="padding:56px 26px 30px;text-align:center">
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">15 DE MAYO DE 2027</div>
+            <div style="font-family:'Pinyon Script',cursive;font-size:46px;color:var(--t-ink);margin-top:10px;line-height:1.2">Gracias por venir</div>
+            <div style="font-size:14px;color:var(--t-ink2);margin-top:12px;line-height:1.7">La fiesta terminó, pero el álbum queda abierto. Subí tus fotos de esa noche.</div>
+            <button style="min-height:48px;margin-top:18px;padding:0 24px;background:var(--t-acc);border:0;color:#F7F0E8;font-size:11px;letter-spacing:.24em;cursor:pointer">SUBIR MIS FOTOS</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 20px">
+            <sc-for list="{{ grilla }}" as="g" hint-placeholder-count="8"><div style="{{ g.s }}"></div></sc-for>
+          </div>
+          <div style="text-align:center;margin-top:26px;font-size:10px;letter-spacing:.22em;color:var(--t-ink2)">galeriaSecundariaFotos · álbum compartido</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ esEsc }}" hint-placeholder-val="{{ false }}">
+  <div style="width:1440px;height:900px;position:relative;overflow:hidden;border:1px solid #3a322b;box-shadow:0 30px 70px rgba(0,0,0,.55);display:grid;grid-template-columns:440px 1fr;{{ vars }}">
+
+    <aside style="position:relative;background:var(--t-alt);padding:44px 40px;display:flex;flex-direction:column;overflow:hidden">
+      <div aria-hidden="true" style="position:absolute;inset:0;opacity:.6;background:repeating-linear-gradient(0deg,rgba(0,0,0,.02) 0 1px,transparent 1px 3px)"></div>
+      <div aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:150px;background:linear-gradient(175deg,#e6dbcb,#dccfbe);clip-path:polygon(0 0,100% 0,50% 100%);opacity:.9"></div>
+      <div style="position:relative;margin-top:96px;background:var(--t-bg);border:1px solid rgba(0,0,0,.1);box-shadow:0 18px 40px rgba(42,35,32,.18);padding:16px">
+        <div style="position:relative;height:288px;overflow:hidden;border:1px solid rgba(0,0,0,.08)">
+          <div data-par="1" style="position:absolute;inset:-40px 0;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#7d6d5c">FOTO · portadaImagenFondoDesktop</span></div>
+          <div aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none"><div style="position:absolute;top:0;bottom:0;width:110px;background:linear-gradient(90deg,transparent,rgba(255,244,228,.6),transparent);animation:pvLuz 7s cubic-bezier(.45,0,.55,1) 1.4s infinite"></div></div>
+          <img src="public/templates/sobre-sello/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;left:-14px;top:-8px;width:112px;pointer-events:none">
+        </div>
+        <div style="text-align:center;padding:20px 8px 6px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;letter-spacing:.07em;color:var(--t-ink);line-height:1.1">DELFINA</div>
+          <div style="font-family:'Pinyon Script',cursive;font-size:28px;color:var(--t-acc);line-height:.8">&amp;</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:32px;letter-spacing:.07em;color:var(--t-ink);line-height:1.1">JOAQUÍN</div>
+          <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px"><span style="width:34px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.28em;color:var(--t-ink2)">15 · 05 · 2027</span><span style="width:34px;height:1px;background:var(--t-acc2)"></span></div>
+          <div style="font-size:11px;letter-spacing:.2em;color:var(--t-ink2);margin-top:8px">ESTANCIA LA PAZ · CÓRDOBA</div>
+        </div>
+      </div>
+      <div style="position:relative;margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:2px 16px">
+        <sc-for list="{{ navEsc }}" as="n" hint-placeholder-count="9">
+          <button onClick="{{ n.go }}" style="{{ n.s }}"><span style="font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--t-acc);width:20px;text-align:left">{{ n.num }}</span><span style="font-size:10.5px;letter-spacing:.2em">{{ n.l }}</span></button>
+        </sc-for>
+      </div>
+      <div style="position:relative;margin-top:auto;display:flex;align-items:center;gap:12px">
+        <img src="public/templates/sobre-sello/lacre.webp" alt="" aria-hidden="true" style="width:52px;pointer-events:none">
+        <div style="font-size:9px;letter-spacing:.24em;color:var(--t-ink2);line-height:1.8">ALTAINVITACION.COM<br>PAPELERÍA VIVA · SOBRE &amp; SELLO</div>
+      </div>
+    </aside>
+
+    <div id="scD" data-scroll="1" style="position:relative;overflow-y:auto;background:var(--t-bg)">
+
+      <section data-sec="d-portada" data-screen-label="Escritorio 01 Portada" style="position:relative;min-height:620px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 90px;text-align:center">
+        <div style="font-size:10px;letter-spacing:.34em;color:var(--t-acc)">01 — LA INVITACIÓN</div>
+        <div data-reveal="t" style="margin-top:26px">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:82px;letter-spacing:.08em;color:var(--t-ink);line-height:1">DELFINA</div>
+          <div style="font-family:'Pinyon Script',cursive;font-size:62px;color:var(--t-acc);line-height:.9">&amp;</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:82px;letter-spacing:.08em;color:var(--t-ink);line-height:1">JOAQUÍN</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:30px"><span style="width:90px;height:1px;background:var(--t-acc2)"></span><span style="font-size:13px;letter-spacing:.34em;color:var(--t-ink2)">SÁBADO 15 DE MAYO DE 2027</span><span style="width:90px;height:1px;background:var(--t-acc2)"></span></div>
+        <div style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--t-ink2);margin-top:22px">Estancia La Paz, Ascochinga · Córdoba</div>
+        <img src="public/templates/sobre-sello/pluma.webp" alt="" aria-hidden="true" style="position:absolute;right:70px;bottom:54px;width:104px;opacity:.85;pointer-events:none;animation:pvFlote 7s ease-in-out infinite">
+      </section>
+
+      <section data-sec="d-countdown" data-screen-label="Escritorio 02 Countdown" style="position:relative;padding:80px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:40px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">02 — LA CUENTA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:5px;height:5px;border-radius:50%;background:var(--t-acc2)"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">02 / 09</span></div>
+        <div style="display:flex;align-items:center;gap:60px">
+          <div style="position:relative;width:230px;height:230px;flex:none;display:flex;align-items:center;justify-content:center">
+            <div aria-hidden="true" style="position:absolute;inset:0;animation:pvGira 60s linear infinite"><svg width="230" height="230" viewBox="0 0 230 230"><circle cx="115" cy="115" r="102" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><circle cx="115" cy="115" r="90" fill="none" stroke="var(--t-acc2)" stroke-width="1" stroke-dasharray="1 8"/><circle cx="115" cy="13" r="4" fill="var(--t-acc)"/><circle cx="217" cy="115" r="4" fill="var(--t-acc)"/><circle cx="115" cy="217" r="4" fill="var(--t-acc)"/><circle cx="13" cy="115" r="4" fill="var(--t-acc)"/></svg></div>
+            <div style="text-align:center"><div style="font-family:'Cormorant Garamond',serif;font-size:96px;line-height:1;color:var(--t-ink)">{{ cd.d }}</div><div style="font-size:10px;letter-spacing:.32em;color:var(--t-ink2);margin-top:6px">DÍAS</div></div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <sc-for list="{{ cd.cajas }}" as="c" hint-placeholder-count="3">
+              <div data-reveal="b" style="position:relative;background:var(--t-bg);border:1px solid rgba(0,0,0,.08);padding:26px 12px 20px;text-align:center;overflow:hidden">
+                <div aria-hidden="true" style="position:absolute;right:0;top:0;width:22px;height:22px;background:linear-gradient(225deg,var(--t-alt) 50%,rgba(0,0,0,.1) 50%)"></div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:48px;line-height:1;color:var(--t-ink);font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:8px">{{ c.l }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="d-frase" data-screen-label="Escritorio 03 Frase" style="position:relative;padding:96px 140px;text-align:center">
+        <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc);margin-bottom:34px">03 — LA FRASE</div>
+        <div data-reveal="t" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:42px;line-height:1.4;color:var(--t-ink);text-wrap:pretty">Elegirnos todos los días, y que el mundo sea <span style="font-family:'Pinyon Script',cursive;font-style:normal;font-size:62px;color:var(--t-acc)">testigo</span></div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:34px"><span style="width:50px;height:1px;background:var(--t-acc2)"></span><span style="width:5px;height:5px;border-radius:50%;background:var(--t-acc2)"></span><span style="width:50px;height:1px;background:var(--t-acc2)"></span></div>
+        <div style="margin-top:30px;font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">03 / 09</div>
+      </section>
+
+      <section data-sec="d-detalles" data-screen-label="Escritorio 04 Detalles" style="position:relative;padding:80px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:36px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">04 — EL EVENTO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">04 / 09</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div data-reveal="b" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.08);padding:30px">
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">CEREMONIA</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--t-ink);margin-top:10px">Capilla Santa Rosa</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:8px;line-height:1.7">Camino a Ascochinga s/n, Córdoba<br>Sábado 15 de mayo · 18:00 h</div>
+          </div>
+          <div data-reveal="b" data-delay="90" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.08);padding:30px">
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">FIESTA</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--t-ink);margin-top:10px">Estancia La Paz</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:8px;line-height:1.7">Av. Los Talas 2100, Ascochinga<br>Desde las 19:30 h</div>
+          </div>
+        </div>
+        <div style="margin-top:44px;font-size:10px;letter-spacing:.3em;color:var(--t-ink2);margin-bottom:24px">CRONOGRAMA</div>
+        <div style="position:relative">
+          <div aria-hidden="true" style="position:absolute;left:50%;top:8px;bottom:8px;width:1px;background:var(--t-acc2);opacity:.55"></div>
+          <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="5">
+            <div data-reveal="{{ c.lado }}" style="{{ c.fila }}">
+              <div style="{{ c.celda }}">
+                <div style="display:inline-block;font-size:12px;letter-spacing:.18em;color:var(--t-bg);background:var(--t-acc);padding:6px 16px;border-radius:999px">{{ c.hora }}</div>
+                <div style="font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--t-ink);margin-top:8px">{{ c.t }}</div>
+              </div>
+              <div style="width:56px;display:flex;align-items:center;justify-content:center;flex:none"><span style="width:32px;height:32px;border-radius:50%;background:var(--t-bg);border:1px solid var(--t-acc);display:flex;align-items:center;justify-content:center;color:var(--t-acc);font-size:12px">{{ c.i }}</span></div>
+              <div style="flex:1"></div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-reveal="b" style="margin-top:40px;border:1px solid var(--t-acc2);padding:28px;text-align:center;background:var(--t-bg)">
+          <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">DRESS CODE</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:34px;color:var(--t-ink);margin-top:10px">Elegante de noche</div>
+          <div style="font-size:15px;color:var(--t-ink2);margin-top:6px">Los invitamos a evitar el blanco</div>
+        </div>
+      </section>
+
+      <section data-sec="d-album" data-screen-label="Escritorio 05 Álbum" style="position:relative;padding:80px 90px">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:36px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">05 — EL ÁLBUM</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">05 / 09</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+          <sc-for list="{{ album }}" as="f" hint-placeholder-count="4">
+            <div data-reveal="b" style="background:#fff;padding:12px 12px 40px;box-shadow:0 12px 28px rgba(42,35,32,.14)">
+              <div style="height:230px;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px"><span style="font-size:9px;letter-spacing:.2em;color:#7d6d5c">{{ f.slot }}</span></div>
+              <div style="text-align:center;margin-top:12px;font-family:'Pinyon Script',cursive;font-size:22px;color:var(--t-ink2)">{{ f.pie }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-mapa" data-screen-label="Escritorio 06 Mapa" style="position:relative;padding:80px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:36px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">06 — EL MAPA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">06 / 09</span></div>
+        <div data-reveal="b" style="position:relative;height:340px;border:1px solid rgba(0,0,0,.1);background:var(--t-bg);overflow:hidden">
+          <svg viewBox="0 0 1200 340" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M-10 80 L1210 50" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 200 L1210 240" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M280 -10 L340 350" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M860 -10 L800 350" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 290 C300 250 800 310 1210 260" stroke="var(--t-acc2)" stroke-width="2" opacity=".5" fill="none"/></svg>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center"><svg width="34" height="43" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 37 C15 37 28 22 28 14 A13 13 0 1 0 2 14 C2 22 15 37 15 37 Z" fill="var(--t-acc)"/><circle cx="15" cy="14" r="5" fill="var(--t-bg)"/></svg><div style="font-size:11px;letter-spacing:.24em;color:var(--t-ink);margin-top:8px">ESTANCIA LA PAZ</div></div>
+        </div>
+      </section>
+
+      <section data-sec="d-rsvp" data-screen-label="Escritorio 07 RSVP" style="position:relative;padding:80px 90px;background:var(--t-acc);overflow:hidden">
+        <div aria-hidden="true" style="position:absolute;left:40px;top:70px;font-family:'Cormorant Garamond',serif;font-size:220px;line-height:1;color:#fff;opacity:.06;pointer-events:none">RSVP</div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px;margin-bottom:34px"><span style="font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.8)">07 — CONFIRMACIÓN</span><span style="flex:1;height:1px;background:rgba(255,255,255,.4)"></span><span style="font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.7)">07 / 09</span></div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 380px;gap:70px;align-items:center">
+          <div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:56px;color:#F7F0E8;line-height:1.1">¿Nos acompañás?</div>
+            <div style="font-size:15px;color:rgba(247,240,232,.86);margin-top:12px;line-height:1.7">Confirmá antes del 30 de marzo de 2027. Tenés 2 lugares reservados a tu nombre.</div>
+            <div style="display:flex;gap:12px;margin-top:26px">
+              <button style="min-height:52px;padding:0 30px;background:#F7F0E8;border:0;color:var(--t-acc);font-family:Jost,sans-serif;font-size:11.5px;letter-spacing:.24em;cursor:pointer">SÍ, ALLÁ ESTARÉ</button>
+              <button style="min-height:52px;padding:0 30px;background:none;border:1px solid rgba(255,255,255,.55);color:#F7F0E8;font-family:Jost,sans-serif;font-size:11.5px;letter-spacing:.24em;cursor:pointer">NO PODRÉ</button>
+            </div>
+            <div style="font-size:13px;color:rgba(247,240,232,.7);margin-top:20px">Menores de 10 años $38.000 · de 11 a 17 $62.000 · restricciones alimentarias en el paso 3</div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:center">
+            <div style="position:relative;width:250px;height:250px;display:flex;align-items:center;justify-content:center">
+              <div style="position:relative;width:230px;height:230px;display:flex;align-items:center;justify-content:center;transform:rotate(-8deg)">
+                <svg width="230" height="230" viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="68" fill="none" stroke="#F7F0E8" stroke-width="2"/><circle cx="75" cy="75" r="60" fill="none" stroke="#F7F0E8" stroke-width="1" stroke-dasharray="2 5"/></svg>
+                <div style="position:absolute;text-align:center"><div style="font-size:17px;letter-spacing:.2em;color:#F7F0E8">CONFIRMADO</div><div style="font-family:'Pinyon Script',cursive;font-size:38px;color:#F7F0E8;margin-top:4px">Valentina</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="d-regalos" data-screen-label="Escritorio 08 Regalos" style="position:relative;padding:80px 90px;overflow:hidden">
+        <div aria-hidden="true" style="position:absolute;right:40px;top:120px;font-family:'Cormorant Garamond',serif;font-size:200px;line-height:1;color:var(--t-ink);opacity:.06;pointer-events:none">REGALO</div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px;margin-bottom:34px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">08 — EL REGALO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">08 / 09</span></div>
+        <div style="position:relative;font-size:15px;line-height:1.7;color:var(--t-ink2);max-width:620px;margin-bottom:26px">Su presencia es nuestro mejor regalo. Si además quieren ayudarnos con la luna de miel, acá están los datos.</div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+            <div data-reveal="b" style="background:var(--t-alt);border:1px solid rgba(0,0,0,.08);padding:28px">
+              <div style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">{{ b.tit }}</div>
+              <div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--t-ink);margin-top:8px">{{ b.titular }}</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:12px;line-height:1.8">{{ b.banco }}<br>CBU {{ b.cbu }}<br>Alias {{ b.alias }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-cancion" data-screen-label="Escritorio 09 Canción" style="position:relative;padding:80px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:34px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">09 — LA MÚSICA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">09 / 09</span></div>
+        <div style="display:flex;gap:56px;align-items:center">
+          <div style="position:relative;width:210px;height:210px;flex:none">
+            <img src="public/templates/tinta-vinilo/vinilo.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:210px;height:210px;object-fit:contain;pointer-events:none;animation:{{ aVinilo }}">
+            <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;pointer-events:none"><span style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2)">SUENA AHORA</span></div>
+          </div>
+          <div style="flex:1;max-width:560px">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:40px;color:var(--t-ink);line-height:1.2">Sugerí una canción</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:10px;line-height:1.7">La que no puede faltar en la pista.</div>
+            <div style="display:flex;gap:4px;align-items:flex-end;height:40px;margin-top:18px">
+              <sc-for list="{{ ondasD }}" as="o" hint-placeholder-count="12"><span style="{{ o.s }}"></span></sc-for>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:20px">
+              <div style="flex:1;min-height:52px;border:1px solid rgba(0,0,0,.18);background:var(--t-bg);display:flex;align-items:center;padding:0 16px;font-size:15px;color:var(--t-ink2)">Artista y tema…</div>
+              <button style="min-height:52px;padding:0 30px;background:var(--t-acc);border:0;color:#F7F0E8;font-size:11.5px;letter-spacing:.22em;cursor:pointer">SUGERIR</button>
+              <button onClick="{{ togSon }}" style="min-height:52px;padding:0 22px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-size:11.5px;letter-spacing:.2em;cursor:pointer">{{ labelSon }}</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer style="position:relative;padding:76px 90px 90px;text-align:center">
+        <img src="public/templates/sobre-sello/lazo.webp" alt="" aria-hidden="true" style="width:104px;pointer-events:none">
+        <div style="font-family:'Pinyon Script',cursive;font-size:64px;color:var(--t-acc);line-height:1.2;margin-top:10px">Delfina &amp; Joaquín</div>
+        <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:22px">HECHO CON CARIÑO EN</div>
+        <a href="https://altainvitacion.com" style="font-size:12px;letter-spacing:.26em;color:var(--t-acc)">ALTAINVITACION.COM</a>
+      </footer>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="margin-top:20px;border-top:1px solid #332c26;padding-top:30px;display:flex;flex-direction:column;gap:28px">
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#A8854E;margin-bottom:14px">HANDOFF · PALETA BASE + 4 VARIANTES</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+        <sc-for list="{{ paletas }}" as="p" hint-placeholder-count="5">
+          <div style="border:1px solid #332c26;padding:14px;background:#1c1714">
+            <div style="font-size:12px;color:#E8DFD4;letter-spacing:.06em;margin-bottom:10px">{{ p.n }}</div>
+            <div style="display:flex;gap:5px;margin-bottom:10px"><span style="{{ p.sw1 }}"></span><span style="{{ p.sw2 }}"></span><span style="{{ p.sw3 }}"></span><span style="{{ p.sw4 }}"></span><span style="{{ p.sw5 }}"></span><span style="{{ p.sw6 }}"></span></div>
+            <div style="font-size:10px;line-height:1.75;color:#8d7f72;font-variant-numeric:tabular-nums">fondo {{ p.bg }} · alterno {{ p.alt }}<br>tinta {{ p.ink }} · tinta suave {{ p.ink2 }}<br>acento {{ p.acc }} · secundario {{ p.acc2 }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#A8854E;margin-bottom:14px">HANDOFF · TRÍADA TIPOGRÁFICA</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;font-size:11.5px;color:#9A8B7E;line-height:1.7">
+        <div style="border:1px solid #332c26;padding:14px;background:#1c1714"><div style="font-family:'Cormorant Garamond',serif;font-size:28px;color:#F4EBE2">Cormorant Garamond</div>Display · 300/400 · nombres 42–82 px, números del countdown, títulos de sección</div>
+        <div style="border:1px solid #332c26;padding:14px;background:#1c1714"><div style="font-family:'Pinyon Script',cursive;font-size:30px;color:#F4EBE2">Pinyon Script</div>Solo acentos: el «&amp;», el nombre del invitado, una palabra de la frase y el cierre. Nunca en datos.</div>
+        <div style="border:1px solid #332c26;padding:14px;background:#1c1714"><div style="font-size:22px;color:#F4EBE2;letter-spacing:.25em">JOST</div>Datos y kickers · mayúsculas tracked 0,25 em · cuerpos nunca por debajo de 14 px; 9–11 px solo en kickers y folios</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#A8854E;margin-bottom:14px">HANDOFF · ANIMACIONES (nombre · duración · easing · delay/stagger)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px">
+        <sc-for list="{{ anims }}" as="a" hint-placeholder-count="10">
+          <div style="border:1px solid #332c26;padding:12px 14px;background:#1c1714">
+            <div style="font-size:11.5px;color:#E8DFD4;letter-spacing:.05em">{{ a.n }}</div>
+            <div style="font-size:10.5px;color:#8d7f72;line-height:1.75;margin-top:5px">{{ a.d }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#A8854E;margin-bottom:14px">HANDOFF · 10 SLOTS DE DOODLE Y PIEZAS PICTÓRICAS</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+        <sc-for list="{{ slots }}" as="s" hint-placeholder-count="10">
+          <div style="border:1px solid #332c26;padding:11px 13px;background:#1c1714;font-size:10.5px;color:#8d7f72;line-height:1.7"><span style="color:#E8DFD4">{{ s.n }}</span> · {{ s.d }}</div>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px;font-size:10.5px;color:#8d7f72;line-height:1.8">Piezas pictóricas usadas (4 de 4 de la familia, 318 KB): <span style="color:#A8854E">lacre.webp</span> splash y pie del escritorio · <span style="color:#A8854E">ramo-esquina.webp</span> esquinas de portada · <span style="color:#A8854E">pluma.webp</span> frase · <span style="color:#A8854E">lazo.webp</span> regalo y cierre. Prestada de otra familia: <span style="color:#A8854E">tinta-vinilo/vinilo.webp</span> (51 KB) en «Sugerí una canción» — total 369 KB. Todo el resto es SVG inline.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  state = { view:'celular', vi:0, a:0, b:0, rsvp:0, faq:-1, quiz:-1, son:false,
+            t:{d:'—',h:'00',m:'00',s:'00'} };
+
+  paletas = [
+    {n:'Bordó (base)', bg:'#F4EBE2', alt:'#EAE0D4', ink:'#2A2320', ink2:'#6E5E52', acc:'#7A2F3A', acc2:'#A8854E'},
+    {n:'Verde bosque', bg:'#F2EDE4', alt:'#E5E4D6', ink:'#23261F', ink2:'#5F6456', acc:'#1F5A47', acc2:'#8E7F53'},
+    {n:'Azul tinta',   bg:'#F3F0E9', alt:'#E4E4DF', ink:'#1E2430', ink2:'#5C6472', acc:'#24344D', acc2:'#8E7B4C'},
+    {n:'Terracota',    bg:'#F7EEE6', alt:'#EEDFD2', ink:'#2F241D', ink2:'#725E4E', acc:'#B8643C', acc2:'#83714A'},
+    {n:'Oliva',        bg:'#F4F1E6', alt:'#E7E5D3', ink:'#262619', ink2:'#636453', acc:'#6B6B3A', acc2:'#957F50'}
+  ];
+
+  componentDidMount(){ this.tick(); this.iv=setInterval(()=>this.tick(),1000); this.armar(); this.loop(); }
+  componentDidUpdate(){ this.armar(); }
+  componentWillUnmount(){ clearInterval(this.iv); clearTimeout(this.fb); cancelAnimationFrame(this.rid); (this.ios||[]).forEach(o=>o.disconnect()); }
+
+  setRoot = el => { this.root = el; };
+  setPill = el => { this.pill = el; };
+
+  vigilarPill(){
+    const sc = this.root && this.root.querySelector('#scC');
+    if(!sc || sc.dataset.pill) return;
+    sc.dataset.pill = '1';
+    sc.addEventListener('scroll', ()=>{
+      if(!this.pill) return;
+      this.pill.style.transition = 'opacity .3s ease,transform .3s cubic-bezier(.22,.61,.36,1)';
+      this.pill.style.opacity = '0';
+      this.pill.style.transform = 'translateX(-50%) translateY(26px)';
+      clearTimeout(this.pt);
+      this.pt = setTimeout(()=>{
+        if(!this.pill) return;
+        this.pill.style.transition = 'opacity .35s ease,transform .35s cubic-bezier(.22,.61,.36,1)';
+        this.pill.style.opacity = '1';
+        this.pill.style.transform = 'translateX(-50%) translateY(0)';
+      }, 370);
+    }, { passive:true });
+  }
+
+  tick(){
+    const dif = new Date('2027-05-15T19:30:00-03:00') - new Date();
+    const s = Math.max(0, Math.floor(dif/1000)), p = n => String(n).padStart(2,'0');
+    this.setState({ t:{ d:String(Math.floor(s/86400)), h:p(Math.floor(s/3600)%24), m:p(Math.floor(s/60)%60), s:p(s%60) } });
+  }
+
+  armar(){
+    if(!this.root) return;
+    this.vigilarPill();
+    this.ios = this.ios || [];
+    const nuevos = Array.prototype.slice.call(this.root.querySelectorAll('[data-reveal]')).filter(e=>!e.dataset.armed);
+    nuevos.forEach(el=>{
+      el.dataset.armed='1';
+      const k = el.dataset.reveal;
+      const tr = k==='t' ? 'translateY(60px)' : k==='izq' ? 'translateX(-60px)' : k==='der' ? 'translateX(60px)' : 'translateY(16px)';
+      const dur = k==='t' ? '.7s' : k==='b' ? '.5s' : '.6s';
+      el.style.opacity='0'; el.style.transform=tr; el.style.willChange='transform,opacity';
+      el.style.transition='opacity '+dur+' cubic-bezier(.16,1,.3,1), transform '+dur+' cubic-bezier(.16,1,.3,1)';
+    });
+    if(nuevos.length){
+      const grupos = new Map();
+      nuevos.forEach(el=>{
+        const sc = el.closest('[data-scroll]') || null;
+        if(!grupos.has(sc)) grupos.set(sc, []);
+        grupos.get(sc).push(el);
+      });
+      grupos.forEach((lista, sc)=>{
+        const io = new IntersectionObserver(es=>{
+          es.forEach(e=>{
+            if(!e.isIntersecting) return;
+            const d = parseInt(e.target.dataset.delay||'0',10);
+            setTimeout(()=>{ e.target.style.opacity='1'; e.target.style.transform='none'; }, d);
+            io.unobserve(e.target);
+          });
+        }, { root: sc, threshold:.1 });
+        lista.forEach(el=>io.observe(el));
+        this.ios.push(io);
+      });
+    }
+    clearTimeout(this.fb);
+    this.fb = setTimeout(()=>{
+      if(!this.root) return;
+      this.root.querySelectorAll('[data-reveal]').forEach(el=>{
+        if(el.style.opacity !== '1'){
+          const r = el.getBoundingClientRect();
+          if(r.top < window.innerHeight + 200 && r.bottom > -200){ el.style.opacity='1'; el.style.transform='none'; }
+        }
+      });
+    }, 1200);
+  }
+
+  loop(){
+    const paso = ()=>{
+      if(this.root){
+        this.frame = (this.frame||0)+1;
+        if(!this.pars || this.frame % 40 === 0) this.pars = Array.prototype.slice.call(this.root.querySelectorAll('[data-par]'));
+        this.pars.forEach(el=>{
+          const sc = el.closest('[data-scroll]');
+          const y = sc ? sc.scrollTop : 0;
+          el.style.transform = 'translateY('+(y*0.2).toFixed(1)+'px)';
+        });
+      }
+      this.rid = requestAnimationFrame(paso);
+    };
+    this.rid = requestAnimationFrame(paso);
+  }
+
+  abrir(k){ if(this.state[k]) return; this.setState({[k]:1}); this['to_'+k] = setTimeout(()=>this.setState({[k]:2}), 1300); }
+  gesto(k){
+    const ab = this.state[k] === 1;
+    return {
+      aSelL: ab ? 'pvSelloL .55s cubic-bezier(.4,0,.55,1) forwards' : 'none',
+      aSelR: ab ? 'pvSelloR .55s cubic-bezier(.4,0,.55,1) forwards' : 'none',
+      aSol:  ab ? 'pvSolapa .9s cubic-bezier(.16,1,.3,1) .3s forwards' : 'none',
+      aTar:  ab ? 'pvTarjeta .8s cubic-bezier(.16,1,.3,1) .4s forwards' : 'none',
+      aOv:   ab ? 'pvVelo .4s ease 1s forwards' : (this.state[k]===2 ? 'pvVelo .01s linear forwards' : 'none')
+    };
+  }
+
+  ir(id, sec){
+    const sc = this.root && this.root.querySelector('#'+id);
+    const el = sc && sc.querySelector('[data-sec="'+sec+'"]');
+    if(sc && el) sc.scrollTo({ top: el.offsetTop, behavior:'smooth' });
+  }
+
+  hex(h){ const n = parseInt(h.slice(1),16); return [n>>16&255, n>>8&255, n&255]; }
+  mez(h, f){
+    const [r,g,b] = this.hex(h), k = 1 + f;
+    const c = x => Math.max(0, Math.min(255, Math.round(x*k)));
+    return '#' + [c(r),c(g),c(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+
+  renderVals(){
+    const v = this.paletas[this.state.vi], t = this.state.t;
+    const som = this.hex(v.ink2).join(',');
+    const vars = '--t-bg:'+v.bg+';--t-alt:'+v.alt+';--t-ink:'+v.ink+';--t-ink2:'+v.ink2+';--t-acc:'+v.acc+';--t-acc2:'+v.acc2+
+                 ';--t-som:'+som+';--t-emb:'+this.mez(v.bg,-0.13)+';';
+    const ico = p => { const u = 'public/templates/iconos-linea/'+p+'.webp'; return 'width:30px;height:30px;display:block;background:'+v.ink2+';-webkit-mask:url('+u+') no-repeat center / contain;mask:url('+u+') no-repeat center / contain'; };
+    const iconos = ['tarjeta','reloj','copas','polaroids','sobre'];
+    const tog = on => 'min-height:40px;padding:0 16px;border-radius:999px;border:0;cursor:pointer;font-family:Jost,sans-serif;font-size:10.5px;letter-spacing:.18em;background:'+(on?'#F4EBE2':'transparent')+';color:'+(on?'#241d18':'#9A8B7E');
+
+    const cron = [
+      {hora:'18:00', t:'Ceremonia', i:'I'}, {hora:'19:30', t:'Recepción', i:'II'}, {hora:'21:00', t:'Cena', i:'III'},
+      {hora:'00:00', t:'Fiesta', i:'IV'}, {hora:'04:00', t:'Último brindis', i:'V'}
+    ].map((c,i)=>{
+      const izq = i % 2 === 0;
+      return Object.assign({}, c, {
+        lado: izq ? 'izq' : 'der',
+        fila: 'display:flex;align-items:center;margin-bottom:16px;'+(izq ? '' : 'flex-direction:row-reverse'),
+        celda: 'flex:1;'+(izq ? 'text-align:right' : 'text-align:left')
+      });
+    });
+
+    const faqTextos = [
+      'La estancia tiene estacionamiento propio sin costo, con personal hasta las cinco de la mañana.',
+      'Tarifa especial en Hotel Ascochinga y en La Posada del Río mencionando «Boda Delfina y Joaquín».',
+      'Ruta E-53 hasta Ascochinga, 55 minutos desde el centro. Sale un micro a las 17:30 desde Plaza España.',
+      'Es una fiesta de adultos, pero hay guardería con dos niñeras hasta la una de la mañana.'
+    ];
+    const faqs = ['¿Dónde estaciono?','¿Dónde me alojo?','¿Cómo llego desde Córdoba?','¿Podemos llevar a los chicos?'].map((q,i)=>{
+      const ab = this.state.faq === i;
+      return {
+        q, a: faqTextos[i],
+        tog: () => this.setState({ faq: ab ? -1 : i }),
+        mas: 'font-size:22px;line-height:1;color:'+v.acc+';transition:transform .3s cubic-bezier(.16,1,.3,1);transform:rotate('+(ab?'45deg':'0deg')+')',
+        panel: 'overflow:hidden;transform-origin:top;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .3s ease;transform:scaleY('+(ab?1:0)+');opacity:'+(ab?1:0)+';height:'+(ab?'auto':'0')
+      };
+    });
+
+    const quizOps = ['Un bar de Güemes','La fila del cine','Un casamiento ajeno'].map((txt,i)=>{
+      const sel = this.state.quiz === i, ok = i === 2;
+      const bg = sel ? (ok ? v.acc : 'transparent') : 'transparent';
+      return {
+        t: txt,
+        pick: () => this.setState({ quiz: i }),
+        s: 'min-height:48px;text-align:left;padding:0 16px;cursor:pointer;font-family:Jost,sans-serif;font-size:14px;background:'+bg+';color:'+(sel&&ok?'#F7F0E8':v.ink)+';border:1px solid '+(sel?v.acc:'rgba(0,0,0,.18)')
+      };
+    });
+
+    const qrBits = [1,0,1,1,0,0,1,0,1, 0,1,1,0,1,1,0,1,0, 1,1,0,0,1,1,0,1,0, 0,0,1,1,0,1,0,1,1, 1,0,1,0,0,1,1,0,1, 0,1,1,0,1,0,0,1,1, 1,0,0,1,0,1,1,0,1, 0,1,1,0,1,1,0,1,0, 1,1,0,1,0,1,1,0,1];
+    const qr = qrBits.map((b,i)=>{
+      const f = Math.floor(i/9), c = i%9;
+      const ojo = (f<3&&c<3)||(f<3&&c>5)||(f>5&&c<3);
+      const on = ojo ? !(f%3===1 && c%3===1) : !!b;
+      return { s:'background:'+(on ? v.ink : 'transparent') };
+    });
+
+    const barras = (h, col) => [7,13,5,16,9,18,6,14,11,4,15,8].map((n,i)=>({
+      s:'flex:1;height:'+h+'px;background:'+col+';transform-origin:bottom;transform:scaleY('+(n/18)+');'+(this.state.son ? 'animation:pvOnda '+(.7+i*0.06).toFixed(2)+'s ease-in-out '+(i*0.05).toFixed(2)+'s infinite;' : '')
+    }));
+
+    const navSec = [['01','PORTADA','portada'],['02','FECHA','countdown'],['04','EVENTO','detalles'],['05','ÁLBUM','album'],['07','RSVP','rsvp']];
+    const navEscSec = [['01','PORTADA','d-portada'],['02','LA FECHA','d-countdown'],['03','LA FRASE','d-frase'],['04','EL EVENTO','d-detalles'],['05','EL ÁLBUM','d-album'],['06','EL MAPA','d-mapa'],['07','CONFIRMAR','d-rsvp'],['08','EL REGALO','d-regalos'],['09','LA MÚSICA','d-cancion']];
+
+    return {
+      setRoot: this.setRoot,
+      setPill: this.setPill,
+      vars, v,
+      esCel: this.state.view === 'celular',
+      esEsc: this.state.view === 'escritorio',
+      vNombre: v.n,
+      verCel: () => this.setState({view:'celular'}),
+      verEsc: () => this.setState({view:'escritorio'}),
+      btnCel: tog(this.state.view === 'celular'),
+      btnEsc: tog(this.state.view === 'escritorio'),
+      marco: 'width:430px;height:932px;border-radius:44px;overflow:hidden;position:relative;border:1px solid #3a322b;box-shadow:0 30px 70px rgba(0,0,0,.55);background:'+v.bg+';'+vars,
+      btnAbrir: 'position:relative;margin-top:28px;min-height:48px;padding:0 34px;border:1px solid '+v.acc+';background:'+v.acc+';color:#F7F0E8;font-family:Jost,sans-serif;font-size:11.5px;letter-spacing:.26em;cursor:pointer',
+      btnGhost: 'align-self:flex-start;min-height:34px;padding:0 14px;border:1px solid #3a322b;background:#1d1815;color:#9A8B7E;font-size:10px;letter-spacing:.2em;cursor:pointer;border-radius:999px',
+
+      paletas: this.paletas.map((p,i)=>Object.assign({}, p, {
+        set: () => this.setState({vi:i}),
+        chip: 'width:26px;height:26px;border-radius:50%;cursor:pointer;background:'+p.acc+';border:2px solid '+(this.state.vi===i ? '#F4EBE2' : 'transparent')+';box-shadow:0 0 0 1px #3a322b',
+        sw1:'flex:1;height:26px;background:'+p.bg, sw2:'flex:1;height:26px;background:'+p.alt, sw3:'flex:1;height:26px;background:'+p.ink,
+        sw4:'flex:1;height:26px;background:'+p.ink2, sw5:'flex:1;height:26px;background:'+p.acc, sw6:'flex:1;height:26px;background:'+p.acc2
+      })),
+
+      sA: this.gesto('a'), sB: this.gesto('b'),
+      abrirA: () => this.abrir('a'), abrirB: () => this.abrir('b'),
+      resetA: () => this.setState({a:0}), resetB: () => this.setState({b:0}),
+
+      cd: { d: t.d, cajas: [{n:t.h,l:'HORAS'},{n:t.m,l:'MINUTOS'},{n:t.s,l:'SEGUNDOS'}] },
+      cronograma: cron,
+      album: [
+        {slot:'FOTO · galeriaPrincipalFotos[1]', pie:'la propuesta'},
+        {slot:'FOTO · galeriaPrincipalFotos[2]', pie:'Villa General Belgrano'},
+        {slot:'FOTO · galeriaPrincipalFotos[3]', pie:'el sí civil'},
+        {slot:'FOTO · galeriaPrincipalFotos[4]', pie:'nosotros'}
+      ],
+      qr, faqs, quiz: quizOps,
+      grilla: [0,1,2,3,4,5,6,7].map(i=>({ s:'height:'+(i%3===0?140:112)+'px;background:repeating-linear-gradient(135deg,#DED1C0 0 7px,#D5C7B4 7px 14px)' })),
+      bancos: [
+        {tit:'REGALO · CUENTA PRINCIPAL', titular:'Delfina Arrieta', banco:'Banco Galicia · Caja de ahorro en pesos', cbu:'0070 0999 3000 4812 5560 11', alias:'delfi.joaco.boda'},
+        {tit:'LUNA DE MIEL · CUENTA EN DÓLARES', titular:'Joaquín Bustos', banco:'Banco Nación · Caja de ahorro en dólares', cbu:'0110 5992 3000 1174 8823 04', alias:'lunademiel.dj'}
+      ],
+      ondas: barras(26, v.acc), ondasD: barras(40, v.acc),
+      aVinilo: this.state.son ? 'pvGira 8s linear infinite' : 'none',
+      togSon: () => this.setState({son: !this.state.son}),
+      labelSon: this.state.son ? 'PAUSAR MÚSICA' : 'ESCUCHAR',
+
+      noConfirmado: !this.state.rsvp,
+      confirmado: !!this.state.rsvp,
+      confirmar: () => this.setState({rsvp:1}),
+      resetRsvp: () => this.setState({rsvp:0}),
+
+      irMapa: () => this.ir('scC','mapa'),
+      nav: navSec.map(([num,l,sec],i)=>({ num, l, ic: ico(iconos[i]), go: () => this.ir('scC', sec) })),
+      navEsc: navEscSec.map(([num,l,sec])=>({
+        num, l, go: () => this.ir('scD', sec),
+        s: 'display:flex;align-items:center;gap:10px;min-height:38px;background:none;border:0;border-bottom:1px solid rgba(0,0,0,.08);cursor:pointer;padding:0;text-align:left;color:'+v.ink2
+      })),
+
+      anims: [
+        {n:'apertura · sello que se parte', d:'pvSelloL / pvSelloR · 0,55 s · cubic-bezier(.4,0,.55,1) · las dos mitades caen ±(46 px X, 140 px Y) con rotate ∓20° y opacity → 0'},
+        {n:'apertura · solapa del sobre', d:'pvSolapa · 0,9 s · cubic-bezier(.16,1,.3,1) · delay 0,3 s · rotateX(0 → −160°) con perspective 900 px, origen arriba'},
+        {n:'apertura · tarjeta que sale', d:'pvTarjeta · 0,8 s · cubic-bezier(.16,1,.3,1) · delay 0,4 s · translateY(40% → 0) + opacity 0 → 1'},
+        {n:'apertura · velo del splash', d:'pvVelo · 0,4 s · ease · delay 1 s · opacity 1 → 0 y visibility hidden. Total del gesto: 1,4 s'},
+        {n:'reveal de títulos', d:'translateY(60px → 0) + opacity · 0,7 s · cubic-bezier(.16,1,.3,1) · IntersectionObserver threshold 0,1'},
+        {n:'reveal de bloques', d:'translateY(16px → 0) + opacity · 0,5 s · mismo easing · stagger 90 ms entre tarjetas hermanas'},
+        {n:'cronograma', d:'translateX(±60px → 0) + opacity · 0,6 s · alterna lado por índice par/impar'},
+        {n:'parallax de la foto', d:'translateY(scrollTop × 0,2) en requestAnimationFrame · factor visual 0,8 (la foto queda atrás)'},
+        {n:'gesto de luz sobre la foto', d:'pvLuz · 7 s · cubic-bezier(.45,0,.55,1) · infinite · delay 1,4 s · banda de 130 px con skewX(−14°) que cruza el marco de papel'},
+        {n:'corona del countdown', d:'pvGira · 60 s · linear · infinite · una vuelta por minuto en reposo'},
+        {n:'sello CONFIRMADO', d:'pvEstampa · 0,4 s · cubic-bezier(.16,1,.3,1) · scale 1,4 → 1 con rotate −8° + pvHalo 0,9 s (scale 0,55 → 2,4, opacity 0,45 → 0)'},
+        {n:'vinilo y onda de audio', d:'tinta-vinilo/vinilo.webp · pvGira 8 s linear infinite · 12 barras con pvOnda 0,70–1,36 s ease-in-out, stagger 50 ms'},
+        {n:'hoja que se desdobla (FAQ)', d:'scaleY(0 → 1) desde arriba · 0,4 s · cubic-bezier(.16,1,.3,1) + opacity 0,3 s; el «+» rota 45°'},
+        {n:'flote de la pluma', d:'pvFlote · 7 s · ease-in-out · infinite · translateY 0 → −5 px'}
+      ],
+      slots: [
+        {n:'01 portada sup. izq.', d:'ramo-esquina.webp · ramo de rosa crema, eucalipto y bayas bordó sobre el marco de papel'},
+        {n:'02 portada inf. der.', d:'ramo-esquina.webp espejado 8° · sale del marco hacia el borde rasgado'},
+        {n:'03 divisor de countdown', d:'SVG · filete doble con rombo central'},
+        {n:'04 ícono de la frase', d:'pluma.webp · pluma caligráfica con gota de tinta, flote de 5 px'},
+        {n:'05 ícono de detalles', d:'SVG · dos copas de brindis en línea fina'},
+        {n:'06 ícono del álbum', d:'SVG · rama de tres hojas en trazo continuo'},
+        {n:'07 ícono del mapa', d:'SVG · rosa de los vientos'},
+        {n:'08 ícono de RSVP', d:'SVG · filete con anillo central sobre el bloque de acento'},
+        {n:'09 remate del regalo', d:'lazo.webp · moño de cinta de raso crema bajo las cuentas'},
+        {n:'10 viñeta del footer', d:'SVG · estrella de cuatro puntas entre dos filetes'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

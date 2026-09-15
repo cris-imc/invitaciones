@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #7FD8FF; overflow: hidden; }
+  a { color: #FF5E7A; text-decoration: none; }
+  a:hover { color: #2C3A4A; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes tpMarq { to { transform: translate3d(-50%, 0, 0); } }
+  @keyframes tpMarqRev { from { transform: translate3d(-50%, 0, 0); } to { transform: translate3d(0, 0, 0); } }
+  @keyframes tpWave { to { transform: translate3d(-120px, 0, 0); } }
+  @keyframes tpFloat { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+  @keyframes tpSpin { to { transform: rotate(360deg); } }
+  @keyframes tpEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  @keyframes tpSway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  @keyframes tpTwinkle { 0%, 100% { opacity: .3; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+  @media (min-width: 1024px) {
+    [data-spread] { display: grid !important; grid-template-columns: 1fr 1fr !important; align-items: center; column-gap: 72px; }
+    [data-spread] > [data-page] { max-width: 560px; width: 100%; }
+    [data-spread] > [data-page="l"] { justify-self: end; }
+    [data-spread] > [data-page="r"] { justify-self: start; }
+    [data-hero-name] { font-size: min(13vw, 220px) !important; }
+    [data-photo-frame] { max-width: 900px !important; margin-left: auto; margin-right: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: var(--sky, #7FD8FF); color: var(--ink, #2C3A4A); font-family: 'Quicksand', sans-serif;">
+
+  <sc-if value="{{ vistaInvitacion }}" hint-placeholder-val="{{ true }}">
+
+  <div ref="{{ setScroller }}" data-scroller="1" style="position: absolute; inset: 0; overflow-y: hidden; overflow-x: hidden;">
+
+    <!-- 0 · BIENVENIDA · playa: cielo, sol, mar con olas, arena -->
+    <div data-tone="light" data-screen-label="Bienvenida" style="position: sticky; top: 0; height: 100vh; z-index: 0; overflow: hidden; background: var(--sky, #7FD8FF); color: var(--ink, #2C3A4A);">
+      <div ref="{{ setHero }}" style="position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: calc(16px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom)); box-sizing: border-box; will-change: transform;">
+        <div style="position: absolute; inset: 0; pointer-events: none; overflow: hidden;">
+          <div data-drift="-6" style="position: absolute; right: 10%; top: 8%; width: clamp(90px, 24vw, 150px); aspect-ratio: 1; border-radius: 50%; background: var(--sun, #FFD166); box-shadow: 0 0 0 14px rgba(255,209,102,.25);"></div>
+          <div data-drift="4" style="position: absolute; left: 6%; top: 14%; width: 26vw; max-width: 200px; height: 30px; border-radius: 999px; background: #FFFFFF; opacity: .9;"></div>
+          <div data-drift="6" style="position: absolute; left: 12%; top: 11%; width: 16vw; max-width: 120px; height: 26px; border-radius: 999px; background: #FFFFFF; opacity: .9;"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 46%; height: 30%; background: var(--sea, #2EB8C9);"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 46%; height: 22px; overflow: hidden; margin-top: -11px;">
+            <svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: tpWave 3s linear infinite;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z" fill="var(--sea, #2EB8C9)"></path></svg>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; top: 58%; height: 22px; overflow: hidden;">
+            <svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: tpWave 4.2s linear infinite reverse;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z" fill="#FFFFFF" opacity=".7"></path></svg>
+          </div>
+          <div style="position: absolute; left: 0; right: 0; top: 72%; bottom: 0; background: var(--sand, #FBEBD0);"></div>
+          <div style="position: absolute; left: 0; right: 0; top: 72%; height: 22px; overflow: hidden; margin-top: -11px;">
+            <svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: tpWave 5s linear infinite;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z" fill="var(--sand, #FBEBD0)"></path></svg>
+          </div>
+          <svg data-drift="10" viewBox="0 0 160 200" style="position: absolute; right: 2%; top: 30%; width: clamp(120px, 30vw, 220px); transform-origin: 50% 100%; animation: tpSway 5s ease-in-out infinite;"><path d="M66 200 C 70 160, 74 120, 78 76 L 90 78 C 88 120, 86 160, 88 200 Z" fill="var(--trunk, #B07A4A)" stroke="var(--ink, #2C3A4A)" stroke-width="2" stroke-linejoin="round"></path><g stroke="var(--ink, #2C3A4A)" stroke-width="1.5" opacity=".6" fill="none"><path d="M70 104 Q78 100 88 103"></path><path d="M69 128 Q78 124 87 127"></path><path d="M68 152 Q78 148 87 151"></path><path d="M67 176 Q78 172 87 175"></path></g><g transform="rotate(-158 80 68) translate(80 68) scale(0.94)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf, #2E9E6B)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g transform="rotate(-128 80 68) translate(80 68) scale(1.01)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf2, #1E7A55)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g transform="rotate(-98 80 68) translate(80 68) scale(1.08)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf, #2E9E6B)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g transform="rotate(-68 80 68) translate(80 68) scale(1.15)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf2, #1E7A55)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g transform="rotate(-38 80 68) translate(80 68) scale(1.08)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf, #2E9E6B)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g transform="rotate(-8 80 68) translate(80 68) scale(1.01)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf2, #1E7A55)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g transform="rotate(22 80 68) translate(80 68) scale(0.94)"><path d="M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z" fill="var(--leaf, #2E9E6B)" stroke="var(--ink, #2C3A4A)" stroke-width="2.2" stroke-linejoin="round"></path><path d="M2,-1 C 20,-6 40,-2 58,20" fill="none" stroke="var(--ink, #2C3A4A)" stroke-width="1.2" opacity=".4"></path></g><g fill="var(--trunk, #B07A4A)" stroke="var(--ink, #2C3A4A)" stroke-width="2"><circle cx="76" cy="76" r="7"></circle><circle cx="90" cy="78" r="7"></circle><circle cx="83" cy="86" r="6"></circle></g></svg>
+          <svg data-drift="8" viewBox="0 0 60 60" style="position: absolute; left: 6%; bottom: 9%; width: clamp(40px, 11vw, 64px); animation: tpFloat 4s ease-in-out infinite;"><polygon points="30,2 37,22 58,23 41,36 47,57 30,45 13,57 19,36 2,23 23,22" fill="var(--acc, #FF5E7A)" stroke="var(--ink, #2C3A4A)" stroke-width="3" stroke-linejoin="round"></polygon></svg>
+          <svg data-drift="5" viewBox="0 0 80 50" style="position: absolute; left: 28%; bottom: 5%; width: clamp(52px, 14vw, 84px);"><path d="M4 46 A36 36 0 0 1 76 46 Z" fill="var(--acc, #FF5E7A)" stroke="var(--ink, #2C3A4A)" stroke-width="3" stroke-linejoin="round"></path><path d="M4 46 A36 36 0 0 1 76 46" fill="none" stroke="var(--leaf, #2E9E6B)" stroke-width="8"></path><circle cx="30" cy="34" r="2.5" fill="var(--ink, #2C3A4A)"></circle><circle cx="44" cy="28" r="2.5" fill="var(--ink, #2C3A4A)"></circle><circle cx="54" cy="38" r="2.5" fill="var(--ink, #2C3A4A)"></circle></svg>
+        </div>
+
+        <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;">
+          <span style="background: var(--ink, #2C3A4A); color: #FFFFFF; padding: 6px 12px; border-radius: 999px;">Mis quince</span>
+          <span style="text-align: right; background: #FFFFFF; padding: 6px 12px; border-radius: 999px;">Nº 00 / 10</span>
+        </div>
+
+        <div style="position: relative; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 0; text-align: center;">
+          <span ref="{{ setKicker }}" style="font-weight: 700; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; color: var(--ink, #2C3A4A); background: #FFFFFF; padding: 6px 14px; border-radius: 999px;">Sábado 15 · mayo · 2027</span>
+          <h1 data-hero-name="1" style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(60px, 20vw, 180px); line-height: .9; letter-spacing: .01em; display: flex; flex-direction: column; align-items: center; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--acc, #FF5E7A);">
+            <sc-if value="{{ nombreCorto }}" hint-placeholder-val="{{ true }}">
+              <span style="overflow: hidden; display: block;"><span data-piece="1" style="display: block;">Valentina</span></span>
+            </sc-if>
+            <sc-if value="{{ nombreLargo }}" hint-placeholder-val="{{ false }}">
+              <span style="overflow: hidden; display: block; font-size: .72em;"><span data-piece="1" style="display: block;">María</span></span>
+              <span style="overflow: hidden; display: block; font-size: .72em;"><span data-piece="1" style="display: block;">Florencia</span></span>
+            </sc-if>
+          </h1>
+          <div style="display: flex; align-items: center; gap: 10px; background: var(--acc, #FF5E7A); color: #FFFFFF; border-radius: 999px; padding: 8px 18px; font-family: 'Lilita One', cursive; font-size: clamp(18px, 5vw, 26px); letter-spacing: .06em; border: 3px solid var(--ink, #2C3A4A);">15 años ☼ tropical</div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; font-weight: 700; font-size: 13px; line-height: 1.35; text-align: left; background: rgba(255,255,255,.9); padding: 10px 14px; border-radius: 14px;">
+            <span>Salón Palacio Sans Souci<br><span style="color: var(--acc, #FF5E7A);">Victoria · Buenos Aires</span></span>
+            <span style="text-align: right;">Pase Nº 027<br><span style="color: var(--acc, #FF5E7A);">3 personas</span></span>
+          </div>
+        </div>
+
+        <div style="position: relative; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center;">
+          <p style="margin: 0; font-weight: 700; font-size: clamp(15px, 4.2vw, 19px); line-height: 1.35; max-width: 34ch; background: rgba(255,255,255,.9); padding: 8px 14px; border-radius: 14px;">Familia Gómez, traigan protector solar y ganas de bailar.</p>
+          <button onClick="{{ open }}" style="min-height: 54px; width: 100%; max-width: 360px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: var(--ink, #2C3A4A); color: #FFFFFF; font-family: 'Lilita One', cursive; font-size: 20px; letter-spacing: .06em; padding: 2px 22px 0; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 4px 5px 0 var(--acc, #FF5E7A);" style-hover="background: var(--acc, #FF5E7A);">Abrir invitación →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 01 · SAVE THE DATE · etiqueta de botella -->
+    <section data-tone="light" data-screen-label="Save the Date" style="position: relative; z-index: 1; min-height: 100vh; background: var(--sand, #FBEBD0); color: var(--ink, #2C3A4A); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px; overflow: hidden;">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 22px; overflow: hidden;"><svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V0 H0 Z" fill="var(--sea, #2EB8C9)"></path></svg></div>
+      <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #FF5E7A);"><span data-xin="1" data-dist="-40">01 — Guardá la fecha</span><span data-xin="1" data-dist="40">01 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; flex-direction: column; font-family: 'Lilita One', cursive; line-height: .9;">
+            <span data-xin="1" data-dist="-160" style="font-size: clamp(96px, 32vw, 240px); color: var(--acc, #FF5E7A); -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 6px 6px 0 #FFFFFF;">15</span>
+            <span data-xin="1" data-dist="160" data-delay="120" style="font-size: clamp(56px, 18vw, 150px); text-align: right; color: var(--sea, #2EB8C9); -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill;">mayo</span>
+            <span data-xin="1" data-dist="-160" data-delay="240" style="font-size: clamp(56px, 18vw, 150px); color: var(--sun, #FFD166); -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill;">2027</span>
+          </div>
+          <div data-xin="1" data-delay="360" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase;">
+            <span>Sábado · 21:00 h</span>
+            <a href="#" style="color: #FFFFFF; background: var(--ink, #2C3A4A); border-radius: 999px; padding: 12px 18px; min-height: 24px;">Agregar al calendario ☼</a>
+          </div>
+        </div>
+        <div data-page="r" data-photo-frame="1" ref="{{ setPhotoWrap }}" data-xin="1" data-delay="200" data-dist="0" style="position: relative; width: 100%; aspect-ratio: 4 / 5; box-sizing: border-box; overflow: hidden; background: repeating-linear-gradient(135deg, #C9BFAE 0 8px, #D9D0C0 8px 16px); border: 4px solid #FFFFFF; border-radius: 22px; box-shadow: 0 0 0 3px var(--ink, #2C3A4A), 8px 8px 0 var(--sea, #2EB8C9);">
+          <svg width="100%" height="100%" style="position: absolute; inset: 0; pointer-events: none;">
+            <defs><pattern id="tpHtPhoto" patternUnits="userSpaceOnUse" width="10" height="10"><circle ref="{{ setHtDot }}" cx="5" cy="5" r="7.2" fill="var(--sea, #2EB8C9)"></circle></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#tpHtPhoto)"></rect>
+          </svg>
+          <span style="position: absolute; left: 14px; bottom: 12px; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #FFFFFF; background: var(--ink, #2C3A4A); padding: 4px 10px; border-radius: 999px;">FOTO · portadaImagenFondo</span>
+          <div style="position: absolute; right: 12px; top: 12px; display: flex; gap: 2px; align-items: flex-end; background: #FFFFFF; padding: 6px 8px; border-radius: 6px;">
+            <span style="width: 2px; height: 26px; background: #2C3A4A;"></span><span style="width: 1px; height: 26px; background: #2C3A4A;"></span><span style="width: 3px; height: 26px; background: #2C3A4A;"></span><span style="width: 1px; height: 26px; background: #2C3A4A;"></span><span style="width: 2px; height: 26px; background: #2C3A4A;"></span><span style="width: 3px; height: 26px; background: #2C3A4A;"></span><span style="width: 1px; height: 26px; background: #2C3A4A;"></span><span style="width: 2px; height: 26px; background: #2C3A4A;"></span><span style="width: 1px; height: 26px; background: #2C3A4A;"></span><span style="width: 3px; height: 26px; background: #2C3A4A;"></span><span style="width: 2px; height: 26px; background: #2C3A4A;"></span><span style="width: 1px; height: 26px; background: #2C3A4A;"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 · COUNTDOWN · radiocasete -->
+    <section data-tone="dark" data-screen-label="Countdown" style="position: relative; z-index: 1; min-height: 100vh; background: var(--sea, #2EB8C9); color: #FFFFFF; padding: 60px 0 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; overflow: hidden;">
+      <div style="padding: 0 max(20px, calc((100% - 1100px) / 2)); display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">02 — Falta</span><span data-xin="1" data-dist="40">02 / 10</span></div>
+      <div style="overflow: hidden; background: var(--sun, #FFD166); color: var(--ink, #2C3A4A); border-top: 3px solid var(--ink, #2C3A4A); border-bottom: 3px solid var(--ink, #2C3A4A); padding: 6px 0; transform: rotate(-2deg) scale(1.04);">
+        <div ref="{{ setMarq1 }}" style="display: flex; width: max-content; animation: tpMarq 16s linear infinite; font-family: 'Lilita One', cursive; font-size: 26px; letter-spacing: .06em; white-space: nowrap;">
+          <span style="padding-right: 32px;">Días ☼ Horas ☼ Minutos ☼ Segundos ☼ hasta el 15 de mayo ☼</span>
+          <span style="padding-right: 32px;">Días ☼ Horas ☼ Minutos ☼ Segundos ☼ hasta el 15 de mayo ☼</span>
+        </div>
+      </div>
+      <div data-spread="1" style="padding: 0 max(20px, calc((100% - 1100px) / 2)); display: flex; flex-direction: column;">
+        <div data-page="l" style="grid-column: 1 / -1; position: relative; background: var(--ink, #2C3A4A); border-radius: 26px; padding: 18px 14px 16px; display: flex; flex-direction: column; gap: 14px; border: 4px solid #FFFFFF; box-shadow: 8px 8px 0 rgba(44,58,74,.35);">
+          <div style="position: absolute; left: 50%; top: -22px; transform: translateX(-50%); width: 46%; height: 18px; border: 4px solid #FFFFFF; border-bottom: 0; border-radius: 12px 12px 0 0; background: var(--ink, #2C3A4A);"></div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <sc-for list="{{ cuenta }}" as="c" hint-placeholder-count="4">
+              <div data-xin="1" data-dist="{{ c.dist }}" data-delay="{{ c.delay }}" style="position: relative; background: {{ c.bg }}; color: var(--ink, #2C3A4A); border-radius: 16px; padding: 14px 12px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; overflow: hidden;">
+                <span ref="{{ c.ref }}" style="font-family: 'Lilita One', cursive; font-size: clamp(56px, 17vw, 130px); line-height: .9; display: inline-block;">—</span>
+                <span style="font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;">{{ c.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 6px;">
+            <span style="width: 44px; height: 44px; border-radius: 50%; border: 5px solid var(--sand, #FBEBD0); box-sizing: border-box; animation: tpSpin 3s linear infinite; border-top-color: var(--acc, #FF5E7A);"></span>
+            <span style="font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--sand, #FBEBD0);">Play ▶ hasta la fiesta</span>
+            <span style="width: 44px; height: 44px; border-radius: 50%; border: 5px solid var(--sand, #FBEBD0); box-sizing: border-box; animation: tpSpin 3s linear infinite; border-top-color: var(--acc, #FF5E7A);"></span>
+          </div>
+        </div>
+      </div>
+      <div style="overflow: hidden; background: #FFFFFF; color: var(--ink, #2C3A4A); border-top: 3px solid var(--ink, #2C3A4A); border-bottom: 3px solid var(--ink, #2C3A4A); padding: 8px 0; transform: rotate(2deg) scale(1.04);">
+        <div ref="{{ setMarq2 }}" style="display: flex; width: max-content; animation: tpMarqRev 16s linear infinite; font-weight: 700; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; white-space: nowrap;">
+          <span style="padding-right: 32px;">Palacio Sans Souci · Victoria · 21:00 h · Elegante tropical · Palacio Sans Souci · Victoria · 21:00 h · Elegante tropical ·</span>
+          <span style="padding-right: 32px;">Palacio Sans Souci · Victoria · 21:00 h · Elegante tropical · Palacio Sans Souci · Victoria · 21:00 h · Elegante tropical ·</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 · FRASE · mensaje en la arena -->
+    <section data-tone="light" data-screen-label="Frase" style="position: relative; z-index: 1; min-height: 100vh; background: var(--sand, #FBEBD0); color: var(--ink, #2C3A4A); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 30px; overflow: hidden;">
+      <svg width="100%" height="100%" style="position: absolute; inset: 0; pointer-events: none; opacity: .5;"><defs><pattern id="tpGrain" patternUnits="userSpaceOnUse" width="14" height="14"><circle cx="3" cy="4" r="1" fill="#C9A87A"></circle><circle cx="10" cy="11" r="1" fill="#C9A87A"></circle></pattern></defs><rect width="100%" height="100%" fill="url(#tpGrain)"></rect></svg>
+      <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #FF5E7A);"><span data-xin="1" data-dist="-40">03 — Escrito en la arena</span><span data-xin="1" data-dist="40">03 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <h2 data-page="l" ref="{{ setPhrase }}" style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(34px, 9.5vw, 80px); line-height: 1.02; max-width: 15ch; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--sea, #2EB8C9);">
+          <span data-w="1">Quince</span> <span data-w="1">años</span> <span data-w="1">de</span> <span data-w="1" style="color: var(--acc, #FF5E7A);">canciones</span> <span data-w="1">a</span> <span data-w="1">todo</span> <span data-w="1">volumen.</span> <span data-w="1">Esta</span> <span data-w="1">noche,</span> <span data-w="1" style="color: var(--sun, #FFD166);">la</span> <span data-w="1" style="color: var(--sun, #FFD166);">mía.</span>
+        </h2>
+        <div data-page="r" data-xin="1" data-delay="900" data-dist="60" style="align-self: flex-end; display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; padding: 12px 20px; max-width: 320px; animation: tpFloat 4s ease-in-out infinite; box-shadow: 4px 5px 0 var(--acc, #FF5E7A);">
+          <svg viewBox="0 0 60 60" style="width: 26px; height: 26px; flex: 0 0 auto;"><polygon points="30,2 37,22 58,23 41,36 47,57 30,45 13,57 19,36 2,23 23,22" fill="var(--acc, #FF5E7A)" stroke="var(--ink, #2C3A4A)" stroke-width="3" stroke-linejoin="round"></polygon></svg>
+          <span style="font-weight: 700; font-size: 14px; line-height: 1.4;">frasePersonalizadaTexto</span>
+        </div>
+      </div>
+      <div style="position: relative; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;"><span>Valentina · XV</span><span style="width: 40%; height: 4px; background: var(--ink, #2C3A4A); border-radius: 2px;"></span></div>
+    </section>
+
+    <!-- 04 · CUÁNDO Y DÓNDE · pineado -->
+    <sc-if value="{{ modoLateral }}" hint-placeholder-val="{{ true }}">
+    <div data-pan="1" data-screen-label="Cuándo y dónde" style="position: relative; z-index: 1; height: 300vh;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: var(--sky, #7FD8FF);">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform;">
+          <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3">
+            <div data-tone="{{ p.tone }}" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: {{ p.bg }}; color: {{ p.fg }};">
+              <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 22px; overflow: hidden;"><svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: tpWave 4s linear infinite;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z" fill="{{ p.wave }}"></path></svg></div>
+              <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;"><span>04 — {{ p.kicker }}</span><span>{{ p.folio }}</span></div>
+              <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 18px;">
+                <div data-page="l" style="display: flex; flex-direction: column; gap: 6px;">
+                  <span style="font-weight: 700; font-size: 12px; letter-spacing: .22em; text-transform: uppercase;">{{ p.sub }}</span>
+                  <h2 style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(48px, 14vw, 120px); line-height: .92; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 {{ p.acc }};">{{ p.titulo }}</h2>
+                </div>
+                <div data-page="r" style="background: #FFFFFF; color: var(--ink, #2C3A4A); border: 3px solid var(--ink, #2C3A4A); border-radius: 20px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; box-shadow: 6px 7px 0 {{ p.acc }};">
+                  <sc-for list="{{ p.lineas }}" as="l" hint-placeholder-count="3">
+                    <div style="display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 2px dotted var(--ink, #2C3A4A); font-size: 15px; line-height: 1.3;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 2px;">{{ l.k }}</span><span style="text-align: right; font-weight: 700;">{{ l.v }}</span></div>
+                  </sc-for>
+                  <a href="#" style="margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; border-radius: 999px; padding: 0 18px; color: #FFFFFF; background: var(--ink, #2C3A4A); font-family: 'Lilita One', cursive; font-size: 18px; letter-spacing: .04em;">{{ p.cta }}<span>→</span></a>
+                </div>
+              </div>
+              <div style="position: relative; display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;"><span>{{ p.pie }}</span><span>Deslizá →</span></div>
+            </div>
+          </sc-for>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: var(--ink, #2C3A4A);">
+          <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3"><span data-dot="{{ $index }}" style="width: 14px; height: 14px; border-radius: 50%; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span></sc-for>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- 04 · vertical -->
+    <sc-if value="{{ modoVertical }}" hint-placeholder-val="{{ false }}">
+    <section data-tone="light" data-screen-label="Cuándo y dónde" style="position: relative; z-index: 1; background: var(--sky, #7FD8FF); color: var(--ink, #2C3A4A); padding: 0 max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box;">
+      <div style="position: sticky; top: 0; z-index: 0; padding-top: 60px; padding-bottom: 20px; background: var(--sky, #7FD8FF); display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;"><span>04 — Cuándo y dónde</span><span>04 / 10</span></div>
+        <h2 style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(48px, 14vw, 120px); line-height: .92; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--acc, #FF5E7A);">Palacio Sans Souci</h2>
+        <span style="font-weight: 700; font-size: 13px; letter-spacing: .12em; text-transform: uppercase;">Alsina 1035 · Victoria · Buenos Aires</span>
+      </div>
+      <div style="position: relative; z-index: 1; display: flex; flex-direction: column; gap: 18px; padding-top: 28vh;">
+        <sc-for list="{{ paneles }}" as="p" hint-placeholder-count="3">
+          <div data-xin="1" data-dist="{{ p.dist }}" data-rot="{{ p.rot }}" style="background: #FFFFFF; color: var(--ink, #2C3A4A); border: 3px solid var(--ink, #2C3A4A); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; box-shadow: 6px 7px 0 {{ p.acc }};">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; opacity: .7;"><span>{{ p.kicker }}</span><span>{{ p.folio }}</span></div>
+            <span style="font-family: 'Lilita One', cursive; font-size: clamp(30px, 8.5vw, 52px); line-height: .95; color: {{ p.acc }}; -webkit-text-stroke: 1px var(--ink, #2C3A4A); paint-order: stroke fill;">{{ p.titulo }}</span>
+            <sc-for list="{{ p.lineas }}" as="l" hint-placeholder-count="3">
+              <div style="display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 2px dotted var(--ink, #2C3A4A); font-size: 15px; line-height: 1.3;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 2px;">{{ l.k }}</span><span style="text-align: right; font-weight: 700;">{{ l.v }}</span></div>
+            </sc-for>
+            <a href="#" style="margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; border-radius: 999px; padding: 0 18px; color: #FFFFFF; background: var(--ink, #2C3A4A); font-family: 'Lilita One', cursive; font-size: 18px; letter-spacing: .04em;">{{ p.cta }}<span>→</span></a>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <!-- 05 · CHECK-IN · pulsera de playa -->
+    <section data-tone="light" data-screen-label="Check-in" style="position: relative; z-index: 1; min-height: 100vh; background: var(--acc, #FF5E7A); color: var(--ink, #2C3A4A); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+      <svg width="100%" height="100%" style="position: absolute; inset: 0; pointer-events: none; opacity: .25;"><defs><pattern id="tpDots5" patternUnits="userSpaceOnUse" width="16" height="16"><circle cx="8" cy="8" r="3" fill="#FFFFFF"></circle></pattern></defs><rect width="100%" height="100%" fill="url(#tpDots5)" style="mask-image: linear-gradient(90deg, #000, transparent 60%); -webkit-mask-image: linear-gradient(90deg, #000, transparent 60%);"></rect></svg>
+      <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #FFFFFF;"><span data-xin="1" data-dist="-40">05 — Check-in</span><span data-xin="1" data-dist="40">05 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 12px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(52px, 15vw, 130px); line-height: .9; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--ink, #2C3A4A);">¿Venís<br><span style="color: var(--sun, #FFD166);">a la playa?</span></h2>
+          <p data-xin="1" data-delay="120" style="margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; max-width: 40ch; color: #FFFFFF;">Confirmá antes del 15 de abril. Menores de 12 no abonan; de 12 a 17, precio adolescente.</p>
+        </div>
+        <div data-page="r" ref="{{ setCoupon }}" data-xin="1" data-delay="160" data-dist="80" style="position: relative; background: #FFFFFF; color: var(--ink, #2C3A4A); border: 3px solid var(--ink, #2C3A4A); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; box-shadow: 7px 8px 0 var(--ink, #2C3A4A);">
+          <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; border-bottom: 3px dotted var(--ink, #2C3A4A); padding-bottom: 12px;"><span>Pulsera de acceso</span><span ref="{{ setStatus }}">Pendiente</span></div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8;">Nombre y apellido<input value="Familia Gómez" readOnly="{{ true }}" style="min-height: 48px; border: 0; border-bottom: 3px solid var(--ink, #2C3A4A); background: transparent; font-family: 'Lilita One', cursive; font-size: 18px; color: var(--ink, #2C3A4A); padding: 0; outline: none;"></label>
+          <div style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8;">Asistencia
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button onClick="{{ pickYes }}" ref="{{ setYes }}" style="min-height: 48px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: var(--sea, #2EB8C9); color: #FFFFFF; font-family: 'Lilita One', cursive; font-size: 18px; cursor: pointer;">¡Sí, voy!</button>
+              <button onClick="{{ pickNo }}" ref="{{ setNo }}" style="min-height: 48px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: transparent; color: var(--ink, #2C3A4A); font-family: 'Lilita One', cursive; font-size: 18px; cursor: pointer;">No puedo</button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8;">Personas<div style="display: flex; align-items: center; border-bottom: 3px solid var(--ink, #2C3A4A); min-height: 48px;"><button onClick="{{ dec }}" style="width: 44px; min-height: 44px; border: 0; background: transparent; font-family: 'Lilita One', cursive; font-size: 24px; color: var(--ink, #2C3A4A); cursor: pointer;">−</button><span ref="{{ setCount }}" style="flex: 1; text-align: center; font-family: 'Lilita One', cursive; font-size: 28px; color: var(--acc, #FF5E7A);">3</span><button onClick="{{ inc }}" style="width: 44px; min-height: 44px; border: 0; background: transparent; font-family: 'Lilita One', cursive; font-size: 24px; color: var(--ink, #2C3A4A); cursor: pointer;">+</button></div></label>
+            <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8;">Restricciones<input placeholder="Sin TACC, vegano…" style="min-height: 48px; border: 0; border-bottom: 3px solid var(--ink, #2C3A4A); background: transparent; font-family: 'Quicksand', sans-serif; font-weight: 600; font-size: 15px; color: var(--ink, #2C3A4A); padding: 0; outline: none; width: 100%; box-sizing: border-box;"></label>
+          </div>
+          <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8;">Mensaje para Valentina<textarea rows="2" placeholder="Opcional" style="border: 0; border-bottom: 3px solid var(--ink, #2C3A4A); background: transparent; font-family: 'Quicksand', sans-serif; font-weight: 600; font-size: 15px; color: var(--ink, #2C3A4A); padding: 8px 0; outline: none; resize: none; width: 100%; box-sizing: border-box;"></textarea></label>
+          <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8;"><span>Adolescente (12–17)</span><span>$ 15.000</span></div>
+          <button onClick="{{ confirm }}" style="min-height: 54px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: var(--sun, #FFD166); color: var(--ink, #2C3A4A); font-family: 'Lilita One', cursive; font-size: 20px; letter-spacing: .04em; cursor: pointer; box-shadow: 4px 5px 0 var(--ink, #2C3A4A);" style-hover="background: var(--sea, #2EB8C9); color: #FFFFFF;">Confirmar asistencia</button>
+          <div ref="{{ setSticker }}" style="position: absolute; right: 12px; bottom: 78px; width: 134px; aspect-ratio: 1; opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px); pointer-events: none;">
+            <svg viewBox="0 0 100 100" style="position: absolute; inset: 0;">
+              <defs><path id="tpArcOk" d="M50 50 m -33 0 a 33 33 0 1 1 66 0 a 33 33 0 1 1 -66 0" fill="none"></path></defs>
+              <polygon points="50,3 62,36 97,38 69,59 79,94 50,74 21,94 31,59 3,38 38,36" fill="var(--acc, #FF5E7A)" stroke="var(--ink, #2C3A4A)" stroke-width="3" stroke-linejoin="round"></polygon>
+              <text style="font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 8px; letter-spacing: 1.4px; fill: #FFFFFF;"><textPath href="#tpArcOk">CONFIRMADO · 15 · 05 · 2027 · CONFIRMADO ·</textPath></text>
+              <text x="50" y="58" text-anchor="middle" style="font-family: 'Lilita One', cursive; font-size: 20px; fill: #FFFFFF; stroke: var(--ink, #2C3A4A); stroke-width: .8;">¡Sí!</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 · ÁLBUM -->
+    <div data-pan="1" data-screen-label="Álbum" style="position: relative; z-index: 1; height: 240vh;">
+      <div style="position: sticky; top: 0; height: 100vh; overflow: hidden; background: #F7F5F0; color: #2C3A4A;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 200vw; will-change: transform;">
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #6E6A78;"><span>06 — Álbum</span><span>Hoja 01 / 02 · 06 / 10</span></div>
+            <h2 style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(44px, 12vw, 100px); line-height: .92; color: #FFFFFF; -webkit-text-stroke: 2px #2C3A4A; paint-order: stroke fill; text-shadow: 4px 5px 0 var(--sea, #2EB8C9);">Postales</h2>
+            <div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px;">
+              <sc-for list="{{ fotos }}" as="f" hint-placeholder-count="5">
+                <div data-sheet="1" style="grid-column: {{ f.col }}; grid-row: {{ f.row }}; position: relative; overflow: hidden; border: 5px solid #FFFFFF; border-radius: 12px; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); min-height: 0; box-shadow: 0 0 0 2px #2C3A4A; transform: rotate({{ f.rot }});">
+                  <div data-colorwash="1" style="position: absolute; inset: 0; background: {{ f.tint }}; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear;"></div>
+                  <span style="position: absolute; left: 8px; bottom: 6px; font-weight: 700; font-size: 11px; letter-spacing: .14em; color: #2C3A4A;">FOTO {{ f.n }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #6E6A78;"><span>galeriaPrincipalFotos · 5 por hoja</span><span>Deslizá →</span></div>
+          </div>
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: #EFEBE3;">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #6E6A78;"><span ref="{{ setAlbumKicker }}">Hoja 02 / 02 — después de la fiesta</span><span>06 / 10</span></div>
+            <h2 style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(44px, 12vw, 100px); line-height: .92;">Momentos<br><span style="color: var(--acc, #FF5E7A);">de la noche</span></h2>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 600px;">
+              <div style="aspect-ratio: 1; border: 5px solid #FFFFFF; border-radius: 12px; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); box-shadow: 0 0 0 2px #2C3A4A;"></div>
+              <div style="aspect-ratio: 1; border: 5px solid #FFFFFF; border-radius: 12px; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); box-shadow: 0 0 0 2px #2C3A4A;"></div>
+              <div style="aspect-ratio: 1; border: 3px dashed #2C3A4A; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'Lilita One', cursive; font-size: 36px;">+</div>
+            </div>
+            <p style="margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; color: #6E6A78; max-width: 40ch;">Acá van las fotos que suban los invitados. Se habilita cuando termine la fiesta.</p>
+          </div>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: #2C3A4A;">
+          <span data-dot="0" style="width: 14px; height: 14px; border-radius: 50%; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span>
+          <span data-dot="1" style="width: 14px; height: 14px; border-radius: 50%; background: currentColor; opacity: .3; transition: opacity 300ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 · MÚSICA · parlante de playa -->
+    <section data-tone="dark" data-screen-label="Música" style="position: relative; z-index: 1; min-height: 100vh; background: var(--ink, #2C3A4A); color: #FFFFFF; padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px; overflow: hidden;">
+      <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--sun, #FFD166);"><span data-xin="1" data-dist="-40">07 — Playlist</span><span data-xin="1" data-dist="40">07 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 16px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(48px, 14vw, 120px); line-height: .92; text-shadow: 5px 6px 0 var(--sea, #2EB8C9);">¿Qué tema<br><span style="color: var(--sun, #FFD166);">suena?</span></h2>
+          <div data-xin="1" data-delay="120" style="display: flex; align-items: flex-end; gap: 6px; height: 44px;">
+            <span style="width: 12px; height: 100%; background: var(--sea, #2EB8C9); border-radius: 6px; transform-origin: bottom; animation: tpEq 1.1s ease-in-out infinite;"></span><span style="width: 12px; height: 100%; background: var(--acc, #FF5E7A); border-radius: 6px; transform-origin: bottom; animation: tpEq 1.1s ease-in-out .18s infinite;"></span><span style="width: 12px; height: 100%; background: var(--sun, #FFD166); border-radius: 6px; transform-origin: bottom; animation: tpEq 1.1s ease-in-out .36s infinite;"></span><span style="width: 12px; height: 100%; background: var(--leaf, #2E9E6B); border-radius: 6px; transform-origin: bottom; animation: tpEq 1.1s ease-in-out .54s infinite;"></span><span style="width: 12px; height: 100%; background: #FFFFFF; border-radius: 6px; transform-origin: bottom; animation: tpEq 1.1s ease-in-out .72s infinite;"></span>
+          </div>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 12px;">
+          <div data-xin="1" data-delay="160" data-dist="60" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <input placeholder="Título" style="min-height: 48px; border: 3px solid #FFFFFF; border-radius: 14px; background: transparent; color: #FFFFFF; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 15px; padding: 0 14px; outline: none; min-width: 0;">
+            <input placeholder="Artista" style="min-height: 48px; border: 3px solid #FFFFFF; border-radius: 14px; background: transparent; color: #FFFFFF; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 15px; padding: 0 14px; outline: none; min-width: 0;">
+          </div>
+          <button data-xin="1" data-delay="220" style="min-height: 50px; border: 3px solid #FFFFFF; border-radius: 999px; background: var(--sun, #FFD166); color: var(--ink, #2C3A4A); font-family: 'Lilita One', cursive; font-size: 19px; cursor: pointer;" style-hover="background: var(--acc, #FF5E7A); color: #FFFFFF;">Sugerir canción</button>
+          <div data-xin="1" data-delay="280" style="display: flex; flex-direction: column; gap: 8px;">
+            <sc-for list="{{ canciones }}" as="c" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: #FFFFFF; color: var(--ink, #2C3A4A); border-radius: 16px;">
+                <div style="display: flex; align-items: center; gap: 12px; min-width: 0;"><span style="width: 14px; height: 14px; border-radius: 50%; background: {{ c.acc }}; flex: 0 0 auto;"></span><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 17px; line-height: 1.1;">{{ c.t }}</span><span style="font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7;">{{ c.a }}</span></div></div>
+                <button onClick="{{ c.vote }}" style="min-height: 44px; min-width: 64px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: {{ c.acc }}; color: #FFFFFF; font-family: 'Lilita One', cursive; font-size: 16px; cursor: pointer; padding: 0 12px;">☼ {{ c.v }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 · REGALOS -->
+    <section data-tone="light" data-screen-label="Regalos" style="position: relative; z-index: 1; min-height: 100vh; background: var(--sand, #FBEBD0); color: var(--ink, #2C3A4A); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px;">
+      <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--acc, #FF5E7A);"><span data-xin="1" data-dist="-40">08 — Regalos</span><span data-xin="1" data-dist="40">08 / 10</span></div>
+      <div data-spread="1" style="display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 14px;">
+          <h2 data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(48px, 14vw, 120px); line-height: .92; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--sun, #FFD166);">Tu regalo<br>es venir</h2>
+          <p data-xin="1" data-delay="120" style="margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; max-width: 40ch;">Si además querés sumar arena para mi viaje a Brasil, acá están los datos.</p>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 14px;">
+          <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+            <div data-xin="1" data-dist="{{ b.dist }}" data-delay="{{ b.delay }}" style="background: #FFFFFF; color: var(--ink, #2C3A4A); border: 3px solid var(--ink, #2C3A4A); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: 6px 7px 0 {{ b.acc }};">
+              <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7;"><span>{{ b.k }}</span><span>{{ b.banco }}</span></div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 2px dotted var(--ink, #2C3A4A); padding-bottom: 8px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-weight: 700; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7;">Alias</span><span style="font-family: 'Lilita One', cursive; font-size: 22px; line-height: 1; color: {{ b.acc }}; -webkit-text-stroke: 1px var(--ink, #2C3A4A); paint-order: stroke fill;">{{ b.alias }}</span></div><button onClick="{{ b.copyAlias }}" style="min-height: 44px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: {{ b.acc }}; color: #FFFFFF; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; padding: 0 14px; cursor: pointer;">{{ b.aliasLabel }}</button></div>
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><div style="display: flex; flex-direction: column; gap: 2px; min-width: 0;"><span style="font-weight: 700; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7;">CBU</span><span style="font-weight: 700; font-size: 14px; letter-spacing: .04em; word-break: break-all;">{{ b.cbu }}</span></div><button onClick="{{ b.copyCbu }}" style="min-height: 44px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: {{ b.acc }}; color: #FFFFFF; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; padding: 0 14px; cursor: pointer; flex: 0 0 auto;">{{ b.cbuLabel }}</button></div>
+              <span style="font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7;">Titular · {{ b.titular }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 · QUIZ -->
+    <section data-tone="light" data-screen-label="Quiz" style="position: relative; z-index: 1; min-height: 100vh; background: var(--sun, #FFD166); color: var(--ink, #2C3A4A); padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 22px; overflow: hidden;"><svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: tpWave 4s linear infinite;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z" fill="var(--sea, #2EB8C9)"></path></svg></div>
+      <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">09 — Trivia</span><span data-xin="1" data-dist="40">09 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 20px;">
+        <div data-page="l" style="display: flex; flex-direction: column; gap: 12px;">
+          <span data-xin="1" style="align-self: flex-start; background: var(--ink, #2C3A4A); color: #FFFFFF; border-radius: 999px; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 8px 16px;">Pregunta <span ref="{{ setQn }}">1</span> / 3</span>
+          <h2 ref="{{ setQ }}" data-xin="1" data-dist="-80" style="margin: 0; font-family: 'Lilita One', cursive; font-weight: 400; font-size: clamp(38px, 10.5vw, 90px); line-height: .96; max-width: 14ch; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--acc, #FF5E7A);">¿Cuál es mi playa favorita?</h2>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 10px;">
+          <sc-for list="{{ opciones }}" as="o" hint-placeholder-count="3">
+            <button onClick="{{ o.pick }}" style="min-height: 54px; border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; background: {{ o.bg }}; color: {{ o.fg }}; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 16px; text-align: left; padding: 0 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; box-shadow: 4px 5px 0 var(--ink, #2C3A4A);"><span>{{ o.t }}</span><span style="font-family: 'Lilita One', cursive; font-size: 18px;">{{ o.tag }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · TU PASE · pulsera + QR -->
+    <section data-tone="dark" data-screen-label="Tu pase" style="position: relative; z-index: 1; min-height: 100vh; background: var(--sea, #2EB8C9); color: #FFFFFF; padding: 60px max(20px, calc((100% - 1100px) / 2)) calc(28px + env(safe-area-inset-bottom)); box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; gap: 22px; overflow: hidden;">
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 26%; background: var(--sand, #FBEBD0);"></div>
+      <div style="position: absolute; left: 0; right: 0; bottom: 26%; height: 22px; overflow: hidden; margin-bottom: -11px;"><svg viewBox="0 0 120 22" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: tpWave 5s linear infinite;"><path d="M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z" fill="var(--sand, #FBEBD0)"></path></svg></div>
+      <div style="position: relative; display: flex; justify-content: space-between; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;"><span data-xin="1" data-dist="-40">10 — Tu pase</span><span data-xin="1" data-dist="40">10 / 10</span></div>
+      <div data-spread="1" style="position: relative; display: flex; flex-direction: column; gap: 22px;">
+        <div data-page="l" data-xin="1" data-dist="-60" style="display: flex; flex-direction: column; gap: 16px; align-items: flex-start;">
+          <div style="position: relative; width: min(100%, 300px); aspect-ratio: 1; background: #FFFFFF; padding: 16px; box-sizing: border-box; border: 3px solid var(--ink, #2C3A4A); border-radius: 22px; box-shadow: 8px 8px 0 var(--acc, #FF5E7A);">
+            <svg viewBox="0 0 21 21" width="100%" height="100%" shape-rendering="crispEdges" style="display: block;">
+              <path fill="#2C3A4A" d="M0 0h7v7H0zM1 1v5h5V1zM2 2h3v3H2zM14 0h7v7h-7zM15 1v5h5V1zM16 2h3v3h-3zM0 14h7v7H0zM1 15v5h5v-5zM2 16h3v3H2zM8 0h1v1H8zM10 0h1v2h-1zM12 0h1v1h-1zM8 2h2v1H8zM11 2h2v1h-2zM8 4h1v1H8zM10 4h2v1h-2zM8 6h1v1H8zM12 6h1v1h-1zM10 5h1v3h-1zM0 8h1v1H0zM2 8h2v1H2zM5 8h1v1H5zM8 8h1v2H8zM10 8h1v1h-1zM12 8h2v1h-2zM15 8h1v1h-1zM17 8h1v1h-1zM19 8h2v1h-2zM0 10h2v1H0zM3 10h1v1H3zM5 10h1v1H5zM9 10h2v1H9zM12 10h1v1h-1zM14 10h2v1h-2zM17 10h2v1h-2zM20 10h1v1h-1zM1 12h1v1H1zM3 12h3v1H3zM8 12h1v1H8zM10 12h2v1h-2zM13 12h1v1h-1zM15 12h1v1h-1zM17 12h1v1h-1zM19 12h2v1h-2zM8 14h1v1H8zM10 14h1v1h-1zM12 14h1v1h-1zM14 14h3v1h-3zM18 14h1v1h-1zM20 14h1v1h-1zM8 16h2v1H8zM11 16h1v1h-1zM14 16h1v1h-1zM16 16h3v1h-3zM20 16h1v1h-1zM8 18h1v1H8zM10 18h2v1h-2zM13 18h1v1h-1zM15 18h1v1h-1zM17 18h2v1h-2zM8 20h1v1H8zM10 20h1v1h-1zM12 20h2v1h-2zM15 20h2v1h-2zM19 20h2v1h-2z"></path>
+            </svg>
+            <span style="position: absolute; left: 0; right: 0; bottom: -24px; text-align: center; font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #FFFFFF;">QrDeIngreso</span>
+          </div>
+        </div>
+        <div data-page="r" style="display: flex; flex-direction: column; gap: 14px; padding-top: 12px;">
+          <div data-xin="1" data-delay="100" style="display: flex; align-items: flex-end; justify-content: space-between; gap: 14px;">
+            <div style="display: flex; flex-direction: column;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;">Pase Nº</span><span style="font-family: 'Lilita One', cursive; font-size: clamp(72px, 22vw, 160px); line-height: .88; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--acc, #FF5E7A);">027</span></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; text-align: right;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase;">Mesa</span><span style="font-family: 'Lilita One', cursive; font-size: clamp(44px, 13vw, 96px); line-height: .9; color: var(--sun, #FFD166); -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill;">12</span></div>
+          </div>
+          <div data-xin="1" data-delay="160" style="display: flex; flex-direction: column; background: #FFFFFF; color: var(--ink, #2C3A4A); border: 3px solid var(--ink, #2C3A4A); border-radius: 18px; padding: 6px 16px;">
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 2px dotted var(--ink, #2C3A4A); font-size: 14px;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; opacity: .7;">Sector · Mesa</span><span style="font-weight: 700;">Pista · Mesa 12</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 2px dotted var(--ink, #2C3A4A); font-size: 14px;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; opacity: .7; flex: 0 0 auto;">Estacionamiento</span><span style="text-align: right; line-height: 1.35; font-weight: 600;">En el salón, con valet sin cargo.</span></div>
+            <div style="display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; font-size: 14px;"><span style="font-weight: 700; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; opacity: .7; flex: 0 0 auto;">Transporte</span><span style="text-align: right; line-height: 1.35; font-weight: 600;">Combi desde Belgrano 19:45 h, vuelve 05:00 h.</span></div>
+          </div>
+        </div>
+      </div>
+      <div data-xin="1" data-delay="220" style="position: relative; display: flex; flex-direction: column; gap: 14px; color: var(--ink, #2C3A4A);">
+        <span style="font-family: 'Lilita One', cursive; font-size: clamp(28px, 7.5vw, 48px); line-height: 1; color: #FFFFFF; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 3px 4px 0 var(--acc, #FF5E7A);">¡Nos vemos en la arena! — Vale</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; border-top: 3px solid var(--ink, #2C3A4A); padding-top: 12px;"><span>altainvitacion.com</span><span onClick="{{ replay }}" style="cursor: pointer; color: var(--acc, #FF5E7A);">Volver a la playa ↺</span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- riel de progreso -->
+  <div ref="{{ setRail }}" style="position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom)); opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--ink, #2C3A4A); border-left: 3px solid currentColor;">
+    <span ref="{{ setRailTop }}" style="writing-mode: vertical-rl; font-family: 'Lilita One', cursive; font-size: 14px; letter-spacing: .2em;">00</span>
+    <span ref="{{ setRailBar }}" style="position: absolute; left: -3px; top: 0; width: 6px; height: 0%; background: var(--acc, #FF5E7A); border-radius: 3px; transition: height 200ms linear;"></span>
+    <span ref="{{ setRailLabel }}" style="writing-mode: vertical-rl; font-weight: 700; font-size: 10px; letter-spacing: .28em; text-transform: uppercase;">Bienvenida</span>
+  </div>
+
+  <!-- burbuja de pase -->
+  <div ref="{{ setBubble }}" style="position: absolute; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 4; display: flex; align-items: center; gap: 10px; background: #FFFFFF; color: var(--ink, #2C3A4A); border: 3px solid var(--ink, #2C3A4A); border-radius: 999px; padding: 0 16px 0 6px; min-height: 48px; font-weight: 700; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; box-shadow: 3px 4px 0 var(--acc, #FF5E7A); opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 600ms cubic-bezier(.16,1,.3,1);">
+    <span style="width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: var(--acc, #FF5E7A); border: 2px solid var(--ink, #2C3A4A); font-family: 'Lilita One', cursive; font-size: 16px; color: #FFFFFF;">27</span>
+    <span>Pase Nº 027 · 3 personas</span>
+  </div>
+
+  <!-- botón flotante de música -->
+  <button ref="{{ setMusicBtn }}" onClick="{{ toggleMusic }}" style="position: absolute; right: 56px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 4; width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--ink, #2C3A4A); background: var(--sun, #FFD166); color: var(--ink, #2C3A4A); cursor: pointer; display: flex; align-items: flex-end; justify-content: center; gap: 3px; padding: 0 0 15px; box-shadow: 3px 4px 0 var(--ink, #2C3A4A); opacity: 0; transform: translateY(20px); transition: opacity 500ms ease, transform 600ms cubic-bezier(.16,1,.3,1);">
+    <span data-eq="1" style="width: 4px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; transform: scaleY(.3);"></span><span data-eq="1" style="width: 4px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; transform: scaleY(.6);"></span><span data-eq="1" style="width: 4px; height: 16px; background: currentColor; border-radius: 2px; transform-origin: bottom; transform: scaleY(.4);"></span>
+  </button>
+
+  <!-- preloader -->
+  <div ref="{{ setLoader }}" style="position: absolute; inset: 0; z-index: 9; display: grid; grid-template-columns: repeat(4, 1fr);">
+    <div data-col="1" style="background: var(--acc, #FF5E7A); transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: var(--sun, #FFD166); transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: var(--sea, #2EB8C9); transform-origin: top; will-change: transform;"></div>
+    <div data-col="1" style="background: var(--sand, #FBEBD0); transform-origin: top; will-change: transform;"></div>
+    <div ref="{{ setCounter }}" style="position: absolute; right: 22px; bottom: calc(22px + env(safe-area-inset-bottom)); font-family: 'Lilita One', cursive; font-size: clamp(64px, 18vw, 140px); color: #FFFFFF; line-height: 1; -webkit-text-stroke: 2px var(--ink, #2C3A4A); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--ink, #2C3A4A);">0%</div>
+    <div style="position: absolute; left: 22px; top: calc(22px + env(safe-area-inset-top)); font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--ink, #2C3A4A);">Tropical · Sube la marea</div>
+  </div>
+
+  </sc-if>
+
+  <!-- HANDOFF -->
+  <sc-if value="{{ vistaHandoff }}" hint-placeholder-val="{{ false }}">
+  <div style="position: absolute; inset: 0; overflow: auto; background: #FBEBD0; color: #2C3A4A; padding: 40px max(22px, calc((100% - 760px) / 2)) 80px; font-family: 'Quicksand', sans-serif; font-size: 14px; line-height: 1.55;">
+    <div style="font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #FF5E7A;">Handoff — Tropical · Colección Tipográfica Editorial</div>
+    <h1 style="margin: 12px 0 28px; font-family: 'Lilita One', cursive; font-weight: 400; font-size: 72px; line-height: .9; color: #FFFFFF; -webkit-text-stroke: 2px #2C3A4A; paint-order: stroke fill; text-shadow: 5px 6px 0 #FF5E7A;">Tropical</h1>
+    <h2 style="margin: 0 0 10px; font-family: 'Lilita One', cursive; font-weight: 400; font-size: 30px;">Fuentes</h2>
+    <p style="margin: 0 0 24px;"><strong>Lilita One</strong> (display, un peso): redonda y gordita, tipo etiqueta de bebida; siempre blanca con trazo 2 px tinta (paint-order stroke fill) y sombra plana de color. <strong>Quicksand</strong> 500–700 (texto, datos, formularios): redondeada y liviana. Sin mono.</p>
+    <h2 style="margin: 0 0 10px; font-family: 'Lilita One', cursive; font-weight: 400; font-size: 30px;">Variantes</h2>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px;">
+      <sc-for list="{{ variantesInfo }}" as="v" hint-placeholder-count="5">
+        <div style="display: grid; grid-template-columns: 110px repeat(7, 1fr); gap: 4px; align-items: center; font-weight: 700; font-size: 9px;">
+          <span style="font-size: 13px;">{{ v.nombre }}</span>
+          <span style="background: {{ v.sky }}; padding: 6px 2px; text-align: center;">{{ v.sky }}</span>
+          <span style="background: {{ v.sea }}; padding: 6px 2px; text-align: center; color: #FFFFFF;">{{ v.sea }}</span>
+          <span style="background: {{ v.sand }}; border: 1px solid #2C3A4A; padding: 6px 2px; text-align: center;">{{ v.sand }}</span>
+          <span style="background: {{ v.ink }}; padding: 6px 2px; text-align: center; color: #FFFFFF;">{{ v.ink }}</span>
+          <span style="background: {{ v.acc }}; padding: 6px 2px; text-align: center; color: #FFFFFF;">{{ v.acc }}</span>
+          <span style="background: {{ v.sun }}; padding: 6px 2px; text-align: center;">{{ v.sun }}</span>
+          <span style="background: {{ v.leaf }}; padding: 6px 2px; text-align: center; color: #FFFFFF;">{{ v.leaf }}</span>
+        </div>
+      </sc-for>
+      <span style="font-weight: 700; font-size: 11px; color: #6E6A78;">columnas: cielo · mar · arena · tinta · acento principal (sandía/flamenco) · sol · hoja. Blanco de tarjetas y neutros del álbum fijos.</span>
+    </div>
+    <h2 style="margin: 0 0 10px; font-family: 'Lilita One', cursive; font-weight: 400; font-size: 30px;">Recursos SVG y CSS</h2>
+    <pre style="margin: 0 0 24px; padding: 14px; background: #2C3A4A; color: #FBEBD0; font-family: 'Quicksand', sans-serif; font-weight: 600; font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow: auto;">olas:              path Q/T de 120×22 repetido al 200 % de ancho; translateX 0→−120 px lineal 3–5 s (loop exacto); tres franjas (mar, espuma blanca al 70 %, arena)
+palmera:           tronco curvo con anillos; 7 frondas = 1 path reutilizado (hoja ancha con borde dentado + nervio central) rotado alrededor de la copa (−150° → 44°), alternando dos verdes; 3 cocos; contorno 2 px tinta; sway rotate ±2° 5 s con origen en la base
+sol:               círculo + anillo box-shadow 0 0 0 14px al 25 % (estático)
+estrella de mar:   polígono 10 puntas, stroke 3, flota ±10 px 4 s
+sandía:            semicírculo acento + arco hoja 8 px + 3 semillas
+radiocasete:       caja tinta radius 26 con asa (borde superior) y dos parlantes circulares girando (borde con sector de color)
+código de barras:  12 barras de 1–3 px en tarjeta blanca (esquina de la foto)
+halftone foto:     pattern 10×10, circle r 7.2 → 0 según progreso en viewport (0.15→0.75); estático r = 3
+grano de arena:    pattern 14×14 con 2 puntos #C9A87A</pre>
+    <h2 style="margin: 0 0 10px; font-family: 'Lilita One', cursive; font-weight: 400; font-size: 30px;">Animaciones clave</h2>
+    <div style="display: flex; flex-direction: column; border-top: 3px solid #2C3A4A; margin-bottom: 24px;">
+      <sc-for list="{{ animaciones }}" as="a" hint-placeholder-count="10">
+        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 12px; padding: 10px 0; border-bottom: 2px dotted #2C3A4A;"><span style="font-weight: 700;">{{ a.n }}</span><span style="font-weight: 600; font-size: 12px;">{{ a.d }}</span></div>
+      </sc-for>
+    </div>
+    <h2 style="margin: 0 0 10px; font-family: 'Lilita One', cursive; font-weight: 400; font-size: 30px;">Convenciones</h2>
+    <p style="margin: 0;">data-xin + data-dist (+ data-delay, + data-rot) en entradas; data-w en la frase; data-drift en sol, nubes, palmera, estrella y sandía; data-tone / data-screen-label por pantalla; data-scroller, data-pan / data-strip / data-dot en paneles; data-piece en el nombre; data-colorwash en el álbum. Reduced-motion: olas, palmera y parlantes quietos, sin marquesinas; reveals en estado final.</p>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932},&quot;variante&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;sandia&quot;,&quot;options&quot;:[&quot;sandia&quot;,&quot;flamenco&quot;,&quot;coco&quot;,&quot;lima&quot;,&quot;atardecer&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Color&quot;},&quot;nombreLargo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Portada&quot;},&quot;scrollVertical&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cuándo y dónde&quot;},&quot;ceremonia&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Cuándo y dónde&quot;},&quot;postEvento&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Estado&quot;},&quot;vista&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;invitacion&quot;,&quot;options&quot;:[&quot;invitacion&quot;,&quot;handoff&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Vista&quot;},&quot;onConfirmed&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(data: {attending: boolean; count: number}) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  refs = {};
+  state = { count: 3, yes: true, confirmed: false, votes: [19, 8, 5], q: 0, picked: -1, music: false, copied: {} };
+  set(k) { return (el) => { this.refs[k] = el; }; }
+
+  static VARIANTES = {
+    sandia:   { nombre: 'Sandía',   sky: '#7FD8FF', sea: '#2EB8C9', sand: '#FBEBD0', ink: '#2C3A4A', acc: '#FF5E7A', sun: '#FFD166', leaf: '#2E9E6B', leaf2: '#1E7A55', trunk: '#B07A4A' },
+    flamenco: { nombre: 'Flamenco', sky: '#FFD9E8', sea: '#7FD8FF', sand: '#FFF4E0', ink: '#3A2C4A', acc: '#FF7BAC', sun: '#FFE08A', leaf: '#3FBF9F', leaf2: '#2A8F76', trunk: '#B07A4A' },
+    coco:     { nombre: 'Coco',     sky: '#BDEFFF', sea: '#1FA7A0', sand: '#F7EBD5', ink: '#2C3A4A', acc: '#FF8A3D', sun: '#FFD166', leaf: '#2E9E6B', leaf2: '#1E7A55', trunk: '#8C5A34' },
+    lima:     { nombre: 'Lima',     sky: '#DFFBE6', sea: '#2EB8C9', sand: '#FFF6DC', ink: '#233A2E', acc: '#9BD83A', sun: '#FFE08A', leaf: '#1E7A55', leaf2: '#155C40', trunk: '#B07A4A' },
+    atardecer:{ nombre: 'Atardecer',sky: '#FFB27A', sea: '#6C4FBF', sand: '#FBE3C8', ink: '#3A2340', acc: '#FF4F7A', sun: '#FFD166', leaf: '#2E7A5A', leaf2: '#1E5A42', trunk: '#7A4A3A' },
+  };
+
+  static QUIZ = [
+    { q: '¿Cuál es mi playa favorita?', o: ['Mar del Plata', 'Búzios', 'Cabo Polonio'], ok: 1 },
+    { q: '¿Qué materia odio en el colegio?', o: ['Matemática', 'Química', 'Historia'], ok: 1 },
+    { q: '¿A dónde quiero viajar a los 18?', o: ['Nueva York', 'Río de Janeiro', 'Tokio'], ok: 1 },
+  ];
+
+  renderVals() {
+    const p = this.props;
+    const vertical = !!p.scrollVertical, ceremonia = p.ceremonia !== false, vista = p.vista || 'invitacion', long = !!p.nombreLargo;
+    const V = Component.VARIANTES;
+    const A = 'var(--acc, #FF5E7A)', S = 'var(--sea, #2EB8C9)', Y = 'var(--sun, #FFD166)', L = 'var(--leaf, #2E9E6B)', K = 'var(--ink, #2C3A4A)';
+
+    const cuenta = [
+      { label: 'Días', ref: this.set('d'), dist: -80, delay: 0, bg: A }, { label: 'Horas', ref: this.set('h'), dist: 80, delay: 100, bg: Y },
+      { label: 'Minutos', ref: this.set('m'), dist: -80, delay: 200, bg: 'var(--sand, #FBEBD0)' }, { label: 'Segundos', ref: this.set('s'), dist: 80, delay: 300, bg: '#FFFFFF' },
+    ];
+
+    const salon = { kicker: 'El salón', sub: 'Parador 1', titulo: 'Palacio Sans Souci', tone: 'light', bg: 'var(--sky, #7FD8FF)', fg: K, acc: A, wave: S, cta: 'Cómo llegar', pie: 'Alsina 1035 · Victoria · Buenos Aires', dist: -80, rot: -3,
+      lineas: [{ k: 'Recepción', v: '21:00 h' }, { k: 'Dirección', v: 'Alsina 1035, Victoria' }, { k: 'Dress code', v: 'Elegante tropical' }] };
+    const cer = { kicker: 'La ceremonia', sub: 'Parador 2', titulo: 'Misa de acción de gracias', tone: 'light', bg: 'var(--sand, #FBEBD0)', fg: K, acc: S, wave: 'var(--sky, #7FD8FF)', cta: 'Cómo llegar', pie: 'Parroquia San Isidro Labrador · 19:00 h', dist: 80, rot: 3,
+      lineas: [{ k: 'Hora', v: '19:00 h' }, { k: 'Dirección', v: 'Av. del Libertador 16200, San Isidro' }, { k: 'Llegá', v: '15 min antes' }] };
+    const crono = { kicker: 'Cronograma', sub: 'Parador 3', titulo: 'La noche', tone: 'dark', bg: S, fg: '#FFFFFF', acc: Y, wave: 'var(--sand, #FBEBD0)', cta: 'Agregar al calendario', pie: 'cronogramaEventos · 5 momentos', dist: -80, rot: -2,
+      lineas: [{ k: '21:00', v: 'Recepción' }, { k: '22:00', v: 'Entrada y vals' }, { k: '23:00', v: 'Cena' }, { k: '00:30', v: 'Carnaval carioca' }, { k: '05:00', v: 'Cierre' }] };
+    const paneles = ceremonia ? [salon, cer, crono] : [salon, crono];
+    paneles.forEach((x, i) => { x.folio = String(i + 1).padStart(2, '0') + ' / ' + String(paneles.length).padStart(2, '0'); });
+
+    const tints = ['rgba(255,94,122,.5)', 'rgba(46,184,201,.5)', 'rgba(255,209,102,.6)', 'rgba(46,158,107,.45)', 'rgba(127,216,255,.6)'];
+    const fotos = [
+      { n: '01', col: '1 / 4', row: '1 / 3', tint: tints[0], rot: '-1.5deg' }, { n: '02', col: '4 / 7', row: '1 / 2', tint: tints[1], rot: '1.5deg' },
+      { n: '03', col: '4 / 6', row: '2 / 3', tint: tints[2], rot: '-1deg' }, { n: '04', col: '6 / 7', row: '2 / 3', tint: tints[3], rot: '2deg' },
+      { n: '05', col: '1 / 7', row: '3 / 4', tint: tints[4], rot: '.5deg' },
+    ];
+
+    const songs = [['Tacones rojos', 'Sebastián Yatra', A], ['Despechá', 'Rosalía', S], ['Provenza', 'Karol G', L]];
+    const canciones = songs.map(([t, a, acc], i) => ({ t, a, acc, v: this.state.votes[i], vote: () => this.setState((s) => { const votes = s.votes.slice(); votes[i]++; return { votes }; }) }));
+
+    const cp = this.state.copied;
+    const mk = (id, k, banco, alias, cbu, titular, dist, delay, acc) => ({ k, banco, alias, cbu, titular, dist, delay, acc,
+      aliasLabel: cp[id + 'a'] ? 'Copiado' : 'Copiar', cbuLabel: cp[id + 'c'] ? 'Copiado' : 'Copiar',
+      copyAlias: () => this.copy(id + 'a', alias), copyCbu: () => this.copy(id + 'c', cbu) });
+    const bancos = [
+      mk('r', 'Regalo · viaje a Brasil', 'Banco Galicia', 'VALE.QUINCE.PLAYA', '0070099030004012345678', 'Carolina Pérez', 60, 160, A),
+      mk('t', 'Pago de tarjeta', 'Mercado Pago', 'FIESTA.VALE.XV', '0000003100012345678901', 'Martín Suárez', -60, 240, S),
+    ];
+
+    const Q = Component.QUIZ[this.state.q];
+    const opciones = Q.o.map((t, i) => {
+      const picked = this.state.picked === i, ok = i === Q.ok, done = this.state.picked >= 0;
+      return { t, pick: () => this.answer(i), bg: picked ? (ok ? S : A) : '#FFFFFF', fg: picked ? '#FFFFFF' : K,
+        tag: done ? (ok ? '☼ ¡Sí!' : (picked ? 'Casi' : '')) : String.fromCharCode(65 + i) };
+    });
+
+    const animaciones = [
+      { n: 'Preloader', d: 'contador 0→100 % en 1000 ms; cortina 4 columnas (sandía, sol, mar, arena) scaleY 1→0, 500 ms, stagger 80 ms, cubic-bezier(.7,0,.2,1)' },
+      { n: 'Nombre en piezas', d: 'translateY 320px→0 + opacity, 1400 ms, stagger 150 ms, cubic-bezier(.16,1,.3,1); arranca 260 ms tras la cortina' },
+      { n: 'Letras vivas', d: 'cada 3400 ms una letra "flota": translateY −14 px + rotate ±6°, 300 ms ida, 600 ms vuelta con rebote cubic-bezier(.34,1.56,.64,1)' },
+      { n: 'Olas', d: 'tres franjas translateX 0→−120 px (3 / 4.2 / 5 s, lineal, una invertida)' },
+      { n: 'Escena (data-drift)', d: 'sol −6, nubes 4 / 6, palmera 10, estrella 8, sandía 5 px por vh + mouse/giroscopio; palmera sway ±2° 5 s; estrella flota ±10 px' },
+      { n: 'Hero fijo', d: 'sticky top:0; translateY 0.08 × scroll' },
+      { n: 'Entradas (data-xin)', d: 'opacity 0→1 + translateX(dist) (+ rotate(rot)), 900 ms, cubic-bezier(.16,1,.3,1), delay data-delay; disparo a 0.92 vh' },
+      { n: 'Fecha etiqueta', d: '15 / mayo / 2027 con dist −160 / +160 / −160 y delays 0 / 120 / 240 ms' },
+      { n: 'Foto halftone', d: 'r 7.2 → 0 según progreso en viewport (0.15→0.75), puntos en mar; estático r = 3' },
+      { n: 'Marquesinas', d: '80 px/s, dos direcciones, franjas inclinadas ±2°; pausadas con reduced-motion' },
+      { n: 'Radiocasete', d: 'cuatro displays entran alternados ±80 px; parlantes rotate 360° 3 s; segundos translateY 18 %→0 + opacity .4→1, 300 ms' },
+      { n: 'Frase (data-w)', d: 'palabra: opacity 0→1 + translateY 24px→0 + scale .9→1, 600 ms, stagger 100 ms; pastilla flota 4 s' },
+      { n: 'Paneles pineados', d: 'strip translateX = −p × (n−1) × vw con suavizado 0.14 por frame; dot activo opacity 1' },
+      { n: 'Tarjetas verticales', d: 'entran desde ±80 px con rotate ∓3 °, título sticky arriba' },
+      { n: 'Estrella ¡Sí!', d: 'scale 1.9→1, translateY −120→0, rotate 18→−8 °, 700 ms, cubic-bezier(.34,1.56,.64,1)' },
+      { n: 'Álbum color', d: 'colorwash opacity 0→1 por foto según cercanía al centro horizontal (|dx| < 0.35 vw)' },
+    ];
+
+    return {
+      vistaInvitacion: vista === 'invitacion', vistaHandoff: vista === 'handoff',
+      nombreCorto: !long, nombreLargo: long, modoLateral: !vertical, modoVertical: vertical,
+      cuenta, paneles, fotos, canciones, bancos, opciones, animaciones, variantesInfo: Object.values(V),
+      setRoot: this.set('root'), setScroller: this.set('scroller'), setHero: this.set('hero'), setKicker: this.set('kicker'),
+      setPhotoWrap: this.set('photoWrap'), setHtDot: this.set('htDot'), setMarq1: this.set('marq1'), setMarq2: this.set('marq2'),
+      setPhrase: this.set('phrase'), setCoupon: this.set('coupon'), setStatus: this.set('status'), setSticker: this.set('sticker'),
+      setYes: this.set('yes'), setNo: this.set('no'), setCount: this.set('count'), setAlbumKicker: this.set('albumKicker'),
+      setQn: this.set('qn'), setQ: this.set('qEl'),
+      setRail: this.set('rail'), setRailTop: this.set('railTop'), setRailLabel: this.set('railLabel'), setRailBar: this.set('railBar'),
+      setBubble: this.set('bubble'), setMusicBtn: this.set('musicBtn'), setLoader: this.set('loader'), setCounter: this.set('counter'),
+      open: () => this.open(), replay: () => this.replay(), confirm: () => this.confirm(),
+      pickYes: () => this.setState({ yes: true }), pickNo: () => this.setState({ yes: false }),
+      inc: () => this.setState((s) => ({ count: Math.min(9, s.count + 1) })), dec: () => this.setState((s) => ({ count: Math.max(1, s.count - 1) })),
+      toggleMusic: () => this.setState((s) => ({ music: !s.music })),
+    };
+  }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.applyVariant(); this.prepareReveals(); this.preparePhrase(); this.tick();
+    this.timer = setInterval(() => this.tick(), 1000);
+    this.ticker = setInterval(() => this.frame(), 16);
+    this.onMouse = (e) => { this.mouse = { x: e.clientX / window.innerWidth - .5, y: e.clientY / window.innerHeight - .5 }; };
+    window.addEventListener('mousemove', this.onMouse, { passive: true });
+    this.applyPost(); this.frame();
+  }
+  componentDidUpdate(prev) {
+    if (prev.variante !== this.props.variante) this.applyVariant();
+    if (prev.scrollVertical !== this.props.scrollVertical || prev.ceremonia !== this.props.ceremonia || prev.nombreLargo !== this.props.nombreLargo) {
+      this.reveals = null; this.pans = null; this.drifts = null;
+      setTimeout(() => { this.prepareReveals(); this.introPieces(true); this.frame(); }, 30);
+    }
+    if (prev.postEvento !== this.props.postEvento) this.applyPost();
+    this.syncState();
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer); clearInterval(this.ticker); clearInterval(this.letterTimer);
+    window.removeEventListener('mousemove', this.onMouse);
+    if (this.attached && this.onScroll) this.attached.removeEventListener('scroll', this.onScroll);
+  }
+
+  applyVariant() {
+    const v = Component.VARIANTES[this.props.variante] || Component.VARIANTES.sandia, r = this.refs.root; if (!r) return;
+    ['sky', 'sea', 'sand', 'ink', 'acc', 'sun', 'leaf', 'leaf2', 'trunk'].forEach((k) => r.style.setProperty('--' + k, v[k]));
+  }
+  applyPost() {
+    const sc = this.refs.scroller; if (!sc) return;
+    const post = !!this.props.postEvento;
+    Array.from(sc.children).forEach((el) => { const l = el.dataset.screenLabel; if (l === 'Álbum' || l === 'Bienvenida') return; el.style.display = post ? 'none' : ''; });
+    if (this.refs.albumKicker) this.refs.albumKicker.textContent = post ? 'Hoja 02 / 02 — Momentos' : 'Hoja 02 / 02 — después de la fiesta';
+  }
+  syncState() {
+    const { yes, no, count, status, coupon } = this.refs;
+    if (yes) { yes.style.background = this.state.yes ? 'var(--sea, #2EB8C9)' : 'transparent'; yes.style.color = this.state.yes ? '#FFFFFF' : 'var(--ink, #2C3A4A)'; }
+    if (no) { no.style.background = !this.state.yes ? 'var(--sea, #2EB8C9)' : 'transparent'; no.style.color = !this.state.yes ? '#FFFFFF' : 'var(--ink, #2C3A4A)'; }
+    if (count) count.textContent = this.state.count;
+    if (status) { status.textContent = this.state.confirmed ? 'Confirmado' : 'Pendiente'; status.style.color = this.state.confirmed ? 'var(--acc, #FF5E7A)' : ''; status.style.opacity = this.state.confirmed ? '1' : ''; }
+    if (coupon) coupon.style.boxShadow = this.state.confirmed ? '7px 8px 0 var(--sea, #2EB8C9)' : '7px 8px 0 var(--ink, #2C3A4A)';
+    const btn = this.refs.musicBtn;
+    if (btn) btn.querySelectorAll('[data-eq]').forEach((b, i) => { b.style.animation = this.state.music && !this.reduced ? 'tpEq 1s ease-in-out ' + (i * .18) + 's infinite' : 'none'; });
+    if (this.refs.qn) this.refs.qn.textContent = this.state.q + 1;
+    if (this.refs.qEl) this.refs.qEl.textContent = Component.QUIZ[this.state.q].q;
+  }
+
+  preloader() {
+    const { loader, counter } = this.refs; if (!loader) return;
+    const cols = Array.from(loader.querySelectorAll('[data-col]'));
+    if (this.reduced) { loader.style.display = 'none'; this.introPieces(true); return; }
+    const t0 = performance.now();
+    const step = (t) => { const p = Math.min(1, (t - t0) / 1000); if (counter) counter.textContent = Math.round(p * 100) + '%'; if (p < 1) requestAnimationFrame(step); else this.curtain(cols, loader); };
+    requestAnimationFrame(step);
+  }
+  curtain(cols, loader) {
+    if (this.refs.counter) this.refs.counter.style.opacity = 0;
+    cols.forEach((c, i) => { c.style.transition = 'transform 500ms cubic-bezier(.7,0,.2,1) ' + (i * 80) + 'ms'; c.style.transform = 'scaleY(0)'; });
+    setTimeout(() => { loader.style.display = 'none'; }, 800);
+    setTimeout(() => this.introPieces(), 260);
+  }
+
+  introPieces(instant) {
+    const hero = this.refs.hero; if (!hero) return;
+    const pieces = Array.from(hero.querySelectorAll('[data-piece]'));
+    pieces.forEach((p, i) => {
+      if (!p.dataset.split) this.splitLetters(p);
+      if (instant || this.reduced) { p.style.transform = 'none'; p.style.opacity = 1; return; }
+      p.style.transition = 'none'; p.style.transform = 'translate3d(0,320px,0)'; p.style.opacity = 0;
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        p.style.transition = 'transform 1400ms cubic-bezier(.16,1,.3,1) ' + (i * 150) + 'ms, opacity 900ms ease ' + (i * 150) + 'ms';
+        p.style.transform = 'translate3d(0,0,0)'; p.style.opacity = 1;
+      }));
+    });
+    this.fitName();
+    const k = this.refs.kicker;
+    if (k && !instant && !this.reduced) { k.style.opacity = 0; k.style.transition = 'opacity 800ms ease 900ms'; requestAnimationFrame(() => { k.style.opacity = 1; }); }
+    clearInterval(this.letterTimer);
+    if (!this.reduced) this.letterTimer = setInterval(() => this.floatLetter(), 3400);
+  }
+  fitName() {
+    const hero = this.refs.hero; if (!hero) return;
+    const h1 = hero.querySelector('[data-hero-name]'); if (!h1) return;
+    if (h1.dataset.fs == null) h1.dataset.fs = h1.style.fontSize || '';
+    h1.style.fontSize = h1.dataset.fs;
+    const avail = (h1.parentElement ? h1.parentElement.clientWidth : h1.clientWidth) - 4; if (!(avail > 0)) return;
+    const widest = Math.max.apply(null, Array.from(h1.querySelectorAll('[data-piece]')).map((p) => p.scrollWidth));
+    if (widest > avail) { const cur = parseFloat(getComputedStyle(h1).fontSize); h1.style.fontSize = Math.floor(cur * avail / widest * .98) + 'px'; }
+  }
+  splitLetters(piece) {
+    piece.dataset.split = '1';
+    const walk = (node) => {
+      Array.from(node.childNodes).forEach((n) => {
+        if (n.nodeType === 3) {
+          const frag = document.createDocumentFragment();
+          Array.from(n.textContent).forEach((ch) => {
+            if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); return; }
+            const w = document.createElement('span'); w.dataset.letter = '1'; w.textContent = ch;
+            w.style.cssText = 'display:inline-block;will-change:transform;';
+            frag.appendChild(w);
+          });
+          n.parentNode.replaceChild(frag, n);
+        } else if (n.nodeType === 1) walk(n);
+      });
+    };
+    walk(piece);
+  }
+  floatLetter() {
+    const hero = this.refs.hero; if (!hero || this.floating) return;
+    const letters = Array.from(hero.querySelectorAll('[data-letter]')).filter((l) => /\p{L}/u.test(l.textContent));
+    if (!letters.length) return;
+    const w = letters[Math.floor(Math.random() * letters.length)], rot = Math.random() < .5 ? -6 : 6;
+    this.floating = 1;
+    w.style.transition = 'transform 300ms cubic-bezier(.16,1,.3,1)'; w.style.transform = 'translateY(-14px) rotate(' + rot + 'deg)';
+    setTimeout(() => { w.style.transition = 'transform 600ms cubic-bezier(.34,1.56,.64,1)'; w.style.transform = 'none'; }, 340);
+    setTimeout(() => { this.floating = 0; }, 1000);
+  }
+
+  open() {
+    const sc = this.refs.scroller; if (!sc) return;
+    sc.style.overflowY = 'auto'; this.opened = 1;
+    if (this.reduced) sc.scrollTop = sc.clientHeight; else this.smoothTo(sc, sc.clientHeight, 1100);
+    setTimeout(() => { ['rail', 'bubble', 'musicBtn'].forEach((k) => { const el = this.refs[k]; if (el) { el.style.opacity = 1; el.style.transform = 'none'; } }); }, 700);
+    this.askGyro();
+  }
+  replay() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.smoothTo(sc, 0, 900);
+    setTimeout(() => { sc.style.overflowY = 'hidden'; this.opened = 0; ['rail', 'bubble', 'musicBtn'].forEach((k) => { const el = this.refs[k]; if (el) el.style.opacity = 0; }); this.introPieces(); }, 950);
+  }
+  smoothTo(sc, y, ms) {
+    const y0 = sc.scrollTop, t0 = performance.now(), ease = (t) => 1 - Math.pow(1 - t, 4);
+    const step = (t) => { const p = Math.min(1, (t - t0) / ms); sc.scrollTop = y0 + (y - y0) * ease(p); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  }
+  askGyro() {
+    if (this.gyro || typeof DeviceOrientationEvent === 'undefined') return;
+    const start = () => { this.gyro = 1; window.addEventListener('deviceorientation', (e) => { if (e.gamma == null) return; this.mouse = { x: Math.max(-.5, Math.min(.5, e.gamma / 60)), y: Math.max(-.5, Math.min(.5, (e.beta - 45) / 90)) }; }, { passive: true }); };
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') DeviceOrientationEvent.requestPermission().then((r) => { if (r === 'granted') start(); }).catch(() => {});
+    else if ('ontouchstart' in window) start();
+  }
+
+  attach(sc) {
+    if (this.attached === sc) return;
+    this.attached = sc; this.onScroll = () => this.frame();
+    sc.addEventListener('scroll', this.onScroll, { passive: true }); window.addEventListener('resize', () => { this.onScroll(); this.fitName(); });
+  }
+  frame() { try { this.frameBody(); } catch (e) { if (!this.errLogged) { this.errLogged = 1; console.error(e); } } }
+  frameBody() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.attach(sc);
+    if (!this.preStarted && this.refs.loader && this.refs.hero) { this.preStarted = 1; this.preloader(); }
+    const vh = sc.clientHeight, vw = sc.clientWidth, y = sc.scrollTop;
+    if (!this.pans) this.pans = Array.from(sc.querySelectorAll('[data-pan]'));
+    if (!this.reveals) this.prepareReveals();
+    this.checkReveals(vh);
+
+    const hero = this.refs.hero;
+    if (hero) {
+      const m = this.mouse || { x: 0, y: 0 }, par = window.innerWidth >= 1024 || this.gyro ? m : { x: 0, y: 0 };
+      hero.style.transform = 'translate3d(0,' + (y * 0.08) + 'px,0)';
+      if (!this.drifts) this.drifts = Array.from(hero.querySelectorAll('[data-drift]')).filter((d) => !d.style.animationName && !(d.getAttribute('style') || '').includes('animation:'));
+      const k = Math.min(1, y / vh);
+      this.drifts.forEach((d) => { const f = parseFloat(d.dataset.drift) || 0; d.style.transform = 'translate3d(' + (par.x * f * 1.5) + 'px,' + (k * f * 8 + par.y * f) + 'px,0)'; });
+    }
+
+    if (!this.panPos) this.panPos = [];
+    this.pans.forEach((pan, pi) => {
+      const strip = pan.querySelector('[data-strip]'); if (!strip) return;
+      const n = strip.children.length, span = pan.offsetHeight - vh;
+      const p = span > 0 ? Math.min(1, Math.max(0, (y - pan.offsetTop) / span)) : 0;
+      const prev = this.panPos[pi], eased = prev == null || this.reduced ? p : prev + (p - prev) * 0.14;
+      this.panPos[pi] = Math.abs(p - eased) < .0004 ? p : eased;
+      strip.style.transform = 'translate3d(' + (-eased * (n - 1) * vw) + 'px,0,0)';
+      const active = Math.min(n - 1, Math.round(eased * (n - 1)));
+      pan.querySelectorAll('[data-dot]').forEach((d, i) => { d.style.opacity = i === active ? '1' : '.3'; });
+      const dots = pan.querySelector('[data-dots]'); if (dots && strip.children[active]) dots.style.color = strip.children[active].dataset.tone === 'dark' ? '#FFFFFF' : '#2C3A4A';
+      strip.querySelectorAll('[data-sheet]').forEach((s) => {
+        const r = s.getBoundingClientRect(), dx = Math.abs((r.left + r.width / 2) / vw - .5);
+        const wash = s.querySelector('[data-colorwash]'); if (wash) wash.style.opacity = Math.max(0, Math.min(1, 1 - (dx - .1) / .3));
+      });
+    });
+
+    const pw = this.refs.photoWrap, dot = this.refs.htDot;
+    if (pw && dot) {
+      const r = pw.getBoundingClientRect(), prog = 1 - (r.top + r.height / 2) / vh;
+      const t = this.reduced ? .6 : Math.min(1, Math.max(0, (prog - .15) / .6));
+      dot.setAttribute('r', (7.2 * (1 - t)).toFixed(2));
+    }
+    [this.refs.marq1, this.refs.marq2].forEach((m) => { if (m && !m.dataset.timed) { const w = m.scrollWidth / 2; if (w) { m.style.animationDuration = (w / 80).toFixed(1) + 's'; m.dataset.timed = '1'; } } });
+    this.updateRail(sc);
+  }
+  updateRail(sc) {
+    const max = sc.scrollHeight - sc.clientHeight, p = max > 0 ? Math.min(1, sc.scrollTop / max) : 0;
+    if (this.refs.railBar) this.refs.railBar.style.height = (p * 100) + '%';
+    const secs = Array.from(sc.children).filter((s) => s.style.display !== 'none');
+    const mid = sc.scrollTop + sc.clientHeight / 2; let cur = secs[0], idx = 0;
+    secs.forEach((s, i) => { if (s.offsetTop <= mid) { cur = s; idx = i; } });
+    if (!cur) return;
+    const label = cur.dataset.screenLabel || '';
+    if (this.refs.railLabel && this.refs.railLabel.textContent !== label) this.refs.railLabel.textContent = label;
+    if (this.refs.railTop) this.refs.railTop.textContent = String(idx).padStart(2, '0');
+    let tone = cur.dataset.tone;
+    if (!tone) { const strip = cur.querySelector('[data-strip]'); if (strip) { const i = Math.min(strip.children.length - 1, Math.round(Math.abs(parseFloat(strip.style.transform.replace(/[^-\d.]/g, '')) || 0) / (sc.clientWidth || 1))); tone = strip.children[i] ? strip.children[i].dataset.tone : 'light'; } }
+    const rail = this.refs.rail; if (rail) rail.style.color = tone === 'dark' ? '#FFFFFF' : 'var(--ink, #2C3A4A)';
+  }
+
+  prepareReveals() {
+    const sc = this.refs.scroller; if (!sc) return;
+    this.reveals = Array.from(sc.querySelectorAll('[data-xin]')).filter((el) => !el.dataset.shown);
+    this.reveals.forEach((el) => {
+      if (this.reduced) { el.dataset.shown = '1'; return; }
+      const d = el.dataset.dist != null ? parseFloat(el.dataset.dist) : 60, rot = parseFloat(el.dataset.rot || 0);
+      el.dataset.base = el.style.transform || '';
+      el.style.opacity = 0;
+      el.style.transform = 'translate3d(' + d + 'px,' + (d === 0 ? 40 : 0) + 'px,0) rotate(' + rot + 'deg)';
+      el.style.transition = 'opacity 700ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1)';
+      el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+    });
+  }
+  preparePhrase() {
+    const ph = this.refs.phrase; if (!ph || this.reduced) return;
+    this.words = Array.from(ph.querySelectorAll('[data-w]'));
+    this.words.forEach((w) => { w.style.display = 'inline-block'; w.style.opacity = 0; w.style.transform = 'translate3d(0,24px,0) scale(.9)'; w.style.transition = 'opacity 600ms cubic-bezier(.16,1,.3,1), transform 600ms cubic-bezier(.34,1.56,.64,1)'; });
+  }
+  checkReveals(vh) {
+    const pending = this.reveals || [];
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const el = pending[i];
+      if (!el.isConnected) { pending.splice(i, 1); continue; }
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0) { el.style.opacity = 1; el.style.transform = el.dataset.base || 'none'; el.dataset.shown = '1'; pending.splice(i, 1); }
+    }
+    const ph = this.refs.phrase;
+    if (ph && !this.phraseDone && this.words) {
+      const r = ph.getBoundingClientRect();
+      if (r.top < vh * 0.8 && r.bottom > 0) { this.phraseDone = 1; this.words.forEach((w, i) => { w.style.transitionDelay = (i * 100) + 'ms'; w.style.opacity = 1; w.style.transform = 'none'; }); }
+    }
+  }
+
+  tick() {
+    const ms = Math.max(0, new Date('2027-05-15T21:00:00') - new Date());
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60, p = (n) => String(n).padStart(2, '0');
+    if (this.refs.d) this.refs.d.textContent = d;
+    if (this.refs.h) this.refs.h.textContent = p(h);
+    if (this.refs.m) this.refs.m.textContent = p(m);
+    const sEl = this.refs.s;
+    if (sEl) {
+      sEl.textContent = p(s);
+      if (this.reduced) return;
+      sEl.style.transition = 'none'; sEl.style.transform = 'translateY(18%)'; sEl.style.opacity = '.4';
+      requestAnimationFrame(() => { sEl.style.transition = 'transform 300ms cubic-bezier(.16,1,.3,1), opacity 300ms ease'; sEl.style.transform = 'translateY(0)'; sEl.style.opacity = '1'; });
+    }
+  }
+
+  confirm() {
+    if (this.state.confirmed) return;
+    this.setState({ confirmed: true });
+    const st = this.refs.sticker;
+    if (st) { st.style.transition = this.reduced ? 'none' : 'transform 700ms cubic-bezier(.34,1.56,.64,1), opacity 300ms ease'; st.style.opacity = 1; st.style.transform = 'rotate(-8deg) scale(1) translateY(0)'; }
+    if (typeof this.props.onConfirmed === 'function') this.props.onConfirmed({ attending: this.state.yes, count: this.state.count });
+  }
+  answer(i) {
+    if (this.state.picked >= 0) return;
+    this.setState({ picked: i });
+    setTimeout(() => this.setState((s) => ({ picked: -1, q: (s.q + 1) % Component.QUIZ.length })), 1400);
+  }
+  copy(id, text) {
+    try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (e) {}
+    this.setState((s) => ({ copied: Object.assign({}, s.copied, { [id]: true }) }));
+    setTimeout(() => this.setState((s) => { const c = Object.assign({}, s.copied); delete c[id]; return { copied: c }; }), 1600);
+  }
+}
+</script>
+</body>
+</html>

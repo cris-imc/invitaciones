@@ -46,3 +46,9 @@ next-env.d.ts
 docs/ANALISIS.md
 img/*
 /svg/
+
+# Material de referencia de los mockups de Claude Design: no es del repo.
+mockup/*/uploads/
+mockup/*/screenshots/
+mockup/**/*.zip
+mockup/**/.thumbnail

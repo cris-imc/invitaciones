@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #F7E9EC; overflow: hidden; }
+  a { color: #D9738F; text-decoration: none; }
+  a:hover { color: #241C3A; }
+  button { font: inherit; }
+  @keyframes ppFloat { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(6px,-14px) rotate(8deg); } }
+  @keyframes ppDrift { 0% { transform: translateX(-14px); } 100% { transform: translateX(14px); } }
+  @keyframes ppSway { 0%,100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
+  @keyframes ppBreath { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+  @keyframes ppRibbon { 0%,100% { transform: skewY(0deg) translateX(0); } 50% { transform: skewY(2deg) translateX(3px); } }
+  @keyframes ppBlink { 0%,94%,100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
+  @keyframes ppFly1 { 0% { transform: translate(0,0) rotate(-6deg); } 25% { transform: translate(26px,-22px) rotate(6deg); } 50% { transform: translate(54px,-4px) rotate(-4deg); } 75% { transform: translate(24px,16px) rotate(8deg); } 100% { transform: translate(0,0) rotate(-6deg); } }
+  @keyframes ppFly2 { 0% { transform: translate(0,0) rotate(4deg); } 30% { transform: translate(-30px,-18px) rotate(-8deg); } 60% { transform: translate(-48px,10px) rotate(6deg); } 100% { transform: translate(0,0) rotate(4deg); } }
+  @keyframes ppWingL { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.28); } }
+  @keyframes ppWingR { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.28); } }
+  @keyframes ppNoteUp { 0% { transform: translate(0,0) rotate(-8deg) scale(.7); opacity: 0; } 15% { opacity: .9; } 70% { opacity: .7; } 100% { transform: translate(26px,-120px) rotate(12deg) scale(1); opacity: 0; } }
+  @keyframes ppNoteUp2 { 0% { transform: translate(0,0) rotate(6deg) scale(.6); opacity: 0; } 18% { opacity: .85; } 100% { transform: translate(-30px,-140px) rotate(-14deg) scale(1); opacity: 0; } }
+  @keyframes ppBeat { 0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  @keyframes ppWindow { 0%,100% { opacity: .18; } 50% { opacity: .5; } }
+  @keyframes ppSpin { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+  @keyframes ppGlow { 0%,100% { filter: drop-shadow(0 8px 16px rgba(0,0,0,.14)) brightness(1); } 50% { filter: drop-shadow(0 8px 22px rgba(255,240,200,.5)) brightness(1.12); } }
+  @keyframes ppFall { 0% { transform: translate(0,-20px) rotate(0deg); opacity: 0; } 12% { opacity: .9; } 100% { transform: translate(34px,180px) rotate(220deg); opacity: 0; } }
+  @keyframes ppHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  @keyframes ppSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
+  @keyframes ppPulse { 0% { transform: scale(1); opacity: .6; } 100% { transform: scale(1.7); opacity: 0; } }
+  @keyframes ppTwinkle { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" data-pp-root="cielo" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: var(--pp-bg, #F7E9EC); font-family: 'Jost', sans-serif; color: var(--pp-ink, #241C3A); --pp-bg: #F7E9EC; --pp-bg2: #F0DDE4; --pp-ink: #241C3A; --pp-ink2: #7A6C7E; --pp-acc: #D9738F; --pp-acc2: #C9A24D; --pp-sky1: #F7E9EC; --pp-sky2: #F2C9D8; --pp-hill1: #E6D2E8; --pp-hill2: #C9A24D; --pp-hill3: #8E77A8; --pp-night: #1B2347; --pp-night-ink: #F7E9EC;">
+
+  <svg aria-hidden="true" style="position: absolute; width: 0; height: 0;">
+    <defs>
+      <filter id="ppGrain" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".62" numOctaves="4" stitchTiles="stitch" result="n"></feTurbulence>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.1 0"></feColorMatrix>
+      </filter>
+      <filter id="ppFibra" x="0" y="0" width="100%" height="100%">
+        <feTurbulence type="fractalNoise" baseFrequency=".006 .5" numOctaves="3" stitchTiles="stitch" result="n"></feTurbulence>
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0"></feColorMatrix>
+      </filter>
+      <filter id="ppTorn" x="-3%" y="-3%" width="106%" height="106%">
+        <feTurbulence type="fractalNoise" baseFrequency=".012 .05" numOctaves="2" seed="7" result="t"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="7" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+      </filter>
+      <linearGradient id="ppShade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"></stop><stop offset=".5" stop-color="#fff" stop-opacity="0"></stop><stop offset="1" stop-color="#000" stop-opacity=".16"></stop></linearGradient>
+      <filter id="ppRough" x="-2%" y="-2%" width="104%" height="104%">
+        <feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="1" result="t"></feTurbulence>
+        <feDisplacementMap in="SourceGraphic" in2="t" scale="1.6" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+      </filter>
+    </defs>
+  </svg>
+
+  <!-- ============ SCROLLER ============ -->
+  <div ref="{{ setScroller }}" data-scroller="1" style="position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0; transition: opacity 900ms ease 300ms;">
+
+    <!-- 01 SAVE THE DATE -->
+    <section data-tone="light" data-screen-label="Save the Date" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 22px; padding: 46vh max(24px, calc((100% - 560px) / 2)) 90px; background: linear-gradient(180deg, var(--pp-sky1, #F7E9EC) 0%, var(--pp-sky2, #F2C9D8) 48%, var(--pp-bg, #F7E9EC) 62%);">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 62vh; overflow: hidden;">
+        <svg data-layer="2" data-drift="70" data-depth=".25" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><circle cx="640" cy="243" r="78" fill="rgba(0,0,0,.12)"></circle><circle cx="640" cy="240" r="78" style="fill: var(--pp-acc, #D9738F);"></circle></svg>
+        <svg data-layer="3" data-drift="-40" data-depth=".35" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><path d="M0 476 C150 426 260 406 400 446 S620 526 800 456 S1050 386 1200 446 V700 H0Z" fill="rgba(0,0,0,.1)"></path><path d="M0 472 C150 422 260 402 400 442 S620 522 800 452 S1050 382 1200 442 V700 H0Z" style="fill: var(--pp-hill1, #E6D2E8);"></path></svg>
+        <svg data-layer="5" data-drift="0" data-depth=".5" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><path d="M0 564 C200 504 330 524 480 554 S700 624 900 544 S1080 494 1200 524 V700 H0Z" fill="rgba(0,0,0,.12)"></path><path d="M0 560 C200 500 330 520 480 550 S700 620 900 540 S1080 490 1200 520 V700 H0Z" style="fill: var(--pp-hill2, #C9A24D);"></path><ellipse cx="470" cy="520" rx="11" ry="58" style="fill: var(--pp-hill3, #8E77A8);"></ellipse><ellipse cx="492" cy="536" rx="9" ry="44" style="fill: var(--pp-hill3, #8E77A8);"></ellipse><ellipse cx="740" cy="530" rx="10" ry="52" style="fill: var(--pp-hill3, #8E77A8);"></ellipse></svg>
+        <div style="position: absolute; left: 0; right: 0; bottom: -2%; height: 92%; display: flex; justify-content: center; align-items: flex-end; pointer-events: none;"><img src="./img/xv-frente2.png" alt="" data-layer="6b" data-drift="10" data-depth=".6" style="height: 100%; max-width: 100%; object-fit: contain; object-position: bottom; will-change: transform; filter: drop-shadow(0 2px 0 rgba(0,0,0,.12)) drop-shadow(0 8px 14px rgba(0,0,0,.08));"></div>
+        <svg data-layer="6" data-drift="30" data-depth=".7" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 6.5s ease-in-out infinite;"><path d="M520 300 C534 290 546 296 550 308 C538 316 526 312 520 300Z" style="fill: var(--pp-acc2, #C9A24D);"></path></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 7.8s ease-in-out -2s infinite;"><path d="M730 380 C744 370 756 376 760 388 C748 396 736 392 730 380Z" style="fill: var(--pp-acc, #D9738F);"></path></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 5.6s ease-in-out -4s infinite;"><path d="M560 430 C574 420 586 426 590 438 C578 446 566 442 560 430Z" style="fill: var(--pp-hill3, #8E77A8);"></path></g><g transform="translate(270 300)"><g style="animation: ppFly1 13s ease-in-out -3s infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .52s ease-in-out infinite;"><path d="M0 0 C-16 -13 -25 -3 -19 9 C-12 18 -3 13 0 0Z" style="fill: var(--pp-acc, #D9738F);"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .52s ease-in-out infinite;"><path d="M0 0 C16 -13 25 -3 19 9 C12 18 3 13 0 0Z" style="fill: var(--pp-acc, #D9738F);" opacity=".8"></path></g></g></g><g transform="translate(950 380)"><g style="animation: ppFly2 16s ease-in-out -7s infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .6s ease-in-out infinite;"><path d="M0 0 C-13 -11 -20 -2 -15 7 C-10 14 -3 10 0 0Z" style="fill: var(--pp-acc2, #C9A24D);"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .6s ease-in-out infinite;"><path d="M0 0 C13 -11 20 -2 15 7 C10 14 3 10 0 0Z" style="fill: var(--pp-acc2, #C9A24D);" opacity=".8"></path></g></g></g></svg>
+        <svg data-layer="7" data-drift="90" data-depth="1" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g fill="rgba(0,0,0,.14)"><ellipse cx="420" cy="690" rx="120" ry="64"></ellipse><ellipse cx="790" cy="700" rx="130" ry="70"></ellipse></g><g style="fill: var(--pp-hill3, #8E77A8);"><ellipse cx="420" cy="686" rx="120" ry="64"></ellipse><ellipse cx="470" cy="700" rx="70" ry="40"></ellipse><ellipse cx="790" cy="696" rx="130" ry="70"></ellipse><ellipse cx="730" cy="708" rx="60" ry="34"></ellipse></g></svg>
+        <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 74px;"><path d="M0 44 C90 18 150 62 250 40 S420 10 520 46 S700 74 820 42 S1020 14 1200 40 V120 H0Z" fill="rgba(0,0,0,.1)" transform="translate(0 5)"></path><path d="M0 44 C90 18 150 62 250 40 S420 10 520 46 S700 74 820 42 S1020 14 1200 40 V120 H0Z" style="fill: var(--pp-bg, #F7E9EC);"></path></svg>
+      </div>
+      <div style="position: absolute; inset: 0; opacity: .06; pointer-events: none; background: linear-gradient(45deg, transparent calc(50% - 1px), #fff 50%, transparent calc(50% + 1px)), linear-gradient(-45deg, transparent calc(30% - 1px), #fff 30%, transparent calc(30% + 1px));"></div>
+
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">01 — GUARDÁ LA FECHA</span>
+      <div style="position: relative; display: flex; flex-direction: column; gap: 6px;">
+        <span data-xin="1" data-delay="60" data-dist="40" style="font-family: 'Playfair Display', serif; font-weight: 500; font-size: clamp(120px, 34vw, 200px); line-height: .8; letter-spacing: -.04em; color: var(--pp-ink, #241C3A); text-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);">14</span>
+        <div data-xin="1" data-delay="160" data-dist="30" style="display: flex; align-items: center; gap: 14px;">
+          <span style="display: inline-block; padding: 8px 26px; background: var(--pp-acc, #D9738F); color: #FDF4F7; font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(30px, 8vw, 44px); line-height: 1; clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%); box-shadow: 0 2px 0 rgba(0,0,0,.12); animation: ppRibbon 4s ease-in-out infinite;">de marzo</span>
+          <span style="font-family: 'Playfair Display', serif; font-size: clamp(30px, 8vw, 44px); line-height: 1; color: var(--pp-ink, #241C3A);">2027</span>
+        </div>
+      </div>
+      <div data-xin="1" data-delay="240" data-dist="20" style="position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; font-size: 14px; letter-spacing: .12em; color: var(--pp-ink2, #7A6C7E);">
+        <span>SÁBADO · 20:30 H</span>
+        <span style="width: 4px; height: 4px; border-radius: 50%; background: var(--pp-acc, #D9738F);"></span>
+        <span>CÓRDOBA CAPITAL</span>
+      </div>
+      <a href="#" data-xin="1" data-delay="320" style="position: relative; display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 0 22px; align-self: flex-start; border: 1.5px solid var(--pp-ink, #241C3A); color: var(--pp-ink, #241C3A); font-size: 14px; letter-spacing: .14em; background: #FDF4F7; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1deg);">AGREGAR AL CALENDARIO <span style="font-size: 16px;">↗</span></a>
+    </section>
+
+    <!-- foto principal (portadaImagenFondo) -->
+    <section data-tone="light" data-screen-label="Foto de portada" style="position: relative; overflow: hidden; padding: 20px max(24px, calc((100% - 900px) / 2)) 70px; background: var(--pp-bg, #F7E9EC);">
+      <div class="gpv-hero-photo-frame" style="position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 4 / 5; max-height: 78vh;">
+        <div ref="{{ setWin }}" style="position: absolute; inset: 0; clip-path: inset(44% 38% 44% 38% round 999px 999px 14px 14px); background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 4px rgba(217,115,143,.55), inset 0 0 60px rgba(217,115,143,.28); transition: clip-path 120ms linear;">
+          <span style="font-size: 14px; letter-spacing: .3em; color: #8A7E88;">FOTO</span>
+        </div>
+        <div style="position: absolute; left: 6%; bottom: -26px; padding: 12px 18px; background: #FDF4F7; color: #241C3A; font-family: 'Playfair Display', serif; font-style: italic; font-size: 20px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-2deg);">Milagros</div>
+      </div>
+    </section>
+
+    <!-- 02 COUNTDOWN -->
+    <section data-tone="light" data-screen-label="Countdown" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 30px; padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; background: linear-gradient(180deg, var(--pp-bg, #F7E9EC), var(--pp-bg2, #F0DDE4));">
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+      <svg data-drift="-25" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .5; will-change: transform;"><path d="M0 600 C200 540 330 560 480 590 S700 660 900 580 S1080 530 1200 560 V700 H0Z" style="fill: var(--pp-hill1, #E6D2E8);"></path></svg>
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">02 — FALTA POCO</span>
+      <h2 data-xin="1" data-delay="60" style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96;">Estamos contando<br><em style="color: var(--pp-acc, #D9738F);">los días</em></h2>
+      <div style="position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; max-width: 460px;">
+        <div data-xin="1" data-delay="80" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1.6deg);" style-before="content: ''; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0; border-color: var(--pp-bg, #F7E9EC) var(--pp-bg, #F7E9EC) #EFDCE4 #EFDCE4;">
+          <span ref="{{ setD }}" style="font-family: 'Playfair Display', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85;">—</span><span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">DÍAS</span>
+        </div>
+        <div data-xin="1" data-delay="160" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(1.2deg); margin-top: 10px;" style-before="content: ''; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0; border-color: var(--pp-bg, #F7E9EC) var(--pp-bg, #F7E9EC) #EFDCE4 #EFDCE4;">
+          <span ref="{{ setH }}" style="font-family: 'Playfair Display', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85;">—</span><span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">HORAS</span>
+        </div>
+        <div data-xin="1" data-delay="240" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(1.8deg);" style-before="content: ''; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0; border-color: var(--pp-bg, #F7E9EC) var(--pp-bg, #F7E9EC) #EFDCE4 #EFDCE4;">
+          <span ref="{{ setM }}" style="font-family: 'Playfair Display', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85;">—</span><span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">MINUTOS</span>
+        </div>
+        <div data-xin="1" data-delay="320" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px 16px 16px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1.1deg); margin-top: 10px; perspective: 500px;" style-before="content: ''; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0; border-color: var(--pp-bg, #F7E9EC) var(--pp-bg, #F7E9EC) #EFDCE4 #EFDCE4;">
+          <span ref="{{ setS }}" style="display: inline-block; font-family: 'Playfair Display', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85; color: var(--pp-acc, #D9738F); transform-origin: 50% 50%; backface-visibility: hidden;">—</span><span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">SEGUNDOS</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 FRASE -->
+    <section data-tone="light" data-screen-label="Frase" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 36px; padding: 100px max(24px, calc((100% - 620px) / 2)); background: var(--pp-bg2, #F0DDE4);">
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+      
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">03 — UNAS PALABRAS</span>
+      <h2 ref="{{ setPhrase }}" style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(40px, 11.5vw, 76px); line-height: 1; letter-spacing: -.01em; text-wrap: pretty;">
+        <span data-w="1">Hoy</span> <span data-w="1">empieza</span> <span data-w="1">algo</span> <span data-w="1" style="font-style: italic; color: var(--pp-acc, #D9738F);">nuevo,</span> <span data-w="1">y</span> <span data-w="1">quiero</span> <span data-w="1">celebrarlo</span> <span data-w="1">con</span> <span data-w="1">ustedes</span> <span data-w="1" style="font-style: italic; color: var(--pp-acc, #D9738F);">cerca.</span>
+      </h2>
+      <div data-xin="1" data-delay="200" style="position: relative; display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: .14em; color: var(--pp-ink2, #7A6C7E);"><span style="width: 44px; height: 1.5px; background: var(--pp-acc, #D9738F);"></span>MILAGROS</div>
+      <svg viewBox="0 0 400 300" aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+        <g transform="translate(70 60)"><g style="animation: ppFly1 11s ease-in-out infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .5s ease-in-out infinite;"><path d="M0 0 C-14 -12 -22 -2 -16 8 C-10 16 -2 12 0 0Z" style="fill: var(--pp-acc, #D9738F);"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .5s ease-in-out infinite;"><path d="M0 0 C14 -12 22 -2 16 8 C10 16 2 12 0 0Z" style="fill: var(--pp-acc, #D9738F);" opacity=".8"></path></g><rect x="-1" y="-2" width="2" height="12" rx="1" style="fill: var(--pp-ink, #241C3A);"></rect></g></g>
+        <g transform="translate(330 200)"><g style="animation: ppFly2 14s ease-in-out -4s infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .62s ease-in-out infinite;"><path d="M0 0 C-11 -9 -17 -1 -12 6 C-8 12 -2 9 0 0Z" style="fill: var(--pp-acc2, #C9A24D);"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .62s ease-in-out infinite;"><path d="M0 0 C11 -9 17 -1 12 6 C8 12 2 9 0 0Z" style="fill: var(--pp-acc2, #C9A24D);" opacity=".8"></path></g></g></g>
+        <g style="transform-box: fill-box; transform-origin: center; animation: ppFall 9s linear infinite;"><path d="M300 20 C314 10 326 16 330 28 C318 36 306 32 300 20Z" style="fill: var(--pp-acc2, #C9A24D);"></path></g>
+        <g style="transform-box: fill-box; transform-origin: center; animation: ppFall 12s linear -5s infinite;"><path d="M120 10 C132 2 142 7 146 18 C136 25 125 21 120 10Z" style="fill: var(--pp-acc, #D9738F);" opacity=".75"></path></g>
+      </svg>
+
+    </section>
+
+    <!-- 04 CUÁNDO Y DÓNDE (pineado lateral / apilado vertical) -->
+    <div data-pan="1" data-screen-label="Cuándo y dónde" style="height: 360vh; position: relative;">
+      <div data-sticky="1" style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 400vw; will-change: transform;">
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 18px; padding: 80px max(24px, calc((100vw - 560px) / 2)) 96px; background: var(--pp-bg, #F7E9EC);">
+            <svg viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%;"><path d="M0 560 C200 500 330 520 480 550 S700 620 900 540 S1080 490 1200 520 V700 H0Z" style="fill: var(--pp-hill1, #E6D2E8);"></path><ellipse cx="440" cy="470" rx="12" ry="70" style="fill: var(--pp-hill3, #8E77A8);"></ellipse><ellipse cx="760" cy="470" rx="12" ry="70" style="fill: var(--pp-hill3, #8E77A8);"></ellipse></svg>
+            <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);"><span>04 — CUÁNDO Y DÓNDE</span><span data-num="1">01 / 04</span></div>
+            <div style="position: relative; background: #FDF4F7; color: #241C3A; padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1deg);">
+              <span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">FIESTA</span>
+              <h2 style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 500; font-size: clamp(38px, 10vw, 56px); line-height: .96;">Salón Le Blanc</h2>
+              <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.4; color: #241C3A;">
+                <div style="display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #EFDCE4; padding-bottom: 8px;"><span style="color: #7A6C7E;">Dirección</span><span style="text-align: right;">Av. Colón 4550, Córdoba</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid #EFDCE4; padding-bottom: 8px;"><span style="color: #7A6C7E;">Hora</span><span>20:30 h</span></div>
+                <div style="display: flex; justify-content: space-between; gap: 12px;"><span style="color: #7A6C7E;">Dress code</span><span style="color: var(--pp-acc, #D9738F);">Elegante de noche</span></div>
+              </div>
+            </div>
+            <div style="position: absolute; left: 0; right: 0; top: 0; height: 52%; z-index: 1; display: flex; justify-content: center; pointer-events: none;">
+              <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
+                <img src="./img/bola.png" alt="" data-drift="20" data-depth=".6" style="width: clamp(220px, 72vw, 320px); will-change: transform; animation: ppSpin 6s ease-in-out infinite, ppGlow 3.2s ease-in-out infinite; transform-origin: 50% 0%;">
+              </div>
+            </div>
+            <div data-hint-side="1" style="position: relative; display: flex; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .24em; color: var(--pp-ink2, #7A6C7E);">SEGUÍ BAJANDO <span style="display: inline-block; animation: ppSide 2.2s ease-in-out infinite;">→</span></div>
+          </div>
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 18px; padding: 80px max(24px, calc((100vw - 560px) / 2)) 96px; background: var(--pp-bg, #F7E9EC);">
+            <svg viewBox="0 0 430 700" preserveAspectRatio="xMidYMid slice" style="position: absolute; inset: 0; width: 100%; height: 100%;"><path d="M0 520 C120 470 200 500 300 470 S420 380 430 400 V700 H0Z" style="fill: var(--pp-hill1, #E6D2E8);"></path><path ref="{{ setRoute }}" d="M40 560 C120 500 80 380 180 340 S300 250 330 150" fill="none" style="stroke: var(--pp-acc, #D9738F);" stroke-width="3" stroke-dasharray="10 8" stroke-linecap="round"></path><circle cx="40" cy="560" r="7" style="fill: var(--pp-ink, #241C3A);"></circle><path d="M330 150 m-16 0 a16 16 0 1 1 32 0 c0 12 -16 30 -16 30 s-16 -18 -16 -30Z" style="fill: var(--pp-acc, #D9738F);"></path></svg>
+            <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);"><span>CÓMO LLEGAR</span><span data-num="1">03 / 04</span></div>
+            <h2 style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(38px, 10vw, 56px); line-height: .96;">Quince minutos<br><em style="color: var(--pp-acc, #D9738F);">desde el centro</em></h2>
+            <p style="position: relative; margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2, #7A6C7E); max-width: 360px;">Por Av. Colón, a la altura del 4550. Hay estacionamiento en el salón.</p>
+            <a href="#" style="position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; align-self: flex-start; background: var(--pp-ink, #241C3A); color: #FDF4F7; font-size: 14px; letter-spacing: .14em; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);">ABRIR EN MAPAS ↗</a>
+          </div>
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 80px max(24px, calc((100vw - 560px) / 2)) 96px; background: var(--pp-bg2, #F0DDE4);">
+            <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);"><span>CRONOGRAMA</span><span data-num="1">04 / 04</span></div>
+            <h2 style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(38px, 10vw, 56px); line-height: .96;">La noche, <em style="color: var(--pp-acc, #D9738F);">paso a paso</em></h2>
+            <div style="position: relative; display: flex; flex-direction: column; gap: 0; border-left: 2px solid var(--pp-acc, #D9738F); margin-left: 6px;">
+              <div style="display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline;"><span style="font-family: 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1;">20:30</span><span style="font-size: 15px;">Recepción</span></div>
+              <div style="display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline;"><span style="font-family: 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1;">21:30</span><span style="font-size: 15px;">Entrada y vals</span></div>
+              <div style="display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline;"><span style="font-family: 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1;">22:00</span><span style="font-size: 15px;">Cena</span></div>
+              <div style="display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline;"><span style="font-family: 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1;">23:00</span><span style="font-size: 15px;">Baile</span></div>
+              <div style="display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline;"><span style="font-family: 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1;">03:00</span><span style="font-size: 15px;">Último brindis</span></div>
+            </div>
+          </div>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2;">
+          <span data-dot="0" style="width: 22px; height: 3px; background: var(--pp-acc, #D9738F); transition: background 400ms ease;"></span>
+          <span data-dot="1" style="width: 22px; height: 3px; background: rgba(36,28,58,.18); transition: background 400ms ease;"></span>
+          <span data-dot="2" style="width: 22px; height: 3px; background: rgba(36,28,58,.18); transition: background 400ms ease;"></span>
+          <span data-dot="3" style="width: 22px; height: 3px; background: rgba(36,28,58,.18); transition: background 400ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 CHECK-IN -->
+    <section data-tone="light" data-screen-label="Check-in" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; background: var(--pp-bg, #F7E9EC);">
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">05 — CHECK-IN</span>
+      <h2 data-xin="1" data-delay="60" style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96;">¿Venís?<br><em style="color: var(--pp-acc, #D9738F);">Contanos</em></h2>
+      <div ref="{{ setStub }}" data-xin="1" data-delay="140" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 22px 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-.8deg);">
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; letter-spacing: .24em; color: #7A6C7E;"><span>PASE Nº 042 · FAMILIA GÓMEZ</span><span ref="{{ setStatus }}" style="color: #7A6C7E; transition: color 400ms ease;">PENDIENTE</span></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><label style="font-size: 12px; letter-spacing: .2em; color: #7A6C7E;">¿CUÁNTOS VIENEN? (HASTA 3)</label>
+          <div style="display: flex; align-items: center; gap: 12px;"><button onClick="{{ dec }}" style="width: 48px; height: 48px; border: 1.5px solid #241C3A; background: transparent; color: #241C3A; font-size: 22px; cursor: pointer;">−</button><span ref="{{ setCount }}" style="font-family: 'Playfair Display', serif; font-size: 40px; min-width: 40px; text-align: center; line-height: 1;">3</span><button onClick="{{ inc }}" style="width: 48px; height: 48px; border: 1.5px solid #241C3A; background: transparent; color: #241C3A; font-size: 22px; cursor: pointer;">+</button></div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><label style="font-size: 12px; letter-spacing: .2em; color: #7A6C7E;">RESTRICCIONES ALIMENTARIAS</label><div style="display: flex; flex-wrap: wrap; gap: 8px;"><span style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border: 1.5px solid #241C3A; background: #241C3A; color: #FDF4F7; font-size: 14px;">Ninguna</span><span style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border: 1.5px solid #E2CBD6; font-size: 14px;">Vegetariano</span><span style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border: 1.5px solid #E2CBD6; font-size: 14px;">Sin TACC</span><span style="min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px; border: 1.5px solid #E2CBD6; font-size: 14px;">Otro</span></div></div>
+        <div style="display: flex; flex-direction: column; gap: 6px;"><label style="font-size: 12px; letter-spacing: .2em; color: #7A6C7E;">UN MENSAJE PARA MILAGROS</label><div style="min-height: 64px; border-bottom: 1.5px solid #E2CBD6; font-family: 'Playfair Display', serif; font-style: italic; font-size: 18px; color: #A58FA0; padding: 6px 0;">Escribí algo lindo…</div></div>
+        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #7A6C7E; border-top: 1px dashed #E2CBD6; padding-top: 12px;"><span>Menores de 12 · $15.000</span><span>Adultos · sin cargo</span></div>
+        <div ref="{{ setSeal }}" style="position: absolute; right: 14px; top: 44px; width: 92px; height: 92px; border-radius: 50%; background: var(--pp-acc, #D9738F); color: #FDF4F7; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 11px; letter-spacing: .2em; line-height: 1.3; opacity: 0; transform: scale(1.6) rotate(-20deg); box-shadow: 0 2px 0 rgba(0,0,0,.15); clip-path: polygon(50% 0%, 61% 5%, 71% 2%, 79% 10%, 90% 11%, 93% 22%, 100% 30%, 97% 42%, 100% 52%, 95% 63%, 96% 75%, 88% 82%, 84% 93%, 72% 94%, 63% 100%, 50% 96%, 37% 100%, 28% 94%, 16% 93%, 12% 82%, 4% 75%, 5% 63%, 0% 52%, 3% 42%, 0% 30%, 7% 22%, 10% 11%, 21% 10%, 29% 2%, 39% 5%); pointer-events: none;">CONFIR<br>MADO</div>
+        <div ref="{{ setPetals }}" style="position: absolute; inset: 0; pointer-events: none; overflow: visible;"></div>
+      </div>
+      <button onClick="{{ confirm }}" data-xin="1" data-delay="220" style="position: relative; min-height: 52px; border: none; background: var(--pp-acc, #D9738F); color: #FDF4F7; font-family: 'Jost', sans-serif; font-size: 14px; letter-spacing: .2em; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);" style-hover="background: var(--pp-ink, #241C3A);">CONFIRMAR ASISTENCIA</button>
+    </section>
+
+    <!-- 06 ÁLBUM (pineado lateral / vertical) -->
+    <div data-pan="1" data-screen-label="Álbum" style="height: 300vh; position: relative;">
+      <div data-sticky="1" style="position: sticky; top: 0; height: 100vh; overflow: hidden;">
+        <div data-strip="1" style="position: absolute; top: 0; left: 0; height: 100%; display: flex; width: 300vw; will-change: transform;">
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; padding: clamp(52px, 8vh, 80px) max(24px, calc((100vw - 900px) / 2)) clamp(60px, 10vh, 96px); background: #FBF2F5; color: #241C3A;">
+            <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);"><span>06 — ÁLBUM</span><span data-num="1">01 / 03</span></div>
+            <h2 style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(38px, 10vw, 56px); line-height: .96;">Yo, <em style="color: var(--pp-acc, #D9738F);">hasta ahora</em></h2>
+            <div style="position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 14px; max-width: 900px; width: 100%; margin: 0 auto;">
+              <div style="grid-column: 1 / 4; position: relative; background: #FFFAFC; padding: 8px 8px 30px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-2deg); min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .26em; color: #8A7E88;">FOTO</div><span style="position: absolute; left: 50%; top: -10px; width: 64px; height: 20px; margin-left: -32px; background: rgba(217,115,143,.5); transform: rotate(-3deg); box-shadow: 0 1px 0 rgba(0,0,0,.06);"></span></div>
+              <div style="grid-column: 4 / 7; position: relative; background: #FFFAFC; padding: 8px 8px 30px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(1.5deg); margin-top: 14px; min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .26em; color: #8A7E88;">FOTO</div><span style="position: absolute; left: 50%; top: -10px; width: 64px; height: 20px; margin-left: -32px; background: rgba(201,162,77,.45); transform: rotate(4deg); box-shadow: 0 1px 0 rgba(0,0,0,.06);"></span></div>
+              <div style="grid-column: 1 / 3; position: relative; background: #FFFAFC; padding: 6px 6px 22px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(1deg); min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 12px; letter-spacing: .26em; color: #8A7E88;">FOTO</div></div>
+              <div style="grid-column: 3 / 5; position: relative; background: #FFFAFC; padding: 6px 6px 22px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1.5deg); margin-top: 8px; min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 12px; letter-spacing: .26em; color: #8A7E88;">FOTO</div><span style="position: absolute; left: 50%; top: -8px; width: 50px; height: 16px; margin-left: -25px; background: rgba(217,115,143,.45); transform: rotate(-6deg); box-shadow: 0 1px 0 rgba(0,0,0,.06);"></span></div>
+              <div style="grid-column: 5 / 7; position: relative; background: #FFFAFC; padding: 6px 6px 22px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(2deg); min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 12px; letter-spacing: .26em; color: #8A7E88;">FOTO</div></div>
+            </div>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .22em; color: var(--pp-ink2, #7A6C7E);"><span>HOJA 01 · 5 FOTOS</span><span style="color: var(--pp-acc, #D9738F);">SEGUÍ →</span></div>
+          </div>
+
+          <div data-tone="light" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 14px; padding: clamp(52px, 8vh, 80px) max(24px, calc((100vw - 900px) / 2)) clamp(60px, 10vh, 96px); background: #F6ECF1; color: #241C3A;">
+            <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);"><span>HOJA 02</span><span data-num="1">02 / 03</span></div>
+            <div style="position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 900px; width: 100%; margin: 0 auto;">
+              <div style="position: relative; background: #FFFAFC; padding: 8px 8px 28px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(1.5deg); min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .26em; color: #8A7E88;">FOTO</div><span style="position: absolute; left: 50%; top: -10px; width: 64px; height: 20px; margin-left: -32px; background: rgba(201,162,77,.45); transform: rotate(4deg); box-shadow: 0 1px 0 rgba(0,0,0,.06);"></span></div>
+              <div style="position: relative; background: #FFFAFC; padding: 8px 8px 28px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-2deg); margin-top: 16px; min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .26em; color: #8A7E88;">FOTO</div></div>
+              <div style="position: relative; background: #FFFAFC; padding: 8px 8px 28px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1deg); min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .26em; color: #8A7E88;">FOTO</div><span style="position: absolute; left: 50%; top: -10px; width: 64px; height: 20px; margin-left: -32px; background: rgba(217,115,143,.5); transform: rotate(-3deg); box-shadow: 0 1px 0 rgba(0,0,0,.06);"></span></div>
+              <div style="position: relative; background: #FFFAFC; padding: 8px 8px 28px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(2deg); margin-top: 16px; min-height: 0; display: flex;"><div style="flex: 1; background: repeating-linear-gradient(135deg, #E5DEE4 0 8px, #F0EAEE 8px 16px); display: flex; align-items: center; justify-content: center; font-size: 13px; letter-spacing: .26em; color: #8A7E88;">FOTO</div></div>
+            </div>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 12px; letter-spacing: .22em; color: var(--pp-ink2, #7A6C7E);"><span>HOJA 02 · 4 FOTOS</span><span style="color: var(--pp-acc, #D9738F);">SEGUÍ →</span></div>
+          </div>
+
+          <div data-tone="light" data-momentos="1" style="flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 80px max(24px, calc((100vw - 900px) / 2)) 96px; background: #F1E4EC; color: #241C3A;">
+            <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+            <div style="position: relative; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);"><span>MOMENTOS</span><span data-num="1">03 / 03</span></div>
+            <h2 style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(38px, 10vw, 56px); line-height: .96;">Lo que pasó <em style="color: var(--pp-acc, #D9738F);">esa noche</em></h2>
+            <p style="position: relative; margin: 0; font-size: 15px; line-height: 1.5; color: var(--pp-ink2, #7A6C7E); max-width: 420px;">Después de la fiesta, acá van a aparecer las fotos que saquemos entre todos.</p>
+            <div style="position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 900px;">
+              <div style="aspect-ratio: 1; border: 1.5px dashed #D6BFCC; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--pp-acc, #D9738F);">+</div>
+              <div style="aspect-ratio: 1; border: 1.5px dashed #D6BFCC;"></div>
+              <div style="aspect-ratio: 1; border: 1.5px dashed #D6BFCC;"></div>
+            </div>
+            <a href="#" style="position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; align-self: flex-start; border: 1.5px solid #241C3A; color: #241C3A; font-size: 14px; letter-spacing: .14em;">SUBIR MIS FOTOS</a>
+          </div>
+        </div>
+        <div data-dots="1" style="position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2;">
+          <span data-dot="0" style="width: 22px; height: 3px; background: var(--pp-acc, #D9738F); transition: background 400ms ease;"></span>
+          <span data-dot="1" style="width: 22px; height: 3px; background: rgba(36,28,58,.18); transition: background 400ms ease;"></span>
+          <span data-dot="2" style="width: 22px; height: 3px; background: rgba(36,28,58,.18); transition: background 400ms ease;"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 07 MÚSICA -->
+    <section data-tone="light" data-screen-label="Música" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; background: linear-gradient(180deg, var(--pp-bg2, #F0DDE4), var(--pp-sky2, #F2C9D8));">
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+      <img src="./img/nota.png" alt="" data-drift="30" data-depth=".7" style="position: absolute; right: 8%; top: 10%; width: clamp(70px, 18vw, 120px); will-change: transform; animation: ppFloat 7s ease-in-out infinite; filter: drop-shadow(0 2px 0 rgba(0,0,0,.1)) drop-shadow(0 8px 14px rgba(0,0,0,.08));">
+      <img src="./img/nota.png" alt="" data-drift="-25" data-depth=".5" style="position: absolute; left: 10%; top: 22%; width: clamp(44px, 11vw, 74px); opacity: .75; will-change: transform; animation: ppFloat 9s ease-in-out -3s infinite; filter: drop-shadow(0 2px 0 rgba(0,0,0,.08));">
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">07 — MÚSICA</span>
+      <h2 data-xin="1" data-delay="60" style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96;">¿Qué canción<br><em style="color: var(--pp-acc, #D9738F);">no puede faltar?</em></h2>
+      <div data-xin="1" data-delay="140" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(.8deg);">
+        <div style="display: flex; flex-direction: column; gap: 4px;"><label style="font-size: 12px; letter-spacing: .2em; color: #7A6C7E;">TÍTULO</label><div style="min-height: 44px; border-bottom: 1.5px solid #E2CBD6; font-family: 'Playfair Display', serif; font-size: 20px; color: #A58FA0; display: flex; align-items: center;">Nombre de la canción</div></div>
+        <div style="display: flex; flex-direction: column; gap: 4px;"><label style="font-size: 12px; letter-spacing: .2em; color: #7A6C7E;">ARTISTA</label><div style="min-height: 44px; border-bottom: 1.5px solid #E2CBD6; font-family: 'Playfair Display', serif; font-size: 20px; color: #A58FA0; display: flex; align-items: center;">Quién la canta</div></div>
+        <button style="min-height: 48px; border: none; background: #241C3A; color: #FDF4F7; font-family: 'Jost', sans-serif; font-size: 14px; letter-spacing: .2em; cursor: pointer;">SUGERIR</button>
+      </div>
+      <div data-xin="1" data-delay="220" style="position: relative; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(36,28,58,.14);"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px;">Vida de rico</span><span style="font-size: 13px; color: var(--pp-ink2, #7A6C7E);">Camilo · sugerida por Ana</span></div><button onClick="{{ vote }}" data-votes="12" style="min-width: 64px; min-height: 44px; border: 1.5px solid var(--pp-acc, #D9738F); background: transparent; color: var(--pp-acc, #D9738F); font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer;">♥ 12</button></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(36,28,58,.14);"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 15px;">Tacones rojos</span><span style="font-size: 13px; color: var(--pp-ink2, #7A6C7E);">Sebastián Yatra · sugerida por Delfi</span></div><button onClick="{{ vote }}" data-votes="7" style="min-width: 64px; min-height: 44px; border: 1.5px solid var(--pp-acc, #D9738F); background: transparent; color: var(--pp-acc, #D9738F); font-family: 'Jost', sans-serif; font-size: 14px; cursor: pointer;">♥ 7</button></div>
+      </div>
+    </section>
+
+    <!-- 08 REGALOS -->
+    <section data-tone="light" data-screen-label="Regalos" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; background: linear-gradient(180deg, var(--pp-sky2, #F2C9D8), #C9A0B8 60%, #6B5A8E);">
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+      <svg data-drift="-40" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .55; will-change: transform;"><path d="M0 600 C200 540 330 560 480 590 S700 660 900 580 S1080 530 1200 560 V700 H0Z" style="fill: var(--pp-hill3, #8E77A8);"></path></svg>
+      
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-ink, #241C3A);">08 — REGALOS</span>
+      <h2 data-xin="1" data-delay="60" style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96; color: var(--pp-ink, #241C3A);">Tu presencia<br><em>es el regalo</em></h2>
+      <p data-xin="1" data-delay="120" style="position: relative; margin: 0; font-size: 15px; line-height: 1.55; color: var(--pp-ink, #241C3A); max-width: 400px;">Si además querés regalarme algo, te dejo los datos para el viaje de egresados.</p>
+      <div data-xin="1" data-delay="180" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1.2deg);" style-before="content: ''; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 22px 22px 0; border-color: #C79FB4 #C79FB4 #EFDCE4 #EFDCE4;">
+        <span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">VIAJE DE EGRESADOS</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid #EFDCE4; padding-bottom: 10px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; letter-spacing: .18em; color: #7A6C7E;">ALIAS</span><span style="font-size: 16px; font-weight: 500;">mili.quince.2027</span></div><button onClick="{{ copy }}" data-copy="mili.quince.2027" style="min-height: 44px; padding: 0 14px; border: 1.5px solid #241C3A; background: transparent; color: #241C3A; font-family: 'Jost', sans-serif; font-size: 13px; letter-spacing: .12em; cursor: pointer;">COPIAR</button></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; border-bottom: 1px solid #EFDCE4; padding-bottom: 10px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; letter-spacing: .18em; color: #7A6C7E;">CBU</span><span style="font-size: 14px;">0720123488000012345678</span></div><button onClick="{{ copy }}" data-copy="0720123488000012345678" style="min-height: 44px; padding: 0 14px; border: 1.5px solid #241C3A; background: transparent; color: #241C3A; font-family: 'Jost', sans-serif; font-size: 13px; letter-spacing: .12em; cursor: pointer;">COPIAR</button></div>
+        <div style="display: flex; justify-content: space-between; gap: 12px; font-size: 14px;"><span style="color: #7A6C7E;">Banco Santander</span><span>Carolina Ríos</span></div>
+      </div>
+      <div data-xin="1" data-delay="260" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(1deg); margin-top: -6px;">
+        <span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">PAGO DE TARJETA · $45.000 POR PERSONA</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px;"><div style="display: flex; flex-direction: column; gap: 2px;"><span style="font-size: 12px; letter-spacing: .18em; color: #7A6C7E;">ALIAS</span><span style="font-size: 16px; font-weight: 500;">tarjeta.mili.2027</span></div><button onClick="{{ copy }}" data-copy="tarjeta.mili.2027" style="min-height: 44px; padding: 0 14px; border: 1.5px solid #241C3A; background: transparent; color: #241C3A; font-family: 'Jost', sans-serif; font-size: 13px; letter-spacing: .12em; cursor: pointer;">COPIAR</button></div>
+      </div>
+    </section>
+
+    <!-- 09 QUIZ -->
+    <section data-tone="dark" data-screen-label="Quiz" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center; gap: 22px; padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; background: linear-gradient(180deg, #6B5A8E, var(--pp-night, #1B2347) 70%); color: var(--pp-night-ink, #F7E9EC);">
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .07; pointer-events: none;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect></svg>
+      <svg data-drift="60" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMin slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g fill="#F7E9EC"><circle cx="500" cy="120" r="3" style="animation: ppTwinkle 3s ease-in-out infinite;"></circle><circle cx="700" cy="80" r="2.5" style="animation: ppTwinkle 4s ease-in-out -1s infinite;"></circle><circle cx="640" cy="200" r="2" style="animation: ppTwinkle 5s ease-in-out -2s infinite;"></circle><circle cx="560" cy="260" r="2.5" style="animation: ppTwinkle 3.6s ease-in-out -.6s infinite;"></circle><circle cx="760" cy="180" r="2" style="animation: ppTwinkle 4.4s ease-in-out -3s infinite;"></circle></g></svg>
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">09 — TRIVIA</span>
+      <h2 data-xin="1" data-delay="60" style="position: relative; margin: 0; font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96;">¿Cuánto me<br><em style="color: var(--pp-acc, #D9738F);">conocés?</em></h2>
+      <div data-xin="1" data-delay="140" data-dist="30" style="position: relative; background: #FDF4F7; color: #241C3A; padding: 22px 20px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.14); transform: rotate(-1deg);">
+        <span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">PREGUNTA 1 DE 3</span>
+        <span style="font-family: 'Playfair Display', serif; font-size: 26px; line-height: 1.15;">¿Cuál es mi película favorita?</span>
+        <div ref="{{ setQuiz }}" style="display: flex; flex-direction: column; gap: 8px;">
+          <button onClick="{{ answer }}" data-ok="0" style="min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #E2CBD6; background: transparent; color: #241C3A; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; transition: background 300ms, border-color 300ms;">Mamma Mia</button>
+          <button onClick="{{ answer }}" data-ok="1" style="min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #E2CBD6; background: transparent; color: #241C3A; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; transition: background 300ms, border-color 300ms;">El diario de Noa</button>
+          <button onClick="{{ answer }}" data-ok="0" style="min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #E2CBD6; background: transparent; color: #241C3A; font-family: 'Jost', sans-serif; font-size: 15px; cursor: pointer; transition: background 300ms, border-color 300ms;">Orgullo y prejuicio</button>
+        </div>
+        <span ref="{{ setQuizMsg }}" style="min-height: 20px; font-size: 14px; color: var(--pp-acc, #D9738F);"></span>
+      </div>
+    </section>
+
+    <!-- 10 TU PASE -->
+    <section data-tone="dark" data-screen-label="Tu pase" style="min-height: 100vh; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 20px; padding: 44vh max(24px, calc((100% - 560px) / 2)) calc(40px + env(safe-area-inset-bottom)); background: var(--pp-night, #1B2347); color: var(--pp-night-ink, #F7E9EC);">
+      <div style="position: absolute; left: 0; right: 0; top: 0; height: 42vh; overflow: hidden;">
+        <svg data-layer="1" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%;"><g fill="#F7E9EC"><circle cx="480" cy="90" r="2.5" style="animation: ppTwinkle 3.4s ease-in-out infinite;"></circle><circle cx="540" cy="180" r="2" style="animation: ppTwinkle 4.2s ease-in-out -1.2s infinite;"></circle><circle cx="700" cy="60" r="3" style="animation: ppTwinkle 5s ease-in-out -2s infinite;"></circle><circle cx="780" cy="220" r="2" style="animation: ppTwinkle 3.8s ease-in-out -.8s infinite;"></circle><circle cx="620" cy="300" r="1.8" style="animation: ppTwinkle 4.6s ease-in-out -3s infinite;"></circle><circle cx="860" cy="130" r="2.4" style="animation: ppTwinkle 3.2s ease-in-out -1.6s infinite;"></circle></g></svg>
+        <svg data-layer="2" data-drift="70" data-depth=".25" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"></svg>
+        <img src="./img/luna.png" alt="" data-drift="60" data-depth=".25" style="position: absolute; right: 12%; top: 6%; width: clamp(84px, 22vw, 140px); will-change: transform; animation: ppBreath 5s ease-in-out infinite; filter: drop-shadow(0 0 26px rgba(247,233,236,.4));">
+        <svg data-layer="3" data-drift="-40" data-depth=".35" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><path d="M0 472 C150 422 260 402 400 442 S620 522 800 452 S1050 382 1200 442 V700 H0Z" fill="#333B66"></path></svg>
+        <svg data-layer="5" data-drift="0" data-depth=".5" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><path d="M0 560 C200 500 330 520 480 550 S700 620 900 540 S1080 490 1200 520 V700 H0Z" fill="#242C52"></path><ellipse cx="470" cy="520" rx="11" ry="58" fill="#161C3A"></ellipse><ellipse cx="740" cy="530" rx="10" ry="52" fill="#161C3A"></ellipse></svg>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; justify-content: center; align-items: flex-end;">
+          <div style="position: relative; width: min(150%, 900px); flex: 0 0 auto;">
+            <img src="./img/salon.png" alt="" data-drift="-10" data-depth=".45" style="display: block; width: 100%; max-height: 38vh; object-fit: contain; object-position: bottom; will-change: transform; filter: drop-shadow(0 -4px 30px rgba(255,214,140,.18));">
+            <div style="position: absolute; left: 50%; top: 44%; width: 26%; height: 34%; margin-left: -13%; background: radial-gradient(closest-side, rgba(255,214,140,.55), transparent 75%); animation: ppWindow 1.9s ease-in-out infinite; pointer-events: none;"></div>
+            <div style="position: absolute; left: 50%; bottom: 16%; margin-left: -34px; display: flex; align-items: flex-end; gap: 4px; height: 22px; pointer-events: none;">
+              <span style="width: 4px; height: 100%; background: #FFD98A; opacity: .75; transform-origin: bottom; animation: ppBeat 1s ease-in-out infinite;"></span>
+              <span style="width: 4px; height: 100%; background: #FFD98A; opacity: .75; transform-origin: bottom; animation: ppBeat 1s ease-in-out .14s infinite;"></span>
+              <span style="width: 4px; height: 100%; background: #FFE7B8; opacity: .85; transform-origin: bottom; animation: ppBeat 1s ease-in-out .28s infinite;"></span>
+              <span style="width: 4px; height: 100%; background: #FFD98A; opacity: .75; transform-origin: bottom; animation: ppBeat 1s ease-in-out .42s infinite;"></span>
+              <span style="width: 4px; height: 100%; background: #FFD98A; opacity: .75; transform-origin: bottom; animation: ppBeat 1s ease-in-out .56s infinite;"></span>
+            </div>
+          </div>
+        </div>
+        <svg data-layer="7" data-drift="90" data-depth="1" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g fill="#101534"><ellipse cx="420" cy="686" rx="120" ry="64"></ellipse><ellipse cx="790" cy="696" rx="130" ry="70"></ellipse></g></svg>
+        <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .15; pointer-events: none;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+      </div>
+      <span data-xin="1" data-dist="-20" style="position: relative; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc, #D9738F);">10 — TU PASE</span>
+      <div data-xin="1" data-delay="80" data-dist="30" style="position: relative; display: grid; grid-template-columns: 1fr auto; background: #FDF4F7; color: #241C3A; box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.14); transform: rotate(-.6deg); border-radius: 12px; overflow: hidden;">
+        <div style="padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; border-right: 2px dashed #E2CBD6; position: relative;">
+          <span style="font-size: 12px; letter-spacing: .26em; color: #7A6C7E;">PASE Nº 042</span>
+          <span style="font-family: 'Playfair Display', serif; font-size: clamp(30px, 8vw, 40px); line-height: .95;">Familia Gómez</span>
+          <span style="font-size: 14px; color: #7A6C7E;">3 personas · Mesa 7 · Sector pista</span>
+          <span style="font-size: 14px; letter-spacing: .14em; color: var(--pp-acc, #D9738F);">14 · 03 · 2027 — 20:30 H</span>
+          <span style="position: absolute; right: -12px; top: -12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pp-night, #1B2347);"></span>
+          <span style="position: absolute; right: -12px; bottom: -12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pp-night, #1B2347);"></span>
+        </div>
+        <div style="padding: 20px 18px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+          <svg viewBox="0 0 21 21" width="96" height="96" shape-rendering="crispEdges" style="background: #FFFAFC; padding: 4px; box-sizing: border-box;"><path fill="#241C3A" d="M0 0h7v7H0zM1 1v5h5V1zM2 2h3v3H2zM14 0h7v7h-7zM15 1v5h5V1zM16 2h3v3h-3zM0 14h7v7H0zM1 15v5h5v-5zM2 16h3v3H2zM8 0h1v2H8zM10 0h2v1h-2zM8 3h2v1H8zM11 2h1v3h-1zM9 5h1v3H9zM0 8h2v1H0zM3 8h1v2H3zM5 9h3v1H5zM9 9h2v2H9zM12 8h2v1h-2zM15 8h1v2h-1zM17 9h2v1h-2zM20 8h1v2h-1zM0 11h3v1H0zM4 11h2v1H4zM7 12h2v1H7zM11 11h1v2h-1zM13 11h2v1h-2zM16 11h3v1h-3zM20 11h1v1h-1zM8 14h2v2H8zM11 14h1v1h-1zM13 14h1v3h-1zM15 15h2v1h-2zM18 14h1v2h-1zM20 15h1v2h-1zM8 17h1v2H8zM10 18h2v1h-2zM14 18h2v2h-2zM17 17h2v1h-2zM19 19h2v2h-2zM9 20h3v1H9zM16 20h2v1h-2z"></path></svg>
+          <span style="font-size: 12px; letter-spacing: .2em; color: #7A6C7E;">QR DE INGRESO</span>
+        </div>
+      </div>
+      <div data-xin="1" data-delay="160" style="position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid rgba(247,233,236,.25);"><span style="font-size: 11px; letter-spacing: .2em; color: var(--pp-acc, #D9738F);">ALOJAMIENTO</span><span style="font-size: 14px; line-height: 1.4;">Hotel Windsor, tarifa con código MILI</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid rgba(247,233,236,.25);"><span style="font-size: 11px; letter-spacing: .2em; color: var(--pp-acc, #D9738F);">ESTACIONAMIENTO</span><span style="font-size: 14px; line-height: 1.4;">En el salón, sin cargo</span></div>
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border: 1px solid rgba(247,233,236,.25);"><span style="font-size: 11px; letter-spacing: .2em; color: var(--pp-acc, #D9738F);">TRANSPORTE</span><span style="font-size: 14px; line-height: 1.4;">Combi desde Nueva Córdoba, 20:00</span></div>
+      </div>
+      <div style="position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-top: 10px;">
+        <span style="font-family: 'Playfair Display', serif; font-style: italic; font-size: 24px; color: var(--pp-night-ink, #F7E9EC);">Con amor, Mili</span>
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px;"><span style="font-size: 11px; letter-spacing: .2em; color: rgba(247,233,236,.6);">altainvitacion.com</span><span onClick="{{ replay }}" style="cursor: pointer; font-size: 12px; letter-spacing: .18em; color: var(--pp-acc, #D9738F);">VER LA APERTURA OTRA VEZ ↺</span></div>
+      </div>
+    </section>
+
+    <!-- HANDOFF (oculto por defecto; tweak "mostrarHandoff") -->
+    <section ref="{{ setHandoff }}" data-tone="light" data-screen-label="Handoff" style="display: none; position: relative; padding: 60px max(24px, calc((100% - 720px) / 2)) 120px; background: #FDF4F7; color: #241C3A; font-size: 13px; line-height: 1.6;">
+      <h2 style="margin: 0 0 18px; font-family: 'Playfair Display', serif; font-weight: 400; font-size: 40px;">Handoff — Cielo de papel</h2>
+      <p style="margin: 0 0 18px;">Colección Capas de papel · familia QUINCE · prefijo de clases sugerido <code>cdp</code>. Fuentes: Playfair Display (display, 400/500/600 + itálica) y DM Sans (texto, 400/500). Bloque no visible para el invitado.</p>
+      <h3 style="margin: 18px 0 8px; font-size: 13px; letter-spacing: .24em;">VARIANTES (bg · bg alterno · tinta · tinta suave · acento · secundario)</h3>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+        <li>Cielo rosado (base): #F7E9EC · #F0DDE4 · #241C3A · #7A6C7E · #D9738F rosa · #C9A24D oro — cielo #F7E9EC→#F2C9D8, nubes #E6D2E8 / #C3A6D6 / #8E77A8</li>
+        <li>Noche azul: #1B2347 · #141B3A · #F7E9EC · #A9B0D6 · #E9A8C2 rosa claro · #E3C27E oro — cielo #1B2347→#3C3B78, nubes #3A4372 / #2A3159 / #171D3C</li>
+        <li>Lila: #F3ECF7 · #E8DDF2 · #2A2144 · #766A8C · #8E5FB5 violeta · #E3C27E oro — cielo #F3ECF7→#DCC7EE, nubes #DDCBEE / #B79AD8 / #6F5796</li>
+        <li>Dorado: #FAF1E4 · #F2E3CD · #2B2438 · #7B7060 · #C9962F oro · #D98FA8 rosa — cielo #FAF1E4→#F1D9B6, nubes #EBDAC2 / #D3B98C / #8C7450</li>
+        <li>Menta: #EAF3EF · #DAEAE3 · #1F2E2C · #647A74 · #2E9C8A jade · #E3C27E oro — cielo #EAF3EF→#C8E3DA, nubes #CFE5DC / #96C4B5 / #4F7E72</li>
+      </ul>
+      <p style="margin: 10px 0 0;">Los neutros de papelitos, álbum y formularios (#FDF4F7, #FFFAFC, #EFDCE4, #E2CBD6, tinta #241C3A) no cambian entre variantes. La noche final (Quiz, Tu pase) usa --pp-night #1B2347 / tinta #F7E9EC en todas.</p>
+      <h3 style="margin: 18px 0 8px; font-size: 13px; letter-spacing: .24em;">CAPAS DE LA CABECERA (Bienvenida y Save the Date) — de atrás hacia adelante</h3>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+        <li>layer-1 cielo: degradé --pp-sky1→--pp-sky2 + grano (feTurbulence .85, 2 octavas, opacidad .07, una vez por sección, nunca animado) · drift 0 · z 1</li>
+        <li>layer-2 sol / luna: círculo r78, sombra de recorte 0 3px rgba(0,0,0,.12) · data-drift +70 (asciende) · depth .25 · z 2</li>
+        <li>layer-3 cerros lejanos: --pp-hill1 · data-drift −40 (queda atrás, ~0.8× del scroll) · depth .35 · z 3</li>
+        <li>layer-4 portal / arco de papel (Bienvenida, Frase): #FDF4F7, borde irregular feDisplacementMap scale 1.6 · data-drift −25 · depth .4 · z 4</li>
+        <li>layer-5 plano medio: cerros --pp-hill2, cipreses --pp-hill3, casona (Cuándo y dónde) · data-drift 0 · depth .5 · z 5</li>
+        <li>layer-6 objetos flotantes: 3–4 hojas / pétalos · data-drift +30 · depth .7 · ppFloat 5.6–7.8 s con fases distintas · z 6</li>
+        <li>layer-7 primer plano: follaje que asoma por los bordes + la figura de espaldas con el vestido · data-drift +90 · depth 1 · z 7</li>
+      </ul>
+      <h3 style="margin: 18px 0 8px; font-size: 13px; letter-spacing: .24em;">ANIMACIONES CLAVE</h3>
+      <ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px;">
+        <li>Entrada de la portada: capas translateY 60→0 + opacity, 900 ms cubic-bezier(.16,1,.3,1), stagger 90 ms (fondo primero). Cartel del nombre: rotateX −12°→0 en perspective 700px, 1100 ms mismo easing, sombra 0 2px 0 → 0 18px 30px, arranca a los 700 ms.</li>
+        <li>Apertura: capas salen hacia arriba (translateY −110%) 900 ms, stagger 70 ms del primer plano al fondo; el scroller aparece a los 300 ms.</li>
+        <li>Parallax de scroll (data-drift): translateY = rel × drift, rel = distancia del centro del elemento al centro del viewport / alto del viewport. Valores: −40, −25, 0, +30, +60, +70, +90.</li>
+        <li>Parallax de puntero (data-depth): escritorio mouse ±10 px × depth; celular giroscopio ±6 px × depth (permiso iOS pedido al abrir); sin permiso, deriva autónoma sin(t/2600)·6, cos(t/3300)·4. Se suma al drift en el mismo transform.</li>
+        <li>Deriva autónoma: ppFloat translate(6px,−14px) rotate 8° 5.6–8.5 s ease-in-out, fases −2/−3/−4 s. Figuras: ppSway rotate ±1.4° 3.5 s, origen en los pies; parpadeo ppBlink 4 s (scaleY .1 al 97%). Luna: ppBreath translateY ±16 px 3.5 s. Cinta del mes: ppRibbon skewY 2° 4 s.</li>
+        <li>Reveals (data-xin): opacity 0→1 + translateY(dist, default 24 px)→0, 900 ms cubic-bezier(.16,1,.3,1), data-delay en ms. Disparan al entrar al 92 % del viewport. Sin blur.</li>
+        <li>Frase (data-w): cada palabra translateY −24→0 + rotate 3°→0 + opacity, 700 ms cubic-bezier(.16,1,.3,1), stagger 120 ms.</li>
+        <li>Countdown segundos: rotateX 0→−90° (texto cambia a los 180 ms) →0, 360 ms ease-in-out.</li>
+        <li>Foto de portada: clip-path inset(44% 38% round 999px 999px 14px 14px) → inset(0 0 round 999px 999px 14px 14px) según progreso del marco en el viewport (0→1 en el 70 % del alto). Luz cálida: inset 0 0 0 4px rgba(acento,.55) + inset 0 0 60px rgba(acento,.28), estática.</li>
+        <li>Cuándo y dónde: translateX del strip = −p × (n−1) × 100vw con suavizado 0.14 por frame; ruta stroke-dashoffset len→0 1600 ms al entrar el panel. En vertical (storytellingScrollVertical) los paneles apilan a min-height 100vh, sin sticky ni puntos; numeración NN / NN calculada.</li>
+        <li>Check-in: sello scale 1.6→1 rotate −20°→−8°, 700 ms cubic-bezier(.34,1.56,.64,1); 10 pétalos SVG con Web Animations: translate radial 90–160 px, rotate ±240°, opacity 1→0, 1200–1700 ms ease-out, stagger 40 ms. Estado PENDIENTE→CONFIRMADO a los 500 ms (callback onConfirmed).</li>
+        <li>Riel lateral: altura de la barra = progreso del scroller; etiqueta = data-screen-label de la pantalla que cruza el centro; colores según data-tone.</li>
+        <li>prefers-reduced-motion: sin keyframes, sin drift ni tilt, reveals y palabras visibles, capas en su posición final, ventana de foto abierta.</li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- ============ RIEL DE PROGRESO ============ -->
+  <div ref="{{ setRail }}" style="position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom)); opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(36,28,58,.12);">
+    <span ref="{{ setRailTop }}" style="writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-ink2, #7A6C7E); transition: color 500ms ease;">PASE Nº 042</span>
+    <div ref="{{ setRailLine }}" style="flex: 1; width: 1px; margin: 16px 0; background: rgba(36,28,58,.14); position: relative;">
+      <span ref="{{ setRailBar }}" style="position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc, #D9738F); transition: height 260ms linear;"></span>
+    </div>
+    <span ref="{{ setRailLabel }}" style="writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-acc, #D9738F); transition: color 500ms ease;">SAVE THE DATE</span>
+  </div>
+
+  <!-- ============ BOTÓN DE MÚSICA ============ -->
+  <button ref="{{ setMusic }}" onClick="{{ toggleMusic }}" aria-label="Música" style="position: absolute; right: 48px; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 6; width: 52px; height: 52px; border-radius: 50%; border: none; background: #FDF4F7; color: var(--pp-acc, #D9738F); box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 8px 14px rgba(0,0,0,.1); cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 700ms ease; transform: rotate(-4deg);">
+    <span ref="{{ setMusicRing }}" style="position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--pp-acc, #D9738F); opacity: 0;"></span>
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M14 3v10.6a3.5 3.5 0 1 1-2-3.16V7H8v8.6a3.5 3.5 0 1 1-2-3.16V3z"></path></svg>
+  </button>
+
+  <!-- ============ BURBUJA DE PASE ============ -->
+  <div ref="{{ setBubble }}" onClick="{{ toggleBubble }}" style="position: absolute; left: 50%; top: calc(12px + env(safe-area-inset-top)); transform: translateX(-50%) rotate(-1deg); z-index: 7; background: #FDF4F7; color: #241C3A; box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 8px 14px rgba(0,0,0,.1); cursor: pointer; opacity: 0; transition: opacity 600ms ease; overflow: hidden;">
+    <div ref="{{ setBubbleOpen }}" style="display: flex; align-items: center; justify-content: space-between; gap: 16px; width: min(84vw, 360px); padding: 10px 18px;">
+      <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;"><span style="font-size: 10px; letter-spacing: .22em; color: var(--pp-acc, #D9738F);">PASE ESPECIAL</span><span style="font-family: 'Playfair Display', serif; font-size: 20px; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Familia Gómez</span><span style="font-size: 10px; letter-spacing: .2em; color: #7A6C7E;">MESA 7</span></div>
+      <div style="display: flex; flex-direction: column; align-items: flex-end; padding-left: 14px; border-left: 1px solid #EFDCE4;"><span style="font-family: 'Playfair Display', serif; font-size: 24px; line-height: 1;">3</span><span style="font-size: 10px; letter-spacing: .14em; color: #7A6C7E;">LUGARES</span></div>
+    </div>
+    <div ref="{{ setBubbleMini }}" style="display: none; align-items: center; gap: 8px; padding: 10px 18px; font-size: 11px; letter-spacing: .2em;"><span style="width: 14px; height: 10px; background: var(--pp-acc, #D9738F); clip-path: polygon(0 0, 100% 0, 100% 40%, 90% 50%, 100% 60%, 100% 100%, 0 100%, 0 60%, 10% 50%, 0 40%);"></span>PASE</div>
+  </div>
+
+  <!-- ============ BIENVENIDA (portada) ============ -->
+  <div ref="{{ setCover }}" data-tone="light" data-screen-label="Bienvenida" style="position: absolute; inset: 0; z-index: 5; overflow: hidden; background: linear-gradient(180deg, var(--pp-sky1, #F7E9EC), var(--pp-sky2, #F2C9D8));">
+    <div ref="{{ setCoverScene }}" style="position: absolute; inset: 0;">
+      <svg data-cl="1" data-layer="1" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%;"><rect width="1200" height="700" fill="transparent"></rect><g fill="#fff" opacity=".06"><rect x="0" y="0" width="1200" height="1" transform="rotate(45 600 350)"></rect></g></svg>
+      <svg data-cl="2" data-layer="2" data-depth=".25" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><circle cx="472" cy="196" r="70" fill="#fff" opacity=".26"></circle><circle cx="472" cy="199" r="50" fill="rgba(0,0,0,.12)"></circle><circle cx="472" cy="196" r="50" style="fill: var(--pp-acc, #D9738F);"></circle><circle cx="472" cy="196" r="50" fill="url(#ppShade)"></circle><g fill="#FFFAFC" opacity=".9" style="animation: ppDrift 9s ease-in-out infinite alternate;"><ellipse cx="740" cy="230" rx="46" ry="16"></ellipse><ellipse cx="762" cy="218" rx="30" ry="18"></ellipse><ellipse cx="716" cy="222" rx="26" ry="14"></ellipse></g><g fill="#FFFAFC" opacity=".8" style="animation: ppDrift 12s ease-in-out -5s infinite alternate;"><ellipse cx="300" cy="270" rx="40" ry="14"></ellipse><ellipse cx="322" cy="260" rx="26" ry="15"></ellipse></g></svg>
+      <svg data-cl="3" data-layer="3" data-depth=".35" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g style="filter: url(#ppTorn);"><path d="M0 436 C120 406 220 386 340 416 S560 476 720 426 S980 366 1200 416 V700 H0Z" fill="rgba(0,0,0,.09)" transform="translate(0 4)"></path><path d="M0 432 C120 402 220 382 340 412 S560 472 720 422 S980 362 1200 412 V700 H0Z" style="fill: var(--pp-hill1, #E6D2E8);"></path><path d="M0 432 C120 402 220 382 340 412 S560 472 720 422 S980 362 1200 412 V700 H0Z" fill="url(#ppShade)"></path></g>
+        <g opacity=".75"><rect x="812" y="392" width="26" height="22" fill="#FDF4F7"></rect><path d="M808 392 L825 380 L842 392Z" style="fill: var(--pp-acc, #D9738F);"></path><rect x="846" y="398" width="20" height="16" fill="#FDF4F7"></rect><path d="M843 398 L856 388 L869 398Z" style="fill: var(--pp-acc, #D9738F);"></path><rect x="790" y="400" width="16" height="14" fill="#FDF4F7"></rect><rect x="826" y="368" width="6" height="26" fill="#FDF4F7"></rect><ellipse cx="880" cy="404" rx="5" ry="18" style="fill: var(--pp-hill3, #8E77A8);"></ellipse><ellipse cx="780" cy="406" rx="5" ry="16" style="fill: var(--pp-hill3, #8E77A8);"></ellipse></g>
+        <g style="fill: var(--pp-ink, #241C3A);" opacity=".7"><path d="M300 250 q8 -6 16 0 q-8 -2 -16 0Z"></path><path d="M322 240 q7 -5 14 0 q-7 -2 -14 0Z"></path><path d="M290 268 q6 -4 12 0 q-6 -2 -12 0Z"></path></g></svg>
+      
+      <svg data-cl="5" data-layer="5" data-depth=".5" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g style="filter: url(#ppTorn);"><path d="M0 524 C160 484 280 474 420 504 S660 574 860 514 S1060 454 1200 484 V700 H0Z" fill="rgba(0,0,0,.12)" transform="translate(0 5)"></path><path d="M0 520 C160 480 280 470 420 500 S660 570 860 510 S1060 450 1200 480 V700 H0Z" style="fill: var(--pp-hill2, #C9A24D);"></path><path d="M0 520 C160 480 280 470 420 500 S660 570 860 510 S1060 450 1200 480 V700 H0Z" fill="url(#ppShade)"></path></g>
+        <g fill="#FFFAFC" opacity=".95" style="animation: ppDrift 14s ease-in-out infinite alternate;"><ellipse cx="250" cy="486" rx="80" ry="26"></ellipse><ellipse cx="290" cy="470" rx="52" ry="30"></ellipse><ellipse cx="206" cy="476" rx="42" ry="22"></ellipse></g>
+        <g style="fill: var(--pp-hill3, #8E77A8);"><path d="M240 545 C230 500 236 450 246 430 C256 450 262 500 252 545Z"></path><path d="M270 548 C262 512 266 470 276 456 C286 470 290 512 282 548Z"></path><path d="M430 548 C422 510 426 470 438 452 C450 470 454 510 446 548Z"></path><path d="M900 540 C892 500 896 452 908 436 C920 452 924 500 916 540Z"></path><path d="M932 546 C926 514 930 476 938 464 C946 476 950 514 944 546Z"></path></g>
+        <g style="fill: var(--pp-acc2, #C9A24D);" opacity=".9"><ellipse cx="150" cy="508" rx="40" ry="30"></ellipse><ellipse cx="182" cy="520" rx="30" ry="24"></ellipse><rect x="146" y="528" width="6" height="26" style="fill: var(--pp-hill3, #8E77A8);"></rect><ellipse cx="1010" cy="496" rx="42" ry="32"></ellipse><ellipse cx="1046" cy="510" rx="30" ry="24"></ellipse><rect x="1008" y="520" width="6" height="28" style="fill: var(--pp-hill3, #8E77A8);"></rect></g>
+        <g fill="#FFFAFC" opacity=".9" style="animation: ppDrift 18s ease-in-out -6s infinite alternate;"><ellipse cx="960" cy="500" rx="86" ry="26"></ellipse><ellipse cx="1000" cy="484" rx="54" ry="30"></ellipse><ellipse cx="916" cy="490" rx="44" ry="22"></ellipse></g>
+        <g style="filter: url(#ppTorn);"><path d="M0 594 C180 564 300 584 460 574 S700 534 900 584 S1100 604 1200 574 V700 H0Z" fill="rgba(0,0,0,.12)" transform="translate(0 5)"></path><path d="M0 590 C180 560 300 580 460 570 S700 530 900 580 S1100 600 1200 570 V700 H0Z" style="fill: var(--pp-acc2, #C9A24D);" opacity=".85"></path><path d="M0 590 C180 560 300 580 460 570 S700 530 900 580 S1100 600 1200 570 V700 H0Z" fill="url(#ppShade)"></path></g><ellipse cx="600" cy="656" rx="120" ry="12" fill="rgba(0,0,0,.12)"></ellipse></svg>
+      <div data-cl="5b" style="position: absolute; left: 0; right: 0; bottom: 5%; height: min(58%, 620px); display: flex; justify-content: center; align-items: flex-end; pointer-events: none;"><img src="./img/xv-espalda2.png" alt="" data-depth=".55" style="height: 100%; max-width: 96%; object-fit: contain; object-position: bottom; will-change: transform; animation: ppSway 3.5s ease-in-out infinite; transform-origin: 50% 100%; filter: drop-shadow(0 2px 0 rgba(0,0,0,.12)) drop-shadow(0 8px 14px rgba(0,0,0,.08));"></div>
+      <svg data-cl="2c" data-depth=".35" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;">
+        <g fill="#FFFAFC" opacity=".9" style="animation: ppDrift 16s ease-in-out infinite alternate;"><ellipse cx="330" cy="150" rx="58" ry="19"></ellipse><ellipse cx="358" cy="138" rx="38" ry="22"></ellipse><ellipse cx="300" cy="143" rx="30" ry="16"></ellipse></g>
+        <g fill="#FFFAFC" opacity=".75" style="animation: ppDrift 22s ease-in-out -8s infinite alternate;"><ellipse cx="880" cy="118" rx="66" ry="20"></ellipse><ellipse cx="914" cy="105" rx="42" ry="24"></ellipse><ellipse cx="846" cy="110" rx="32" ry="16"></ellipse></g>
+        <g fill="#FFFAFC" opacity=".85" style="animation: ppDrift 19s ease-in-out -4s infinite alternate;"><ellipse cx="1040" cy="300" rx="54" ry="18"></ellipse><ellipse cx="1068" cy="289" rx="34" ry="20"></ellipse></g>
+        <g fill="#FFFAFC" opacity=".7" style="animation: ppDrift 25s ease-in-out -12s infinite alternate;"><ellipse cx="170" cy="330" rx="50" ry="17"></ellipse><ellipse cx="196" cy="320" rx="32" ry="19"></ellipse></g>
+        <g fill="#FFFAFC" opacity=".8" style="animation: ppDrift 20s ease-in-out -6s infinite alternate;"><ellipse cx="620" cy="86" rx="46" ry="15"></ellipse><ellipse cx="646" cy="77" rx="30" ry="17"></ellipse></g>
+      </svg>
+      <svg data-cl="6b" data-depth=".8" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;">
+        <g transform="translate(505 240)"><g style="animation: ppFly1 11s ease-in-out -1s infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .46s ease-in-out infinite;"><path d="M0 0 C-17 -14 -26 -3 -20 9 C-13 19 -3 14 0 0Z" style="fill: var(--pp-acc, #D9738F);"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .46s ease-in-out infinite;"><path d="M0 0 C17 -14 26 -3 20 9 C13 19 3 14 0 0Z" style="fill: var(--pp-acc, #D9738F);" opacity=".8"></path></g><rect x="-1.5" y="-2" width="3" height="15" rx="1.5" style="fill: var(--pp-ink, #241C3A);"></rect></g></g>
+        <g transform="translate(712 300)"><g style="animation: ppFly2 14s ease-in-out -6s infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .54s ease-in-out infinite;"><path d="M0 0 C-14 -12 -22 -2 -16 8 C-10 15 -3 11 0 0Z" style="fill: var(--pp-acc2, #C9A24D);"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .54s ease-in-out infinite;"><path d="M0 0 C14 -12 22 -2 16 8 C10 15 3 11 0 0Z" style="fill: var(--pp-acc2, #C9A24D);" opacity=".8"></path></g></g></g>
+        <g transform="translate(560 452)"><g style="animation: ppFly1 17s ease-in-out -9s infinite;"><g style="transform-box: fill-box; transform-origin: 100% 50%; animation: ppWingL .6s ease-in-out infinite;"><path d="M0 0 C-12 -10 -19 -2 -14 6 C-9 13 -2 9 0 0Z" style="fill: var(--pp-acc, #D9738F);" opacity=".9"></path></g><g style="transform-box: fill-box; transform-origin: 0% 50%; animation: ppWingR .6s ease-in-out infinite;"><path d="M0 0 C12 -10 19 -2 14 6 C9 13 2 9 0 0Z" style="fill: var(--pp-acc, #D9738F);" opacity=".7"></path></g></g></g>
+      </svg>
+      <img src="./img/xv-luna.png" alt="" data-cl="2b" data-depth=".3" style="position: absolute; left: 2%; top: 1.5%; width: clamp(70px, 20vw, 140px); z-index: 2; will-change: transform; animation: ppBreath 5.5s ease-in-out infinite; filter: drop-shadow(0 0 26px rgba(255,236,200,.35));">
+      <svg data-cl="6" data-layer="6" data-depth=".7" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;"><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 6.5s ease-in-out infinite;"><path d="M500 250 C514 240 526 246 530 258 C518 266 506 262 500 250Z" style="fill: var(--pp-acc2, #C9A24D);"></path></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 7.8s ease-in-out -2s infinite;"><path d="M760 200 C774 190 786 196 790 208 C778 216 766 212 760 200Z" style="fill: var(--pp-acc, #D9738F);"></path></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 5.6s ease-in-out -4s infinite;"><path d="M700 420 C714 410 726 416 730 428 C718 436 706 432 700 420Z" style="fill: var(--pp-hill3, #8E77A8);"></path></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFloat 7.1s ease-in-out -1s infinite;"><path d="M470 400 C484 390 496 396 500 408 C488 416 476 412 470 400Z" style="fill: var(--pp-acc, #D9738F);"></path></g></g></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFall 10s linear infinite;"><path d="M250 120 C266 108 280 115 285 129 C271 139 257 134 250 120Z" style="fill: var(--pp-acc2, #C9A24D);" opacity=".8"></path></g><g style="transform-box: fill-box; transform-origin: center; animation: ppFall 13s linear -6s infinite;"><path d="M960 150 C974 140 986 146 990 158 C978 166 966 162 960 150Z" style="fill: var(--pp-acc, #D9738F);" opacity=".7"></path></g></svg>
+      <svg data-cl="7" data-layer="7" data-depth="1" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" style="position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform;">
+        <g style="filter: url(#ppTorn);"><path d="M0 664 C140 634 260 654 400 640 S620 690 760 650 S1000 610 1200 650 V700 H0Z" fill="rgba(0,0,0,.16)" transform="translate(0 5)"></path><path d="M0 660 C140 630 260 650 400 636 S620 686 760 646 S1000 606 1200 646 V700 H0Z" style="fill: var(--pp-hill3, #8E77A8);"></path><path d="M0 660 C140 630 260 650 400 636 S620 686 760 646 S1000 606 1200 646 V700 H0Z" fill="url(#ppShade)"></path></g>
+      </svg>
+      <svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: .13; pointer-events: none; mix-blend-mode: multiply;"><rect width="100%" height="100%" filter="url(#ppGrain)"></rect><rect width="100%" height="100%" filter="url(#ppFibra)" opacity=".5"></rect></svg>
+    </div>
+
+    <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; text-align: center; padding: calc(96px + env(safe-area-inset-top)) max(24px, calc((100% - 480px) / 2)) calc(26px + env(safe-area-inset-bottom)); pointer-events: none;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.6vh, 14px); width: 100%;">
+        <span ref="{{ setK }}" style="display: none;"></span>
+        <div ref="{{ setSign }}" style="position: relative; background: #FDF4F7; color: #241C3A; padding: clamp(16px, 3vh, 26px) clamp(18px, 5vw, 30px); max-width: 100%; box-sizing: border-box; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-1.2deg); transform-origin: 50% 0%; opacity: 1; transition: transform 1100ms cubic-bezier(.16,1,.3,1), opacity 700ms ease, box-shadow 1100ms ease;">
+          <h1 style="margin: 0; font-family: 'Playfair Display', serif; font-weight: 500; font-size: min(clamp(34px, 10vw, 60px), 6.4vh); line-height: .96; letter-spacing: -.01em; display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 .28em;">
+            <span ref="{{ setN1 }}">Milagros</span>
+            <span ref="{{ setN2 }}" style="width: 100%; font-family: 'Jost', sans-serif; font-size: clamp(11px, 3vw, 14px); line-height: 1.6; letter-spacing: .34em; font-weight: 400; color: var(--pp-acc, #D9738F);">QUINCE AÑOS</span>
+          </h1>
+          <span style="position: absolute; left: 50%; top: -10px; width: 74px; height: 22px; margin-left: -37px; background: rgba(217,115,143,.5); transform: rotate(-2deg); box-shadow: 0 1px 0 rgba(0,0,0,.06);"></span>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2vh, 16px); width: 100%; pointer-events: auto;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 20px; background: #FDF4F7; color: #241C3A; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(.8deg); max-width: 100%; box-sizing: border-box;">
+          <span style="font-size: 11px; letter-spacing: .28em; color: #7A6C7E;">HOLA, FAMILIA GÓMEZ · <span style="color: var(--pp-acc, #D9738F);">CUMPLO QUINCE</span></span>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; font-size: 14px; letter-spacing: .14em;"><span>14 · 03 · 2027</span><span style="width: 4px; height: 4px; border-radius: 50%; background: var(--pp-acc, #D9738F);"></span><span>SALÓN LE BLANC, CÓRDOBA</span></div>
+          <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; font-size: 11px; letter-spacing: .18em; color: #7A6C7E;"><span>PASE Nº 042</span><span>·</span><span>PARA 3 PERSONAS</span><span>·</span><span>NO TRANSFERIBLE</span></div>
+        </div>
+        <button onClick="{{ open }}" style="width: 100%; max-width: 360px; min-height: 52px; border: none; background: var(--pp-btn-bg, var(--pp-ink, #241C3A)); color: var(--pp-btn-fg, #FDF4F7); font-family: 'Jost', sans-serif; font-size: 14px; letter-spacing: .22em; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 8px 14px rgba(0,0,0,.1);" style-hover="background: var(--pp-acc, #D9738F);">ABRIR INVITACIÓN</button>
+      </div>
+    </div>
+  </div>
+
+  <div ref="{{ setHint }}" style="position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2, #7A6C7E); opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ppHint 2.4s ease-in-out infinite;">DESLIZÁ ↓</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932},&quot;variante&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Cielo rosado&quot;,&quot;options&quot;:[&quot;Cielo rosado&quot;,&quot;Noche azul&quot;,&quot;Lila&quot;,&quot;Dorado&quot;,&quot;Menta&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variante de color&quot;},&quot;nombreLargo&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Portada&quot;},&quot;scrollVertical&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;postEvento&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;mostrarHandoff&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamiento&quot;},&quot;onConfirmed&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(data: { attending: boolean; count: number }) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  refs = {};
+  set(k) { return (el) => { this.refs[k] = el; }; }
+
+  renderVals() {
+    const r = (k) => this.set(k);
+    return {
+      setRoot: r('root'), setScroller: r('scroller'), setCover: r('cover'), setCoverScene: r('coverScene'),
+      setSign: r('sign'), setK: r('kicker'), setN1: r('n1'), setN2: r('n2'),
+      setD: r('d'), setH: r('h'), setM: r('m'), setS: r('s'),
+      setWin: r('win'), setPhrase: r('phrase'), setRoute: r('route'),
+      setStub: r('stub'), setStatus: r('status'), setSeal: r('seal'), setPetals: r('petals'), setCount: r('count'),
+      setQuiz: r('quiz'), setQuizMsg: r('quizMsg'),
+      setRail: r('rail'), setRailTop: r('railTop'), setRailLabel: r('railLabel'), setRailBar: r('railBar'), setRailLine: r('railLine'),
+      setMusic: r('music'), setMusicRing: r('musicRing'), setBubble: r('bubble'), setBubbleOpen: r('bubbleOpen'), setBubbleMini: r('bubbleMini'),
+      setHint: r('hint'), setHandoff: r('handoff'),
+      open: () => this.open(), replay: () => this.reset(), confirm: () => this.confirm(),
+      copy: (e) => this.copy(e), vote: (e) => this.vote(e), answer: (e) => this.answer(e),
+      toggleMusic: () => this.toggleMusic(), toggleBubble: () => this.toggleBubble(),
+      inc: () => this.count(1), dec: () => this.count(-1),
+    };
+  }
+
+  static PALETAS = {
+    'Cielo rosado': { bg: '#F7E9EC', bg2: '#F0DDE4', ink: '#241C3A', ink2: '#7A6C7E', acc: '#D9738F', acc2: '#C9A24D', sky1: '#F7E9EC', sky2: '#F2C9D8', hill1: '#E6D2E8', hill2: '#C3A6D6', hill3: '#8E77A8' },
+    'Noche azul': { bg: '#1B2347', bg2: '#141B3A', ink: '#F7E9EC', ink2: '#A9B0D6', acc: '#E9A8C2', acc2: '#E3C27E', sky1: '#1B2347', sky2: '#3C3B78', hill1: '#3A4372', hill2: '#2A3159', hill3: '#171D3C' },
+    'Lila': { bg: '#F3ECF7', bg2: '#E8DDF2', ink: '#2A2144', ink2: '#766A8C', acc: '#8E5FB5', acc2: '#E3C27E', sky1: '#F3ECF7', sky2: '#DCC7EE', hill1: '#DDCBEE', hill2: '#B79AD8', hill3: '#6F5796' },
+    'Dorado': { bg: '#FAF1E4', bg2: '#F2E3CD', ink: '#2B2438', ink2: '#7B7060', acc: '#C9962F', acc2: '#D98FA8', sky1: '#FAF1E4', sky2: '#F1D9B6', hill1: '#EBDAC2', hill2: '#D3B98C', hill3: '#8C7450' },
+    'Menta': { bg: '#EAF3EF', bg2: '#DAEAE3', ink: '#1F2E2C', ink2: '#647A74', acc: '#2E9C8A', acc2: '#E3C27E', sky1: '#EAF3EF', sky2: '#C8E3DA', hill1: '#CFE5DC', hill2: '#96C4B5', hill3: '#4F7E72' },
+  };
+
+  componentDidMount() {
+    this.reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.tilt = { x: 0, y: 0 };
+    this.applyMode();
+    this.prepareReveals();
+    this.preparePhrase();
+    this.intro();
+    this.tick();
+    this.timer = setInterval(() => this.tick(), 1000);
+    this.onMouse = (e) => {
+      if (window.innerWidth < 1024) return;
+      this.tilt.x = (e.clientX / window.innerWidth - .5) * 20;
+      this.tilt.y = (e.clientY / window.innerHeight - .5) * 20;
+      this.hasPointer = true;
+    };
+    window.addEventListener('mousemove', this.onMouse);
+    this.onGyro = (e) => {
+      if (e.gamma == null) return;
+      this.hasGyro = true;
+      this.tilt.x = Math.max(-6, Math.min(6, e.gamma / 5));
+      this.tilt.y = Math.max(-6, Math.min(6, (e.beta - 45) / 6));
+    };
+    window.addEventListener('deviceorientation', this.onGyro);
+    const loop = () => { this.frame(); this.raf = requestAnimationFrame(loop); };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  componentDidUpdate() { this.applyMode(); }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+    cancelAnimationFrame(this.raf);
+    window.removeEventListener('mousemove', this.onMouse);
+    window.removeEventListener('deviceorientation', this.onGyro);
+    if (this.attached && this.onScroll) this.attached.removeEventListener('scroll', this.onScroll);
+  }
+
+  /* ---------- modo: variante, nombre largo, vertical, post-evento, handoff ---------- */
+
+  applyMode() {
+    const p = this.props || {};
+    const root = this.refs.root;
+    const pal = Component.PALETAS[p.variante] || Component.PALETAS['Cielo rosado'];
+    if (root) {
+      Object.keys(pal).forEach((k) => root.style.setProperty('--pp-' + k, pal[k]));
+      const lum = (hex) => { const n = parseInt(hex.slice(1), 16); const r = (n >> 16) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255; return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+      root.style.setProperty('--pp-btn-bg', pal.ink);
+      root.style.setProperty('--pp-btn-fg', lum(pal.ink) > 0.5 ? pal.bg : '#FFFFFF');
+      const dark = p.variante === 'Noche azul';
+      root.style.setProperty('--pp-night', dark ? '#0C1030' : '#1B2347');
+    }
+    const largo = !!p.nombreLargo;
+    if (this.refs.n1) this.refs.n1.textContent = largo ? 'María Guadalupe' : 'Milagros';
+    
+    if (this.refs.handoff) this.refs.handoff.style.display = p.mostrarHandoff ? 'block' : 'none';
+
+    const sc = this.refs.scroller;
+    if (!sc) return;
+    const vertical = !!p.scrollVertical;
+    const post = !!p.postEvento;
+    Array.from(sc.children).forEach((el) => {
+      const label = el.dataset.screenLabel || '';
+      if (label === 'Handoff') return;
+      el.style.display = post && label !== 'Álbum' ? 'none' : '';
+    });
+    sc.querySelectorAll('[data-pan]').forEach((pan) => {
+      const sticky = pan.querySelector('[data-sticky]');
+      const strip = pan.querySelector('[data-strip]');
+      const dots = pan.querySelector('[data-dots]');
+      const panels = Array.from(strip.children);
+      const n = panels.length;
+      panels.forEach((pn, i) => {
+        pn.querySelectorAll('[data-num]').forEach((el) => { el.textContent = String(i + 1).padStart(2, '0') + ' / ' + String(n).padStart(2, '0'); });
+        pn.querySelectorAll('[data-hint-side]').forEach((el) => { el.style.visibility = vertical ? 'hidden' : ''; });
+      });
+      if (vertical) {
+        pan.style.height = 'auto';
+        sticky.style.position = 'relative'; sticky.style.height = 'auto'; sticky.style.overflow = 'visible';
+        strip.style.position = 'relative'; strip.style.flexDirection = 'column'; strip.style.width = '100%'; strip.style.height = 'auto'; strip.style.transform = 'none';
+        panels.forEach((pn) => { pn.style.flex = '0 0 auto'; pn.style.width = '100%'; pn.style.minHeight = '100vh'; pn.style.height = 'auto'; });
+        if (dots) dots.style.display = 'none';
+      } else {
+        pan.style.height = (n * 90 + 60) + 'vh';
+        sticky.style.position = 'sticky'; sticky.style.height = '100vh'; sticky.style.overflow = 'hidden';
+        strip.style.position = 'absolute'; strip.style.flexDirection = 'row'; strip.style.width = (n * 100) + 'vw'; strip.style.height = '100%';
+        panels.forEach((pn) => { pn.style.flex = '0 0 100vw'; pn.style.width = ''; pn.style.minHeight = ''; pn.style.height = '100%'; });
+        if (dots) dots.style.display = 'flex';
+      }
+    });
+  }
+
+  /* ---------- loop: pans, drift + tilt, reveals, rail ---------- */
+
+  attach(sc) {
+    if (this.attached === sc) return;
+    this.attached = sc;
+    this.pans = Array.from(sc.querySelectorAll('[data-pan]'));
+    this.drifts = Array.from(document.querySelectorAll('[data-drift], [data-depth]'));
+  }
+
+  frame() {
+    try { this.frameBody(); } catch (err) { if (!this.errLogged) { this.errLogged = 1; console.error('frame error', err); } }
+  }
+
+  frameBody() {
+    const sc = this.refs.scroller;
+    if (!sc) return;
+    this.attach(sc);
+    const vh = sc.clientHeight, vw = sc.clientWidth, y = sc.scrollTop;
+    this.checkReveals(vh);
+    if (this.reduced) { this.updateRail(); return; }
+
+    if (!this.hasGyro && !this.hasPointer) {
+      const t = performance.now();
+      this.tilt.x = Math.sin(t / 2600) * 6;
+      this.tilt.y = Math.cos(t / 3300) * 4;
+    }
+    const tx = this.tilt.x, ty = this.tilt.y;
+    const vertical = !!(this.props && this.props.scrollVertical);
+
+    if (!this.panPos) this.panPos = [];
+    (this.pans || []).forEach((pan, pi) => {
+      const strip = pan.querySelector('[data-strip]');
+      if (!strip || vertical) return;
+      const n = strip.children.length;
+      const span = pan.offsetHeight - vh;
+      const p = span > 0 ? Math.min(1, Math.max(0, (y - pan.offsetTop) / span)) : 0;
+      const prev = this.panPos[pi];
+      const eased = prev == null ? p : prev + (p - prev) * 0.14;
+      this.panPos[pi] = Math.abs(p - eased) < 0.0004 ? p : eased;
+      strip.style.transform = 'translate3d(' + (-eased * (n - 1) * vw) + 'px,0,0)';
+      const active = Math.min(n - 1, Math.round(eased * (n - 1)));
+      pan.querySelectorAll('[data-dot]').forEach((d, i) => { d.style.background = i === active ? 'var(--pp-acc, #D9738F)' : 'rgba(36,28,58,.18)'; });
+      if (active >= 2 && this.routeReveal) this.routeReveal();
+    });
+
+    (this.drifts || []).forEach((el) => {
+      const amt = parseFloat(el.dataset.drift) || 0;
+      const depth = parseFloat(el.dataset.depth) || 0;
+      let dy = 0;
+      if (amt) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return;
+        const rel = (r.top + r.height / 2 - vh / 2) / vh;
+        dy = rel * amt;
+      }
+      el.style.transform = 'translate3d(' + (tx * depth) + 'px,' + (dy + ty * depth) + 'px,0)';
+    });
+
+    const win = this.refs.win;
+    if (win) {
+      const r = win.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.7)));
+      const v = (1 - p) * 44, h = (1 - p) * 38;
+      win.style.clipPath = 'inset(' + v + '% ' + h + '% ' + v + '% ' + h + '% round 999px 999px 14px 14px)';
+    }
+    this.updateRail();
+  }
+
+  updateRail() {
+    const sc = this.refs.scroller;
+    if (!sc) return;
+    const max = sc.scrollHeight - sc.clientHeight;
+    const p = max > 0 ? Math.min(1, sc.scrollTop / max) : 0;
+    if (this.refs.railBar) this.refs.railBar.style.height = (p * 100) + '%';
+    const secs = Array.from(sc.children).filter((s) => s.style.display !== 'none');
+    const mid = sc.scrollTop + sc.clientHeight / 2;
+    let cur = secs[0];
+    secs.forEach((s) => { if (s.offsetTop <= mid) cur = s; });
+    if (!cur) return;
+    let label = (cur.dataset.screenLabel || '').toUpperCase();
+    if (label === 'FOTO DE PORTADA') label = 'SAVE THE DATE';
+    if (this.refs.railLabel && this.refs.railLabel.textContent !== label) this.refs.railLabel.textContent = label;
+    let tone = cur.dataset.tone;
+    if (!tone) {
+      const strip = cur.querySelector('[data-strip]');
+      if (strip) { const idx = Math.min(strip.children.length - 1, Math.round(Math.abs(parseFloat((strip.style.transform || '').replace(/[^-\d.]/g, '')) || 0) / (sc.clientWidth || 1))); tone = strip.children[idx] ? strip.children[idx].dataset.tone : 'light'; }
+    }
+    const dark = tone === 'dark' || (this.props && this.props.variante === 'Noche azul');
+    const line = dark ? 'rgba(247,233,236,.18)' : 'rgba(36,28,58,.14)';
+    if (this.refs.rail) this.refs.rail.style.borderLeftColor = line;
+    if (this.refs.railLine) this.refs.railLine.style.background = line;
+    if (this.refs.railTop) this.refs.railTop.style.color = dark ? 'rgba(247,233,236,.7)' : 'var(--pp-ink2, #7A6C7E)';
+    if (this.refs.hint && sc.scrollTop > 40) this.refs.hint.style.opacity = 0;
+  }
+
+  /* ---------- reveals ---------- */
+
+  prepareReveals() {
+    this.reveals = Array.from(document.querySelectorAll('[data-xin]'));
+    if (this.reduced) { this.reveals = []; return; }
+    this.reveals.forEach((el) => {
+      const d = el.dataset.dist ? parseFloat(el.dataset.dist) : 24;
+      el.style.opacity = 0;
+      el.style.transform = 'translate3d(0,' + d + 'px,0)';
+      el.style.transition = 'opacity 900ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1)';
+      el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+    });
+  }
+
+  preparePhrase() {
+    const ph = this.refs.phrase;
+    if (!ph || this.reduced) return;
+    this.words = Array.from(ph.querySelectorAll('[data-w]'));
+    this.words.forEach((w) => {
+      w.style.display = 'inline-block';
+      w.style.opacity = 0;
+      w.style.transform = 'translate3d(0,-24px,0) rotate(3deg)';
+      w.style.transition = 'opacity 700ms cubic-bezier(.16,1,.3,1), transform 700ms cubic-bezier(.16,1,.3,1)';
+    });
+  }
+
+  revealPhrase() {
+    (this.words || []).forEach((w, i) => { w.style.transitionDelay = (i * 120) + 'ms'; w.style.opacity = 1; w.style.transform = 'none'; });
+  }
+
+  checkReveals(vh) {
+    const pending = this.reveals || [];
+    for (let i = pending.length - 1; i >= 0; i--) {
+      const el = pending[i];
+      if (!el.isConnected) { pending.splice(i, 1); continue; }
+      const r = el.getBoundingClientRect();
+      if (r.top < vh * 0.92 && r.bottom > 0 && r.left < window.innerWidth && r.right > 0) { el.style.opacity = 1; el.style.transform = 'none'; pending.splice(i, 1); }
+    }
+    const ph = this.refs.phrase;
+    if (ph && !this.phraseDone) { const r = ph.getBoundingClientRect(); if (r.top < vh * 0.8 && r.bottom > 0) { this.phraseDone = 1; this.revealPhrase(); } }
+    const rt = this.refs.route;
+    if (rt && this.routeReveal && !this.routeDone) { const r = rt.getBoundingClientRect(); if (r.left < window.innerWidth * 0.9 && r.right > 0 && r.top < vh && r.bottom > 0) { this.routeReveal(); } }
+  }
+
+  /* ---------- portada ---------- */
+
+  intro() {
+    const scene = this.refs.coverScene, sign = this.refs.sign, k = this.refs.kicker;
+    const layers = scene ? Array.from(scene.querySelectorAll('[data-cl]')) : [];
+    if (this.reduced) { if (sign) { sign.style.opacity = 1; sign.style.transform = 'rotate(-1.2deg)'; } return; }
+    layers.forEach((l, i) => {
+      l.style.transition = 'none';
+      l.style.opacity = 0;
+      l.style.transform = 'translate3d(0,60px,0)';
+      setTimeout(() => {
+        l.style.transition = 'opacity 900ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1)';
+        l.style.opacity = 1;
+        l.style.transform = 'translate3d(0,0,0)';
+        setTimeout(() => { l.style.transition = 'none'; }, 950);
+      }, 80 + i * 90);
+    });
+    if (sign) {
+      sign.style.transition = 'none';
+      sign.style.opacity = 0;
+      sign.style.transform = 'perspective(700px) rotateX(-12deg) rotate(-1.2deg)';
+      sign.style.boxShadow = '0 2px 0 rgba(0,0,0,.12)';
+      setTimeout(() => {
+        sign.style.transition = 'transform 1100ms cubic-bezier(.16,1,.3,1), opacity 700ms ease, box-shadow 1100ms ease';
+        sign.style.opacity = 1;
+        sign.style.transform = 'perspective(700px) rotateX(0deg) rotate(-1.2deg)';
+        sign.style.boxShadow = '0 2px 0 rgba(0,0,0,.12), 0 18px 30px rgba(0,0,0,.14)';
+      }, 700);
+    }
+  }
+
+  open() {
+    const { cover, coverScene, scroller, hint, rail, music, bubble } = this.refs;
+    if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission().catch(() => {});
+    }
+    const layers = coverScene ? Array.from(coverScene.querySelectorAll('[data-cl]')).reverse() : [];
+    layers.forEach((l, i) => {
+      l.style.transition = 'transform 900ms cubic-bezier(.7,0,.2,1) ' + (i * 70) + 'ms, opacity 700ms ease ' + (i * 70 + 200) + 'ms';
+      l.style.transform = 'translate3d(0,-110%,0)';
+      l.style.opacity = 0;
+    });
+    if (cover) { cover.style.transition = 'opacity 700ms ease 500ms'; cover.style.opacity = 0; }
+    if (scroller) scroller.style.opacity = 1;
+    setTimeout(() => {
+      if (hint) hint.style.opacity = 1;
+      if (rail) rail.style.opacity = 1;
+      if (music) music.style.opacity = 1;
+      if (bubble) { bubble.style.opacity = 1; this.bubbleOpen = true; this.bubbleTimer = setTimeout(() => this.setBubble(false), 4000); }
+    }, 1000);
+    setTimeout(() => { if (cover) cover.style.pointerEvents = 'none'; }, 1200);
+    this.drawRoute();
+  }
+
+  reset() {
+    const { cover, coverScene, scroller, hint, rail, music, bubble } = this.refs;
+    if (scroller) { scroller.scrollTop = 0; scroller.style.opacity = 0; }
+    [hint, rail, music, bubble].forEach((el) => { if (el) el.style.opacity = 0; });
+    if (cover) { cover.style.pointerEvents = 'auto'; cover.style.transition = 'none'; cover.style.opacity = 1; }
+    if (coverScene) coverScene.querySelectorAll('[data-cl]').forEach((l) => { l.style.transition = 'none'; l.style.opacity = 1; l.style.transform = 'none'; });
+    setTimeout(() => this.intro(), 300);
+  }
+
+  /* ---------- countdown ---------- */
+
+  tick() {
+    const target = new Date('2027-03-14T20:30:00');
+    const ms = Math.max(0, target - new Date());
+    const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, s = Math.floor(ms / 1e3) % 60;
+    const p = (n) => String(n).padStart(2, '0');
+    if (this.refs.d) this.refs.d.textContent = d;
+    if (this.refs.h) this.refs.h.textContent = p(h);
+    if (this.refs.m) this.refs.m.textContent = p(m);
+    const sEl = this.refs.s;
+    if (!sEl) return;
+    if (this.reduced || !sEl.animate) { sEl.textContent = p(s); return; }
+    sEl.animate([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(-90deg)', offset: .5 }, { transform: 'rotateX(0deg)' }], { duration: 360, easing: 'ease-in-out' });
+    setTimeout(() => { sEl.textContent = p(s); }, 180);
+  }
+
+  /* ---------- cuándo y dónde ---------- */
+
+  drawRoute() {
+    const r = this.refs.route;
+    if (!r || r.dataset.drawn) return;
+    const len = r.getTotalLength();
+    r.style.strokeDasharray = len;
+    r.style.strokeDashoffset = len;
+    r.style.transition = 'stroke-dashoffset 1600ms cubic-bezier(.16,1,.3,1)';
+    r.dataset.drawn = '1';
+    this.routeReveal = () => { if (this.routeDone) return; this.routeDone = 1; r.style.strokeDashoffset = 0; setTimeout(() => { r.style.strokeDasharray = '10 8'; r.style.strokeDashoffset = 0; }, 1650); };
+  }
+
+  /* ---------- check-in ---------- */
+
+  count(delta) {
+    this.n = Math.max(1, Math.min(3, (this.n == null ? 3 : this.n) + delta));
+    if (this.refs.count) this.refs.count.textContent = this.n;
+  }
+
+  confirm() {
+    const { seal, status, petals, stub } = this.refs;
+    if (this.confirmed) return;
+    this.confirmed = true;
+    if (seal) {
+      seal.style.transition = 'transform 700ms cubic-bezier(.34,1.56,.64,1), opacity 300ms ease';
+      seal.style.opacity = 1;
+      seal.style.transform = 'scale(1) rotate(-8deg)';
+    }
+    setTimeout(() => {
+      if (status) { status.textContent = 'CONFIRMADO'; status.style.color = 'var(--pp-acc, #D9738F)'; }
+      if (stub) stub.style.boxShadow = '0 2px 0 rgba(0,0,0,.12), 0 18px 30px rgba(0,0,0,.14)';
+      if (this.props && typeof this.props.onConfirmed === 'function') this.props.onConfirmed({ attending: true, count: this.n == null ? 3 : this.n });
+    }, 500);
+    if (!petals || this.reduced) return;
+    const ns = 'http://www.w3.org/2000/svg';
+    const acc = getComputedStyle(this.refs.root).getPropertyValue('--pp-acc').trim() || '#D9738F';
+    const acc2 = getComputedStyle(this.refs.root).getPropertyValue('--pp-acc2').trim() || '#C9A24D';
+    const cx = petals.clientWidth - 60, cy = 90;
+    for (let i = 0; i < 10; i++) {
+      const s = document.createElementNS(ns, 'svg');
+      s.setAttribute('viewBox', '0 0 20 20');
+      s.style.cssText = 'position:absolute;left:' + cx + 'px;top:' + cy + 'px;width:16px;height:16px;';
+      const path = document.createElementNS(ns, 'path');
+      path.setAttribute('d', 'M10 0 C16 4 18 12 10 20 C2 12 4 4 10 0Z');
+      path.setAttribute('fill', i % 3 === 0 ? acc2 : acc);
+      s.appendChild(path);
+      petals.appendChild(s);
+      const ang = (i / 10) * Math.PI * 2 + Math.random() * .5;
+      const dist = 90 + Math.random() * 70;
+      const dx = Math.cos(ang) * dist, dy = Math.sin(ang) * dist + 40;
+      const rot = (Math.random() > .5 ? 1 : -1) * (120 + Math.random() * 120);
+      s.animate([
+        { transform: 'translate(0,0) rotate(0deg) scale(.4)', opacity: 1 },
+        { transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(' + rot + 'deg) scale(1)', opacity: 0 }
+      ], { duration: 1200 + Math.random() * 500, delay: 200 + i * 40, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'forwards' }).onfinish = () => s.remove();
+    }
+  }
+
+  /* ---------- música, burbuja, copiar, votar, quiz ---------- */
+
+  toggleMusic() {
+    this.playing = !this.playing;
+    const ring = this.refs.musicRing, btn = this.refs.music;
+    if (ring) ring.style.animation = this.playing && !this.reduced ? 'ppPulse 1.6s ease-out infinite' : 'none';
+    if (btn) { btn.style.background = this.playing ? 'var(--pp-acc, #D9738F)' : '#FDF4F7'; btn.style.color = this.playing ? '#FDF4F7' : 'var(--pp-acc, #D9738F)'; }
+  }
+
+  setBubble(open) {
+    this.bubbleOpen = open;
+    if (this.refs.bubbleOpen) this.refs.bubbleOpen.style.display = open ? 'flex' : 'none';
+    if (this.refs.bubbleMini) this.refs.bubbleMini.style.display = open ? 'none' : 'flex';
+  }
+
+  toggleBubble() {
+    clearTimeout(this.bubbleTimer);
+    this.setBubble(!this.bubbleOpen);
+    if (this.bubbleOpen) this.bubbleTimer = setTimeout(() => this.setBubble(false), 4000);
+  }
+
+  copy(e) {
+    const btn = e.currentTarget, val = btn.dataset.copy;
+    if (navigator.clipboard) navigator.clipboard.writeText(val).catch(() => {});
+    btn.textContent = 'COPIADO';
+    btn.style.background = '#241C3A'; btn.style.color = '#FDF4F7';
+    setTimeout(() => { btn.textContent = 'COPIAR'; btn.style.background = 'transparent'; btn.style.color = '#241C3A'; }, 1600);
+  }
+
+  vote(e) {
+    const btn = e.currentTarget;
+    const on = btn.dataset.on === '1';
+    const n = parseInt(btn.dataset.votes, 10) + (on ? -1 : 1);
+    btn.dataset.votes = n; btn.dataset.on = on ? '0' : '1';
+    btn.textContent = '♥ ' + n;
+    btn.style.background = on ? 'transparent' : 'var(--pp-acc, #D9738F)';
+    btn.style.color = on ? 'var(--pp-acc, #D9738F)' : '#FDF4F7';
+  }
+
+  answer(e) {
+    const btn = e.currentTarget, ok = btn.dataset.ok === '1';
+    if (this.answered) return;
+    this.answered = true;
+    Array.from(this.refs.quiz.children).forEach((b) => {
+      if (b.dataset.ok === '1') { b.style.background = 'var(--pp-acc2, #C9A24D)'; b.style.borderColor = 'var(--pp-acc2, #C9A24D)'; b.style.color = '#FDF4F7'; }
+      else if (b === btn) { b.style.borderColor = 'var(--pp-acc, #D9738F)'; b.style.color = 'var(--pp-acc, #D9738F)'; }
+    });
+    if (this.refs.quizMsg) this.refs.quizMsg.textContent = ok ? 'Esa misma. La vi catorce veces.' : 'Casi. Es El diario de Noa, la vi catorce veces.';
+  }
+}
+</script>
+</body>
+</html>

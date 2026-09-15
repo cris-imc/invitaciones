@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Parisienne&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#171317;-webkit-font-smoothing:antialiased}
+  a{color:#C27C86;text-decoration:none}
+  a:hover{color:#9A7F5E}
+  ::-webkit-scrollbar{width:0;height:0}
+  @keyframes acHoja{0%{transform:translateY(0)}100%{transform:translateY(-110%)}}
+  @keyframes acFlor{0%{transform:rotate(-12deg) scale(.94);opacity:0}100%{transform:rotate(0) scale(1);opacity:1}}
+  @keyframes acVelo{0%{opacity:1}100%{opacity:0;visibility:hidden}}
+  @keyframes acGira{to{transform:rotate(360deg)}}
+  @keyframes acPetalo{0%{transform:translateY(-40px) rotate(0);opacity:0}12%{opacity:1}100%{transform:translateY(300px) rotate(220deg);opacity:0}}
+  @keyframes acFlote{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(4deg)}}
+  @keyframes acOnda{0%,100%{transform:scaleY(.22)}50%{transform:scaleY(1)}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="font-family:'DM Sans',system-ui,sans-serif;color:#EADFDA;padding:34px 34px 70px;display:flex;flex-direction:column;gap:26px;min-height:100vh;background:radial-gradient(120% 90% at 50% 0%,#2a1f26 0%,#161215 70%)">
+
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px">
+    <div>
+      <div style="font-size:10px;letter-spacing:.34em;color:#C27C86;text-transform:uppercase">Colección Papelería Viva · Familia 02 · Quince años</div>
+      <div style="font-family:'Playfair Display',serif;font-size:46px;font-weight:400;margin-top:6px;color:#F7EEE6;line-height:1.05">Acuarela <span style="font-family:Parisienne,cursive;color:#C27C86">&amp;</span> Corona</div>
+      <div style="font-size:11.5px;letter-spacing:.06em;color:#9E8D89;margin-top:6px;max-width:580px">Mecanismo Flat · 9 secciones · 10 slots de doodle · 8 piezas de <code style="color:#C27C86">/templates/acuarela-corona/</code></div>
+    </div>
+    <div style="display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap">
+      <div>
+        <div style="font-size:9px;letter-spacing:.3em;color:#7f7073;margin-bottom:7px">VISTA</div>
+        <div style="display:flex;gap:4px;padding:4px;border:1px solid #3d323a;border-radius:999px;background:#201a1f">
+          <button onClick="{{ verCel }}" style="{{ btnCel }}">Celular 430 × 932</button>
+          <button onClick="{{ verEsc }}" style="{{ btnEsc }}">Escritorio 1440 × 900</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.3em;color:#7f7073;margin-bottom:7px">VARIANTE · {{ vNombre }}</div>
+        <div style="display:flex;gap:7px">
+          <sc-for list="{{ paletas }}" as="p" hint-placeholder-count="5">
+            <button onClick="{{ p.set }}" title="{{ p.n }}" style="{{ p.chip }}"></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ esCel }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8f8085">SPLASH · « VALENTINA »</div>
+      <div style="{{ marco }}">
+        <div style="position:absolute;inset:0;background:var(--t-bg);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;top:0;height:660px;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#83706a">FOTO · portadaImagenFondo</span></div>
+          <div aria-hidden="true" style="position:absolute;left:-26px;top:-16px;width:176px;pointer-events:none;transform-origin:top left;animation:{{ sA.aFlor1 }}"><img src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" style="display:block;width:176px"></div>
+          <div aria-hidden="true" style="position:absolute;right:-24px;top:470px;width:138px;pointer-events:none;transform-origin:bottom right;animation:{{ sA.aFlor2 }}"><img src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" style="display:block;width:138px;transform:scaleX(-1)"></div>
+          <svg viewBox="0 0 430 24" preserveAspectRatio="none" style="position:absolute;left:0;top:640px;width:430px;height:24px" aria-hidden="true"><path d="M0,13 L17,7 L34,14 L51,6 L68,15 L85,8 L102,16 L119,7 L136,13 L153,6 L170,14 L187,9 L204,16 L221,7 L238,13 L255,6 L272,15 L289,8 L306,16 L323,7 L340,13 L357,6 L374,14 L391,9 L408,15 L430,11 L430,24 L0,24 Z" fill="var(--t-bg)"/></svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:272px;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:10px;letter-spacing:.34em;color:var(--t-acc)">MIS QUINCE</div>
+            <div style="font-family:Parisienne,cursive;font-size:62px;color:var(--t-ink);margin-top:6px;line-height:1.1">Victoria</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:16px"><span style="width:46px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.3em;color:var(--t-ink2)">21 · 08 · 2027</span><span style="width:46px;height:1px;background:var(--t-acc2)"></span></div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;animation:{{ sA.aOv }}">
+          <div style="position:absolute;inset:0;background:var(--t-alt);animation:{{ sA.aHoja }};display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(59,42,42,.18)">
+            <div aria-hidden="true" style="position:absolute;inset:0;opacity:.6;background:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 1px,transparent 1px 3px)"></div>
+            <div aria-hidden="true" style="position:absolute;left:26px;right:26px;top:26px;bottom:26px;border:1px solid var(--t-acc2);opacity:.4"></div>
+            <div style="position:relative;font-size:10px;letter-spacing:.34em;color:var(--t-ink2)">PAPEL VEGETAL · PARA</div>
+            <div style="position:relative;font-family:Parisienne,cursive;font-size:64px;color:var(--t-ink);margin-top:8px;line-height:1.1">Valentina</div>
+            <div style="position:relative;width:60px;height:1px;background:var(--t-acc2);margin-top:18px"></div>
+            <div style="position:relative;font-family:'Playfair Display',serif;font-size:19px;color:var(--t-ink2);margin-top:18px;text-align:center;line-height:1.6">Victoria cumple quince<br>y quiere celebrarlo con vos</div>
+            <button onClick="{{ abrirA }}" style="{{ btnAbrir }}">ABRIR INVITACIÓN</button>
+            <img src="public/templates/acuarela-corona/mariposa-1.webp" alt="" aria-hidden="true" style="position:absolute;right:52px;top:150px;width:56px;pointer-events:none;animation:acFlote 6s ease-in-out infinite">
+          </div>
+        </div>
+      </div>
+      <button onClick="{{ resetA }}" style="{{ btnGhost }}">REPETIR APERTURA</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8f8085">SPLASH · « MARÍA FLORENCIA »</div>
+      <div style="{{ marco }}">
+        <div style="position:absolute;inset:0;background:var(--t-bg);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;top:0;height:660px;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#83706a">FOTO · portadaImagenFondo</span></div>
+          <div aria-hidden="true" style="position:absolute;left:-26px;top:-16px;width:176px;pointer-events:none;transform-origin:top left;animation:{{ sB.aFlor1 }}"><img src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" style="display:block;width:176px"></div>
+          <div aria-hidden="true" style="position:absolute;right:-24px;top:470px;width:138px;pointer-events:none;transform-origin:bottom right;animation:{{ sB.aFlor2 }}"><img src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" style="display:block;width:138px;transform:scaleX(-1)"></div>
+          <svg viewBox="0 0 430 24" preserveAspectRatio="none" style="position:absolute;left:0;top:640px;width:430px;height:24px" aria-hidden="true"><path d="M0,13 L17,7 L34,14 L51,6 L68,15 L85,8 L102,16 L119,7 L136,13 L153,6 L170,14 L187,9 L204,16 L221,7 L238,13 L255,6 L272,15 L289,8 L306,16 L323,7 L340,13 L357,6 L374,14 L391,9 L408,15 L430,11 L430,24 L0,24 Z" fill="var(--t-bg)"/></svg>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:272px;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:10px;letter-spacing:.34em;color:var(--t-acc)">MIS QUINCE</div>
+            <div style="font-family:Parisienne,cursive;font-size:62px;color:var(--t-ink);margin-top:6px;line-height:1.1">Victoria</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-top:16px"><span style="width:46px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.3em;color:var(--t-ink2)">21 · 08 · 2027</span><span style="width:46px;height:1px;background:var(--t-acc2)"></span></div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;animation:{{ sB.aOv }}">
+          <div style="position:absolute;inset:0;background:var(--t-alt);animation:{{ sB.aHoja }};display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 18px 40px rgba(59,42,42,.18)">
+            <div aria-hidden="true" style="position:absolute;inset:0;opacity:.6;background:repeating-linear-gradient(0deg,rgba(0,0,0,.018) 0 1px,transparent 1px 3px)"></div>
+            <div aria-hidden="true" style="position:absolute;left:26px;right:26px;top:26px;bottom:26px;border:1px solid var(--t-acc2);opacity:.4"></div>
+            <div style="position:relative;font-size:10px;letter-spacing:.34em;color:var(--t-ink2)">PAPEL VEGETAL · PARA</div>
+            <div style="position:relative;font-family:Parisienne,cursive;font-size:52px;color:var(--t-ink);margin-top:10px;line-height:1.2;text-align:center">María Florencia</div>
+            <div style="position:relative;width:60px;height:1px;background:var(--t-acc2);margin-top:18px"></div>
+            <div style="position:relative;font-family:'Playfair Display',serif;font-size:19px;color:var(--t-ink2);margin-top:18px;text-align:center;line-height:1.6">Victoria cumple quince<br>y quiere celebrarlo con vos</div>
+            <button onClick="{{ abrirB }}" style="{{ btnAbrir }}">ABRIR INVITACIÓN</button>
+            <img src="public/templates/acuarela-corona/mariposa-2.webp" alt="" aria-hidden="true" style="position:absolute;left:46px;top:170px;width:62px;pointer-events:none;animation:acFlote 7s ease-in-out infinite">
+          </div>
+        </div>
+      </div>
+      <button onClick="{{ resetB }}" style="{{ btnGhost }}">REPETIR APERTURA</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8f8085">INVITACIÓN ABIERTA · 9 SECCIONES + EXTRAS</div>
+      <div style="{{ marco }}">
+        <div id="scC" data-scroll="1" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--t-bg)">
+
+          <section data-sec="portada" data-screen-label="01 Portada" style="position:relative;height:812px;overflow:hidden">
+            <div data-par="1" style="position:absolute;left:0;right:0;top:-70px;height:730px;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.3em;color:#83706a">FOTO · portadaImagenFondo</span></div>
+            <div data-velo="1" aria-hidden="true" style="position:absolute;left:0;right:0;top:0;height:646px;pointer-events:none;background:linear-gradient(180deg,rgba(251,243,234,.72),rgba(251,243,234,.12));-webkit-mask-image:linear-gradient(180deg,#000 30%,rgba(0,0,0,.25));mask-image:linear-gradient(180deg,#000 30%,rgba(0,0,0,.25))"></div>
+            <div aria-hidden="true" data-doodle="3" style="position:absolute;left:18px;right:18px;top:18px;height:610px;border:1px solid rgba(251,243,234,.85);pointer-events:none"></div>
+            <div aria-hidden="true" data-doodle="4" style="position:absolute;left:25px;right:25px;top:25px;height:596px;border:1px solid rgba(251,243,234,.45);pointer-events:none"></div>
+            <img data-doodle="1" src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;left:-24px;top:-14px;width:172px;pointer-events:none;filter:drop-shadow(0 3px 8px rgba(59,42,42,.16))">
+            <img data-doodle="2" src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;right:-22px;top:466px;width:140px;transform:scaleX(-1) rotate(6deg);pointer-events:none;filter:drop-shadow(0 3px 8px rgba(59,42,42,.16))">
+            <img data-doodle="5" src="public/templates/acuarela-corona/mariposa-1.webp" alt="" aria-hidden="true" style="position:absolute;right:56px;top:200px;width:52px;pointer-events:none;animation:acFlote 6.5s ease-in-out infinite">
+            <svg viewBox="0 0 430 24" preserveAspectRatio="none" style="position:absolute;left:0;top:626px;width:430px;height:24px;filter:drop-shadow(0 -1px 0 rgba(59,42,42,.1))" aria-hidden="true"><path d="M0,13 L17,7 L34,14 L51,6 L68,15 L85,8 L102,16 L119,7 L136,13 L153,6 L170,14 L187,9 L204,16 L221,7 L238,13 L255,6 L272,15 L289,8 L306,16 L323,7 L340,13 L357,6 L374,14 L391,9 L408,15 L430,11 L430,24 L0,24 Z" fill="var(--t-bg)"/></svg>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:190px;background:var(--t-bg);display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:10px;letter-spacing:.34em;color:var(--t-acc)">MIS QUINCE AÑOS</div>
+              <div style="font-family:Parisienne,cursive;font-size:70px;color:var(--t-ink);margin-top:2px;line-height:1.1">Victoria</div>
+              <div style="display:flex;align-items:center;gap:12px;margin-top:12px"><span style="width:46px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.3em;color:var(--t-ink2)">21 · 08 · 2027</span><span style="width:46px;height:1px;background:var(--t-acc2)"></span></div>
+            </div>
+          </section>
+
+          <section data-sec="countdown" data-screen-label="02 Countdown" style="position:relative;padding:56px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">02 — LA FECHA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div data-reveal="t" style="display:flex;justify-content:center">
+              <div style="position:relative;width:250px;height:250px;display:flex;align-items:center;justify-content:center">
+                <img src="public/templates/acuarela-corona/corona.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:250px;height:250px;object-fit:contain;pointer-events:none;animation:acGira 60s linear infinite">
+                <div style="position:relative;text-align:center"><div style="font-family:'Playfair Display',serif;font-size:74px;line-height:1;color:var(--t-ink)">{{ cd.d }}</div><div style="font-size:9.5px;letter-spacing:.3em;color:var(--t-ink2);margin-top:4px">DÍAS</div></div>
+              </div>
+            </div>
+            <div style="margin-top:18px;background:var(--t-bg);border:1px solid rgba(0,0,0,.07);box-shadow:0 8px 20px rgba(59,42,42,.06);display:grid;grid-template-columns:repeat(3,1fr)">
+              <sc-for list="{{ cd.cajas }}" as="c" hint-placeholder-count="3">
+                <div data-reveal="b" style="{{ c.s }}">
+                  <div style="font-family:'Playfair Display',serif;font-size:32px;line-height:1;color:var(--t-ink);font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                  <div style="font-size:9px;letter-spacing:.24em;color:var(--t-ink2);margin-top:6px">{{ c.l }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <img data-doodle="6" src="public/templates/acuarela-corona/guirnalda.webp" alt="" aria-hidden="true" style="display:block;width:220px;margin:26px auto 0;pointer-events:none">
+            <div style="margin-top:16px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">02 / 09</div>
+          </section>
+
+          <section data-sec="frase" data-screen-label="03 Frase" style="position:relative;padding:62px 30px 44px;background:var(--t-bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:26px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">03 — LA FRASE</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <img data-doodle="7" src="public/templates/acuarela-corona/mariposa-2.webp" alt="" aria-hidden="true" style="position:absolute;right:20px;top:44px;width:64px;pointer-events:none;animation:acFlote 7.5s ease-in-out infinite">
+            <div data-reveal="t" style="text-align:center">
+              <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:27px;line-height:1.45;color:var(--t-ink);text-wrap:pretty">Que la noche sea larga <span style="font-family:Parisienne,cursive;font-style:normal;font-size:42px;color:var(--t-acc)">&amp;</span> el recuerdo <span style="font-family:Parisienne,cursive;font-style:normal;font-size:40px;color:var(--t-acc)">eterno</span></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:24px"><span style="width:34px;height:1px;background:var(--t-acc2)"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span><span style="width:34px;height:1px;background:var(--t-acc2)"></span></div>
+            </div>
+            <div style="margin-top:34px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">03 / 09</div>
+          </section>
+
+          <section data-sec="detalles" data-screen-label="04 Detalles" style="position:relative;padding:56px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">04 — LA FIESTA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div data-reveal="b" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.07);padding:22px 20px">
+              <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-acc)">SALÓN</div>
+              <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--t-ink);margin-top:8px">Quinta Los Álamos</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:6px;line-height:1.6">Av. Bernabé Márquez 1480, San Isidro<br>Sábado 21 de agosto · 21:00 h</div>
+              <button onClick="{{ irMapa }}" style="min-height:48px;margin-top:14px;padding:0 20px;border:1px solid var(--t-acc);background:none;color:var(--t-acc);font-family:'DM Sans',sans-serif;font-size:10.5px;letter-spacing:.24em;cursor:pointer">CÓMO LLEGAR</button>
+            </div>
+            <div style="margin-top:30px;font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin-bottom:18px">CRONOGRAMA</div>
+            <div style="position:relative">
+              <div aria-hidden="true" style="position:absolute;left:50%;top:6px;bottom:6px;width:1px;background:var(--t-acc2);opacity:.5"></div>
+              <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="5">
+                <div data-reveal="{{ c.lado }}" style="{{ c.fila }}">
+                  <div style="{{ c.celda }}">
+                    <div style="display:inline-block;font-size:11px;letter-spacing:.18em;color:var(--t-bg);background:var(--t-acc);padding:5px 12px;border-radius:999px">{{ c.hora }}</div>
+                    <div style="font-family:'Playfair Display',serif;font-size:20px;color:var(--t-ink);margin-top:6px">{{ c.t }}</div>
+                  </div>
+                  <div style="width:40px;display:flex;align-items:center;justify-content:center;flex:none">
+                    <span style="width:30px;height:30px;border-radius:50%;background:var(--t-bg);border:1px solid var(--t-acc);display:flex;align-items:center;justify-content:center">{{ c.icono }}</span>
+                  </div>
+                  <div style="flex:1"></div>
+                </div>
+              </sc-for>
+            </div>
+            <div data-reveal="b" style="margin-top:28px;border:1px solid var(--t-acc2);padding:20px;text-align:center;background:var(--t-bg)">
+              <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-acc)">DRESS CODE</div>
+              <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--t-ink);margin-top:8px">Elegante sport</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:6px">El rosa lo pongo yo</div>
+            </div>
+            <div style="margin-top:30px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">04 / 09</div>
+          </section>
+
+          <section data-sec="album" data-screen-label="05 Álbum" style="position:relative;padding:56px 0 44px;background:var(--t-bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin:0 26px 24px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">05 — EL ÁLBUM</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div style="display:flex;gap:18px;overflow-x:auto;padding:16px 26px 18px;scroll-snap-type:x mandatory">
+              <sc-for list="{{ album }}" as="f" hint-placeholder-count="4">
+                <div data-reveal="b" style="{{ f.card }}">
+                  <div aria-hidden="true" style="position:absolute;left:50%;top:-12px;transform:translateX(-50%) rotate(-2deg);width:86px;height:24px;background:rgba(236,224,206,.82);border-left:1px solid rgba(0,0,0,.05);border-right:1px solid rgba(0,0,0,.05);box-shadow:0 2px 5px rgba(59,42,42,.1)"></div>
+                  <div style="height:262px;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px"><span style="font-size:9px;letter-spacing:.2em;color:#83706a">{{ f.slot }}</span></div>
+                  <div style="text-align:center;margin-top:12px;font-family:Parisienne,cursive;font-size:24px;color:var(--t-ink2)">{{ f.pie }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin:4px 26px 0;font-size:10px;letter-spacing:.2em;color:var(--t-ink2);text-align:center">albumStyle · solapadas</div>
+            <div style="margin-top:24px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">05 / 09</div>
+          </section>
+
+          <section data-sec="mapa" data-screen-label="06 Mapa" style="position:relative;padding:56px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">06 — EL MAPA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div aria-hidden="true" data-doodle="8" style="position:absolute;right:16px;top:46px;opacity:.5;pointer-events:none"><svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><path d="M20 8 L24 20 L20 32 L16 20 Z" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg></div>
+            <div data-reveal="b" style="position:relative;height:296px;border:1px solid rgba(0,0,0,.08);background:var(--t-bg);overflow:hidden">
+              <svg viewBox="0 0 380 296" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M-10 70 L400 40" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M-10 170 L400 200" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M90 -10 L120 306" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M270 -10 L250 306" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M-10 240 C120 210 260 260 400 230" stroke="var(--t-acc2)" stroke-width="2" opacity=".45" fill="none"/></svg>
+              <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center"><svg width="30" height="38" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 37 C15 37 28 22 28 14 A13 13 0 1 0 2 14 C2 22 15 37 15 37 Z" fill="var(--t-acc)"/><circle cx="15" cy="14" r="5" fill="var(--t-bg)"/></svg><div style="font-size:10px;letter-spacing:.22em;color:var(--t-ink);margin-top:6px">QUINTA LOS ÁLAMOS</div></div>
+            </div>
+            <a href="https://maps.google.com" target="_blank" rel="noreferrer" style="display:flex;align-items:center;justify-content:center;min-height:48px;margin-top:14px;border:1px solid var(--t-ink);color:var(--t-ink);font-size:10.5px;letter-spacing:.24em">ABRIR EN GOOGLE MAPS · mapUrl</a>
+            <div style="margin-top:28px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">06 / 09</div>
+          </section>
+
+          <section data-sec="extras" data-screen-label="Extras pase e info" style="position:relative;padding:52px 26px 44px;background:var(--t-bg)">
+            <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin-bottom:16px">EXTRA — TU PASE DE INGRESO</div>
+            <div data-reveal="b" style="position:relative;background:var(--t-alt);padding:22px 18px;border:1px dashed var(--t-acc);display:flex;gap:16px;align-items:center">
+              <div style="flex:1">
+                <div style="font-size:9.5px;letter-spacing:.26em;color:var(--t-ink2)">PASE N.º</div>
+                <div style="font-family:'Playfair Display',serif;font-size:56px;line-height:1;color:var(--t-acc)">018</div>
+                <div style="font-size:14px;color:var(--t-ink);margin-top:8px">Mesa 4 · 2 lugares</div>
+                <div style="font-size:12px;color:var(--t-ink2);margin-top:8px;line-height:1.5">Presentá tu pase al ingresar</div>
+              </div>
+              <div style="flex:none;width:110px;height:110px;background:#fff;padding:7px;display:grid;grid-template-columns:repeat(9,1fr);grid-auto-rows:1fr;gap:1px">
+                <sc-for list="{{ qr }}" as="q" hint-placeholder-count="81"><span style="{{ q.s }}"></span></sc-for>
+              </div>
+            </div>
+
+            <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin:32px 0 12px">EXTRA — BUENO SABER</div>
+            <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+              <div style="border-bottom:1px solid rgba(0,0,0,.1)">
+                <button onClick="{{ f.tog }}" style="width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:'Playfair Display',serif;font-size:20px;color:var(--t-ink)"><span>{{ f.q }}</span><span style="{{ f.mas }}">+</span></button>
+                <div style="{{ f.panel }}"><div style="padding:0 0 16px;font-size:14px;line-height:1.65;color:var(--t-ink2)">{{ f.a }}</div></div>
+              </div>
+            </sc-for>
+
+            <div style="font-size:9.5px;letter-spacing:.28em;color:var(--t-ink2);margin:32px 0 12px">EXTRA — EL QUIZ · triviaHabilitada</div>
+            <div data-reveal="b" style="border:1px solid rgba(0,0,0,.1);padding:20px;background:var(--t-alt)">
+              <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--t-ink);line-height:1.3">¿Cuál es el tema que Victoria pide siempre?</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+                <sc-for list="{{ quiz }}" as="q" hint-placeholder-count="3"><button onClick="{{ q.pick }}" style="{{ q.s }}">{{ q.t }}</button></sc-for>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="rsvp" data-screen-label="07 RSVP" style="position:relative;padding:58px 26px 48px;background:var(--t-acc);overflow:hidden">
+            <div aria-hidden="true" style="position:absolute;left:-12px;top:46px;font-family:'Playfair Display',serif;font-size:128px;line-height:1;color:#fff;opacity:.06;pointer-events:none">RSVP</div>
+            <div style="position:relative;display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.28em;color:rgba(255,255,255,.82)">07 — CONFIRMACIÓN</span><span style="flex:1;height:1px;background:rgba(255,255,255,.42)"></span><span style="width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.75)"></span></div>
+            <div style="position:relative;font-family:'Playfair Display',serif;font-size:34px;color:#FFF7F1;line-height:1.2">¿Venís a bailar?</div>
+            <div style="position:relative;font-size:14px;color:rgba(255,247,241,.86);margin-top:8px;line-height:1.6">Confirmá antes del 10 de julio de 2027</div>
+            <sc-if value="{{ noConfirmado }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;margin-top:24px;display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.26em;color:rgba(255,255,255,.74);margin-bottom:8px">PASO 1 · ASISTENCIA</div>
+                <div style="display:flex;gap:10px">
+                  <button style="flex:1;min-height:48px;background:#FFF7F1;border:0;color:var(--t-acc);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.2em;cursor:pointer">SÍ, ALLÁ ESTARÉ</button>
+                  <button style="flex:1;min-height:48px;background:none;border:1px solid rgba(255,255,255,.55);color:#FFF7F1;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.2em;cursor:pointer">NO PODRÉ</button>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.26em;color:rgba(255,255,255,.74);margin-bottom:8px">PASO 2 · CANTIDAD · 2 LUGARES</div>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <button style="width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.55);color:#FFF7F1;font-size:18px;cursor:pointer">–</button>
+                  <div style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:26px;color:#FFF7F1;border:1px solid rgba(255,255,255,.3)">2</div>
+                  <button style="width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.55);color:#FFF7F1;font-size:18px;cursor:pointer">+</button>
+                </div>
+                <div style="font-size:12px;color:rgba(255,247,241,.74);margin-top:8px">Menores de 10 años $34.000 · de 11 a 17 $56.000</div>
+              </div>
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.26em;color:rgba(255,255,255,.74);margin-bottom:8px">PASO 3 · RESTRICCIONES</div>
+                <div style="min-height:48px;border:1px solid rgba(255,255,255,.3);display:flex;align-items:center;padding:0 14px;font-size:14px;color:rgba(255,247,241,.64)">Vegetariano, sin TACC, alergias…</div>
+              </div>
+              <button onClick="{{ confirmar }}" style="min-height:52px;margin-top:4px;background:#FFF7F1;border:0;color:var(--t-acc);font-family:'DM Sans',sans-serif;font-size:11.5px;letter-spacing:.26em;cursor:pointer">CONFIRMAR MI LUGAR</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ confirmado }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;margin-top:26px;height:266px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;overflow:hidden">
+              <sc-for list="{{ petalos }}" as="p" hint-placeholder-count="10"><img src="{{ p.src }}" alt="" aria-hidden="true" style="{{ p.s }}"></sc-for>
+              <div style="position:relative;font-family:Parisienne,cursive;font-size:58px;color:#FFF7F1;line-height:1.1">¡Te espero!</div>
+              <div style="position:relative;font-size:14px;color:rgba(255,247,241,.9);text-align:center;line-height:1.6">2 lugares reservados · Mesa 4<br>21 de agosto, 21:00 h</div>
+              <button onClick="{{ resetRsvp }}" style="position:relative;min-height:44px;padding:0 18px;background:none;border:1px solid rgba(255,255,255,.45);color:#FFF7F1;font-size:10px;letter-spacing:.2em;cursor:pointer">VER EL FORMULARIO</button>
+            </div>
+            </sc-if>
+            <div aria-hidden="true" data-doodle="9" style="position:relative;display:flex;justify-content:center;margin-top:22px;opacity:.55"><svg width="90" height="12" viewBox="0 0 90 12"><path d="M0 6 L34 6 M56 6 L90 6" stroke="#FFF7F1" stroke-width="1"/><path d="M45 1 C41 4 41 8 45 11 C49 8 49 4 45 1 Z" fill="none" stroke="#FFF7F1" stroke-width="1"/></svg></div>
+            <div style="position:relative;margin-top:16px;text-align:center;font-size:9px;letter-spacing:.3em;color:rgba(255,255,255,.66)">07 / 09</div>
+          </section>
+
+          <section data-sec="regalos" data-screen-label="08 Regalos" style="position:relative;padding:58px 26px 44px;background:var(--t-bg);overflow:hidden">
+            <div aria-hidden="true" style="position:absolute;right:-14px;top:134px;font-family:'Playfair Display',serif;font-size:116px;line-height:1;color:var(--t-ink);opacity:.06;pointer-events:none">REGALO</div>
+            <div style="position:relative;display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">08 — EL REGALO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div style="position:relative;font-size:14px;line-height:1.7;color:var(--t-ink2);margin-bottom:18px">Tu presencia es el mejor regalo. Si querés hacerme uno igual, acá están los datos.</div>
+            <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+              <div data-reveal="b" style="position:relative;background:var(--t-alt);border:1px solid rgba(0,0,0,.07);padding:20px;margin-bottom:12px">
+                <div style="font-size:9.5px;letter-spacing:.26em;color:var(--t-acc)">{{ b.tit }}</div>
+                <div style="font-family:'Playfair Display',serif;font-size:22px;color:var(--t-ink);margin-top:6px">{{ b.titular }}</div>
+                <div style="font-size:13.5px;color:var(--t-ink2);margin-top:10px;line-height:1.7">{{ b.banco }}<br>CBU {{ b.cbu }}<br>Alias {{ b.alias }}</div>
+                <button style="min-height:44px;margin-top:12px;padding:0 16px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-size:10px;letter-spacing:.2em;cursor:pointer">COPIAR ALIAS</button>
+              </div>
+            </sc-for>
+            <img data-doodle="10" src="public/templates/acuarela-corona/guirnalda.webp" alt="" aria-hidden="true" style="position:relative;display:block;width:190px;margin:18px auto 0;pointer-events:none;transform:scaleY(-1)">
+            <div style="position:relative;margin-top:14px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">08 / 09</div>
+          </section>
+
+          <section data-sec="cancion" data-screen-label="09 Canción" style="position:relative;padding:58px 26px 44px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">09 — LA MÚSICA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="width:4px;height:4px;border-radius:50%;background:var(--t-acc2)"></span></div>
+            <div style="display:flex;gap:18px;align-items:center">
+              <div style="position:relative;width:126px;height:126px;flex:none">
+                <img src="public/templates/tinta-vinilo/vinilo.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:126px;height:126px;object-fit:contain;pointer-events:none;animation:{{ aVinilo }}">
+                <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;pointer-events:none"><span style="font-size:8px;letter-spacing:.18em;color:var(--t-ink2)">SUENA AHORA</span></div>
+              </div>
+              <div style="flex:1">
+                <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--t-ink);line-height:1.25">Sugerí una canción</div>
+                <div style="font-size:14px;color:var(--t-ink2);margin-top:6px;line-height:1.6">La que no puede faltar en la pista.</div>
+                <div style="display:flex;gap:3px;align-items:flex-end;height:26px;margin-top:12px"><sc-for list="{{ ondas }}" as="o" hint-placeholder-count="12"><span style="{{ o.s }}"></span></sc-for></div>
+              </div>
+            </div>
+            <div style="min-height:48px;margin-top:18px;border:1px solid rgba(0,0,0,.16);background:var(--t-bg);display:flex;align-items:center;padding:0 14px;font-size:14px;color:var(--t-ink2)">Artista y tema…</div>
+            <div style="display:flex;gap:10px;margin-top:10px">
+              <button style="flex:1;min-height:48px;background:var(--t-acc);border:0;color:#FFF7F1;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.22em;cursor:pointer">SUGERIR</button>
+              <button onClick="{{ togSon }}" style="min-height:48px;padding:0 18px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:.2em;cursor:pointer">{{ labelSon }}</button>
+            </div>
+            <div style="margin-top:28px;text-align:center;font-size:9px;letter-spacing:.3em;color:var(--t-ink2)">09 / 09</div>
+          </section>
+
+          <footer style="position:relative;padding:50px 26px 128px;background:var(--t-bg);text-align:center">
+            <div style="font-family:Parisienne,cursive;font-size:62px;color:var(--t-acc);line-height:1.15">Victoria</div>
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2);margin-top:12px">21 DE AGOSTO DE 2027 · SAN ISIDRO</div>
+            <div style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2);margin-top:20px">HECHO CON CARIÑO EN</div>
+            <a href="https://altainvitacion.com" style="font-size:11px;letter-spacing:.24em;color:var(--t-acc)">ALTAINVITACION.COM</a>
+          </footer>
+        </div>
+
+        <div ref="{{ setPill }}" style="position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:4px;padding:11px 14px;border-radius:14px;background-color:var(--t-bg);background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.30'/%3E%3C/svg%3E&quot;);box-shadow:-1.41px 1.41px 4px rgba(var(--t-som),.40),inset 1px 1px 0 rgba(255,255,255,.9),inset -1px -1px 0 rgba(var(--t-som),.3);transition:opacity .3s ease,transform .3s cubic-bezier(.22,.61,.36,1)">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+            <button onClick="{{ n.go }}" aria-label="{{ n.l }}" style="width:56px;height:48px;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:0;cursor:pointer;border-radius:10px">
+              <span aria-hidden="true" style="{{ n.ic }}"></span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.28em;color:#8f8085">ESTADO POST-EVENTO · SOLO ÁLBUM</div>
+      <div style="{{ marco }}">
+        <div data-scroll="1" style="position:absolute;inset:0;overflow-y:auto;background:var(--t-bg);padding:0 0 40px">
+          <img src="public/templates/acuarela-corona/guirnalda.webp" alt="" aria-hidden="true" style="display:block;width:220px;margin:40px auto 0;pointer-events:none">
+          <div style="padding:16px 26px 26px;text-align:center">
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">21 DE AGOSTO DE 2027</div>
+            <div style="font-family:Parisienne,cursive;font-size:52px;color:var(--t-ink);margin-top:8px;line-height:1.15">Gracias por venir</div>
+            <div style="font-size:14px;color:var(--t-ink2);margin-top:12px;line-height:1.7">La fiesta terminó, pero el álbum queda abierto. Subí tus fotos de esa noche.</div>
+            <button style="min-height:48px;margin-top:18px;padding:0 24px;background:var(--t-acc);border:0;color:#FFF7F1;font-size:11px;letter-spacing:.24em;cursor:pointer">SUBIR MIS FOTOS</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 20px">
+            <sc-for list="{{ grilla }}" as="g" hint-placeholder-count="8"><div style="{{ g.s }}"></div></sc-for>
+          </div>
+          <div style="text-align:center;margin-top:24px;font-size:10px;letter-spacing:.22em;color:var(--t-ink2)">galeriaSecundariaFotos · álbum compartido</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ esEsc }}" hint-placeholder-val="{{ false }}">
+  <div style="width:1440px;height:900px;position:relative;overflow:hidden;border:1px solid #3d323a;box-shadow:0 30px 70px rgba(0,0,0,.55);display:grid;grid-template-columns:440px 1fr;{{ vars }}">
+
+    <aside style="position:relative;background:var(--t-alt);padding:40px 38px;display:flex;flex-direction:column;overflow:hidden">
+      <div aria-hidden="true" style="position:absolute;inset:0;opacity:.6;background:repeating-linear-gradient(0deg,rgba(0,0,0,.016) 0 1px,transparent 1px 3px)"></div>
+      <div style="position:relative;width:364px;height:364px;margin:6px auto 0;display:flex;align-items:center;justify-content:center">
+        <div style="position:absolute;width:232px;height:232px;border-radius:50%;overflow:hidden;border:3px solid var(--t-bg);box-shadow:0 12px 30px rgba(59,42,42,.18)">
+          <div data-par="1" style="position:absolute;inset:-30px 0;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:9px;letter-spacing:.24em;color:#83706a">FOTO · portadaImagenFondoDesktop</span></div>
+          <div data-velo="1" aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(251,243,234,.7),rgba(251,243,234,.1))"></div>
+        </div>
+        <img src="public/templates/acuarela-corona/corona.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:364px;height:364px;object-fit:contain;pointer-events:none">
+      </div>
+      <div style="position:relative;text-align:center;margin-top:8px">
+        <div style="font-size:10px;letter-spacing:.34em;color:var(--t-acc)">MIS QUINCE AÑOS</div>
+        <div style="font-family:Parisienne,cursive;font-size:62px;color:var(--t-ink);line-height:1.15;margin-top:4px">Victoria</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:12px"><span style="width:34px;height:1px;background:var(--t-acc2)"></span><span style="font-size:11px;letter-spacing:.28em;color:var(--t-ink2)">21 · 08 · 2027</span><span style="width:34px;height:1px;background:var(--t-acc2)"></span></div>
+        <div style="font-size:11px;letter-spacing:.2em;color:var(--t-ink2);margin-top:8px">QUINTA LOS ÁLAMOS · SAN ISIDRO</div>
+      </div>
+      <div style="position:relative;margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+        <sc-for list="{{ navEsc }}" as="n" hint-placeholder-count="9">
+          <button onClick="{{ n.go }}" style="{{ n.s }}"><span style="font-family:'Playfair Display',serif;font-size:13px;color:var(--t-acc);width:20px;text-align:left">{{ n.num }}</span><span style="font-size:10.5px;letter-spacing:.2em">{{ n.l }}</span></button>
+        </sc-for>
+      </div>
+      <div style="position:relative;margin-top:auto;font-size:9px;letter-spacing:.24em;color:var(--t-ink2);line-height:1.8">ALTAINVITACION.COM<br>PAPELERÍA VIVA · ACUARELA &amp; CORONA</div>
+      <img src="public/templates/acuarela-corona/mariposa-2.webp" alt="" aria-hidden="true" style="position:absolute;right:26px;bottom:26px;width:64px;pointer-events:none;animation:acFlote 7s ease-in-out infinite">
+    </aside>
+
+    <div id="scD" data-scroll="1" style="position:relative;overflow-y:auto;background:var(--t-bg)">
+
+      <section data-sec="d-portada" data-screen-label="Escritorio 01 Portada" style="position:relative;min-height:600px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 90px;text-align:center;overflow:hidden">
+        <img src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;left:-30px;top:-30px;width:210px;pointer-events:none">
+        <img src="public/templates/acuarela-corona/ramo-esquina.webp" alt="" aria-hidden="true" style="position:absolute;right:-30px;bottom:-30px;width:210px;transform:scaleX(-1) scaleY(-1);pointer-events:none">
+        <div style="font-size:10px;letter-spacing:.34em;color:var(--t-acc)">01 — LA INVITACIÓN</div>
+        <div data-reveal="t" style="margin-top:20px">
+          <div style="font-family:Parisienne,cursive;font-size:124px;color:var(--t-ink);line-height:1.05">Victoria</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:20px"><span style="width:90px;height:1px;background:var(--t-acc2)"></span><span style="font-size:13px;letter-spacing:.34em;color:var(--t-ink2)">SÁBADO 21 DE AGOSTO DE 2027</span><span style="width:90px;height:1px;background:var(--t-acc2)"></span></div>
+        <div style="font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--t-ink2);margin-top:20px">Quinta Los Álamos, San Isidro · Buenos Aires</div>
+      </section>
+
+      <section data-sec="d-countdown" data-screen-label="Escritorio 02 Countdown" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:34px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">02 — LA CUENTA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">02 / 09</span></div>
+        <div style="display:flex;align-items:center;gap:56px">
+          <div style="position:relative;width:300px;height:300px;flex:none;display:flex;align-items:center;justify-content:center">
+            <img src="public/templates/acuarela-corona/corona.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:300px;height:300px;object-fit:contain;pointer-events:none;animation:acGira 60s linear infinite">
+            <div style="position:relative;text-align:center"><div style="font-family:'Playfair Display',serif;font-size:94px;line-height:1;color:var(--t-ink)">{{ cd.d }}</div><div style="font-size:10px;letter-spacing:.32em;color:var(--t-ink2);margin-top:4px">DÍAS</div></div>
+          </div>
+          <div style="flex:1;background:var(--t-bg);border:1px solid rgba(0,0,0,.07);box-shadow:0 10px 26px rgba(59,42,42,.07);display:grid;grid-template-columns:repeat(3,1fr)">
+            <sc-for list="{{ cd.cajasD }}" as="c" hint-placeholder-count="3">
+              <div data-reveal="b" style="{{ c.s }}">
+                <div style="font-family:'Playfair Display',serif;font-size:52px;line-height:1;color:var(--t-ink);font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:8px">{{ c.l }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="d-frase" data-screen-label="Escritorio 03 Frase" style="position:relative;padding:90px 140px;text-align:center">
+        <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc);margin-bottom:30px">03 — LA FRASE</div>
+        <div data-reveal="t" style="font-family:'Playfair Display',serif;font-style:italic;font-size:42px;line-height:1.4;color:var(--t-ink);text-wrap:pretty">Que la noche sea larga <span style="font-family:Parisienne,cursive;font-style:normal;font-size:66px;color:var(--t-acc)">&amp;</span> el recuerdo <span style="font-family:Parisienne,cursive;font-style:normal;font-size:62px;color:var(--t-acc)">eterno</span></div>
+        <img src="public/templates/acuarela-corona/guirnalda.webp" alt="" aria-hidden="true" style="display:block;width:300px;margin:34px auto 0;pointer-events:none">
+        <div style="margin-top:20px;font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">03 / 09</div>
+      </section>
+
+      <section data-sec="d-detalles" data-screen-label="Escritorio 04 Detalles" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">04 — LA FIESTA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">04 / 09</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div data-reveal="b" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.07);padding:30px">
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">SALÓN</div>
+            <div style="font-family:'Playfair Display',serif;font-size:34px;color:var(--t-ink);margin-top:10px">Quinta Los Álamos</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:8px;line-height:1.7">Av. Bernabé Márquez 1480, San Isidro<br>Sábado 21 de agosto · 21:00 h</div>
+          </div>
+          <div data-reveal="b" data-delay="90" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.07);padding:30px">
+            <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">DRESS CODE</div>
+            <div style="font-family:'Playfair Display',serif;font-size:34px;color:var(--t-ink);margin-top:10px">Elegante sport</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:8px;line-height:1.7">El rosa lo pongo yo</div>
+          </div>
+        </div>
+        <div style="margin-top:40px;font-size:10px;letter-spacing:.3em;color:var(--t-ink2);margin-bottom:22px">CRONOGRAMA</div>
+        <div style="position:relative">
+          <div aria-hidden="true" style="position:absolute;left:50%;top:8px;bottom:8px;width:1px;background:var(--t-acc2);opacity:.5"></div>
+          <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="5">
+            <div data-reveal="{{ c.lado }}" style="{{ c.fila }}">
+              <div style="{{ c.celda }}">
+                <div style="display:inline-block;font-size:12px;letter-spacing:.18em;color:var(--t-bg);background:var(--t-acc);padding:6px 16px;border-radius:999px">{{ c.hora }}</div>
+                <div style="font-family:'Playfair Display',serif;font-size:26px;color:var(--t-ink);margin-top:8px">{{ c.t }}</div>
+              </div>
+              <div style="width:60px;display:flex;align-items:center;justify-content:center;flex:none"><span style="width:38px;height:38px;border-radius:50%;background:var(--t-bg);border:1px solid var(--t-acc);display:flex;align-items:center;justify-content:center">{{ c.icono }}</span></div>
+              <div style="flex:1"></div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-album" data-screen-label="Escritorio 05 Álbum" style="position:relative;padding:76px 90px">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:38px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">05 — EL ÁLBUM</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">05 / 09</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+          <sc-for list="{{ album }}" as="f" hint-placeholder-count="4">
+            <div data-reveal="b" style="{{ f.cardD }}">
+              <div aria-hidden="true" style="position:absolute;left:50%;top:-12px;transform:translateX(-50%) rotate(-2deg);width:92px;height:24px;background:rgba(236,224,206,.82);box-shadow:0 2px 5px rgba(59,42,42,.1)"></div>
+              <div style="height:228px;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:10px"><span style="font-size:9px;letter-spacing:.2em;color:#83706a">{{ f.slot }}</span></div>
+              <div style="text-align:center;margin-top:12px;font-family:Parisienne,cursive;font-size:24px;color:var(--t-ink2)">{{ f.pie }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-mapa" data-screen-label="Escritorio 06 Mapa" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:32px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">06 — EL MAPA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">06 / 09</span></div>
+        <div data-reveal="b" style="position:relative;height:330px;border:1px solid rgba(0,0,0,.08);background:var(--t-bg);overflow:hidden">
+          <svg viewBox="0 0 1200 330" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M-10 80 L1210 50" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M-10 200 L1210 240" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M280 -10 L340 340" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M860 -10 L800 340" stroke="var(--t-ink2)" stroke-width="1" opacity=".26" fill="none"/><path d="M-10 285 C300 245 800 305 1210 255" stroke="var(--t-acc2)" stroke-width="2" opacity=".45" fill="none"/></svg>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center"><svg width="34" height="43" viewBox="0 0 30 38" aria-hidden="true"><path d="M15 37 C15 37 28 22 28 14 A13 13 0 1 0 2 14 C2 22 15 37 15 37 Z" fill="var(--t-acc)"/><circle cx="15" cy="14" r="5" fill="var(--t-bg)"/></svg><div style="font-size:11px;letter-spacing:.24em;color:var(--t-ink);margin-top:8px">QUINTA LOS ÁLAMOS</div></div>
+        </div>
+      </section>
+
+      <section data-sec="d-rsvp" data-screen-label="Escritorio 07 RSVP" style="position:relative;padding:76px 90px;background:var(--t-acc);overflow:hidden">
+        <div aria-hidden="true" style="position:absolute;left:40px;top:60px;font-family:'Playfair Display',serif;font-size:220px;line-height:1;color:#fff;opacity:.06;pointer-events:none">RSVP</div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px;margin-bottom:32px"><span style="font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.82)">07 — CONFIRMACIÓN</span><span style="flex:1;height:1px;background:rgba(255,255,255,.42)"></span><span style="font-size:10px;letter-spacing:.3em;color:rgba(255,255,255,.72)">07 / 09</span></div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 380px;gap:60px;align-items:center">
+          <div>
+            <div style="font-family:'Playfair Display',serif;font-size:56px;color:#FFF7F1;line-height:1.1">¿Venís a bailar?</div>
+            <div style="font-size:15px;color:rgba(255,247,241,.88);margin-top:12px;line-height:1.7">Confirmá antes del 10 de julio de 2027. Tenés 2 lugares reservados a tu nombre.</div>
+            <div style="display:flex;gap:12px;margin-top:26px">
+              <button style="min-height:52px;padding:0 30px;background:#FFF7F1;border:0;color:var(--t-acc);font-family:'DM Sans',sans-serif;font-size:11.5px;letter-spacing:.24em;cursor:pointer">SÍ, ALLÁ ESTARÉ</button>
+              <button style="min-height:52px;padding:0 30px;background:none;border:1px solid rgba(255,255,255,.55);color:#FFF7F1;font-family:'DM Sans',sans-serif;font-size:11.5px;letter-spacing:.24em;cursor:pointer">NO PODRÉ</button>
+            </div>
+            <div style="font-size:13px;color:rgba(255,247,241,.74);margin-top:20px">Menores de 10 años $34.000 · de 11 a 17 $56.000 · restricciones alimentarias en el paso 3</div>
+          </div>
+          <div style="position:relative;height:280px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+            <sc-for list="{{ petalosD }}" as="p" hint-placeholder-count="10"><img src="{{ p.src }}" alt="" aria-hidden="true" style="{{ p.s }}"></sc-for>
+            <div style="position:relative;text-align:center"><div style="font-family:Parisienne,cursive;font-size:76px;color:#FFF7F1;line-height:1.1">¡Te espero!</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="d-regalos" data-screen-label="Escritorio 08 Regalos" style="position:relative;padding:76px 90px;overflow:hidden">
+        <div aria-hidden="true" style="position:absolute;right:40px;top:110px;font-family:'Playfair Display',serif;font-size:200px;line-height:1;color:var(--t-ink);opacity:.06;pointer-events:none">REGALO</div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">08 — EL REGALO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">08 / 09</span></div>
+        <div style="position:relative;font-size:15px;line-height:1.7;color:var(--t-ink2);max-width:620px;margin-bottom:26px">Tu presencia es el mejor regalo. Si querés hacerme uno igual, acá están los datos.</div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+            <div data-reveal="b" style="background:var(--t-alt);border:1px solid rgba(0,0,0,.07);padding:28px">
+              <div style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">{{ b.tit }}</div>
+              <div style="font-family:'Playfair Display',serif;font-size:28px;color:var(--t-ink);margin-top:8px">{{ b.titular }}</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:12px;line-height:1.8">{{ b.banco }}<br>CBU {{ b.cbu }}<br>Alias {{ b.alias }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-cancion" data-screen-label="Escritorio 09 Canción" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">09 — LA MÚSICA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.5"></span><span style="font-size:10px;letter-spacing:.3em;color:var(--t-ink2)">09 / 09</span></div>
+        <div style="display:flex;gap:56px;align-items:center">
+          <div style="position:relative;width:210px;height:210px;flex:none">
+            <img src="public/templates/tinta-vinilo/vinilo.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:210px;height:210px;object-fit:contain;pointer-events:none;animation:{{ aVinilo }}">
+            <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;pointer-events:none"><span style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2)">SUENA AHORA</span></div>
+          </div>
+          <div style="flex:1;max-width:560px">
+            <div style="font-family:'Playfair Display',serif;font-size:40px;color:var(--t-ink);line-height:1.2">Sugerí una canción</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:10px;line-height:1.7">La que no puede faltar en la pista.</div>
+            <div style="display:flex;gap:4px;align-items:flex-end;height:40px;margin-top:18px"><sc-for list="{{ ondasD }}" as="o" hint-placeholder-count="12"><span style="{{ o.s }}"></span></sc-for></div>
+            <div style="display:flex;gap:12px;margin-top:20px">
+              <div style="flex:1;min-height:52px;border:1px solid rgba(0,0,0,.16);background:var(--t-bg);display:flex;align-items:center;padding:0 16px;font-size:15px;color:var(--t-ink2)">Artista y tema…</div>
+              <button style="min-height:52px;padding:0 30px;background:var(--t-acc);border:0;color:#FFF7F1;font-size:11.5px;letter-spacing:.22em;cursor:pointer">SUGERIR</button>
+              <button onClick="{{ togSon }}" style="min-height:52px;padding:0 22px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-size:11.5px;letter-spacing:.2em;cursor:pointer">{{ labelSon }}</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer style="position:relative;padding:70px 90px 86px;text-align:center">
+        <img src="public/templates/acuarela-corona/guirnalda.webp" alt="" aria-hidden="true" style="width:260px;pointer-events:none">
+        <div style="font-family:Parisienne,cursive;font-size:76px;color:var(--t-acc);line-height:1.1;margin-top:6px">Victoria</div>
+        <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:20px">HECHO CON CARIÑO EN</div>
+        <a href="https://altainvitacion.com" style="font-size:12px;letter-spacing:.26em;color:var(--t-acc)">ALTAINVITACION.COM</a>
+      </footer>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="margin-top:20px;border-top:1px solid #362c33;padding-top:30px;display:flex;flex-direction:column;gap:28px">
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#C27C86;margin-bottom:14px">HANDOFF · PALETA BASE + 4 VARIANTES</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+        <sc-for list="{{ paletas }}" as="p" hint-placeholder-count="5">
+          <div style="border:1px solid #362c33;padding:14px;background:#201a1f">
+            <div style="font-size:12px;color:#EADFDA;letter-spacing:.06em;margin-bottom:10px">{{ p.n }}</div>
+            <div style="display:flex;gap:5px;margin-bottom:10px"><span style="{{ p.sw1 }}"></span><span style="{{ p.sw2 }}"></span><span style="{{ p.sw3 }}"></span><span style="{{ p.sw4 }}"></span><span style="{{ p.sw5 }}"></span><span style="{{ p.sw6 }}"></span></div>
+            <div style="font-size:10px;line-height:1.75;color:#928289;font-variant-numeric:tabular-nums">fondo {{ p.bg }} · alterno {{ p.alt }}<br>tinta {{ p.ink }} · tinta suave {{ p.ink2 }}<br>acento {{ p.acc }} · secundario {{ p.acc2 }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#C27C86;margin-bottom:14px">HANDOFF · TRÍADA TIPOGRÁFICA</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;font-size:11.5px;color:#9E8D89;line-height:1.7">
+        <div style="border:1px solid #362c33;padding:14px;background:#201a1f"><div style="font-family:'Playfair Display',serif;font-size:28px;color:#F7EEE6">Playfair Display</div>Display · 400/500 · números del countdown, títulos de sección, frase en itálica</div>
+        <div style="border:1px solid #362c33;padding:14px;background:#201a1f"><div style="font-family:Parisienne,cursive;font-size:32px;color:#F7EEE6">Parisienne</div>Solo acentos: el nombre de la quinceañera, el nombre del invitado, el «&amp;» y los pies de las polaroids. Nunca en datos.</div>
+        <div style="border:1px solid #362c33;padding:14px;background:#201a1f"><div style="font-size:22px;color:#F7EEE6;letter-spacing:.25em">DM SANS</div>Datos y kickers · mayúsculas tracked 0,25 em · cuerpos nunca por debajo de 14 px</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#C27C86;margin-bottom:14px">HANDOFF · ANIMACIONES (nombre · duración · easing · delay/stagger)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px">
+        <sc-for list="{{ anims }}" as="a" hint-placeholder-count="10">
+          <div style="border:1px solid #362c33;padding:12px 14px;background:#201a1f">
+            <div style="font-size:11.5px;color:#EADFDA;letter-spacing:.05em">{{ a.n }}</div>
+            <div style="font-size:10.5px;color:#928289;line-height:1.75;margin-top:5px">{{ a.d }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#C27C86;margin-bottom:14px">HANDOFF · 10 SLOTS DE DOODLE Y PIEZAS PICTÓRICAS</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+        <sc-for list="{{ slots }}" as="s" hint-placeholder-count="10">
+          <div style="border:1px solid #362c33;padding:11px 13px;background:#201a1f;font-size:10.5px;color:#928289;line-height:1.7"><span style="color:#EADFDA">{{ s.n }}</span> · {{ s.d }}</div>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px;font-size:10.5px;color:#928289;line-height:1.8">Piezas pictóricas usadas (8 de 8 de la familia, 437 KB): <span style="color:#C27C86">corona.webp</span> countdown y columna fija · <span style="color:#C27C86">ramo-esquina.webp</span> esquinas de portada · <span style="color:#C27C86">guirnalda.webp</span> divisores · <span style="color:#C27C86">mariposa-1/2.webp</span> piezas flotantes · <span style="color:#C27C86">petalo-1/2/3.webp</span> lluvia del RSVP. Prestada: <span style="color:#C27C86">tinta-vinilo/vinilo.webp</span>. Todo el resto es SVG inline.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  state = { view:'celular', vi:0, a:0, b:0, rsvp:0, faq:-1, quiz:-1, son:false,
+            t:{d:'—',h:'00',m:'00',s:'00'} };
+
+  paletas = [
+    {n:'Rosa antiguo (base)', bg:'#FBF3EA', alt:'#F3E6DC', ink:'#3B2A2A', ink2:'#7A6058', acc:'#C27C86', acc2:'#9A7F5E'},
+    {n:'Lavanda',             bg:'#F8F4FA', alt:'#EDE6F2', ink:'#2E2838', ink2:'#6B6278', acc:'#8E7CC3', acc2:'#8A7B63'},
+    {n:'Durazno',             bg:'#FDF4EB', alt:'#F6E5D4', ink:'#3A2A20', ink2:'#7E6551', acc:'#E39A6B', acc2:'#9A7B4E'},
+    {n:'Salvia',              bg:'#F6F5EE', alt:'#E7E9DD', ink:'#27302A', ink2:'#5F6B60', acc:'#7C9A7E', acc2:'#95835B'},
+    {n:'Azul noche',          bg:'#F4F5F7', alt:'#E3E6EC', ink:'#1C2331', ink2:'#5A6374', acc:'#22304A', acc2:'#8D7C55'}
+  ];
+
+  componentDidMount(){ this.tick(); this.iv=setInterval(()=>this.tick(),1000); this.armar(); this.loop(); }
+  componentDidUpdate(){ this.armar(); }
+  componentWillUnmount(){ clearInterval(this.iv); clearTimeout(this.fb); cancelAnimationFrame(this.rid); (this.ios||[]).forEach(o=>o.disconnect()); }
+
+  setRoot = el => { this.root = el; };
+  setPill = el => { this.pill = el; };
+
+  hex(h){ const n = parseInt(h.slice(1),16); return [n>>16&255, n>>8&255, n&255]; }
+  mez(h, f){
+    const [r,g,b] = this.hex(h), k = 1 + f;
+    const c = x => Math.max(0, Math.min(255, Math.round(x*k)));
+    return '#' + [c(r),c(g),c(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+
+  vigilarPill(){
+    const sc = this.root && this.root.querySelector('#scC');
+    if(!sc || sc.dataset.pill) return;
+    sc.dataset.pill = '1';
+    sc.addEventListener('scroll', ()=>{
+      if(!this.pill) return;
+      this.pill.style.transition = 'opacity .3s ease,transform .3s cubic-bezier(.22,.61,.36,1)';
+      this.pill.style.opacity = '0';
+      this.pill.style.transform = 'translateX(-50%) translateY(26px)';
+      clearTimeout(this.pt);
+      this.pt = setTimeout(()=>{
+        if(!this.pill) return;
+        this.pill.style.transition = 'opacity .35s ease,transform .35s cubic-bezier(.22,.61,.36,1)';
+        this.pill.style.opacity = '1';
+        this.pill.style.transform = 'translateX(-50%) translateY(0)';
+      }, 370);
+    }, { passive:true });
+  }
+
+  tick(){
+    const dif = new Date('2027-08-21T21:00:00-03:00') - new Date();
+    const s = Math.max(0, Math.floor(dif/1000)), p = n => String(n).padStart(2,'0');
+    this.setState({ t:{ d:String(Math.floor(s/86400)), h:p(Math.floor(s/3600)%24), m:p(Math.floor(s/60)%60), s:p(s%60) } });
+  }
+
+  armar(){
+    if(!this.root) return;
+    this.vigilarPill();
+    this.ios = this.ios || [];
+    const nuevos = Array.prototype.slice.call(this.root.querySelectorAll('[data-reveal]')).filter(e=>!e.dataset.armed);
+    nuevos.forEach(el=>{
+      el.dataset.armed='1';
+      const k = el.dataset.reveal;
+      const tr = k==='t' ? 'translateY(60px)' : k==='izq' ? 'translateX(-60px)' : k==='der' ? 'translateX(60px)' : 'translateY(16px)';
+      const dur = k==='t' ? '.7s' : k==='b' ? '.5s' : '.6s';
+      el.style.opacity='0'; el.style.transform=tr; el.style.willChange='transform,opacity';
+      el.style.transition='opacity '+dur+' cubic-bezier(.16,1,.3,1), transform '+dur+' cubic-bezier(.16,1,.3,1)';
+    });
+    if(nuevos.length){
+      const grupos = new Map();
+      nuevos.forEach(el=>{
+        const sc = el.closest('[data-scroll]') || null;
+        if(!grupos.has(sc)) grupos.set(sc, []);
+        grupos.get(sc).push(el);
+      });
+      grupos.forEach((lista, sc)=>{
+        const io = new IntersectionObserver(es=>{
+          es.forEach(e=>{
+            if(!e.isIntersecting) return;
+            const d = parseInt(e.target.dataset.delay||'0',10);
+            setTimeout(()=>{ e.target.style.opacity='1'; e.target.style.transform='none'; }, d);
+            io.unobserve(e.target);
+          });
+        }, { root: sc, threshold:.1 });
+        lista.forEach(el=>io.observe(el));
+        this.ios.push(io);
+      });
+    }
+    clearTimeout(this.fb);
+    this.fb = setTimeout(()=>{
+      if(!this.root) return;
+      this.root.querySelectorAll('[data-reveal]').forEach(el=>{
+        if(el.style.opacity !== '1'){
+          const r = el.getBoundingClientRect();
+          if(r.top < window.innerHeight + 200 && r.bottom > -200){ el.style.opacity='1'; el.style.transform='none'; }
+        }
+      });
+    }, 1200);
+  }
+
+  loop(){
+    const paso = ()=>{
+      if(this.root){
+        this.frame = (this.frame||0)+1;
+        if(!this.mov || this.frame % 40 === 0){
+          this.pars = Array.prototype.slice.call(this.root.querySelectorAll('[data-par]'));
+          this.velos = Array.prototype.slice.call(this.root.querySelectorAll('[data-velo]'));
+          this.mov = true;
+        }
+        this.pars.forEach(el=>{
+          const sc = el.closest('[data-scroll]');
+          const y = sc ? sc.scrollTop : 0;
+          el.style.transform = 'translateY('+(y*0.2).toFixed(1)+'px)';
+        });
+        this.velos.forEach(el=>{
+          const sc = el.closest('[data-scroll]');
+          const y = sc ? sc.scrollTop : 0;
+          el.style.opacity = Math.max(0.12, 1 - y/420).toFixed(3);
+        });
+      }
+      this.rid = requestAnimationFrame(paso);
+    };
+    this.rid = requestAnimationFrame(paso);
+  }
+
+  abrir(k){ if(this.state[k]) return; this.setState({[k]:1}); setTimeout(()=>this.setState({[k]:2}), 1400); }
+  gesto(k){
+    const ab = this.state[k] === 1;
+    return {
+      aHoja:  ab ? 'acHoja 1s cubic-bezier(.7,0,.3,1) forwards' : 'none',
+      aFlor1: ab ? 'acFlor .8s cubic-bezier(.16,1,.3,1) .35s both' : 'none',
+      aFlor2: ab ? 'acFlor .8s cubic-bezier(.16,1,.3,1) .5s both' : 'none',
+      aOv:    ab ? 'acVelo .3s ease 1s forwards' : (this.state[k]===2 ? 'acVelo .01s linear forwards' : 'none')
+    };
+  }
+
+  ir(id, sec){
+    const sc = this.root && this.root.querySelector('#'+id);
+    const el = sc && sc.querySelector('[data-sec="'+sec+'"]');
+    if(sc && el) sc.scrollTo({ top: el.offsetTop, behavior:'smooth' });
+  }
+
+  icono(tipo, col){
+    const P = (d, extra) => React.createElement('path', Object.assign({ d, fill:'none', stroke:col, strokeWidth:1, strokeLinecap:'round' }, extra||{}));
+    const hijos = {
+      copa:   [P('M6 4 H14 L12.4 10.5 H7.6 Z'), P('M10 10.5 V15'), P('M6.5 16 H13.5')],
+      corona: [P('M4 14 L5.2 6 L8 10 L10 5 L12 10 L14.8 6 L16 14 Z'), P('M4 16 H16')],
+      torta:  [P('M4.5 16 V10.5 H15.5 V16 Z'), P('M6 10.5 V8.5 H14 V10.5'), P('M10 8.5 V5'), P('M10 5 C8.8 3.6 11.2 3.2 10 1.8')],
+      notas:  [P('M7.5 14.5 A2 2 0 1 0 7.5 14.4'), P('M9.5 14.5 V4.5 L15 3 V12.5'), P('M13 12.5 A2 2 0 1 0 13 12.4')],
+      brindis:[P('M3.5 4 H8.5 L7 9.5 L5 9.5 Z'), P('M11.5 4 H16.5 L15 9.5 L13 9.5 Z'), P('M6 9.5 V15'), P('M14 9.5 V15'), P('M4 16 H8'), P('M12 16 H16')]
+    }[tipo] || [];
+    return React.createElement('svg', { width:20, height:20, viewBox:'0 0 20 20', 'aria-hidden':'true' }, hijos);
+  }
+
+  renderVals(){
+    const v = this.paletas[this.state.vi], t = this.state.t;
+    const som = this.hex(v.ink2).join(',');
+    const vars = '--t-bg:'+v.bg+';--t-alt:'+v.alt+';--t-ink:'+v.ink+';--t-ink2:'+v.ink2+';--t-acc:'+v.acc+';--t-acc2:'+v.acc2+
+                 ';--t-som:'+som+';--t-emb:'+this.mez(v.bg,-0.13)+';';
+    const ico = p => { const u = 'public/templates/iconos-linea/'+p+'.webp'; return 'width:30px;height:30px;display:block;background:'+v.ink2+';-webkit-mask:url('+u+') no-repeat center / contain;mask:url('+u+') no-repeat center / contain'; };
+    const iconos = ['tarjeta','reloj','torta','polaroids','sobre'];
+    const tog = on => 'min-height:40px;padding:0 16px;border-radius:999px;border:0;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:10.5px;letter-spacing:.18em;background:'+(on?'#F7EEE6':'transparent')+';color:'+(on?'#2a1f26':'#9E8D89');
+
+    const cron = [
+      {hora:'21:00', t:'Recepción', ic:'copa'}, {hora:'21:45', t:'Entrada de Victoria', ic:'corona'},
+      {hora:'22:30', t:'Cena', ic:'brindis'}, {hora:'00:30', t:'Vals y torta', ic:'torta'}, {hora:'01:00', t:'Fiesta', ic:'notas'}
+    ].map((c,i)=>{
+      const izq = i % 2 === 0;
+      return {
+        hora:c.hora, t:c.t, icono: this.icono(c.ic, v.acc),
+        lado: izq ? 'izq' : 'der',
+        fila: 'display:flex;align-items:center;margin-bottom:16px;'+(izq ? '' : 'flex-direction:row-reverse'),
+        celda: 'flex:1;'+(izq ? 'text-align:right' : 'text-align:left')
+      };
+    });
+
+    const faqTextos = [
+      'La quinta tiene estacionamiento propio sin costo, con vigilancia toda la noche.',
+      'Tarifa especial en Hotel Del Casco y en Posada de San Isidro mencionando «Quince de Victoria».',
+      'Tren de la Línea Mitre hasta la estación San Isidro y ocho cuadras, o acceso Norte salida Márquez.',
+      'Es una fiesta de grandes y de amigos de Victoria; los más chiquitos tienen su rincón hasta la una.'
+    ];
+    const faqs = ['¿Dónde estaciono?','¿Dónde me alojo?','¿Cómo llego?','¿Podemos llevar a los chicos?'].map((q,i)=>{
+      const ab = this.state.faq === i;
+      return {
+        q, a: faqTextos[i],
+        tog: () => this.setState({ faq: ab ? -1 : i }),
+        mas: 'font-size:22px;line-height:1;color:'+v.acc+';transition:transform .3s cubic-bezier(.16,1,.3,1);transform:rotate('+(ab?'45deg':'0deg')+')',
+        panel: 'overflow:hidden;transform-origin:top;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .3s ease;transform:scaleY('+(ab?1:0)+');opacity:'+(ab?1:0)+';height:'+(ab?'auto':'0')
+      };
+    });
+
+    const quizOps = ['Un clásico de los 2000','Cumbia del under','Lo que ponga el DJ'].map((txt,i)=>{
+      const sel = this.state.quiz === i, ok = i === 0;
+      return {
+        t: txt, pick: () => this.setState({ quiz: i }),
+        s: 'min-height:48px;text-align:left;padding:0 16px;cursor:pointer;font-family:\'DM Sans\',sans-serif;font-size:14px;background:'+(sel&&ok?v.acc:'transparent')+';color:'+(sel&&ok?'#FFF7F1':v.ink)+';border:1px solid '+(sel?v.acc:'rgba(0,0,0,.16)')
+      };
+    });
+
+    const qrBits = [1,0,1,1,0,0,1,0,1, 0,1,1,0,1,1,0,1,0, 1,1,0,0,1,1,0,1,0, 0,0,1,1,0,1,0,1,1, 1,0,1,0,0,1,1,0,1, 0,1,1,0,1,0,0,1,1, 1,0,0,1,0,1,1,0,1, 0,1,1,0,1,1,0,1,0, 1,1,0,1,0,1,1,0,1];
+    const qr = qrBits.map((b,i)=>{
+      const f = Math.floor(i/9), c = i%9;
+      const ojo = (f<3&&c<3)||(f<3&&c>5)||(f>5&&c<3);
+      const on = ojo ? !(f%3===1 && c%3===1) : !!b;
+      return { s:'background:'+(on ? v.ink : 'transparent') };
+    });
+
+    const barras = (h, col) => [7,13,5,16,9,18,6,14,11,4,15,8].map((n,i)=>({
+      s:'flex:1;height:'+h+'px;background:'+col+';transform-origin:bottom;transform:scaleY('+(n/18)+');'+(this.state.son ? 'animation:acOnda '+(.7+i*0.06).toFixed(2)+'s ease-in-out '+(i*0.05).toFixed(2)+'s infinite;' : '')
+    }));
+
+    const lluvia = (n, ancho) => Array.from({length:n}, (_,i)=>({
+      src: 'public/templates/acuarela-corona/petalo-'+(i%3+1)+'.webp',
+      s: 'position:absolute;top:-40px;left:'+Math.round(6 + (i*(88/n)) + (i%3)*4)+'%;width:'+(ancho + (i%3)*7)+'px;pointer-events:none;animation:acPetalo '+(2.6+(i%4)*0.45).toFixed(2)+'s cubic-bezier(.4,0,.6,1) '+(i*0.13).toFixed(2)+'s infinite'
+    }));
+
+    const cajaCd = (i, pad, tam) => 'padding:'+pad+';text-align:center;'+(i ? 'border-left:1px solid rgba(0,0,0,.07);' : '')+'font-size:'+tam;
+    const navSec = [['01','PORTADA','portada'],['02','FECHA','countdown'],['04','FIESTA','detalles'],['05','ÁLBUM','album'],['07','RSVP','rsvp']];
+    const navEscSec = [['01','PORTADA','d-portada'],['02','LA FECHA','d-countdown'],['03','LA FRASE','d-frase'],['04','LA FIESTA','d-detalles'],['05','EL ÁLBUM','d-album'],['06','EL MAPA','d-mapa'],['07','CONFIRMAR','d-rsvp'],['08','EL REGALO','d-regalos'],['09','LA MÚSICA','d-cancion']];
+    const pies = ['a los cinco','con la abuela','verano en Mar del Plata','mis amigas'];
+    const rot = ['-2.4deg','1.8deg','-1.2deg','2.2deg'];
+
+    return {
+      setRoot: this.setRoot, setPill: this.setPill, vars, v,
+      esCel: this.state.view === 'celular',
+      esEsc: this.state.view === 'escritorio',
+      vNombre: v.n,
+      verCel: () => this.setState({view:'celular'}),
+      verEsc: () => this.setState({view:'escritorio'}),
+      btnCel: tog(this.state.view === 'celular'),
+      btnEsc: tog(this.state.view === 'escritorio'),
+      marco: 'width:430px;height:932px;border-radius:44px;overflow:hidden;position:relative;border:1px solid #3d323a;box-shadow:0 30px 70px rgba(0,0,0,.55);background:'+v.bg+';'+vars,
+      btnAbrir: 'position:relative;margin-top:30px;min-height:48px;padding:0 34px;border:1px solid '+v.acc+';background:'+v.acc+';color:#FFF7F1;font-family:\'DM Sans\',sans-serif;font-size:11.5px;letter-spacing:.26em;cursor:pointer',
+      btnGhost: 'align-self:flex-start;min-height:34px;padding:0 14px;border:1px solid #3d323a;background:#201a1f;color:#9E8D89;font-size:10px;letter-spacing:.2em;cursor:pointer;border-radius:999px',
+
+      paletas: this.paletas.map((p,i)=>Object.assign({}, p, {
+        set: () => this.setState({vi:i}),
+        chip: 'width:26px;height:26px;border-radius:50%;cursor:pointer;background:'+p.acc+';border:2px solid '+(this.state.vi===i ? '#F7EEE6' : 'transparent')+';box-shadow:0 0 0 1px #3d323a',
+        sw1:'flex:1;height:26px;background:'+p.bg, sw2:'flex:1;height:26px;background:'+p.alt, sw3:'flex:1;height:26px;background:'+p.ink,
+        sw4:'flex:1;height:26px;background:'+p.ink2, sw5:'flex:1;height:26px;background:'+p.acc, sw6:'flex:1;height:26px;background:'+p.acc2
+      })),
+
+      sA: this.gesto('a'), sB: this.gesto('b'),
+      abrirA: () => this.abrir('a'), abrirB: () => this.abrir('b'),
+      resetA: () => this.setState({a:0}), resetB: () => this.setState({b:0}),
+
+      cd: {
+        d: t.d,
+        cajas:  [{n:t.h,l:'HORAS'},{n:t.m,l:'MINUTOS'},{n:t.s,l:'SEGUNDOS'}].map((c,i)=>Object.assign({}, c, { s: cajaCd(i,'16px 6px 14px','12px') })),
+        cajasD: [{n:t.h,l:'HORAS'},{n:t.m,l:'MINUTOS'},{n:t.s,l:'SEGUNDOS'}].map((c,i)=>Object.assign({}, c, { s: cajaCd(i,'34px 12px 30px','12px') }))
+      },
+      cronograma: cron,
+      album: pies.map((pie,i)=>({
+        slot:'FOTO · galeriaPrincipalFotos['+(i+1)+']', pie,
+        card:'position:relative;flex:none;width:232px;background:#fff;padding:12px 12px 40px;box-shadow:0 12px 26px rgba(59,42,42,.14);scroll-snap-align:center;transform:rotate('+rot[i]+')',
+        cardD:'position:relative;background:#fff;padding:12px 12px 38px;box-shadow:0 14px 30px rgba(59,42,42,.14);transform:rotate('+rot[i]+')'
+      })),
+      qr, faqs, quiz: quizOps,
+      grilla: [0,1,2,3,4,5,6,7].map(i=>({ s:'height:'+(i%3===0?140:112)+'px;background:repeating-linear-gradient(135deg,#E3D5CC 0 7px,#DACAC0 7px 14px)' })),
+      bancos: [
+        {tit:'REGALO · CUENTA PRINCIPAL', titular:'Victoria Aguirre', banco:'Banco Santander · Caja de ahorro en pesos', cbu:'0720 4881 8800 0032 1147 05', alias:'victoria.quince'},
+        {tit:'VIAJE DE EGRESADOS · SEGUNDA CUENTA', titular:'Mariana Sosa', banco:'Mercado Pago · CVU', cbu:'0000 0031 0000 4471 9920 88', alias:'viaje.vicky.27'}
+      ],
+      ondas: barras(26, v.acc), ondasD: barras(40, v.acc),
+      aVinilo: this.state.son ? 'acGira 8s linear infinite' : 'none',
+      togSon: () => this.setState({son: !this.state.son}),
+      labelSon: this.state.son ? 'PAUSAR MÚSICA' : 'ESCUCHAR',
+      petalos: lluvia(10, 26), petalosD: lluvia(12, 34),
+
+      noConfirmado: !this.state.rsvp,
+      confirmado: !!this.state.rsvp,
+      confirmar: () => this.setState({rsvp:1}),
+      resetRsvp: () => this.setState({rsvp:0}),
+
+      irMapa: () => this.ir('scC','mapa'),
+      nav: navSec.map(([num,l,sec],i)=>({ num, l, ic: ico(iconos[i]), go: () => this.ir('scC', sec) })),
+      navEsc: navEscSec.map(([num,l,sec])=>({
+        num, l, go: () => this.ir('scD', sec),
+        s: 'display:flex;align-items:center;gap:10px;min-height:38px;background:none;border:0;border-bottom:1px solid rgba(0,0,0,.07);cursor:pointer;padding:0;text-align:left;color:'+v.ink2
+      })),
+
+      anims: [
+        {n:'apertura · hoja de papel vegetal', d:'acHoja · 1 s · cubic-bezier(.7,0,.3,1) · translateY(0 → −110%), como sacada de una caja'},
+        {n:'apertura · flores que entran girando', d:'acFlor · 0,8 s · cubic-bezier(.16,1,.3,1) · rotate(−12° → 0) + scale(.94 → 1) · delays 0,35 s y 0,5 s'},
+        {n:'apertura · velo del splash', d:'acVelo · 0,3 s · ease · delay 1 s. Total del gesto: 1,4 s'},
+        {n:'reveal de títulos', d:'translateY(60px → 0) + opacity · 0,7 s · cubic-bezier(.16,1,.3,1) · IntersectionObserver threshold 0,1'},
+        {n:'reveal de bloques', d:'translateY(16px → 0) + opacity · 0,5 s · mismo easing · stagger 90 ms'},
+        {n:'cronograma', d:'translateX(±60px → 0) + opacity · 0,6 s · alterna lado; ícono de línea fina en el eje (copa, corona, brindis, torta, notas)'},
+        {n:'parallax de la foto', d:'translateY(scrollTop × 0,2) en requestAnimationFrame · factor visual 0,8'},
+        {n:'gesto de luz · velo de acuarela', d:'opacity = clamp(1 − scrollTop/420, 0,12) sobre un mask-image lineal: el velo se aclara al bajar'},
+        {n:'corona del countdown', d:'acGira · 60 s · linear · infinite · una vuelta por minuto, con los días en serif en el centro'},
+        {n:'lluvia de pétalos (RSVP)', d:'acPetalo · 2,6–4,0 s · cubic-bezier(.4,0,.6,1) · 10 pétalos en celular y 12 en escritorio · stagger 130 ms · translateY(−40 → 300 px) + rotate 220°'},
+        {n:'mariposas flotantes', d:'acFlote · 6–7,5 s · ease-in-out · infinite · translateY 0 → −8 px con rotate 4°'},
+        {n:'hoja que se desdobla (FAQ)', d:'scaleY(0 → 1) desde arriba · 0,4 s · cubic-bezier(.16,1,.3,1); el «+» rota 45°'},
+        {n:'vinilo y onda de audio', d:'acGira 8 s linear infinite · 12 barras con acOnda 0,70–1,36 s ease-in-out, stagger 50 ms'}
+      ],
+      slots: [
+        {n:'01 portada sup. izq.', d:'ramo-esquina.webp · peonías en acuarela sobre el borde de la foto'},
+        {n:'02 portada inf. der.', d:'ramo-esquina.webp espejado 6° · sale del marco hacia el borde rasgado'},
+        {n:'03 marco de foto · esquina A', d:'SVG · filete fino blanco a 18 px del borde'},
+        {n:'04 marco de foto · esquina B', d:'SVG · segundo filete a 25 px, más tenue'},
+        {n:'05 pieza que sale del marco', d:'mariposa-1.webp flotando sobre la foto de portada'},
+        {n:'06 divisor de countdown', d:'guirnalda.webp horizontal bajo las tarjetas de hh:mm:ss'},
+        {n:'07 ícono de la frase', d:'mariposa-2.webp de frente, alas abiertas'},
+        {n:'08 ícono del mapa', d:'SVG · rosa de los vientos'},
+        {n:'09 ícono de RSVP', d:'SVG · filete con pétalo central sobre el bloque de acento'},
+        {n:'10 remate del regalo', d:'guirnalda.webp invertida bajo las cuentas bancarias'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

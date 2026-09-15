@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=Archivo:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#101213;-webkit-font-smoothing:antialiased}
+  a{color:#1F4E79;text-decoration:none}
+  a:hover{color:#5A6069}
+  ::-webkit-scrollbar{width:0;height:0}
+  @keyframes mbSello{0%{transform:scale(1.18);opacity:0}45%{opacity:1}100%{transform:scale(1);opacity:1}}
+  @keyframes mbHoja{0%{transform:translateX(0)}100%{transform:translateX(-102%)}}
+  @keyframes mbVelo{0%{opacity:1}100%{opacity:0;visibility:hidden}}
+  @keyframes mbGira{to{transform:rotate(360deg)}}
+  @keyframes mbOnda{0%,100%{transform:scaleY(.2)}50%{transform:scaleY(1)}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
+</style>
+</helmet>
+
+<div ref="{{ setRoot }}" style="font-family:Archivo,system-ui,sans-serif;color:#DCDFE2;padding:34px 34px 70px;display:flex;flex-direction:column;gap:26px;min-height:100vh;background:radial-gradient(120% 90% at 50% 0%,#1b1f22 0%,#0f1112 70%)">
+
+  <div style="display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px">
+    <div>
+      <div style="font-size:10px;letter-spacing:.3em;color:#7E93A8;text-transform:uppercase">Colección Papelería Viva · Familia 05 · Corporativo</div>
+      <div style="font-family:'Source Serif 4',serif;font-weight:400;font-size:46px;margin-top:6px;color:#F2F3F4;line-height:1.05">Membrete</div>
+      <div style="font-size:11.5px;letter-spacing:.04em;color:#878e95;margin-top:6px;max-width:580px">Mecanismo Flat · 9 secciones · 10 slots de doodle · grilla estricta, sello seco, sin script y sin gesto de luz: la sobriedad es el efecto</div>
+    </div>
+    <div style="display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap">
+      <div>
+        <div style="font-size:9px;letter-spacing:.26em;color:#6d757c;margin-bottom:7px">VISTA</div>
+        <div style="display:flex;gap:4px;padding:4px;border:1px solid #2c3135;background:#181b1d">
+          <button onClick="{{ verCel }}" style="{{ btnCel }}">Celular 430 × 932</button>
+          <button onClick="{{ verEsc }}" style="{{ btnEsc }}">Escritorio 1440 × 900</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:9px;letter-spacing:.26em;color:#6d757c;margin-bottom:7px">VARIANTE · {{ vNombre }}</div>
+        <div style="display:flex;gap:7px">
+          <sc-for list="{{ paletas }}" as="p" hint-placeholder-count="5">
+            <button onClick="{{ p.set }}" title="{{ p.n }}" style="{{ p.chip }}"></button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ esCel }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.24em;color:#7e868d">SPLASH · « VALENTINA »</div>
+      <div style="{{ marco }}">
+        <div style="position:absolute;inset:0;background:var(--t-bg);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;top:0;height:120px;background:var(--t-acc);display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 18px;color:#fff">
+            <div style="font-family:'Source Serif 4',serif;font-size:22px;letter-spacing:.04em">Grupo Lerma</div>
+            <div style="font-size:9.5px;letter-spacing:.24em;opacity:.85">EST. 1994</div>
+          </div>
+          <div style="position:absolute;left:0;right:0;top:120px;height:470px;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.24em;color:#6f767c">FOTO · portadaImagenFondo</span></div>
+          <div style="position:absolute;left:0;right:0;top:590px;bottom:0;background:var(--t-bg);padding:34px 26px 0">
+            <div style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">ASAMBLEA ANUAL DE SOCIOS</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:46px;color:var(--t-ink);line-height:1.1;margin-top:10px">Encuentro 2027</div>
+            <div style="height:1px;background:var(--t-acc2);opacity:.5;margin:20px 0"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 10px;font-size:13px;color:var(--t-ink2);line-height:1.6">
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">FECHA</div>Jueves 9 de septiembre de 2027</div>
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">HORARIO</div>09:00 a 18:00 h</div>
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">SEDE</div>Centro de Convenciones BA</div>
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">MODALIDAD</div>Presencial, con acreditación</div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;overflow:hidden;animation:{{ sA.aOv }}">
+          <div style="position:absolute;inset:0;background:var(--t-bg);animation:{{ sA.aHoja }};box-shadow:8px 0 26px rgba(0,0,0,.14)">
+            <div style="position:absolute;left:0;right:0;top:0;height:8px;background:var(--t-acc)"></div>
+            <div style="position:absolute;left:34px;right:34px;top:56px">
+              <div style="font-family:'Source Serif 4',serif;font-size:24px;color:var(--t-ink);letter-spacing:.03em">Grupo Lerma</div>
+              <div style="font-size:9.5px;letter-spacing:.26em;color:var(--t-ink2);margin-top:6px">AV. DEL LIBERTADOR 2300 · BUENOS AIRES</div>
+              <div style="height:1px;background:var(--t-acc2);opacity:.45;margin-top:18px"></div>
+            </div>
+            <div style="position:absolute;left:34px;right:34px;top:250px">
+              <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2)">INVITACIÓN NOMINAL PARA</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:44px;color:var(--t-ink);margin-top:8px;line-height:1.15">Valentina Ruiz</div>
+              <div style="font-size:13px;color:var(--t-ink2);margin-top:14px;line-height:1.7">Le damos la bienvenida a la asamblea anual de socios. Esta invitación es personal e intransferible.</div>
+            </div>
+            <div style="position:absolute;left:34px;right:34px;bottom:150px;display:flex;align-items:center;gap:20px">
+              <div style="{{ selloSeco }}">
+                <svg width="88" height="88" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="41" fill="none" stroke="var(--t-ink2)" stroke-width="1.5" opacity=".5"/><circle cx="44" cy="44" r="34" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".4" stroke-dasharray="2 4"/><path d="M30 44 L40 54 L58 34" fill="none" stroke="var(--t-ink2)" stroke-width="2" opacity=".5"/></svg>
+              </div>
+              <div style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2);line-height:1.9">SELLO SECO<br>DE SECRETARÍA</div>
+            </div>
+            <button onClick="{{ abrirA }}" style="{{ btnAbrir }}">ABRIR INVITACIÓN</button>
+          </div>
+        </div>
+      </div>
+      <button onClick="{{ resetA }}" style="{{ btnGhost }}">REPETIR APERTURA</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.24em;color:#7e868d">SPLASH · « MARÍA FLORENCIA »</div>
+      <div style="{{ marco }}">
+        <div style="position:absolute;inset:0;background:var(--t-bg);overflow:hidden">
+          <div style="position:absolute;left:0;right:0;top:0;height:120px;background:var(--t-acc);display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 18px;color:#fff">
+            <div style="font-family:'Source Serif 4',serif;font-size:22px;letter-spacing:.04em">Grupo Lerma</div>
+            <div style="font-size:9.5px;letter-spacing:.24em;opacity:.85">EST. 1994</div>
+          </div>
+          <div style="position:absolute;left:0;right:0;top:120px;height:470px;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.24em;color:#6f767c">FOTO · portadaImagenFondo</span></div>
+          <div style="position:absolute;left:0;right:0;top:590px;bottom:0;background:var(--t-bg);padding:34px 26px 0">
+            <div style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">ASAMBLEA ANUAL DE SOCIOS</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:46px;color:var(--t-ink);line-height:1.1;margin-top:10px">Encuentro 2027</div>
+            <div style="height:1px;background:var(--t-acc2);opacity:.5;margin:20px 0"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 10px;font-size:13px;color:var(--t-ink2);line-height:1.6">
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">FECHA</div>Jueves 9 de septiembre de 2027</div>
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">HORARIO</div>09:00 a 18:00 h</div>
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">SEDE</div>Centro de Convenciones BA</div>
+              <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2)">MODALIDAD</div>Presencial, con acreditación</div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;inset:0;overflow:hidden;animation:{{ sB.aOv }}">
+          <div style="position:absolute;inset:0;background:var(--t-bg);animation:{{ sB.aHoja }};box-shadow:8px 0 26px rgba(0,0,0,.14)">
+            <div style="position:absolute;left:0;right:0;top:0;height:8px;background:var(--t-acc)"></div>
+            <div style="position:absolute;left:34px;right:34px;top:56px">
+              <div style="font-family:'Source Serif 4',serif;font-size:24px;color:var(--t-ink);letter-spacing:.03em">Grupo Lerma</div>
+              <div style="font-size:9.5px;letter-spacing:.26em;color:var(--t-ink2);margin-top:6px">AV. DEL LIBERTADOR 2300 · BUENOS AIRES</div>
+              <div style="height:1px;background:var(--t-acc2);opacity:.45;margin-top:18px"></div>
+            </div>
+            <div style="position:absolute;left:34px;right:34px;top:250px">
+              <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2)">INVITACIÓN NOMINAL PARA</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:40px;color:var(--t-ink);margin-top:8px;line-height:1.2">María Florencia Paz</div>
+              <div style="font-size:13px;color:var(--t-ink2);margin-top:14px;line-height:1.7">Le damos la bienvenida a la asamblea anual de socios. Esta invitación es personal e intransferible.</div>
+            </div>
+            <div style="position:absolute;left:34px;right:34px;bottom:150px;display:flex;align-items:center;gap:20px">
+              <div style="{{ selloSecoB }}">
+                <svg width="88" height="88" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="41" fill="none" stroke="var(--t-ink2)" stroke-width="1.5" opacity=".5"/><circle cx="44" cy="44" r="34" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".4" stroke-dasharray="2 4"/><path d="M30 44 L40 54 L58 34" fill="none" stroke="var(--t-ink2)" stroke-width="2" opacity=".5"/></svg>
+              </div>
+              <div style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2);line-height:1.9">SELLO SECO<br>DE SECRETARÍA</div>
+            </div>
+            <button onClick="{{ abrirB }}" style="{{ btnAbrir }}">ABRIR INVITACIÓN</button>
+          </div>
+        </div>
+      </div>
+      <button onClick="{{ resetB }}" style="{{ btnGhost }}">REPETIR APERTURA</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.24em;color:#7e868d">INVITACIÓN ABIERTA · 9 SECCIONES + EXTRAS</div>
+      <div style="{{ marco }}">
+        <div id="scC" data-scroll="1" style="position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--t-bg)">
+
+          <section data-sec="portada" data-screen-label="01 Portada" style="position:relative;height:812px;overflow:hidden">
+            <div style="position:absolute;left:0;right:0;top:0;height:112px;background:var(--t-acc);display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 16px;color:#fff;z-index:2">
+              <div style="font-family:'Source Serif 4',serif;font-size:22px;letter-spacing:.04em">Grupo Lerma</div>
+              <div style="font-size:9.5px;letter-spacing:.24em;opacity:.85">EST. 1994</div>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:112px;height:452px;overflow:hidden">
+              <div data-par="1" style="position:absolute;inset:-60px 0;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:10px;letter-spacing:.24em;color:#6f767c">FOTO · portadaImagenFondo</span></div>
+              <div aria-hidden="true" data-doodle="3" style="position:absolute;left:20px;top:20px;width:44px;height:44px;border-left:1px solid rgba(255,255,255,.8);border-top:1px solid rgba(255,255,255,.8)"></div>
+              <div aria-hidden="true" data-doodle="4" style="position:absolute;right:20px;bottom:20px;width:44px;height:44px;border-right:1px solid rgba(255,255,255,.8);border-bottom:1px solid rgba(255,255,255,.8)"></div>
+            </div>
+            <div style="position:absolute;left:0;right:0;top:564px;bottom:0;background:var(--t-bg);padding:30px 26px 0">
+              <div style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">ASAMBLEA ANUAL DE SOCIOS</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:48px;color:var(--t-ink);line-height:1.1;margin-top:10px">Encuentro 2027</div>
+              <div aria-hidden="true" data-doodle="1" style="display:flex;align-items:center;gap:10px;margin-top:18px"><span style="width:26px;height:1px;background:var(--t-acc)"></span><span style="width:6px;height:6px;border:1px solid var(--t-acc)"></span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.45"></span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 10px;margin-top:20px;font-size:13.5px;color:var(--t-ink2);line-height:1.6">
+                <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:3px">FECHA</div>Jueves 9 de septiembre de 2027</div>
+                <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:3px">HORARIO</div>09:00 a 18:00 h</div>
+                <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:3px">SEDE</div>Centro de Convenciones BA</div>
+                <div><div style="font-size:9px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:3px">CÓDIGO</div>ASM-2027-042</div>
+              </div>
+              <div aria-hidden="true" data-doodle="2" style="position:absolute;right:26px;bottom:24px;{{ selloEstatico }}">
+                <svg width="72" height="72" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="41" fill="none" stroke="var(--t-ink2)" stroke-width="1.5" opacity=".45"/><circle cx="44" cy="44" r="34" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35" stroke-dasharray="2 4"/><path d="M30 44 L40 54 L58 34" fill="none" stroke="var(--t-ink2)" stroke-width="2" opacity=".45"/></svg>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="countdown" data-screen-label="02 Countdown" style="position:relative;padding:52px 26px 40px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">02 — LA FECHA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div data-reveal="t">
+              <div style="font-family:'Source Serif 4',serif;font-size:104px;line-height:.95;color:var(--t-ink)">{{ cd.d }}</div>
+              <div style="font-size:10px;letter-spacing:.26em;color:var(--t-ink2);margin-top:8px">DÍAS PARA LA APERTURA</div>
+            </div>
+            <div style="display:flex;margin-top:24px;border-top:1px solid rgba(0,0,0,.14);border-bottom:1px solid rgba(0,0,0,.14)">
+              <sc-for list="{{ cd.cajas }}" as="c" hint-placeholder-count="3">
+                <div data-reveal="b" style="{{ c.s }}">
+                  <div style="font-family:'Source Serif 4',serif;font-size:28px;line-height:1;color:var(--t-ink);font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                  <div style="font-size:8.5px;letter-spacing:.2em;color:var(--t-ink2);margin-top:8px">{{ c.l }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div aria-hidden="true" data-doodle="6" style="display:flex;gap:6px;margin-top:24px"><sc-for list="{{ reglilla }}" as="r" hint-placeholder-count="12"><span style="{{ r.s }}"></span></sc-for></div>
+            <div style="margin-top:20px;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">02 / 09</div>
+          </section>
+
+          <section data-sec="frase" data-screen-label="03 Frase" style="position:relative;padding:58px 26px 40px;background:var(--t-bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:24px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">03 — LA FRASE</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div data-reveal="t" style="border-left:2px solid var(--t-acc);padding-left:18px">
+              <div style="font-family:'Source Serif 4',serif;font-style:italic;font-size:25px;line-height:1.5;color:var(--t-ink);text-wrap:pretty">Treinta y tres años sosteniendo la misma idea: crecer con los que estuvieron desde el principio.</div>
+              <div style="font-size:11px;letter-spacing:.2em;color:var(--t-ink2);margin-top:18px">ELENA LERMA · PRESIDENTA</div>
+            </div>
+            <div style="margin-top:32px;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">03 / 09</div>
+          </section>
+
+          <section data-sec="detalles" data-screen-label="04 Detalles" style="position:relative;padding:52px 26px 40px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">04 — EL ENCUENTRO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div aria-hidden="true" data-doodle="5" style="position:absolute;right:20px;top:44px;opacity:.5;pointer-events:none"><svg width="40" height="40" viewBox="0 0 40 40"><rect x="6" y="8" width="28" height="24" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><path d="M6 14 H34 M14 8 V32" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg></div>
+            <div data-reveal="b" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.14);padding:22px 20px">
+              <div style="font-size:9.5px;letter-spacing:.24em;color:var(--t-acc)">SEDE</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:26px;color:var(--t-ink);margin-top:8px;line-height:1.2">Centro de Convenciones de Buenos Aires</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:8px;line-height:1.6">Av. Pres. Figueroa Alcorta 2099, Recoleta<br>Salón Auditorio, nivel −1 · Acreditación 08:30 h</div>
+              <button onClick="{{ irMapa }}" style="min-height:48px;margin-top:14px;padding:0 20px;border:1px solid var(--t-acc);background:none;color:var(--t-acc);font-family:Archivo,sans-serif;font-size:10.5px;letter-spacing:.2em;cursor:pointer">CÓMO LLEGAR</button>
+            </div>
+            <div style="margin-top:28px;font-size:9.5px;letter-spacing:.24em;color:var(--t-ink2);margin-bottom:14px">AGENDA DEL DÍA</div>
+            <div style="border-top:1px solid rgba(0,0,0,.14)">
+              <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="5">
+                <div data-reveal="{{ c.lado }}" style="display:flex;gap:14px;align-items:baseline;padding:14px 0;border-bottom:1px solid rgba(0,0,0,.1)">
+                  <div style="flex:none;width:52px;font-size:12px;letter-spacing:.06em;color:var(--t-acc);font-variant-numeric:tabular-nums">{{ c.hora }}</div>
+                  <div style="flex:1">
+                    <div style="font-family:'Source Serif 4',serif;font-size:19px;color:var(--t-ink);line-height:1.3">{{ c.t }}</div>
+                    <div style="font-size:12.5px;color:var(--t-ink2);margin-top:3px">{{ c.d }}</div>
+                  </div>
+                  <div style="flex:none;font-size:10px;letter-spacing:.16em;color:var(--t-ink2)">{{ c.i }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <div data-reveal="b" style="margin-top:24px;border:1px solid var(--t-ink);padding:18px">
+              <div style="font-size:9.5px;letter-spacing:.24em;color:var(--t-acc)">CÓDIGO DE VESTIMENTA</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:24px;color:var(--t-ink);margin-top:6px">Formal de negocios</div>
+            </div>
+            <div style="margin-top:26px;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">04 / 09</div>
+          </section>
+
+          <section data-sec="album" data-screen-label="05 Álbum" style="position:relative;padding:52px 0 40px;background:var(--t-bg)">
+            <div style="display:flex;align-items:center;gap:10px;margin:0 26px 20px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">05 — EL ÁLBUM</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div style="display:flex;gap:12px;overflow-x:auto;padding:4px 26px 16px;scroll-snap-type:x mandatory">
+              <sc-for list="{{ album }}" as="f" hint-placeholder-count="4">
+                <div data-reveal="b" style="flex:none;width:230px;scroll-snap-align:center">
+                  <div style="height:170px;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;border:1px solid rgba(0,0,0,.12)"><span style="font-size:9px;letter-spacing:.14em;color:#6f767c">{{ f.slot }}</span></div>
+                  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;font-size:10.5px;letter-spacing:.12em;color:var(--t-ink2)"><span>{{ f.pie }}</span><span>{{ f.num }}</span></div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin:2px 26px 0;font-size:10px;letter-spacing:.14em;color:var(--t-ink2)">albumStyle · carrusel · ediciones anteriores</div>
+            <div style="margin:20px 26px 0;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">05 / 09</div>
+          </section>
+
+          <section data-sec="mapa" data-screen-label="06 Mapa" style="position:relative;padding:52px 26px 40px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">06 — EL MAPA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div aria-hidden="true" data-doodle="8" style="position:absolute;right:20px;top:42px;opacity:.5;pointer-events:none"><svg width="38" height="38" viewBox="0 0 38 38"><rect x="4" y="4" width="30" height="30" fill="none" stroke="var(--t-acc2)" stroke-width="1"/><path d="M19 10 V28 M10 19 H28" fill="none" stroke="var(--t-acc2)" stroke-width="1"/></svg></div>
+            <div data-reveal="b" style="position:relative;height:288px;border:1px solid rgba(0,0,0,.16);background:var(--t-bg);overflow:hidden">
+              <svg viewBox="0 0 380 288" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M-10 72 L400 44" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 168 L400 198" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M92 -10 L120 298" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M268 -10 L248 298" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 236 C120 206 260 256 400 226" stroke="var(--t-acc)" stroke-width="2" opacity=".55" fill="none"/></svg>
+              <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center"><span style="display:block;width:14px;height:14px;border:3px solid var(--t-acc);margin:0 auto"></span><div style="font-size:10px;letter-spacing:.18em;color:var(--t-ink);margin-top:8px">CENTRO DE CONVENCIONES BA</div></div>
+            </div>
+            <a href="https://maps.google.com" target="_blank" rel="noreferrer" style="display:flex;align-items:center;justify-content:center;min-height:48px;margin-top:12px;border:1px solid var(--t-ink);color:var(--t-ink);font-size:10.5px;letter-spacing:.2em">ABRIR EN GOOGLE MAPS · mapUrl</a>
+            <div style="margin-top:24px;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">06 / 09</div>
+          </section>
+
+          <section data-sec="extras" data-screen-label="Extras pase e info" style="position:relative;padding:50px 26px 40px;background:var(--t-bg)">
+            <div style="font-size:9.5px;letter-spacing:.24em;color:var(--t-ink2);margin-bottom:14px">EXTRA — CREDENCIAL DE ACCESO</div>
+            <div data-reveal="b" style="position:relative;border:1px solid var(--t-ink);background:var(--t-bg)">
+              <div style="background:var(--t-acc);color:#fff;padding:10px 16px;display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.22em"><span>GRUPO LERMA</span><span>ASM-2027</span></div>
+              <div style="display:flex;gap:16px;align-items:center;padding:18px 16px">
+                <div style="flex:1">
+                  <div style="font-size:9px;letter-spacing:.2em;color:var(--t-ink2)">PASE N.º</div>
+                  <div style="font-family:'Source Serif 4',serif;font-size:46px;line-height:1;color:var(--t-acc)">042</div>
+                  <div style="font-size:12.5px;color:var(--t-ink);margin-top:8px;line-height:1.6">Valentina Ruiz<br>Mesa 7 · 2 acreditaciones</div>
+                </div>
+                <div style="flex:none;width:96px;height:96px;background:#fff;padding:6px;border:1px solid rgba(0,0,0,.12);display:grid;grid-template-columns:repeat(9,1fr);grid-auto-rows:1fr;gap:1px">
+                  <sc-for list="{{ qr }}" as="q" hint-placeholder-count="81"><span style="{{ q.s }}"></span></sc-for>
+                </div>
+              </div>
+              <div aria-hidden="true" style="border-top:1px dashed rgba(0,0,0,.3);padding:10px 16px;font-size:10.5px;letter-spacing:.14em;color:var(--t-ink2)">PRESENTÁ TU PASE AL INGRESAR</div>
+            </div>
+
+            <div style="font-size:9.5px;letter-spacing:.24em;color:var(--t-ink2);margin:28px 0 8px">EXTRA — INFORMACIÓN ÚTIL</div>
+            <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="4">
+              <div style="border-bottom:1px solid rgba(0,0,0,.14)">
+                <button onClick="{{ f.tog }}" style="width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;background:none;border:0;padding:0;cursor:pointer;text-align:left;font-family:'Source Serif 4',serif;font-size:18px;color:var(--t-ink)"><span>{{ f.q }}</span><span style="{{ f.mas }}">+</span></button>
+                <div style="{{ f.panel }}"><div style="padding:0 0 16px;font-size:14px;line-height:1.65;color:var(--t-ink2)">{{ f.a }}</div></div>
+              </div>
+            </sc-for>
+
+            <div style="font-size:9.5px;letter-spacing:.24em;color:var(--t-ink2);margin:28px 0 8px">EXTRA — EL QUIZ · triviaHabilitada</div>
+            <div data-reveal="b" style="border:1px solid rgba(0,0,0,.14);padding:18px;background:var(--t-alt)">
+              <div style="font-family:'Source Serif 4',serif;font-size:20px;color:var(--t-ink);line-height:1.3">¿En qué año abrimos la planta de Rosario?</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+                <sc-for list="{{ quiz }}" as="q" hint-placeholder-count="3"><button onClick="{{ q.pick }}" style="{{ q.s }}">{{ q.t }}</button></sc-for>
+              </div>
+            </div>
+          </section>
+
+          <section data-sec="rsvp" data-screen-label="07 RSVP" style="position:relative;padding:54px 26px 44px;background:var(--t-acc);overflow:hidden">
+            <div aria-hidden="true" style="position:absolute;left:-10px;top:40px;font-family:'Source Serif 4',serif;font-size:124px;line-height:1;color:#fff;opacity:.07;pointer-events:none">RSVP</div>
+            <div style="position:relative;display:flex;align-items:center;gap:10px;margin-bottom:20px"><span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.84)">07 — CONFIRMACIÓN</span><span style="flex:1;height:1px;background:rgba(255,255,255,.4)"></span><span style="width:5px;height:5px;border:1px solid rgba(255,255,255,.75)"></span></div>
+            <div style="position:relative;font-family:'Source Serif 4',serif;font-size:32px;color:#fff;line-height:1.25">Confirmá tu asistencia</div>
+            <div style="position:relative;font-size:14px;color:rgba(255,255,255,.86);margin-top:8px;line-height:1.6">El cupo es limitado. Fecha límite: 20 de agosto de 2027.</div>
+            <sc-if value="{{ noConfirmado }}" hint-placeholder-val="{{ true }}">
+            <div style="position:relative;margin-top:22px;display:flex;flex-direction:column;gap:14px">
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.22em;color:rgba(255,255,255,.76);margin-bottom:8px">PASO 1 · ASISTENCIA</div>
+                <div style="display:flex;gap:10px">
+                  <button style="flex:1;min-height:48px;background:#fff;border:0;color:var(--t-acc);font-family:Archivo,sans-serif;font-size:11px;letter-spacing:.16em;cursor:pointer">ASISTIRÉ</button>
+                  <button style="flex:1;min-height:48px;background:none;border:1px solid rgba(255,255,255,.6);color:#fff;font-family:Archivo,sans-serif;font-size:11px;letter-spacing:.16em;cursor:pointer">NO ASISTIRÉ</button>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.22em;color:rgba(255,255,255,.76);margin-bottom:8px">PASO 2 · ACREDITACIONES · 2 DISPONIBLES</div>
+                <div style="display:flex;gap:10px;align-items:center">
+                  <button style="width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.6);color:#fff;font-size:18px;cursor:pointer">–</button>
+                  <div style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;font-family:'Source Serif 4',serif;font-size:24px;color:#fff;border:1px solid rgba(255,255,255,.32)">2</div>
+                  <button style="width:48px;height:48px;background:none;border:1px solid rgba(255,255,255,.6);color:#fff;font-size:18px;cursor:pointer">+</button>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:9.5px;letter-spacing:.22em;color:rgba(255,255,255,.76);margin-bottom:8px">PASO 3 · RESTRICCIONES ALIMENTARIAS</div>
+                <div style="min-height:48px;border:1px solid rgba(255,255,255,.32);display:flex;align-items:center;padding:0 14px;font-size:14px;color:rgba(255,255,255,.66)">Vegetariano, sin TACC, alergias…</div>
+              </div>
+              <button onClick="{{ confirmar }}" style="min-height:52px;margin-top:4px;background:#fff;border:0;color:var(--t-acc);font-family:Archivo,sans-serif;font-size:11.5px;letter-spacing:.2em;cursor:pointer">REGISTRAR MI CONFIRMACIÓN</button>
+            </div>
+            </sc-if>
+            <sc-if value="{{ confirmado }}" hint-placeholder-val="{{ false }}">
+            <div style="position:relative;margin-top:26px;height:256px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+              <div style="{{ selloRsvp }}">
+                <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="70" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2"/><circle cx="75" cy="75" r="60" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-dasharray="2 5"/></svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span style="font-size:11.5px;letter-spacing:.2em;color:#fff">CONFIRMADO</span><span style="font-family:'Source Serif 4',serif;font-size:19px;color:#fff">042</span></div>
+              </div>
+              <div style="font-size:14px;color:rgba(255,255,255,.9);text-align:center;line-height:1.6">Valentina Ruiz · 2 acreditaciones<br>Recibirás el pase por correo</div>
+              <button onClick="{{ resetRsvp }}" style="min-height:44px;padding:0 18px;background:none;border:1px solid rgba(255,255,255,.5);color:#fff;font-size:10px;letter-spacing:.16em;cursor:pointer">VER EL FORMULARIO</button>
+            </div>
+            </sc-if>
+            <div aria-hidden="true" data-doodle="9" style="position:relative;display:flex;gap:6px;margin-top:20px;opacity:.55"><sc-for list="{{ reglillaRsvp }}" as="r" hint-placeholder-count="12"><span style="{{ r.s }}"></span></sc-for></div>
+            <div style="position:relative;margin-top:14px;font-size:9px;letter-spacing:.24em;color:rgba(255,255,255,.66)">07 / 09</div>
+          </section>
+
+          <section data-sec="regalos" data-screen-label="08 Datos bancarios" style="position:relative;padding:54px 26px 40px;background:var(--t-bg);overflow:hidden">
+            <div aria-hidden="true" style="position:absolute;right:-12px;top:126px;font-family:'Source Serif 4',serif;font-size:104px;line-height:1;color:var(--t-ink);opacity:.06;pointer-events:none">ARANCEL</div>
+            <div style="position:relative;display:flex;align-items:center;gap:10px;margin-bottom:20px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">08 — ARANCEL E INSCRIPCIÓN</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div style="position:relative;font-size:14px;line-height:1.7;color:var(--t-ink2);margin-bottom:16px">La asamblea no tiene costo para socios activos. El almuerzo de cierre es opcional y se abona por transferencia.</div>
+            <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+              <div data-reveal="b" style="position:relative;background:var(--t-alt);border:1px solid rgba(0,0,0,.14);padding:20px;margin-bottom:12px">
+                <div style="font-size:9.5px;letter-spacing:.22em;color:var(--t-acc)">{{ b.tit }}</div>
+                <div style="font-family:'Source Serif 4',serif;font-size:21px;color:var(--t-ink);margin-top:6px">{{ b.titular }}</div>
+                <div style="font-size:13px;color:var(--t-ink2);margin-top:10px;line-height:1.9;font-variant-numeric:tabular-nums">{{ b.banco }}<br>CBU {{ b.cbu }}<br>Alias {{ b.alias }}<br>CUIT {{ b.cuit }}</div>
+                <button style="min-height:44px;margin-top:12px;padding:0 16px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-size:10px;letter-spacing:.16em;cursor:pointer">COPIAR ALIAS</button>
+              </div>
+            </sc-for>
+            <div aria-hidden="true" data-doodle="10" style="position:relative;display:flex;align-items:center;gap:10px;margin-top:16px"><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:6px;height:6px;border:1px solid var(--t-acc2)"></span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span></div>
+            <div style="position:relative;margin-top:16px;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">08 / 09</div>
+          </section>
+
+          <section data-sec="cancion" data-screen-label="09 Canción" style="position:relative;padding:54px 26px 40px;background:var(--t-alt)">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">09 — EL CIERRE</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="width:5px;height:5px;border:1px solid var(--t-acc2)"></span></div>
+            <div style="display:flex;gap:18px;align-items:center">
+              <div style="position:relative;width:118px;height:118px;flex:none">
+                <div style="position:absolute;inset:0;animation:{{ aVinilo }}">
+                  <svg width="118" height="118" viewBox="0 0 118 118" aria-hidden="true"><circle cx="59" cy="59" r="58" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".5"/><circle cx="59" cy="59" r="48" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35"/><circle cx="59" cy="59" r="40" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35"/><circle cx="59" cy="59" r="32" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35"/><circle cx="59" cy="59" r="22" fill="var(--t-acc)"/><circle cx="59" cy="59" r="3" fill="var(--t-alt)"/></svg>
+                </div>
+                <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;pointer-events:none"><span style="font-size:8px;letter-spacing:.16em;color:var(--t-ink2)">SUENA AHORA</span></div>
+              </div>
+              <div style="flex:1">
+                <div style="font-family:'Source Serif 4',serif;font-size:24px;color:var(--t-ink);line-height:1.25">Sugerí una canción</div>
+                <div style="font-size:14px;color:var(--t-ink2);margin-top:6px;line-height:1.6">Para el brindis de cierre, a las 18:00.</div>
+                <div style="display:flex;gap:3px;align-items:flex-end;height:24px;margin-top:12px"><sc-for list="{{ ondas }}" as="o" hint-placeholder-count="12"><span style="{{ o.s }}"></span></sc-for></div>
+              </div>
+            </div>
+            <div style="min-height:48px;margin-top:16px;border:1px solid rgba(0,0,0,.18);background:var(--t-bg);display:flex;align-items:center;padding:0 14px;font-size:14px;color:var(--t-ink2)">Artista y tema…</div>
+            <div style="display:flex;gap:10px;margin-top:10px">
+              <button style="flex:1;min-height:48px;background:var(--t-acc);border:0;color:#fff;font-family:Archivo,sans-serif;font-size:11px;letter-spacing:.18em;cursor:pointer">SUGERIR</button>
+              <button onClick="{{ togSon }}" style="min-height:48px;padding:0 18px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-family:Archivo,sans-serif;font-size:11px;letter-spacing:.16em;cursor:pointer">{{ labelSon }}</button>
+            </div>
+            <div style="margin-top:24px;font-size:9px;letter-spacing:.24em;color:var(--t-ink2)">09 / 09</div>
+          </section>
+
+          <footer style="position:relative;padding:44px 26px 128px;background:var(--t-bg);border-top:1px solid rgba(0,0,0,.14)">
+            <div style="font-family:'Source Serif 4',serif;font-size:26px;color:var(--t-ink)">Grupo Lerma</div>
+            <div style="font-size:11px;color:var(--t-ink2);margin-top:8px;line-height:1.8">Av. del Libertador 2300, Buenos Aires<br>socios@grupolerma.com.ar · +54 11 4000 0000</div>
+            <div style="height:1px;background:var(--t-acc2);opacity:.4;margin:20px 0"></div>
+            <div style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2)">HECHO EN <a href="https://altainvitacion.com" style="color:var(--t-acc)">ALTAINVITACION.COM</a></div>
+          </footer>
+        </div>
+
+        <div ref="{{ setPill }}" style="position:absolute;left:50%;bottom:22px;transform:translateX(-50%);display:flex;gap:4px;padding:11px 14px;border-radius:14px;background-color:var(--t-bg);background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23f)' opacity='0.30'/%3E%3C/svg%3E&quot;);box-shadow:-1.41px 1.41px 4px rgba(var(--t-som),.40),inset 1px 1px 0 rgba(255,255,255,.9),inset -1px -1px 0 rgba(var(--t-som),.3);transition:opacity .3s ease,transform .3s cubic-bezier(.22,.61,.36,1)">
+          <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+            <button onClick="{{ n.go }}" aria-label="{{ n.l }}" style="width:56px;height:48px;display:flex;align-items:center;justify-content:center;padding:0;background:none;border:0;cursor:pointer;border-radius:10px">
+              <span aria-hidden="true" style="{{ n.ic }}"></span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:11px">
+      <div style="font-size:9.5px;letter-spacing:.24em;color:#7e868d">ESTADO POST-EVENTO · SOLO ÁLBUM</div>
+      <div style="{{ marco }}">
+        <div data-scroll="1" style="position:absolute;inset:0;overflow-y:auto;background:var(--t-bg);padding:0 0 40px">
+          <div style="background:var(--t-acc);color:#fff;padding:44px 26px 30px">
+            <div style="font-size:10px;letter-spacing:.26em;opacity:.85">09 DE SEPTIEMBRE DE 2027</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:38px;margin-top:8px;line-height:1.2">Gracias por participar</div>
+            <div style="font-size:14px;margin-top:10px;line-height:1.7;opacity:.9">La memoria anual y las fotos de la jornada quedan disponibles acá.</div>
+            <button style="min-height:48px;margin-top:16px;padding:0 22px;background:#fff;border:0;color:var(--t-acc);font-size:11px;letter-spacing:.18em;cursor:pointer">DESCARGAR MEMORIA 2027</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:20px">
+            <sc-for list="{{ grilla }}" as="g" hint-placeholder-count="8"><div style="{{ g.s }}"></div></sc-for>
+          </div>
+          <div style="padding:0 26px;font-size:10px;letter-spacing:.16em;color:var(--t-ink2)">galeriaSecundariaFotos · álbum compartido</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ esEsc }}" hint-placeholder-val="{{ false }}">
+  <div style="width:1440px;height:900px;position:relative;overflow:hidden;border:1px solid #2c3135;box-shadow:0 30px 70px rgba(0,0,0,.55);display:grid;grid-template-columns:440px 1fr;{{ vars }}">
+
+    <aside style="position:relative;background:var(--t-alt);padding:0;display:flex;flex-direction:column;overflow:hidden">
+      <div style="background:var(--t-acc);color:#fff;padding:26px 38px 20px;display:flex;align-items:flex-end;justify-content:space-between">
+        <div style="font-family:'Source Serif 4',serif;font-size:24px;letter-spacing:.03em">Grupo Lerma</div>
+        <div style="font-size:9.5px;letter-spacing:.22em;opacity:.85;white-space:nowrap">EST. 1994</div>
+      </div>
+      <div style="padding:26px 38px 30px;display:flex;flex-direction:column;flex:1">
+        <div style="position:relative;height:250px;overflow:hidden;border:1px solid rgba(0,0,0,.14)">
+          <div data-par="1" style="position:absolute;inset:-40px 0;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);display:flex;align-items:center;justify-content:center"><span style="font-size:9px;letter-spacing:.2em;color:#6f767c">FOTO · portadaImagenFondoDesktop</span></div>
+        </div>
+        <div style="margin-top:22px">
+          <div style="font-size:10px;letter-spacing:.28em;color:var(--t-acc)">ASAMBLEA ANUAL DE SOCIOS</div>
+          <div style="font-family:'Source Serif 4',serif;font-size:40px;color:var(--t-ink);line-height:1.1;margin-top:8px">Encuentro 2027</div>
+          <div style="height:1px;background:var(--t-acc2);opacity:.45;margin:16px 0"></div>
+          <div style="font-size:12.5px;color:var(--t-ink2);line-height:1.8">Jueves 9 de septiembre de 2027 · 09:00 a 18:00 h<br>Centro de Convenciones de Buenos Aires</div>
+        </div>
+        <div style="margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:0 16px">
+          <sc-for list="{{ navEsc }}" as="n" hint-placeholder-count="9">
+            <button onClick="{{ n.go }}" style="{{ n.s }}"><span style="font-family:'Source Serif 4',serif;font-size:13px;color:var(--t-acc);width:22px;text-align:left">{{ n.num }}</span><span style="font-size:10px;letter-spacing:.14em">{{ n.l }}</span></button>
+          </sc-for>
+        </div>
+        <div style="margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:14px">
+          <div style="font-size:9px;letter-spacing:.18em;color:var(--t-ink2);line-height:1.9">ALTAINVITACION.COM<br>PAPELERÍA VIVA · MEMBRETE</div>
+          <div style="{{ selloEstatico }}"><svg width="64" height="64" viewBox="0 0 88 88" aria-hidden="true"><circle cx="44" cy="44" r="41" fill="none" stroke="var(--t-ink2)" stroke-width="1.5" opacity=".45"/><circle cx="44" cy="44" r="34" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35" stroke-dasharray="2 4"/><path d="M30 44 L40 54 L58 34" fill="none" stroke="var(--t-ink2)" stroke-width="2" opacity=".45"/></svg></div>
+        </div>
+      </div>
+    </aside>
+
+    <div id="scD" data-scroll="1" style="position:relative;overflow-y:auto;background:var(--t-bg)">
+
+      <section data-sec="d-portada" data-screen-label="Escritorio 01 Portada" style="position:relative;min-height:600px;display:flex;flex-direction:column;justify-content:center;padding:80px 90px">
+        <div style="font-size:10px;letter-spacing:.3em;color:var(--t-acc)">01 — LA INVITACIÓN</div>
+        <div data-reveal="t" style="margin-top:16px">
+          <div style="font-family:'Source Serif 4',serif;font-size:86px;color:var(--t-ink);line-height:1.05">Encuentro Anual<br>de Socios 2027</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;margin-top:26px"><span style="width:70px;height:1px;background:var(--t-acc)"></span><span style="width:7px;height:7px;border:1px solid var(--t-acc)"></span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:30px;font-size:14px;color:var(--t-ink2);line-height:1.6">
+          <div><div style="font-size:9.5px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:4px">FECHA</div>Jueves 9 de septiembre de 2027</div>
+          <div><div style="font-size:9.5px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:4px">HORARIO</div>09:00 a 18:00 h</div>
+          <div><div style="font-size:9.5px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:4px">SEDE</div>Centro de Convenciones BA, Recoleta</div>
+          <div><div style="font-size:9.5px;letter-spacing:.22em;color:var(--t-ink2);margin-bottom:4px">CÓDIGO</div>ASM-2027-042</div>
+        </div>
+      </section>
+
+      <section data-sec="d-countdown" data-screen-label="Escritorio 02 Countdown" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">02 — LA CUENTA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2)">02 / 09</span></div>
+        <div style="display:flex;align-items:flex-end;gap:70px">
+          <div style="flex:none">
+            <div style="font-family:'Source Serif 4',serif;font-size:170px;line-height:.85;color:var(--t-ink)">{{ cd.d }}</div>
+            <div style="font-size:11px;letter-spacing:.24em;color:var(--t-ink2);margin-top:14px">DÍAS PARA LA APERTURA</div>
+          </div>
+          <div style="flex:1;display:flex;border-top:1px solid rgba(0,0,0,.16);border-bottom:1px solid rgba(0,0,0,.16)">
+            <sc-for list="{{ cd.cajasD }}" as="c" hint-placeholder-count="3">
+              <div data-reveal="b" style="{{ c.s }}">
+                <div style="font-family:'Source Serif 4',serif;font-size:48px;line-height:1;color:var(--t-ink);font-variant-numeric:tabular-nums">{{ c.n }}</div>
+                <div style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2);margin-top:10px">{{ c.l }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="d-frase" data-screen-label="Escritorio 03 Frase" style="position:relative;padding:88px 90px">
+        <div style="font-size:10px;letter-spacing:.24em;color:var(--t-acc);margin-bottom:26px">03 — LA FRASE</div>
+        <div data-reveal="t" style="border-left:2px solid var(--t-acc);padding-left:30px;max-width:900px">
+          <div style="font-family:'Source Serif 4',serif;font-style:italic;font-size:40px;line-height:1.45;color:var(--t-ink);text-wrap:pretty">Treinta y tres años sosteniendo la misma idea: crecer con los que estuvieron desde el principio.</div>
+          <div style="font-size:12px;letter-spacing:.2em;color:var(--t-ink2);margin-top:24px">ELENA LERMA · PRESIDENTA</div>
+        </div>
+      </section>
+
+      <section data-sec="d-detalles" data-screen-label="Escritorio 04 Detalles" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">04 — EL ENCUENTRO</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2)">04 / 09</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <div data-reveal="b" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.14);padding:30px">
+            <div style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">SEDE</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:32px;color:var(--t-ink);margin-top:10px;line-height:1.2">Centro de Convenciones de Buenos Aires</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:10px;line-height:1.7">Av. Pres. Figueroa Alcorta 2099, Recoleta<br>Salón Auditorio, nivel −1 · Acreditación 08:30 h</div>
+          </div>
+          <div data-reveal="b" data-delay="90" style="background:var(--t-bg);border:1px solid rgba(0,0,0,.14);padding:30px">
+            <div style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">CÓDIGO DE VESTIMENTA</div>
+            <div style="font-family:'Source Serif 4',serif;font-size:32px;color:var(--t-ink);margin-top:10px;line-height:1.2">Formal de negocios</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:10px;line-height:1.7">Se entregará credencial impresa en la acreditación.</div>
+          </div>
+        </div>
+        <div style="margin-top:40px;font-size:10px;letter-spacing:.24em;color:var(--t-ink2);margin-bottom:18px">AGENDA DEL DÍA</div>
+        <div style="border-top:1px solid rgba(0,0,0,.16)">
+          <sc-for list="{{ cronograma }}" as="c" hint-placeholder-count="5">
+            <div data-reveal="{{ c.lado }}" style="display:grid;grid-template-columns:92px 1fr 160px;gap:20px;align-items:baseline;padding:18px 0;border-bottom:1px solid rgba(0,0,0,.1)">
+              <div style="font-size:13px;letter-spacing:.06em;color:var(--t-acc);font-variant-numeric:tabular-nums">{{ c.hora }}</div>
+              <div>
+                <div style="font-family:'Source Serif 4',serif;font-size:24px;color:var(--t-ink);line-height:1.3">{{ c.t }}</div>
+                <div style="font-size:13.5px;color:var(--t-ink2);margin-top:4px">{{ c.d }}</div>
+              </div>
+              <div style="font-size:10.5px;letter-spacing:.16em;color:var(--t-ink2);text-align:right">{{ c.i }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-album" data-screen-label="Escritorio 05 Álbum" style="position:relative;padding:76px 90px">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">05 — EL ÁLBUM</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2)">05 / 09</span></div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+          <sc-for list="{{ album }}" as="f" hint-placeholder-count="4">
+            <div data-reveal="b">
+              <div style="height:190px;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;border:1px solid rgba(0,0,0,.12)"><span style="font-size:9px;letter-spacing:.14em;color:#6f767c">{{ f.slot }}</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;font-size:11px;letter-spacing:.12em;color:var(--t-ink2)"><span>{{ f.pie }}</span><span>{{ f.num }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-mapa" data-screen-label="Escritorio 06 Mapa" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">06 — EL MAPA</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2)">06 / 09</span></div>
+        <div data-reveal="b" style="position:relative;height:330px;border:1px solid rgba(0,0,0,.16);background:var(--t-bg);overflow:hidden">
+          <svg viewBox="0 0 1200 330" preserveAspectRatio="none" style="position:absolute;inset:0;width:100%;height:100%" aria-hidden="true"><path d="M-10 80 L1210 50" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 200 L1210 240" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M280 -10 L340 340" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M860 -10 L800 340" stroke="var(--t-ink2)" stroke-width="1" opacity=".28" fill="none"/><path d="M-10 285 C300 245 800 305 1210 255" stroke="var(--t-acc)" stroke-width="2" opacity=".55" fill="none"/></svg>
+          <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center"><span style="display:block;width:16px;height:16px;border:3px solid var(--t-acc);margin:0 auto"></span><div style="font-size:11px;letter-spacing:.2em;color:var(--t-ink);margin-top:10px">CENTRO DE CONVENCIONES BA</div></div>
+        </div>
+      </section>
+
+      <section data-sec="d-rsvp" data-screen-label="Escritorio 07 RSVP" style="position:relative;padding:76px 90px;background:var(--t-acc);overflow:hidden">
+        <div aria-hidden="true" style="position:absolute;left:40px;top:50px;font-family:'Source Serif 4',serif;font-size:220px;line-height:1;color:#fff;opacity:.07;pointer-events:none">RSVP</div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px;margin-bottom:30px"><span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.84)">07 — CONFIRMACIÓN</span><span style="flex:1;height:1px;background:rgba(255,255,255,.4)"></span><span style="font-size:10px;letter-spacing:.24em;color:rgba(255,255,255,.72)">07 / 09</span></div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 320px;gap:60px;align-items:center">
+          <div>
+            <div style="font-family:'Source Serif 4',serif;font-size:52px;color:#fff;line-height:1.15">Confirmá tu asistencia</div>
+            <div style="font-size:15px;color:rgba(255,255,255,.88);margin-top:12px;line-height:1.7">El cupo es limitado. Fecha límite: 20 de agosto de 2027. Tenés 2 acreditaciones asignadas.</div>
+            <div style="display:flex;gap:12px;margin-top:26px">
+              <button style="min-height:52px;padding:0 30px;background:#fff;border:0;color:var(--t-acc);font-family:Archivo,sans-serif;font-size:11.5px;letter-spacing:.18em;cursor:pointer">ASISTIRÉ</button>
+              <button style="min-height:52px;padding:0 30px;background:none;border:1px solid rgba(255,255,255,.6);color:#fff;font-family:Archivo,sans-serif;font-size:11.5px;letter-spacing:.18em;cursor:pointer">NO ASISTIRÉ</button>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+            <div style="{{ selloEsc }}">
+              <svg width="200" height="200" viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="70" fill="none" stroke="rgba(255,255,255,.75)" stroke-width="2"/><circle cx="75" cy="75" r="60" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1" stroke-dasharray="2 5"/></svg>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px"><span style="font-size:13px;letter-spacing:.2em;color:#fff">CONFIRMADO</span><span style="font-family:'Source Serif 4',serif;font-size:24px;color:#fff">042</span></div>
+            </div>
+            <div style="font-size:13px;color:rgba(255,255,255,.88)">Valentina Ruiz · 2 acreditaciones</div>
+          </div>
+        </div>
+      </section>
+
+      <section data-sec="d-regalos" data-screen-label="Escritorio 08 Datos bancarios" style="position:relative;padding:76px 90px;overflow:hidden">
+        <div aria-hidden="true" style="position:absolute;right:40px;top:100px;font-family:'Source Serif 4',serif;font-size:190px;line-height:1;color:var(--t-ink);opacity:.06;pointer-events:none">ARANCEL</div>
+        <div style="position:relative;display:flex;align-items:center;gap:14px;margin-bottom:28px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">08 — ARANCEL E INSCRIPCIÓN</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2)">08 / 09</span></div>
+        <div style="position:relative;font-size:15px;line-height:1.7;color:var(--t-ink2);max-width:640px;margin-bottom:26px">La asamblea no tiene costo para socios activos. El almuerzo de cierre es opcional y se abona por transferencia.</div>
+        <div style="position:relative;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+          <sc-for list="{{ bancos }}" as="b" hint-placeholder-count="2">
+            <div data-reveal="b" style="background:var(--t-alt);border:1px solid rgba(0,0,0,.14);padding:28px">
+              <div style="font-size:10px;letter-spacing:.22em;color:var(--t-acc)">{{ b.tit }}</div>
+              <div style="font-family:'Source Serif 4',serif;font-size:26px;color:var(--t-ink);margin-top:8px">{{ b.titular }}</div>
+              <div style="font-size:14px;color:var(--t-ink2);margin-top:12px;line-height:1.9;font-variant-numeric:tabular-nums">{{ b.banco }}<br>CBU {{ b.cbu }}<br>Alias {{ b.alias }}<br>CUIT {{ b.cuit }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section data-sec="d-cancion" data-screen-label="Escritorio 09 Canción" style="position:relative;padding:76px 90px;background:var(--t-alt)">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:28px"><span style="font-size:10px;letter-spacing:.24em;color:var(--t-acc)">09 — EL CIERRE</span><span style="flex:1;height:1px;background:var(--t-acc2);opacity:.4"></span><span style="font-size:10px;letter-spacing:.24em;color:var(--t-ink2)">09 / 09</span></div>
+        <div style="display:flex;gap:56px;align-items:center">
+          <div style="position:relative;width:200px;height:200px;flex:none">
+            <div style="position:absolute;inset:0;animation:{{ aVinilo }}">
+              <svg width="200" height="200" viewBox="0 0 118 118" aria-hidden="true"><circle cx="59" cy="59" r="58" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".5"/><circle cx="59" cy="59" r="48" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35"/><circle cx="59" cy="59" r="40" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35"/><circle cx="59" cy="59" r="32" fill="none" stroke="var(--t-ink2)" stroke-width="1" opacity=".35"/><circle cx="59" cy="59" r="22" fill="var(--t-acc)"/><circle cx="59" cy="59" r="3" fill="var(--t-alt)"/></svg>
+            </div>
+            <div style="position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;pointer-events:none"><span style="font-size:10px;letter-spacing:.18em;color:var(--t-ink2)">SUENA AHORA</span></div>
+          </div>
+          <div style="flex:1;max-width:560px">
+            <div style="font-family:'Source Serif 4',serif;font-size:38px;color:var(--t-ink);line-height:1.2">Sugerí una canción</div>
+            <div style="font-size:15px;color:var(--t-ink2);margin-top:10px;line-height:1.7">Para el brindis de cierre, a las 18:00.</div>
+            <div style="display:flex;gap:4px;align-items:flex-end;height:38px;margin-top:18px"><sc-for list="{{ ondasD }}" as="o" hint-placeholder-count="12"><span style="{{ o.s }}"></span></sc-for></div>
+            <div style="display:flex;gap:12px;margin-top:20px">
+              <div style="flex:1;min-height:52px;border:1px solid rgba(0,0,0,.18);background:var(--t-bg);display:flex;align-items:center;padding:0 16px;font-size:15px;color:var(--t-ink2)">Artista y tema…</div>
+              <button style="min-height:52px;padding:0 30px;background:var(--t-acc);border:0;color:#fff;font-size:11.5px;letter-spacing:.18em;cursor:pointer">SUGERIR</button>
+              <button onClick="{{ togSon }}" style="min-height:52px;padding:0 22px;background:none;border:1px solid var(--t-ink);color:var(--t-ink);font-size:11.5px;letter-spacing:.16em;cursor:pointer">{{ labelSon }}</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer style="position:relative;padding:60px 90px 72px;border-top:1px solid rgba(0,0,0,.14);display:flex;justify-content:space-between;align-items:flex-end;gap:30px">
+        <div>
+          <div style="font-family:'Source Serif 4',serif;font-size:28px;color:var(--t-ink)">Grupo Lerma</div>
+          <div style="font-size:12px;color:var(--t-ink2);margin-top:8px;line-height:1.8">Av. del Libertador 2300, Buenos Aires · socios@grupolerma.com.ar · +54 11 4000 0000</div>
+        </div>
+        <div style="font-size:10px;letter-spacing:.2em;color:var(--t-ink2)">HECHO EN <a href="https://altainvitacion.com" style="color:var(--t-acc)">ALTAINVITACION.COM</a></div>
+      </footer>
+    </div>
+  </div>
+  </sc-if>
+
+  <div style="margin-top:20px;border-top:1px solid #272c2f;padding-top:30px;display:flex;flex-direction:column;gap:28px">
+    <div>
+      <div style="font-size:10px;letter-spacing:.26em;color:#7E93A8;margin-bottom:14px">HANDOFF · PALETA BASE + 4 VARIANTES</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px">
+        <sc-for list="{{ paletas }}" as="p" hint-placeholder-count="5">
+          <div style="border:1px solid #272c2f;padding:14px;background:#171a1c">
+            <div style="font-size:12px;color:#DCDFE2;letter-spacing:.04em;margin-bottom:10px">{{ p.n }}</div>
+            <div style="display:flex;gap:5px;margin-bottom:10px"><span style="{{ p.sw1 }}"></span><span style="{{ p.sw2 }}"></span><span style="{{ p.sw3 }}"></span><span style="{{ p.sw4 }}"></span><span style="{{ p.sw5 }}"></span><span style="{{ p.sw6 }}"></span></div>
+            <div style="font-size:10px;line-height:1.75;color:#848b91;font-variant-numeric:tabular-nums">fondo {{ p.bg }} · alterno {{ p.alt }}<br>tinta {{ p.ink }} · tinta suave {{ p.ink2 }}<br>acento {{ p.acc }} · secundario {{ p.acc2 }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.26em;color:#7E93A8;margin-bottom:14px">HANDOFF · TIPOGRAFÍA (sin script, por definición)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;font-size:11.5px;color:#878e95;line-height:1.7">
+        <div style="border:1px solid #272c2f;padding:14px;background:#171a1c"><div style="font-family:'Source Serif 4',serif;font-size:28px;color:#F2F3F4">Source Serif 4</div>Display institucional · títulos, número del countdown, membrete y cita de la presidencia.</div>
+        <div style="border:1px solid #272c2f;padding:14px;background:#171a1c"><div style="font-family:Archivo,sans-serif;font-size:22px;color:#F2F3F4;letter-spacing:.2em">ARCHIVO</div>Kickers y etiquetas en mayúsculas tracked 0,22 em · botones y navegación.</div>
+        <div style="border:1px solid #272c2f;padding:14px;background:#171a1c"><div style="font-family:Archivo,sans-serif;font-size:19px;color:#F2F3F4">Archivo 300/400</div>Cuerpos y datos · nunca por debajo de 14 px · cifras tabulares en CBU y horarios.</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.26em;color:#7E93A8;margin-bottom:14px">HANDOFF · ANIMACIONES (nombre · duración · easing · delay/stagger)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:10px">
+        <sc-for list="{{ anims }}" as="a" hint-placeholder-count="9">
+          <div style="border:1px solid #272c2f;padding:12px 14px;background:#171a1c">
+            <div style="font-size:11.5px;color:#DCDFE2;letter-spacing:.03em">{{ a.n }}</div>
+            <div style="font-size:10.5px;color:#848b91;line-height:1.75;margin-top:5px">{{ a.d }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:.26em;color:#7E93A8;margin-bottom:14px">HANDOFF · 10 SLOTS DE DOODLE</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+        <sc-for list="{{ slots }}" as="s" hint-placeholder-count="10">
+          <div style="border:1px solid #272c2f;padding:11px 13px;background:#171a1c;font-size:10.5px;color:#848b91;line-height:1.7"><span style="color:#DCDFE2">{{ s.n }}</span> · {{ s.d }}</div>
+        </sc-for>
+      </div>
+      <div style="margin-top:12px;font-size:10.5px;color:#848b91;line-height:1.8">Esta familia no tiene piezas pictóricas en el inventario: <b style="color:#DCDFE2">toda la ornamentación es SVG y CSS inline</b> (0 KB de imágenes). El sello seco se simula con dos sombras — una clara arriba a la izquierda y una oscura abajo a la derecha — sobre trazos al 45 % de opacidad, sin tinta de color.</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1200}}">
+class Component extends DCLogic {
+  state = { view:'celular', vi:0, a:0, b:0, rsvp:0, faq:-1, quiz:-1, son:false,
+            t:{d:'—',h:'00',m:'00',s:'00'} };
+
+  paletas = [
+    {n:'Azul institucional (base)', bg:'#F7F6F3', alt:'#ECEBE7', ink:'#22252A', ink2:'#5A6069', acc:'#1F4E79', acc2:'#8C9099'},
+    {n:'Verde institucional',       bg:'#F6F7F4', alt:'#EAEDE8', ink:'#1E2521', ink2:'#566058', acc:'#1E6B52', acc2:'#8B948D'},
+    {n:'Borgoña',                   bg:'#F8F5F4', alt:'#EEE9E8', ink:'#26201F', ink2:'#61585A', acc:'#7B2B3A', acc2:'#998E90'},
+    {n:'Grafito',                   bg:'#F6F6F6', alt:'#EAEAEA', ink:'#1C1E20', ink2:'#5B5F62', acc:'#3A3F45', acc2:'#8E9296'},
+    {n:'Ocre',                      bg:'#F8F6F1', alt:'#EEEAE0', ink:'#262219', ink2:'#615B4E', acc:'#9A6B1F', acc2:'#9A9284'}
+  ];
+
+  componentDidMount(){ this.tick(); this.iv=setInterval(()=>this.tick(),1000); this.armar(); this.loop(); }
+  componentDidUpdate(){ this.armar(); }
+  componentWillUnmount(){ clearInterval(this.iv); clearTimeout(this.fb); cancelAnimationFrame(this.rid); (this.ios||[]).forEach(o=>o.disconnect()); }
+
+  setRoot = el => { this.root = el; };
+  setPill = el => { this.pill = el; };
+
+  hex(h){ const n = parseInt(h.slice(1),16); return [n>>16&255, n>>8&255, n&255]; }
+
+  vigilarPill(){
+    const sc = this.root && this.root.querySelector('#scC');
+    if(!sc || sc.dataset.pill) return;
+    sc.dataset.pill = '1';
+    sc.addEventListener('scroll', ()=>{
+      if(!this.pill) return;
+      this.pill.style.transition = 'opacity .3s ease,transform .3s cubic-bezier(.22,.61,.36,1)';
+      this.pill.style.opacity = '0';
+      this.pill.style.transform = 'translateX(-50%) translateY(26px)';
+      clearTimeout(this.pt);
+      this.pt = setTimeout(()=>{
+        if(!this.pill) return;
+        this.pill.style.transition = 'opacity .35s ease,transform .35s cubic-bezier(.22,.61,.36,1)';
+        this.pill.style.opacity = '1';
+        this.pill.style.transform = 'translateX(-50%) translateY(0)';
+      }, 370);
+    }, { passive:true });
+  }
+
+  tick(){
+    const dif = new Date('2027-09-09T09:00:00-03:00') - new Date();
+    const s = Math.max(0, Math.floor(dif/1000)), p = n => String(n).padStart(2,'0');
+    this.setState({ t:{ d:String(Math.floor(s/86400)), h:p(Math.floor(s/3600)%24), m:p(Math.floor(s/60)%60), s:p(s%60) } });
+  }
+
+  armar(){
+    if(!this.root) return;
+    this.vigilarPill();
+    this.ios = this.ios || [];
+    const nuevos = Array.prototype.slice.call(this.root.querySelectorAll('[data-reveal]')).filter(e=>!e.dataset.armed);
+    nuevos.forEach(el=>{
+      el.dataset.armed='1';
+      const k = el.dataset.reveal;
+      const tr = k==='t' ? 'translateY(60px)' : k==='izq' ? 'translateX(-60px)' : k==='der' ? 'translateX(60px)' : 'translateY(16px)';
+      const dur = k==='t' ? '.7s' : k==='b' ? '.5s' : '.6s';
+      el.style.opacity='0'; el.style.transform=tr; el.style.willChange='transform,opacity';
+      el.style.transition='opacity '+dur+' cubic-bezier(.16,1,.3,1), transform '+dur+' cubic-bezier(.16,1,.3,1)';
+    });
+    if(nuevos.length){
+      const grupos = new Map();
+      nuevos.forEach(el=>{
+        const sc = el.closest('[data-scroll]') || null;
+        if(!grupos.has(sc)) grupos.set(sc, []);
+        grupos.get(sc).push(el);
+      });
+      grupos.forEach((lista, sc)=>{
+        const io = new IntersectionObserver(es=>{
+          es.forEach(e=>{
+            if(!e.isIntersecting) return;
+            const d = parseInt(e.target.dataset.delay||'0',10);
+            setTimeout(()=>{ e.target.style.opacity='1'; e.target.style.transform='none'; }, d);
+            io.unobserve(e.target);
+          });
+        }, { root: sc, threshold:.1 });
+        lista.forEach(el=>io.observe(el));
+        this.ios.push(io);
+      });
+    }
+    clearTimeout(this.fb);
+    this.fb = setTimeout(()=>{
+      if(!this.root) return;
+      this.root.querySelectorAll('[data-reveal]').forEach(el=>{
+        if(el.style.opacity !== '1'){
+          const r = el.getBoundingClientRect();
+          if(r.top < window.innerHeight + 200 && r.bottom > -200){ el.style.opacity='1'; el.style.transform='none'; }
+        }
+      });
+    }, 1200);
+  }
+
+  loop(){
+    const paso = ()=>{
+      if(this.root){
+        this.frame = (this.frame||0)+1;
+        if(!this.pars || this.frame % 40 === 0) this.pars = Array.prototype.slice.call(this.root.querySelectorAll('[data-par]'));
+        this.pars.forEach(el=>{
+          const sc = el.closest('[data-scroll]');
+          const y = sc ? sc.scrollTop : 0;
+          el.style.transform = 'translateY('+(y*0.2).toFixed(1)+'px)';
+        });
+      }
+      this.rid = requestAnimationFrame(paso);
+    };
+    this.rid = requestAnimationFrame(paso);
+  }
+
+  abrir(k){ if(this.state[k]) return; this.setState({[k]:1}); setTimeout(()=>this.setState({[k]:2}), 1400); }
+  gesto(k){
+    const ab = this.state[k] === 1;
+    return {
+      aSello: ab ? 'mbSello .45s cubic-bezier(.2,.9,.3,1) forwards' : 'none',
+      aHoja:  ab ? 'mbHoja .85s cubic-bezier(.62,0,.3,1) .45s forwards' : 'none',
+      aOv:    ab ? 'mbVelo .2s ease 1.25s forwards' : (this.state[k]===2 ? 'mbVelo .01s linear forwards' : 'none')
+    };
+  }
+
+  ir(id, sec){
+    const sc = this.root && this.root.querySelector('#'+id);
+    const el = sc && sc.querySelector('[data-sec="'+sec+'"]');
+    if(sc && el) sc.scrollTo({ top: el.offsetTop, behavior:'smooth' });
+  }
+
+  relieve(extra){
+    return 'position:relative;display:flex;align-items:center;justify-content:center;filter:drop-shadow(-1px -1px 0 rgba(255,255,255,.95)) drop-shadow(1px 1px 0 rgba(0,0,0,.22));'+(extra||'');
+  }
+
+  renderVals(){
+    const v = this.paletas[this.state.vi], t = this.state.t;
+    const som = this.hex(v.ink2).join(',');
+    const vars = '--t-bg:'+v.bg+';--t-alt:'+v.alt+';--t-ink:'+v.ink+';--t-ink2:'+v.ink2+';--t-acc:'+v.acc+';--t-acc2:'+v.acc2+
+                 ';--t-som:'+som+';';
+    const ico = p => { const u = 'public/templates/iconos-linea/'+p+'.webp'; return 'width:30px;height:30px;display:block;background:'+v.ink2+';-webkit-mask:url('+u+') no-repeat center / contain;mask:url('+u+') no-repeat center / contain'; };
+    const iconos = ['tarjeta','reloj','copas','polaroids','sobre'];
+    const tog = on => 'min-height:40px;padding:0 16px;border:0;cursor:pointer;font-family:Archivo,sans-serif;font-size:10.5px;letter-spacing:.14em;background:'+(on?'#F2F3F4':'transparent')+';color:'+(on?'#1b1f22':'#878e95');
+
+    const cron = [
+      {hora:'08:30', t:'Acreditación', d:'Hall central · retiro de credenciales', i:'HALL'},
+      {hora:'09:30', t:'Apertura institucional', d:'Palabras de la presidencia', i:'AUDITORIO'},
+      {hora:'11:00', t:'Balance del ejercicio', d:'Presentación de resultados 2026', i:'AUDITORIO'},
+      {hora:'14:30', t:'Mesas de trabajo', d:'Cuatro comisiones simultáneas', i:'SALAS 1-4'},
+      {hora:'17:30', t:'Brindis de cierre', d:'Terraza norte', i:'TERRAZA'}
+    ].map((c,i)=>Object.assign({}, c, { lado: i % 2 === 0 ? 'izq' : 'der' }));
+
+    const faqTextos = [
+      'El centro cuenta con cochera propia por Figueroa Alcorta; el ticket se valida en la mesa de acreditación.',
+      'Tenemos tarifa corporativa en dos hoteles de Recoleta; solicitala a socios@grupolerma.com.ar.',
+      'Subte H estación Las Heras y diez minutos a pie, o las líneas 67, 130 y 93.',
+      'Sí: el auditorio y los baños son accesibles, y hay intérprete de lengua de señas en la apertura.'
+    ];
+    const faqs = ['¿Dónde estaciono?','¿Dónde me alojo?','¿Cómo llego?','¿Hay accesibilidad?'].map((q,i)=>{
+      const ab = this.state.faq === i;
+      return {
+        q, a: faqTextos[i],
+        tog: () => this.setState({ faq: ab ? -1 : i }),
+        mas: 'font-size:20px;line-height:1;color:'+v.acc+';transition:transform .3s cubic-bezier(.16,1,.3,1);transform:rotate('+(ab?'45deg':'0deg')+')',
+        panel: 'overflow:hidden;transform-origin:top;transition:transform .4s cubic-bezier(.16,1,.3,1),opacity .3s ease;transform:scaleY('+(ab?1:0)+');opacity:'+(ab?1:0)+';height:'+(ab?'auto':'0')
+      };
+    });
+
+    const quizOps = ['2009','2014','2018'].map((txt,i)=>{
+      const sel = this.state.quiz === i, ok = i === 1;
+      return {
+        t: txt, pick: () => this.setState({ quiz: i }),
+        s: 'min-height:48px;text-align:left;padding:0 16px;cursor:pointer;font-family:Archivo,sans-serif;font-size:14px;background:'+(sel&&ok?v.acc:'transparent')+';color:'+(sel&&ok?'#fff':v.ink)+';border:1px solid '+(sel?v.acc:'rgba(0,0,0,.2)')
+      };
+    });
+
+    const qrBits = [1,0,1,1,0,0,1,0,1, 0,1,1,0,1,1,0,1,0, 1,1,0,0,1,1,0,1,0, 0,0,1,1,0,1,0,1,1, 1,0,1,0,0,1,1,0,1, 0,1,1,0,1,0,0,1,1, 1,0,0,1,0,1,1,0,1, 0,1,1,0,1,1,0,1,0, 1,1,0,1,0,1,1,0,1];
+    const qr = qrBits.map((b,i)=>{
+      const f = Math.floor(i/9), c = i%9;
+      const ojo = (f<3&&c<3)||(f<3&&c>5)||(f>5&&c<3);
+      const on = ojo ? !(f%3===1 && c%3===1) : !!b;
+      return { s:'background:'+(on ? v.ink : 'transparent') };
+    });
+
+    const barras = (h, col) => [7,13,5,16,9,18,6,14,11,4,15,8].map((n,i)=>({
+      s:'flex:1;height:'+h+'px;background:'+col+';transform-origin:bottom;transform:scaleY('+(n/18)+');'+(this.state.son ? 'animation:mbOnda '+(.7+i*0.06).toFixed(2)+'s ease-in-out '+(i*0.05).toFixed(2)+'s infinite;' : '')
+    }));
+    const regla = (col) => [0,1,2,3,4,5,6,7,8,9,10,11].map(i=>({
+      s:'flex:1;height:'+(i%3===0?14:8)+'px;border-left:1px solid '+col
+    }));
+
+    const celdaCd = (i, pad, borde) => 'flex:1;padding:'+pad+';'+(i ? 'border-left:1px solid '+borde+';' : '');
+    const navSec = [['01','PORTADA','portada'],['02','FECHA','countdown'],['04','AGENDA','detalles'],['05','ÁLBUM','album'],['07','RSVP','rsvp']];
+    const navEscSec = [['01','PORTADA','d-portada'],['02','LA FECHA','d-countdown'],['03','LA FRASE','d-frase'],['04','EL ENCUENTRO','d-detalles'],['05','EL ÁLBUM','d-album'],['06','EL MAPA','d-mapa'],['07','CONFIRMAR','d-rsvp'],['08','ARANCEL','d-regalos'],['09','EL CIERRE','d-cancion']];
+    const pies = ['EDICIÓN 2026','MESAS DE TRABAJO','PLANTA ROSARIO','BRINDIS DE CIERRE'];
+
+    return {
+      setRoot: this.setRoot, setPill: this.setPill, vars, v,
+      esCel: this.state.view === 'celular',
+      esEsc: this.state.view === 'escritorio',
+      vNombre: v.n,
+      verCel: () => this.setState({view:'celular'}),
+      verEsc: () => this.setState({view:'escritorio'}),
+      btnCel: tog(this.state.view === 'celular'),
+      btnEsc: tog(this.state.view === 'escritorio'),
+      marco: 'width:430px;height:932px;border-radius:44px;overflow:hidden;position:relative;border:1px solid #2c3135;box-shadow:0 30px 70px rgba(0,0,0,.55);background:'+v.bg+';'+vars,
+      btnAbrir: 'position:absolute;left:34px;right:34px;bottom:64px;min-height:48px;border:0;background:'+v.acc+';color:#fff;font-family:Archivo,sans-serif;font-size:11.5px;letter-spacing:.2em;cursor:pointer',
+      btnGhost: 'align-self:flex-start;min-height:34px;padding:0 14px;border:1px solid #2c3135;background:#181b1d;color:#878e95;font-size:10px;letter-spacing:.16em;cursor:pointer',
+
+      selloSeco:   this.relieve('width:88px;height:88px;flex:none;animation:'+this.gesto('a').aSello),
+      selloSecoB:  this.relieve('width:88px;height:88px;flex:none;animation:'+this.gesto('b').aSello),
+      selloEstatico: this.relieve(''),
+      selloRsvp:   'position:relative;width:150px;height:150px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(-1px -1px 0 rgba(255,255,255,.35)) drop-shadow(1px 1px 0 rgba(0,0,0,.18));animation:mbSello .5s cubic-bezier(.2,.9,.3,1) forwards',
+      selloEsc:    'position:relative;width:200px;height:200px;display:flex;align-items:center;justify-content:center;filter:drop-shadow(-1px -1px 0 rgba(255,255,255,.35)) drop-shadow(1px 1px 0 rgba(0,0,0,.18))',
+
+      paletas: this.paletas.map((p,i)=>Object.assign({}, p, {
+        set: () => this.setState({vi:i}),
+        chip: 'width:26px;height:26px;cursor:pointer;background:'+p.acc+';border:2px solid '+(this.state.vi===i ? '#F2F3F4' : 'transparent')+';box-shadow:0 0 0 1px #2c3135',
+        sw1:'flex:1;height:26px;background:'+p.bg, sw2:'flex:1;height:26px;background:'+p.alt, sw3:'flex:1;height:26px;background:'+p.ink,
+        sw4:'flex:1;height:26px;background:'+p.ink2, sw5:'flex:1;height:26px;background:'+p.acc, sw6:'flex:1;height:26px;background:'+p.acc2
+      })),
+
+      sA: this.gesto('a'), sB: this.gesto('b'),
+      abrirA: () => this.abrir('a'), abrirB: () => this.abrir('b'),
+      resetA: () => this.setState({a:0}), resetB: () => this.setState({b:0}),
+
+      cd: {
+        d: t.d,
+        cajas:  [{n:t.h,l:'HORAS'},{n:t.m,l:'MINUTOS'},{n:t.s,l:'SEGUNDOS'}].map((c,i)=>Object.assign({}, c, { s: celdaCd(i,'16px 12px','rgba(0,0,0,.14)') })),
+        cajasD: [{n:t.h,l:'HORAS'},{n:t.m,l:'MINUTOS'},{n:t.s,l:'SEGUNDOS'}].map((c,i)=>Object.assign({}, c, { s: celdaCd(i,'30px 22px','rgba(0,0,0,.16)') }))
+      },
+      cronograma: cron,
+      album: pies.map((pie,i)=>({ slot:'FOTO · galeriaPrincipalFotos['+(i+1)+']', pie, num:'0'+(i+1) })),
+      qr, faqs, quiz: quizOps,
+      grilla: [0,1,2,3,4,5,6,7].map(i=>({ s:'height:'+(i%3===0?130:104)+'px;background:repeating-linear-gradient(135deg,#D8DADC 0 7px,#CFD2D5 7px 14px);border:1px solid rgba(0,0,0,.1)' })),
+      bancos: [
+        {tit:'ALMUERZO DE CIERRE · CUENTA INSTITUCIONAL', titular:'Grupo Lerma S.A.', banco:'Banco Galicia · Cuenta corriente en pesos', cbu:'0070 0155 2000 3391 4470 28', alias:'lerma.socios.2027', cuit:'30-70884412-9'},
+        {tit:'CUOTA SOCIETARIA · SEGUNDA CUENTA', titular:'Asociación de Socios Lerma', banco:'Banco Nación · Caja de ahorro en pesos', cbu:'0110 3421 3000 8820 1194 55', alias:'cuota.socios.lerma', cuit:'30-71225530-4'}
+      ],
+      ondas: barras(24, v.acc), ondasD: barras(38, v.acc),
+      reglilla: regla('rgba(0,0,0,.22)'), reglillaRsvp: regla('rgba(255,255,255,.55)'),
+      aVinilo: this.state.son ? 'mbGira 8s linear infinite' : 'none',
+      togSon: () => this.setState({son: !this.state.son}),
+      labelSon: this.state.son ? 'PAUSAR' : 'ESCUCHAR',
+
+      noConfirmado: !this.state.rsvp,
+      confirmado: !!this.state.rsvp,
+      confirmar: () => this.setState({rsvp:1}),
+      resetRsvp: () => this.setState({rsvp:0}),
+
+      irMapa: () => this.ir('scC','mapa'),
+      nav: navSec.map(([num,l,sec],i)=>({ num, l, ic: ico(iconos[i]), go: () => this.ir('scC', sec) })),
+      navEsc: navEscSec.map(([num,l,sec])=>({
+        num, l, go: () => this.ir('scD', sec),
+        s: 'display:flex;align-items:center;gap:10px;min-height:38px;background:none;border:0;border-bottom:1px solid rgba(0,0,0,.1);cursor:pointer;padding:0;text-align:left;color:'+v.ink2
+      })),
+
+      anims: [
+        {n:'apertura · el sello seco se marca', d:'mbSello · 0,45 s · cubic-bezier(.2,.9,.3,1) · scale(1,18 → 1) + opacity; el relieve son dos drop-shadow de 1 px, clara arriba a la izquierda y oscura abajo a la derecha'},
+        {n:'apertura · la hoja se retira', d:'mbHoja · 0,85 s · cubic-bezier(.62,0,.3,1) · delay 0,45 s · translateX(0 → −102%), como sacar el membrete de la carpeta'},
+        {n:'apertura · velo del splash', d:'mbVelo · 0,2 s · ease · delay 1,25 s. Total del gesto: 1,4 s'},
+        {n:'reveal de títulos', d:'translateY(60px → 0) + opacity · 0,7 s · cubic-bezier(.16,1,.3,1) · IntersectionObserver threshold 0,1'},
+        {n:'reveal de bloques', d:'translateY(16px → 0) + opacity · 0,5 s · mismo easing · stagger 90 ms'},
+        {n:'agenda', d:'translateX(±60px → 0) + opacity · 0,6 s · alterna lado; en escritorio la fila es una grilla 92 px / 1 fr / 160 px'},
+        {n:'parallax de la foto', d:'translateY(scrollTop × 0,2) en requestAnimationFrame · factor visual 0,8'},
+        {n:'gesto de luz', d:'ninguno. Es la única familia sin destello sobre la foto: la sobriedad es el efecto'},
+        {n:'sello CONFIRMADO', d:'mbSello · 0,5 s · cubic-bezier(.2,.9,.3,1) · scale(1,18 → 1) en relieve sobre el bloque de acento, sin tinta de color'},
+        {n:'disco del cierre', d:'mbGira · 8 s · linear · infinite · disco dibujado en SVG (sin imagen) · 12 barras con mbOnda 0,70–1,36 s, stagger 50 ms'},
+        {n:'despliegue de información útil', d:'scaleY(0 → 1) desde arriba · 0,4 s · cubic-bezier(.16,1,.3,1); el «+» rota 45°'}
+      ],
+      slots: [
+        {n:'01 portada · filete de datos', d:'SVG/CSS · filete con cuadrado de registro sobre el bloque de fecha y sede'},
+        {n:'02 portada · sello seco', d:'SVG en relieve, esquina inferior derecha de la ficha'},
+        {n:'03 marco de foto · escuadra A', d:'CSS · escuadra de registro superior izquierda en blanco'},
+        {n:'04 marco de foto · escuadra B', d:'CSS · escuadra inferior derecha'},
+        {n:'05 ícono del encuentro', d:'SVG · tabla de agenda de línea fina'},
+        {n:'06 divisor de countdown', d:'SVG · reglilla de 12 marcas, una alta cada tres'},
+        {n:'07 faja de membrete', d:'CSS · banda de acento con el nombre institucional y el año de fundación'},
+        {n:'08 ícono del mapa', d:'SVG · cuadrado con cruz de retícula'},
+        {n:'09 ícono de RSVP', d:'SVG · reglilla en blanco sobre el bloque de acento'},
+        {n:'10 remate del arancel', d:'SVG · filete con cuadrado central al pie de las cuentas'}
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
