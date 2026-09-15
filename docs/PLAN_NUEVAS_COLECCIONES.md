@@ -116,7 +116,7 @@ Regla: `XxxTemplate.tsx` exporta `XxxTemplate`; la variante `XxxTemplateNombre.t
 3. Theming en los dos wrappers (§3.2): `--t-bg --t-surface --t-muted --t-acc --t-acc2 --c-accent`, y `--chic-ink` literal en tema claro (§3.4). En Papel Prensado `--t-acc/--t-acc2` son la **tinta**, no un acento.
 4. Las 9 secciones y los 10 slots de doodle en su posición; el gesto de apertura, el efecto sobre la foto y el marco, **tal como los describe el handoff** (nombre · duración · easing · delay).
 5. Piezas: `iconos-linea/` y `manuscrita/` como **máscara CSS** con background en la tinta; `herbario/`, `sobre-sello/`, `acuarela-corona/`, `tinta-vinilo/`, `trazo/` como `<img alt="" aria-hidden>`; rutas canónicas `/templates/<familia>/x.webp` en una constante `PIEZAS`.
-6. Final Parade Script como `var(--font-final-parade)` (ya registrada). El resto por `next/font/google`.
+6. Final Parade Script como `var(--font-final-parade)` (ya registrada). El resto por `next/font/google`. **Las caras son parte del diseño y quedan fijas en el archivo**: Paper no lee `--font-title/--font-body-custom` y el paso de Tipografía del wizard no aparece para esta colección (igual que Storytelling e Icon). Ojo con la especificidad: la regla genérica `.tpl h3` le ganaba a `.pr-titulo`; la script lleva `!important` en sus cuatro lugares (títulos de sección, &, frase de cierre, nombre del splash).
 7. Variantes por script (§2.4), con la nota en el generador de qué cambia y qué no.
 8. Post-evento: el mismo mecanismo que usan las Flat actuales.
 

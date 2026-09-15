@@ -52,7 +52,6 @@ import { AddToCalendarLink } from "@/components/invitation/AddToCalendarLink";
 import { CreditCard, Gift, Ticket, Users } from "lucide-react";
 import { getEventStatus, getInvitationExpirationDate } from "@/lib/expiration";
 import { toEmbedMapUrl } from "@/lib/google-maps";
-import { getTypographyCssVars } from "@/lib/typography-map";
 import { resolveGuestNameDisplay } from "@/lib/invitation-copy";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 import { useTextos } from "@/components/i18n/ProveedorIdioma";
@@ -87,8 +86,13 @@ const TINTA_SUAVE = "#8A756D";
 /** rgb de la sombra: se usa en todos los rgba() del registro. */
 const SH = "120,103,86";
 
-const SERIF = "var(--font-title, var(--pr-cormorant)), 'Cormorant Garamond', serif";
-const SANS = "var(--font-body-custom, var(--pr-jost)), 'Jost', sans-serif";
+// Las tres caras son parte del diseño y no se cambian desde el wizard (a
+// diferencia de las Flat de siempre, que leen --font-title/--font-body-custom):
+// el relieve está calibrado para Cormorant 300 y la firma de la colección es
+// la script. Por eso el paso de Tipografía no aparece para Paper (ver
+// wizard-steps-config.ts).
+const SERIF = "var(--pr-cormorant), 'Cormorant Garamond', serif";
+const SANS = "var(--pr-jost), 'Jost', sans-serif";
 const SCRIPT = "var(--font-final-parade, 'Final Parade Script'), cursive";
 
 // ─── Piezas ─────────────────────────────────────────────────────────────────
@@ -696,7 +700,7 @@ export function PrensaTemplatePiedra({ invitation, guest, isPersonalized = false
         document.body
       )}
 
-      <div className="desktop-stage pr-escenario" data-theme={theme} style={getTypographyCssVars(invitation.fontTitle as string, invitation.fontBody as string) as React.CSSProperties}>
+      <div className="desktop-stage pr-escenario" data-theme={theme}>
         <div className="pr-fondo" aria-hidden="true" />
 
         {/* ── Escritorio: la hoja grande, fija a la izquierda ─────────── */}
@@ -1178,6 +1182,11 @@ const CSS_PRENSA = `
 
   /* Componentes compartidos vestidos con el registro */
   .pr-raiz .tpl h2, .pr-raiz .tpl h3, .pr-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
+  /* La script tiene que ganarle a la regla de arriba y a la tipografía que
+     el anfitrión elige en el wizard (--font-title): los títulos de sección,
+     el &, la frase de cierre y el nombre del splash van SIEMPRE en Final
+     Parade, es la firma de la colección. */
+  .pr-raiz .pr-titulo, .pr-raiz .tpl h3.pr-titulo, .pr-raiz .pr-script, .pr-raiz .pr-amp, .pr-raiz .pr-splash-nombre, .pr-raiz .pr-sinonimo { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
   .pr-raiz .tpl .t-kicker, .pr-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${TINTA_SUAVE} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .39em !important; text-transform: uppercase !important; display: block; }
   .pr-raiz .tpl .t-kicker::before, .pr-raiz .tpl p.kicker::before { display: none !important; }
   .pr-raiz .tpl div:not(#countdown div), .pr-raiz .tpl section, .pr-raiz .tpl button, .pr-raiz .tpl input, .pr-raiz .tpl iframe, .pr-raiz .tpl .t-btn, .pr-raiz .tpl .album-btn { border-radius: 0 !important; }

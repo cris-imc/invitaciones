@@ -138,7 +138,11 @@ export function getWizardSteps({
         // Sólo Storytelling: es el único que tiene paneles que recorrer.
         ...(storytelling ? [{ component: StepStorytellingScroll, label: "Recorrido", clave: "wizard.pasos.recorrido" as const }] : []),
         { component: StepHeroImages, label: "Portada", clave: "wizard.pasos.portada" as const },
-        ...(!storytelling ? [{ component: StepTypography, label: "Tipografía", clave: "wizard.pasos.tipografia" as const }] : []),
+        // Tipografía sólo para la Colección Flat de siempre. Paper trae las
+        // caras como parte del diseño (el relieve de Papel Prensado está
+        // calibrado para Cormorant 300; la script es la firma) y las fija en
+        // el archivo, igual que Storytelling e Icon.
+        ...(coleccionDeFamilia(templateTipo) === "FLAT" ? [{ component: StepTypography, label: "Tipografía", clave: "wizard.pasos.tipografia" as const }] : []),
         { component: StepBasicInfo, label: "Información Básica", clave: "wizard.pasos.informacionBasica" as const },
         ...(!storytelling ? [{ component: StepCountdownStyle, label: "Countdown", clave: "wizard.pasos.countdown" as const }] : []),
         { component: StepPhrase, label: "Frase", clave: "wizard.pasos.frase" as const },
