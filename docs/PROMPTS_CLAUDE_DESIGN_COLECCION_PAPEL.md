@@ -68,15 +68,15 @@ las usamos como máscara CSS, así la misma rama sale verde salvia, oliva o
 ceniza según la variante, sin regenerar un solo archivo.
 
 **Las 29 piezas ya están cortadas** en `public/templates/` (12 íconos de línea
-compartidos, 4 de herbario, 9 de trazo), con su inventario y sus dos modos de
-uso en `public/templates/INVENTARIO_PAPEL_PRENSADO.md`; falta la lámina de
-baraja española, cuyo prompt está en §3. Y hay una distinción que descubrí al
+compartidos, 4 de herbario, 9 de trazo, 5 de baraja española), con su inventario
+y sus dos modos de uso en `public/templates/INVENTARIO_PAPEL_PRENSADO.md`.
+Y hay una distinción que descubrí al
 verificarlas y que importa: los íconos y los trazos son **tinta plana**
 (luminancia 24-47), así que van como máscara CSS y toman el color de la
 variante; el herbario está **pintado** con luces y sombras (luminancia 2-255),
 así que la máscara lo aplastaría — va como imagen con un duotono de filtros, que
 conserva el pintado y también da las cinco variantes. La baraja va en ese mismo
-registro pintado.
+registro pintado, con sus propios valores de duotono.
 
 Y sobre cómo se colocan, medí las siete familias con dibujo y las reglas son
 pocas y estrictas: **toda pieza grande sangra por un borde de la hoja**, se usan
@@ -133,9 +133,8 @@ FORMATO DE ENTREGA (no negociable)
     piezas de baraja) va en PIEZAS WebP con transparencia que YA EXISTEN,
     cortadas y listas. No las inventes ni las describas para generar: leé
     public/templates/INVENTARIO_PAPEL_PRENSADO.md antes de componer y usá sólo
-    las de tu familia más el set compartido de íconos. Son 25 piezas cortadas:
-    12 íconos de línea, 4 de herbario y 9 de trazo (las 5 de baraja están
-    pendientes de generar; si todavía no están, no hagas esa familia).
+    las de tu familia más el set compartido de íconos. Son 30 piezas cortadas:
+    12 íconos de línea, 4 de herbario, 9 de trazo y 5 de baraja.
     Hay DOS formas de usarlas y no son intercambiables:
       - iconos-linea y trazo son TINTA PLANA: van como máscara CSS
         (mask / -webkit-mask con background: var(--t-acc)), y así toman el
@@ -585,18 +584,17 @@ CHEQUEO ANTES DE ENTREGAR
 
 ## 3. Las láminas de assets — YA ESTÁN HECHAS Y CORTADAS
 
-Tres de las cuatro láminas se generaron, se cortaron y quedaron listas:
-**25 piezas** en `public/templates/`, con su inventario en
+Las cuatro láminas se generaron, se cortaron y quedaron listas: **30 piezas** en
+`public/templates/`, con su inventario en
 `public/templates/INVENTARIO_PAPEL_PRENSADO.md`. **No hay que volver a
-generarlas.** La cuarta, la de baraja española, está pendiente: su prompt es el
-de la Lámina 3, más abajo.
+generarlas** salvo que quieras piezas nuevas.
 
 | Set | Piezas | Peso | Cómo se usa |
 |---|---|---|---|
 | `iconos-linea` | 12 (iglesia, copas, anillos, tarjeta, sobre, confeti, polaroids, nota-musical, torta, reloj, auto, regalo) | 225 KB | máscara CSS |
 | `herbario` | 4 (rama-esquina, rama-cabecera, magnolia, hoja) | 277 KB | `<img>` + duotono |
 | `trazo` | 9 (garabato-largo/corto, 2 corazones, marco-circular, 4 destellos) | 101 KB | máscara CSS |
-| `baraja` | 5 (as-de-copas, as-de-oros, ancho-de-espada, ancho-de-basto, espada-y-basto) | — | **pendiente**: `<img>` + duotono |
+| `baraja` | 5 (as-de-copas, as-de-oros, ancho-de-espada, ancho-de-basto, espada-y-basto) | 241 KB | `<img>` + duotono |
 
 Las capturas de control: `mockup/inspire/webs/4y-piezas-cortadas.jpg` (las 29 a
 escala) y `4y-herbario-variantes.jpg` (una rama en las cinco variantes).
@@ -694,7 +692,7 @@ Las 5 piezas:
 Nada de texto, nada de firma.
 ```
 
-### Lámina 3 — Baraja española (familia 5) · PENDIENTE DE GENERAR
+### Lámina 3 — Baraja española (familia 5) · YA CORTADA
 
 > Reemplaza a la lámina vieja de naipe de póker (corazón, trébol, puntilla),
 > que se descartó: era una copia directa de una carta de póker y no aportaba
@@ -773,6 +771,8 @@ Las subís donde te quede cómodo (la vez pasada las pusiste en `main`, en
 | `mockup/inspire/webs/4z-final-parade-relieve-vs-plana.jpg` | Final Parade en tinta plana y en relieve, a cinco tamaños: por qué hay un mínimo |
 | `mockup/inspire/webs/4y-piezas-cortadas.jpg` | **las 25 piezas ya cortadas, a escala y con su nombre** — es con lo que va a componer |
 | `mockup/inspire/webs/4y-herbario-variantes.jpg` | la misma rama en las cinco variantes, con el duotono de filtros |
+| `mockup/inspire/webs/4y-baraja-piezas.jpg` | las 5 piezas de baraja recortadas |
+| `mockup/inspire/webs/4y-baraja-variantes.jpg` | las 5 piezas en las 5 variantes de la familia |
 | `docs/ANALISIS_RAMESTUDIO.md` | los números, y en §8 el inventario de ornamento con las reglas de composición medidas |
 
 ---
@@ -786,7 +786,8 @@ Las cuatro láminas ya están cortadas, así que se puede arrancar directo:
 2. Revisarla en celular real antes de pedir las otras.
 3. **Herbario** (XV) y **Trazo**.
 4. **Noche** (oscura / corporativa): usa el mismo set de íconos, en hueso.
-5. **Baraja**, cuando esté cortada su lámina.
+5. **Baraja** — su lámina ya está cortada, así que puede ir en cualquier
+   momento; es la más distinta de las cinco.
 
 ---
 

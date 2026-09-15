@@ -1,9 +1,7 @@
 # Inventario de piezas — Colección E "Papel Prensado"
 
-> **Falta el set `baraja`** (5 piezas de baraja española): la lámina está
-> pendiente de generar, su prompt es la Lámina 3 de
-> `docs/PROMPTS_CLAUDE_DESIGN_COLECCION_PAPEL.md`. El set viejo `naipe`
-> (corazón, trébol, puntilla de póker) se descartó.
+> El set viejo `naipe` (corazón, trébol, puntilla de póker) se descartó y lo
+> reemplaza `baraja`, de baraja española.
 
 > Cortadas de las láminas de `mockup/inspire/assets/` con el corte por
 > etiquetas: se etiqueta la lámina entera y cada pieza se recorta con el bbox de
@@ -63,6 +61,18 @@ Tinta plana a un color → **se usa como máscara CSS** y se recolorea por varia
 | `/templates/trazo/garabato-largo.webp` | 176×1168 | 17 KB | Línea ondulada muy vertical. Va pegada a un borde lateral de la hoja, sangrando arriba y abajo, ancho 30 %. |
 | `/templates/trazo/marco-circular.webp` | 632×674 | 51.4 KB | Círculo a mano alzada con tres hojitas. SÓLO alrededor del número del countdown. |
 
+## baraja (5 piezas, 241 KB)
+
+Ilustración pintada con luces y sombras → **NO se usa como máscara**. Se usa como imagen y se tiñe con `filter` (ver abajo).
+
+| Ruta | Tamaño | Peso | Para qué es |
+|---|---|---|---|
+| `/templates/baraja/ancho-de-basto.webp` | 240×770 | 44.6 KB | El garrote solo. Canción y cierre, en espejo del ancho de espada. |
+| `/templates/baraja/ancho-de-espada.webp` | 205×787 | 26.5 KB | La espada sola. RSVP: pegada al borde izquierdo, sangrando arriba y abajo, ancho 22 %. |
+| `/templates/baraja/as-de-copas.webp` | 297×489 | 40.4 KB | Copa ceremonial labrada. Esquina inferior izquierda de la portada y del cierre, ancho 32 % de la hoja, sangrando por el borde. En XV y cumpleaños reemplaza al escudo en la portada. |
+| `/templates/baraja/as-de-oros.webp` | 413×414 | 58.8 KB | Medallón con sol de rayos. Countdown (ancho 55 %, el número de días en relieve encima) y cabecera de la sección de datos (ancho 40 %, cortado arriba). |
+| `/templates/baraja/espada-y-basto.webp` | 453×646 | 70.6 KB | Los dos anchos cruzados con un lazo: el escudo de la pareja. Portada, centrado, ancho 45 %, y columna fija de escritorio. |
+
 ## Cómo se usan
 
 ### Piezas de tinta plana (iconos-linea, trazo)
@@ -80,7 +90,7 @@ generar un archivo por color.
 }
 ```
 
-### Piezas pintadas (herbario y, cuando llegue, baraja)
+### Piezas pintadas (herbario y baraja)
 
 Están en sepia desteñido y tienen luces y sombras, así que la máscara las aplastaría. Van
 como `<img>` y se tiñen con un duotono de filtros, que conserva el pintado.
@@ -101,6 +111,22 @@ Valores probados sobre `rama-esquina.webp`:
 
 Se define `--t-tinte` por variante y la misma pieza sirve para las cinco. La
 comparación está en `mockup/inspire/webs/4y-herbario-variantes.jpg`.
+
+Para **baraja**, que arranca más saturada (la copa tiene una banda terracota),
+los cinco valores probados son otros. Están verificados sobre las cinco piezas
+en `mockup/inspire/webs/4y-baraja-variantes.jpg`:
+
+| Variante | `filter` |
+|---|---|
+| Oro viejo | `grayscale(1) sepia(1) hue-rotate(-6deg) saturate(1.45) brightness(.88) contrast(1.08)` |
+| Vino | `grayscale(1) sepia(1) hue-rotate(-38deg) saturate(2.2) brightness(.68) contrast(1.2)` |
+| Verde mesa | `grayscale(1) sepia(1) hue-rotate(95deg) saturate(.7) brightness(.86)` |
+| Tinta | `grayscale(1) sepia(1) hue-rotate(165deg) saturate(.6) brightness(.85)` |
+| Ceniza | `grayscale(1) sepia(.3) saturate(.45) brightness(.98)` |
+
+El `grayscale(1)` del principio no es decorativo: es lo que normaliza la banda
+terracota de la copa con el dorado del oro, para que las cinco piezas queden en
+el mismo tono.
 
 ### Siempre
 
