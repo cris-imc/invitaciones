@@ -91,8 +91,20 @@ function esDecoracion(el) {
   return /^<(svg|img|div)\b/.test(el);
 }
 
+/**
+ * Reapunta las piezas del mockup a las WebP del repo.
+ *
+ * Hay que mirar `src` Y `href`: las que están sueltas en el HTML son <img
+ * src>, pero las que van DENTRO de un SVG son <image href> -- y la pareja de
+ * la portada es de esas. Reescribiendo sólo `src` quedaba apuntando al PNG
+ * del mockup, que en el sitio no existe: la portada de bienvenida de las
+ * familias de casamiento cargaba sin la pareja y nadie veía un error.
+ */
 function piezas(s) {
-  return s.replace(/src="\.\/img\/(?:trazo\/)?([^"]+)\.png"/g, (_, n) => `src="/templates/${carpetaPiezas}/${n}.webp"`);
+  return s.replace(
+    /\b(src|href|xlink:href)="\.\/img\/(?:trazo\/)?([^"]+)\.png"/g,
+    (_, attr, n) => `${attr}="/templates/${carpetaPiezas}/${n}.webp"`
+  );
 }
 
 const secciones = [
