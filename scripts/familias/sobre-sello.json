@@ -1,0 +1,18 @@
+{
+  "codigo": "SOBRESELLO",
+  "etiqueta": "Sobre & Sello",
+  "archivo": "SobreSelloTemplate",
+  "componente": "SobreSelloTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papeleriaViva",
+  "acento": "#7A2F3A",
+  "eventos": ["quinceYCasamiento"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Bordó", "color": "#7A2F3A" },
+    { "id": "Bosque", "nombre": "Verde bosque", "color": "#1F5A47" },
+    { "id": "Tinta", "nombre": "Azul tinta", "color": "#24344D" },
+    { "id": "Terracota", "nombre": "Terracota", "color": "#B8643C" },
+    { "id": "Oliva", "nombre": "Oliva", "color": "#6B6B3A" }
+  ]
+}

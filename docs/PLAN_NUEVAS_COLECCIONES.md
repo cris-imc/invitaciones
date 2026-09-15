@@ -232,7 +232,7 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 
 | Familia | Código | Estado |
 |---|---|---|
-| Sobre & Sello | SOBRESELLO | — |
+| Sobre & Sello | SOBRESELLO | `verificada` — base de Papelería Viva, derivada de Prensa con `scripts/derivar-sobre-sello.js`: comparte la ARQUITECTURA (Flat, las mismas 9 secciones, los componentes compartidos, el splash, la pastilla) y no comparte NADA del vestuario. Dos acentos (lacre + dorado) en vez de monocroma, doodles pintados como `<img>` en 10 slots, tarjetas con filete fino y esquina doblada en vez de hojas troqueladas, portada-SOBRE (forro a rayas, doble filete, ramos, lacre) y cuenta regresiva con los días en un anillo que gira una vuelta por minuto. Pinyon Script como firma. 5 variantes que cambian papel Y acentos (Bordó, Verde bosque, Azul tinta, Terracota, Oliva). Verificada en DOM: 2 sobres, doodles cargando (0 rotas), Cormorant 44 px + Pinyon en el &, 4 cabeceras con filete y punto, cero lucide. |
 | Acuarela & Corona | ACUARELACORONA | — |
 | Manuscrita | MANUSCRITA | — |
 | Tinta & Vinilo | TINTAVINILO | — |

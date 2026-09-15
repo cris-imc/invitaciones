@@ -9,6 +9,7 @@
  * se agrega acá y las dos pantallas la toman.
  */
 export const TEMPLATE_LABELS: Record<string, string> = {
+  SOBRESELLO: "Sobre & Sello",
   TRAZODEPAPEL: "Trazo de papel",
   CIUDADDEPAPEL: "Ciudad de papel",
   CUENTODEPAPEL: "Cuento de papel",

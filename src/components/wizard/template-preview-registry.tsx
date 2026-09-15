@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL" | "SOBRESELLO";
 
 export interface ColorOption {
   id: string;
@@ -1298,4 +1298,20 @@ export const TRAZODEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
   Terracota: dynamic(() => import("@/components/templates/TrazoDePapelTemplateTerracota").then((m) => m.TrazoDePapelTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Azul: dynamic(() => import("@/components/templates/TrazoDePapelTemplateAzul").then((m) => m.TrazoDePapelTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Borgona: dynamic(() => import("@/components/templates/TrazoDePapelTemplateBorgona").then((m) => m.TrazoDePapelTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const SOBRESELLO_COLORS: ColorOption[] = [
+  { id: "default", name: "Bordó", color: "#7A2F3A" },
+  { id: "Bosque", name: "Verde bosque", color: "#1F5A47" },
+  { id: "Tinta", name: "Azul tinta", color: "#24344D" },
+  { id: "Terracota", name: "Terracota", color: "#B8643C" },
+  { id: "Oliva", name: "Oliva", color: "#6B6B3A" },
+];
+
+export const SOBRESELLO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/SobreSelloTemplate").then((m) => m.SobreSelloTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bosque: dynamic(() => import("@/components/templates/SobreSelloTemplateBosque").then((m) => m.SobreSelloTemplateBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Tinta: dynamic(() => import("@/components/templates/SobreSelloTemplateTinta").then((m) => m.SobreSelloTemplateTinta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/SobreSelloTemplateTerracota").then((m) => m.SobreSelloTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Oliva: dynamic(() => import("@/components/templates/SobreSelloTemplateOliva").then((m) => m.SobreSelloTemplateOliva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

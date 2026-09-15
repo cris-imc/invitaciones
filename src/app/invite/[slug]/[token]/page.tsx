@@ -21,6 +21,11 @@ import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso"
 import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
 import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
 import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
+import { SobreSelloTemplate } from "@/components/templates/SobreSelloTemplate";
+import { SobreSelloTemplateBosque } from "@/components/templates/SobreSelloTemplateBosque";
+import { SobreSelloTemplateTinta } from "@/components/templates/SobreSelloTemplateTinta";
+import { SobreSelloTemplateTerracota } from "@/components/templates/SobreSelloTemplateTerracota";
+import { SobreSelloTemplateOliva } from "@/components/templates/SobreSelloTemplateOliva";
 import { TrazoDePapelTemplate } from "@/components/templates/TrazoDePapelTemplate";
 import { TrazoDePapelTemplateTinta } from "@/components/templates/TrazoDePapelTemplateTinta";
 import { TrazoDePapelTemplateTerracota } from "@/components/templates/TrazoDePapelTemplateTerracota";
@@ -781,6 +786,14 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Azul': return <TrazoDePapelTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Borgona': return <TrazoDePapelTemplateBorgona invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <TrazoDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'SOBRESELLO') {
+                switch (color) {
+                    case 'Bosque': return <SobreSelloTemplateBosque invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Tinta': return <SobreSelloTemplateTinta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Terracota': return <SobreSelloTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Oliva': return <SobreSelloTemplateOliva invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <SobreSelloTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'PRENSA') {
                 switch (color) {
