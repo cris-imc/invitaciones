@@ -40,8 +40,8 @@
     "acc2": "#2E9E6B"
   },
   "cssExtra": [
-    "/* Tropical: el sol de fondo y los titulares redondos. */",
-    ".tro-h2, .tro-cartel-nombres { letter-spacing: 0; }",
+    "/* Tropical: titulares redondos y sol de fondo. */",
+    ".tro-tapa-nombres, .tro-h2, .tro-panel-titulo, .tro-fecha-linea { letter-spacing: 0; }",
     ".tro-trama { opacity: .16; background-image: radial-gradient(currentColor 1px, transparent 1.2px); background-size: 18px 18px; }"
   ],
   "variantes": {

@@ -39,9 +39,10 @@
     "acc2": "#2E8B8B"
   },
   "cssExtra": [
-    "/* Postal: el titular va con el contorno de una postal impresa. */",
-    ".pos-cartel-nombres, .pos-h2 { letter-spacing: -.01em; }",
-    ".pos-tarjeta { border-style: dashed; }"
+    "/* Postal: bordes de sello y tarjetas con línea de troquel. */",
+    ".pos-tapa-nombres, .pos-h2, .pos-panel-titulo, .pos-fecha-linea { letter-spacing: -.01em; }",
+    ".pos-tarjeta, .pos-cupon { border-style: dashed; }",
+    ".pos-foto { border-style: dashed; }"
   ],
   "variantes": {
     "Mediterraneo": {

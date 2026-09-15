@@ -18,19 +18,25 @@ interface ShowcaseItem {
 // Las fotos (vestido acorde al color) las resuelve automáticamente
 // getTemplatePreviewSample() dentro de /preview-plantilla.
 //
-// Se alterna Flat y Storytelling a propósito: antes rotaban sólo Elegant y
-// Moderno, así que el visitante veía dos familias de las 58 y ninguna de la
-// Colección Storytelling, que es la que no tiene equivalente en la
-// competencia. Van intercaladas para que dos vecinas nunca se parezcan.
+// Se alternan las CUATRO colecciones a propósito: antes rotaban sólo Elegant
+// y Moderno, así que el visitante veía dos familias de las 58 y ninguna de las
+// que no tienen equivalente en la competencia. Van intercaladas para que dos
+// vecinas nunca se parezcan, y ahora entran también Paper (papel prensado y
+// papelería viva) e Iconic (papel recortado y tipográfica editorial), que son
+// las dos colecciones nuevas y las más distintas de todo lo que se ve afuera.
 const ROTATION: ShowcaseItem[] = [
   { evento: "CASAMIENTO", tipo: "ELEGANT", color: "Green", familia: "Elegant", colorClave: "verde" },
-  { evento: "CASAMIENTO", tipo: "GUESTPASSVIP", color: "default", familia: "Guest Pass VIP" },
+  { evento: "CASAMIENTO", tipo: "JARDINDEPAPEL", color: "default", familia: "Jardín de papel" },
   { evento: "QUINCE_ANOS", tipo: "MODERNO", color: "Rojo", familia: "Moderno", colorClave: "rojo" },
   { evento: "QUINCE_ANOS", tipo: "PRINCESA", color: "default", familia: "Princesa" },
-  { evento: "CASAMIENTO", tipo: "MODERNO", color: "Azul", familia: "Moderno", colorClave: "azul" },
-  { evento: "CASAMIENTO", tipo: "MARMOLYORO", color: "default", familia: "Mármol y Oro" },
+  { evento: "CASAMIENTO", tipo: "PRENSA", color: "default", familia: "Prensa" },
+  { evento: "QUINCE_ANOS", tipo: "CIELODEPAPEL", color: "default", familia: "Cielo de papel" },
+  { evento: "CASAMIENTO", tipo: "GUESTPASSVIP", color: "default", familia: "Guest Pass VIP" },
+  { evento: "CASAMIENTO", tipo: "SOBRESELLO", color: "default", familia: "Sobre & Sello" },
   { evento: "QUINCE_ANOS", tipo: "ELEGANT", color: "Pink", familia: "Elegant", colorClave: "rosa" },
-  { evento: "QUINCE_ANOS", tipo: "ACRYLICPOP", color: "default", familia: "Acrylic Pop" },
+  { evento: "CASAMIENTO", tipo: "EDITORIALBLANCNOIR", color: "default", familia: "Editorial Blanc & Noir" },
+  { evento: "CASAMIENTO", tipo: "MARMOLYORO", color: "default", familia: "Mármol y Oro" },
+  { evento: "QUINCE_ANOS", tipo: "ACUARELACORONA", color: "default", familia: "Acuarela & Corona" },
 ];
 
 // El iframe siempre se layoutea a un ancho de celular real para que

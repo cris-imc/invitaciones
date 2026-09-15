@@ -41,8 +41,8 @@
   },
   "cssExtra": [
     "/* Y2K: burbujas. Nada es cuadrado y el titular tiene brillo de cromo. */",
-    ".y2k-tarjeta, .y2k-ticket, .y2k-btn-solido, .y2k-portada-btn, .y2k-opcion, .y2k-cuenta-caja { border-radius: 22px; }",
-    ".y2k-cartel-nombres, .y2k-h2 { letter-spacing: -.01em; text-shadow: 0 2px 0 #fff, 0 6px 0 color-mix(in srgb, var(--pp-acc) 40%, transparent); }"
+    ".y2k-tarjeta, .y2k-cupon, .y2k-btn-solido, .y2k-tapa-btn, .y2k-opcion, .y2k-input, .y2k-cta, .y2k-foto { border-radius: 22px; }",
+    ".y2k-tapa-nombres, .y2k-h2, .y2k-panel-titulo, .y2k-fecha-linea { letter-spacing: -.01em; text-shadow: 0 2px 0 #fff, 0 7px 0 color-mix(in srgb, var(--pp-acc) 40%, transparent); }"
   ],
   "variantes": {
     "Frutilla": {

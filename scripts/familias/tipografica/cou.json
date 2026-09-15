@@ -43,9 +43,10 @@
     "acc2": "#7A1E2C"
   },
   "cssExtra": [
-    "/* Couture: el titular es de tapa, con la itálica como acento. */",
-    ".cou-h2, .cou-cartel-nombres { letter-spacing: -.04em; }",
-    ".cou-kicker { letter-spacing: .32em; }"
+    "/* Couture: el titular es de tapa de moda y la itálica es el acento. */",
+    ".cou-tapa-nombres, .cou-h2, .cou-panel-titulo { letter-spacing: -.045em; }",
+    ".cou-folio { letter-spacing: .3em; }",
+    ".cou-fecha-linea { text-transform: uppercase; }"
   ],
   "variantes": {
     "Burdeos": {

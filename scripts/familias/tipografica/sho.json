@@ -41,9 +41,9 @@
   },
   "cssExtra": [
     "/* Shōjo: nada tiene esquinas y todo tiene un brillo. */",
-    ".sho-tarjeta, .sho-ticket, .sho-btn-solido, .sho-portada-btn, .sho-opcion { border-radius: 18px; }",
-    ".sho-cartel-nombres, .sho-h2 { letter-spacing: 0; text-shadow: 0 3px 0 color-mix(in srgb, var(--pp-acc) 45%, transparent); }",
-    ".sho-trama { opacity: .25; background-image: radial-gradient(currentColor 1.2px, transparent 1.4px); background-size: 20px 20px; }"
+    ".sho-tarjeta, .sho-cupon, .sho-btn-solido, .sho-tapa-btn, .sho-opcion, .sho-input, .sho-cta { border-radius: 18px; }",
+    ".sho-tapa-nombres, .sho-h2, .sho-panel-titulo, .sho-fecha-linea { letter-spacing: 0; text-shadow: 0 4px 0 color-mix(in srgb, var(--pp-acc) 40%, transparent); }",
+    ".sho-trama { opacity: .22; background-image: radial-gradient(currentColor 1.2px, transparent 1.4px); background-size: 20px 20px; }"
   ],
   "variantes": {
     "Lavanda": {

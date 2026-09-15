@@ -42,8 +42,9 @@
     "acc2": "#7FA3C4"
   },
   "cssExtra": [
-    "/* Observatorio: la trama son estrellas, no puntos de imprenta. */",
-    ".obs-trama { opacity: .35; background-image: radial-gradient(currentColor .6px, transparent .7px), radial-gradient(currentColor .4px, transparent .5px); background-size: 46px 46px, 23px 23px; background-position: 0 0, 12px 8px; }"
+    "/* Observatorio: la trama son estrellas en dos tamaños, no puntos de imprenta. */",
+    ".obs-trama { opacity: .32; background-image: radial-gradient(currentColor .6px, transparent .7px), radial-gradient(currentColor .4px, transparent .5px); background-size: 46px 46px, 23px 23px; background-position: 0 0, 12px 8px; }",
+    ".obs-sello-circular svg { animation-duration: 60s; }"
   ],
   "variantes": {
     "Nebulosa": {

@@ -19,7 +19,7 @@
  * Sin imágenes propias: son tres fuentes y CSS.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Bangers, Nunito } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -29,7 +29,6 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
-import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
 import { useCountdown, pad } from "@/components/invitation/v2/useCountdown";
 import { useTextos, useFormatoDeMoneda, tituloEnDosLineas } from "@/components/i18n/ProveedorIdioma";
@@ -48,7 +47,7 @@ const popSans = Nunito({
   display: "swap",
   variable: "--pop-sans",
 });
-// El mono es la ficha técnica de la revista: kickers, folios y datos.
+// El mono es la ficha técnica de la revista: folios, kickers y datos.
 
 // ─── Paleta ─────────────────────────────────────────────────────────────────
 // Las cinco variantes de "Capas de papel" cambian SOLO estos once colores
@@ -83,11 +82,6 @@ const ES_OSCURA = (() => {
   return 0.2126 * ((n >> 16) / 255) + 0.7152 * (((n >> 8) & 255) / 255) + 0.0722 * ((n & 255) / 255) < 0.5;
 })();
 const TONO: "dark" | "light" = ES_OSCURA ? "dark" : "light";
-
-/** El papel de las tarjetas, que es el mismo en todas las variantes. */
-const CARTA = "#F8F2E6";
-const CARTA_LINEA = "#E2D8C4";
-const CARTA_TINTA = "#2B2A33";
 
 /** Blanco o negro según lo oscuro que sea el color de fondo del botón. */
 function tintaSobre(hex: string): string {
@@ -308,18 +302,18 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
         window.setTimeout(() => { capa.style.transition = "none"; }, 950);
       }, 80 + i * 90);
     });
-    if (cartel) {
-      cartel.style.transition = "none";
-      cartel.style.opacity = "0";
-      cartel.style.transform = "perspective(700px) rotateX(-12deg) rotate(-1.2deg)";
-      cartel.style.boxShadow = "0 2px 0 rgba(0,0,0,.12)";
+    // Cada renglón del nombre sube desde su propia máscara, uno atrás de
+    // otro. Es el gesto de una tapa armándose, no el de un cartel que se
+    // endereza.
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    renglones.forEach((linea, i) => {
+      linea.style.transition = "none";
+      linea.style.transform = "translate3d(0,110%,0)";
       window.setTimeout(() => {
-        cartel.style.transition = "transform 1100ms cubic-bezier(.16,1,.3,1), opacity 700ms ease, box-shadow 1100ms ease";
-        cartel.style.opacity = "1";
-        cartel.style.transform = "perspective(700px) rotateX(0deg) rotate(-1.2deg)";
-        cartel.style.boxShadow = "0 2px 0 rgba(0,0,0,.12), 0 18px 30px rgba(0,0,0,.14)";
-      }, 700);
-    }
+        linea.style.transition = "transform 1000ms cubic-bezier(.16,1,.3,1)";
+        linea.style.transform = "translate3d(0,0,0)";
+      }, 260 + i * 130);
+    });
   }, []);
 
   const dibujarRuta = useCallback(() => {
@@ -567,15 +561,15 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
             el.style.transform = `translate3d(${tx2 * prof}px,${dy + ty2 * prof}px,0)`;
           });
 
-          // La foto principal se abre como una ventana troquelada mientras
-          // sube: de un óvalo angosto al rectángulo entero.
+          // La foto se revela: los puntos de la trama que la tapan se van
+          // achicando de 7,2 a 0 mientras sube, como un papel en el
+          // líquido. El radio va como variable CSS para no tocar el DOM.
           const ven = ventanaRef.current;
           if (ven) {
             const r = ven.getBoundingClientRect();
-            const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.7)));
-            const v = (1 - p) * 44;
-            const h = (1 - p) * 38;
-            ven.style.clipPath = `inset(${v}% ${h}% ${v}% ${h}% round 999px 999px 14px 14px)`;
+            const prog = 1 - (r.top + r.height / 2) / vh;
+            const t = Math.min(1, Math.max(0, (prog - 0.15) / 0.6));
+            ven.style.setProperty("--pop-punto", (7.2 * (1 - t)).toFixed(2));
           }
         }
 
@@ -727,13 +721,19 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
           fondo: PALETA.bg,
           tinta: PALETA.ink,
           acento: PALETA.acc,
-          clase: `${popSerif.variable} ${popSans.variable} `,
+          clase: `${popSerif.variable} ${popSans.variable}`,
           fuente: "var(--pop-sans), 'Nunito', sans-serif",
         }}
       />
     );
   }
 
+
+  // El total de pliegos, para los folios ("03 / 10"). Se cuenta lo que esta
+  // invitación realmente tiene: si no hay trivia, no existe el pliego 09 y el
+  // pase deja de ser 10 de 10.
+  const totalPliegos = cuenta;
+  const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
   return (
     <div
@@ -745,100 +745,121 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
       <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} className="pop-scroller">
-        <BienvenidaStorytelling
-          prefijo="jdp"
-          acento={PALETA.acc}
-          titulo={titulo}
-          tipo={invitation.tipo ? String(invitation.tipo) : null}
-          fechaEvento={fechaEvento}
-          lugar={lugarNombre || null}
-          invitado={isPersonalized && guest?.name ? guest.name : null}
-          numeroDePase={guest?.orderNumber ?? null}
-          personas={guest?.expectedCount ?? null}
-          tono={TONO}
-        />
-
-        {/* ── 01 Guardá la fecha ─────────────────────────────────────── */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="pop-section pop-std">
-          <div className="pop-trama" aria-hidden="true" />
-          <span data-xin="1" data-dist="-20" className="pop-kicker">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-          <div className="pop-std-fecha">
-            <span data-xin="1" data-delay="60" data-dist="40" className="pop-std-dia">{diaNum}</span>
-            <div data-xin="1" data-delay="160" data-dist="30" className="pop-std-fila">
-              <span className="pop-cinta">{mesLargo}</span>
-              <span className="pop-std-anio">{anio}</span>
+        {/* ── 01 Guardá la fecha ─────────────────────────────────────────
+            El pliego se invierte: tinta sobre crema. La fecha ocupa la
+            página izquierda en tres renglones que se cruzan, y la foto va
+            enmarcada en la derecha. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="pop-section pop-std">
+          <div className="pop-trama pop-trama--media" aria-hidden="true" />
+          <div className="pop-spread">
+            <div className="pop-pagina">
+              <div className="pop-folio">
+                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+              </div>
+              <div className="pop-fecha">
+                <span data-xin="1" data-dist="-160" className="pop-fecha-linea">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="pop-fecha-linea pop-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="pop-fecha-linea">{anio}</span>
+              </div>
+              <div data-xin="1" data-delay="360" className="pop-fecha-pie">
+                <span>{diaSemana} · {hora} H</span>
+                <AddToCalendarLink
+                  eventName={titulo}
+                  targetDate={fechaHora}
+                  location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+                  className="pop-link"
+                  showIcon={false}
+                >
+                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                </AddToCalendarLink>
+              </div>
             </div>
-          </div>
-          <div data-xin="1" data-delay="240" data-dist="20" className="pop-meta">
-            <span>{diaSemana} · {hora} H</span>
-            <span className="pop-meta-punto" aria-hidden="true" />
-            <span>{(ciudad || lugarNombre || direccion).toUpperCase()}</span>
-          </div>
-          <AddToCalendarLink
-            eventName={titulo}
-            targetDate={fechaHora}
-            location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-            description={String(invitation.portadaMensaje ?? "")}
-            className="pop-btn-papel pop-btn-papel--reveal"
-            showIcon={false}
-          >
-            {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} <span aria-hidden="true">↗</span>
-          </AddToCalendarLink>
-        </section>
 
-        {/* ── Nuestra foto: se abre como una ventana troquelada ───────── */}
-        {hayFoto && (
-          <section data-tone={TONO} data-screen-label={tx("invitacion.album.nuestraFoto")} className="pop-foto-seccion">
-            <div className="pop-foto-marco">
-              <div ref={ventanaRef} className="pop-ventana">
+            {hayFoto && (
+              <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="pop-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only pop-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="243,235,221" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only pop-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="243,235,221" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
                   </div>
                 )}
+                {/* La trama que tapa la foto y se disuelve al subir: el radio
+                    del punto lo mueve el motor en --pop-punto. */}
+                <span className="pop-foto-revelado" aria-hidden="true" />
+                <span className="pop-foto-anio">{anio}</span>
+                <span className="pop-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
               </div>
-              <div className="pop-foto-firma">{titulo}</div>
-            </div>
-          </section>
-        )}
-
-        {/* ── 02 Falta poco ──────────────────────────────────────────── */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="pop-section pop-countdown">
-          <div className="pop-trama" aria-hidden="true" />
-          <span data-xin="1" data-dist="-20" className="pop-kicker">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
-          <h2 data-xin="1" data-delay="60" className="pop-h2">
-            {tx("invitacion.cuentaRegresiva.estamosContando")}<br /><em>{tx("invitacion.cuentaRegresiva.losDias")}</em>
-          </h2>
-          <CuentaPop targetDate={fechaHora} />
+            )}
+          </div>
         </section>
 
-        {/* ── 03 Unas palabras ───────────────────────────────────────── */}
-        {hayFrase && (
-          <section data-tone={TONO} data-screen-label={tx("invitacion.frase.etiqueta")} className="pop-section pop-frase-seccion">
-            <div className="pop-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="pop-kicker">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
-            <h2 ref={fraseRef} className="pop-frase">
-              {palabras.map((p, i) => (
-                // El espacio va FUERA del span: el motor pone cada palabra en
-                // inline-block para poder moverla, y un espacio de fin de
-                // línea adentro de un inline-block se colapsa a cero.
+        {/* ── 02 Falta poco ──────────────────────────────────────────────
+            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
+            las cuatro cifras. */}
+        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="pop-section pop-countdown">
+          <div className="pop-folio">
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
+          </div>
+          <div className="pop-marquesina" aria-hidden="true">
+            <div className="pop-marquesina-tira">
+              {[0, 1].map((i) => (
                 <span key={i}>
-                  <span data-w="1" className={i >= desdeAcento ? "pop-acento" : undefined}>{p}</span>{" "}
+                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
                 </span>
               ))}
-            </h2>
-            <div data-xin="1" data-delay="200" className="pop-firma">
-              <span className="pop-firma-linea" aria-hidden="true" />{titulo.toUpperCase()}
+            </div>
+          </div>
+          <CuentaPop targetDate={fechaHora} />
+          <div className="pop-marquesina pop-marquesina--contraria" aria-hidden="true">
+            <div className="pop-marquesina-tira">
+              {[0, 1].map((i) => (
+                <span key={i}>
+                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 03 Unas palabras ───────────────────────────────────────────
+            El pliego del acento: la frase entra palabra por palabra y al
+            lado va el sello con la firma. */}
+        {hayFrase && (
+          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="pop-section pop-frase-seccion">
+            <div className="pop-folio">
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
+            </div>
+            <div className="pop-spread">
+              <h2 ref={fraseRef} className="pop-frase">
+                {palabras.map((p, i) => (
+                  // El espacio va fuera del span: el motor pone cada palabra
+                  // en inline-block y un espacio adentro se colapsa a cero.
+                  <span key={i}>
+                    <span data-w="1" className={i >= desdeAcento ? "pop-acento" : undefined}>{p}</span>{" "}
+                  </span>
+                ))}
+              </h2>
+              <div data-xin="1" data-delay="900" data-dist="60" className="pop-sello">
+                <span>{tx("invitacion.frase.conAmor")}</span>
+              </div>
+            </div>
+            <div className="pop-folio pop-folio--pie">
+              <span>{titulo.toUpperCase()}</span>
+              <span>{fechaPuntos}</span>
             </div>
           </section>
         )}
 
-        {/* ── 04 Cuándo y dónde ──────────────────────────────────────── */}
+        {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
+            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
+            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
         <div
           id="details"
           data-pan="1"
@@ -849,104 +870,107 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
         >
           <div className="pop-pan-fijo">
             <div data-strip="1" className="pop-tira">
-              {/* Recepción */}
-              <div data-tone={TONO} className="pop-panel pop-panel--abajo" style={{ background: PALETA.bg }}>
-                <div className="pop-panel-top">
-                  <span>{nCuando} — {tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
+              <div data-tone={TONO} className="pop-panel">
+                <div className="pop-folio">
+                  <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
-                <div className="pop-tarjeta pop-tarjeta--izq">
-                  <span className="pop-tarjeta-kicker">{tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span>
-                  <h2 className="pop-tarjeta-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
-                  <div className="pop-filas">
-                    {direccion && (
-                      <div className="pop-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="pop-fila-valor">{direccion}</span></div>
-                    )}
-                    <div className="pop-fila"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
-                    {dressCode && (
-                      <div className="pop-fila pop-fila--ultima"><span>{tx("invitacion.ubicacion.dressCode")}</span><span className="pop-acento-plano">{dressCode}</span></div>
+                <div className="pop-spread">
+                  <h2 className="pop-panel-titulo">
+                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
+                    <br /><span className="pop-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
+                  </h2>
+                  <div className="pop-lineas">
+                    <div className="pop-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
+                    {direccion && <div className="pop-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
+                    {dressCode && <div className="pop-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
+                    {mapUrl && (
+                      <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pop-cta">
+                        {tx("invitacion.ubicacion.comoLlegar")}<span className="pop-cta-flecha">↗</span>
+                      </a>
                     )}
                   </div>
                 </div>
-                {!scrollVertical && panelesLugar.length > 1 && (
-                  <div className="pop-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="pop-flecha">→</span></div>
-                )}
+                <div className="pop-folio pop-folio--pie">
+                  <span>{(ciudad || direccion).toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                </div>
               </div>
 
-              {/* Ceremonia */}
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone={TONO} className="pop-panel pop-panel--abajo" style={{ background: PALETA.bg2 }}>
-                  <div className="pop-panel-top">
-                    <span>{ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
+                <div id="ceremonia" data-tone="dark" className="pop-panel">
+                  <div className="pop-folio">
+                    <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
-                  <div className="pop-tarjeta pop-tarjeta--der">
-                    <h2 className="pop-tarjeta-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
-                    <div className="pop-filas">
-                      {ceremoniaDireccion && (
-                        <div className="pop-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="pop-fila-valor">{ceremoniaDireccion}</span></div>
-                      )}
-                      {ceremoniaHora && (
-                        <div className="pop-fila pop-fila--ultima"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>
-                      )}
+                  <div className="pop-spread">
+                    <h2 className="pop-panel-titulo">
+                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
+                      <br /><span className="pop-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
+                    </h2>
+                    <div className="pop-lineas">
+                      {ceremoniaHora && <div className="pop-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
+                      {ceremoniaDireccion && <div className="pop-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
+                  </div>
+                  <div className="pop-folio pop-folio--pie">
+                    <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
-              {/* Cómo llegar */}
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="pop-panel pop-panel--abajo" style={{ background: PALETA.bg }}>
-                  <svg viewBox="0 0 430 700" preserveAspectRatio="xMidYMid slice" className="pop-escena" aria-hidden="true">
-                    <path d="M0 520 C120 470 200 500 300 470 S420 380 430 400 V700 H0Z" style={{ fill: "var(--pp-hill1, #BCCBB6)" }} />
-                    <path
-                      ref={rutaRef}
-                      d="M40 560 C120 500 80 380 180 340 S300 250 330 150"
-                      fill="none"
-                      style={{ stroke: "var(--pp-acc, #C86B5A)" }}
-                      strokeWidth={3}
-                      strokeDasharray="10 8"
-                      strokeLinecap="round"
-                    />
-                    <circle cx={40} cy={560} r={7} style={{ fill: "var(--pp-ink, #2B2A33)" }} />
-                    <path d="M330 150 m-16 0 a16 16 0 1 1 32 0 c0 12 -16 30 -16 30 s-16 -18 -16 -30Z" style={{ fill: "var(--pp-acc, #C86B5A)" }} />
-                  </svg>
-                  <div className="pop-panel-top">
-                    <span>{tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
+                <div id="location" data-tone={TONO} className="pop-panel">
+                  <div className="pop-folio">
+                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
-                  <h2 className="pop-h2">{tx("invitacion.ubicacion.comoLlegar")}</h2>
-                  {(direccion || ciudad) && <p className="pop-parrafo">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>}
-                  {embedMapUrl && (
-                    <div className="pop-mapa">
-                      <iframe
-                        src={embedMapUrl}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0, display: "block" }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
-                      />
+                  <div className="pop-spread">
+                    <h2 className="pop-panel-titulo">
+                      {tx("invitacion.ubicacion.comoLlegar")}
+                    </h2>
+                    <div className="pop-lineas">
+                      {embedMapUrl && (
+                        <div className="pop-mapa">
+                          <iframe
+                            src={embedMapUrl}
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0, display: "block" }}
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
+                          />
+                        </div>
+                      )}
+                      <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pop-cta">
+                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="pop-cta-flecha">↗</span>
+                      </a>
                     </div>
-                  )}
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pop-btn-solido">
-                    {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()} <span aria-hidden="true">↗</span>
-                  </a>
+                  </div>
+                  <div className="pop-folio pop-folio--pie">
+                    <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  </div>
                 </div>
               )}
 
-              {/* Cronograma */}
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone={TONO} className="pop-panel pop-panel--centro" style={{ background: PALETA.bg2 }}>
-                  <div className="pop-panel-top">
-                    <span>{tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
+                <div id="schedule" data-tone="dark" className="pop-panel pop-panel--acento">
+                  <div className="pop-folio">
+                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
-                  <h2 className="pop-h2">{tx("invitacion.ubicacion.laNochePasoAPaso")}</h2>
-                  <div className="pop-crono">
-                    {cronograma.map((item, i) => (
-                      <div key={i} className="pop-crono-fila">
-                        <span className="pop-crono-hora">{item.time || ""}</span>
-                        <span className="pop-crono-titulo">{item.title}</span>
-                      </div>
-                    ))}
+                  <div className="pop-spread">
+                    <h2 className="pop-panel-titulo">
+                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
+                      <br /><span className="pop-acento pop-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
+                    </h2>
+                    <div className="pop-lineas">
+                      {cronograma.map((item, i) => (
+                        <div key={i} className="pop-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="pop-folio pop-folio--pie">
+                    <span>{fechaPuntos}</span>
                   </div>
                 </div>
               )}
@@ -955,45 +979,58 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
           </div>
         </div>
 
-        {/* ── 05 Check-in ────────────────────────────────────────────── */}
+        {/* ── 05 Check-in ────────────────────────────────────────────────
+            El cupón: papel blanco con borde grueso, línea de corte punteada
+            y el estado arriba a la derecha. */}
         {rsvpHabilitado && (
           <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="pop-section pop-checkin">
-            <div className="pop-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="pop-kicker">{nCheckin} — CHECK-IN</span>
-            <h2 data-xin="1" data-delay="60" className="pop-h2">
-              {tx("invitacion.rsvp.confirmaLinea1")}<br /><em>{tx("invitacion.rsvp.confirmaLinea2")}</em>
-            </h2>
-            <CheckinPop
-              invitationId={String(invitation.id ?? "")}
-              guestToken={guest?.uniqueToken}
-              guestName={nombreInvitado}
-              pase={pase}
-              maxAdultos={guest?.expectedAdults ?? guest?.expectedCount ?? 1}
-              maxAdolescentes={guest?.expectedTeens ?? 0}
-              maxNinos={guest?.expectedChildren ?? 0}
-              estadoInicial={estadoInvitado}
-              adultosIniciales={guest?.attendingAdults}
-              adolescentesIniciales={guest?.attendingTeens}
-              ninosIniciales={guest?.attendingChildren}
-              restricciones={guest?.dietaryRestrictions ?? ""}
-              hayPago={pagoHabilitado}
-              monto={montoPago}
-              precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
-              precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
-              exento={guest?.isExempt ?? false}
-              estadoDePago={guest?.paymentStatus ?? "PENDING"}
-              vistaDePago={guest?.paymentView ?? null}
-              confirmado={confirmado}
-              tarjetaRef={tarjetaCheckinRef}
-              selloRef={selloRef}
-              petalosRef={petalosRef}
-              estadoRef={estadoRef}
-              alConfirmar={alConfirmar}
-            />
+            <div className="pop-folio">
+              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+              <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
+            </div>
+            <div className="pop-spread">
+              <div className="pop-pagina">
+                <h2 data-xin="1" data-dist="-80" className="pop-h2">
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="pop-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                </h2>
+              </div>
+              <div className="pop-cupon">
+                <span className="pop-cupon-corte" aria-hidden="true" />
+                <CheckinPop
+                  invitationId={String(invitation.id ?? "")}
+                  guestToken={guest?.uniqueToken}
+                  guestName={nombreInvitado}
+                  pase={pase}
+                  maxAdultos={guest?.expectedAdults ?? guest?.expectedCount ?? 1}
+                  maxAdolescentes={guest?.expectedTeens ?? 0}
+                  maxNinos={guest?.expectedChildren ?? 0}
+                  estadoInicial={estadoInvitado}
+                  adultosIniciales={guest?.attendingAdults}
+                  adolescentesIniciales={guest?.attendingTeens}
+                  ninosIniciales={guest?.attendingChildren}
+                  restricciones={guest?.dietaryRestrictions ?? ""}
+                  hayPago={pagoHabilitado}
+                  monto={montoPago}
+                  precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
+                  precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
+                  exento={guest?.isExempt ?? false}
+                  estadoDePago={guest?.paymentStatus ?? "PENDING"}
+                  vistaDePago={guest?.paymentView ?? null}
+                  confirmado={confirmado}
+                  tarjetaRef={tarjetaCheckinRef}
+                  selloRef={selloRef}
+                  petalosRef={petalosRef}
+                  estadoRef={estadoRef}
+                  alConfirmar={alConfirmar}
+                />
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 06 Álbum ───────────────────────────────────────────────── */}
+        {/* ── 06 Álbum ───────────────────────────────────────────────────
+            Hoja de contactos: la grilla de seis columnas de una plancha de
+            fotografía, con la tinta del acento por encima. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1006,19 +1043,21 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
             <div className="pop-pan-fijo">
               <div data-strip="1" className="pop-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="pop-panel pop-panel--album" style={{ background: iHoja % 2 === 0 ? "#F6F1E7" : "#F1EBDF" }}>
-                    <div className="pop-panel-top">
-                      <span>{iHoja === 0 ? `${nAlbum} — ${tx("invitacion.album.titulo").toUpperCase()}` : tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
-                      {hojasDeFotos.length > 1 && <span>{String(iHoja + 1).padStart(2, "0")} / {String(hojasDeFotos.length).padStart(2, "0")}</span>}
+                  <div key={iHoja} data-tone={TONO} className="pop-panel pop-panel--album">
+                    <div className="pop-folio">
+                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
                     </div>
                     {iHoja === 0 && (
-                      <h2 className="pop-h2 pop-h2--album">{tx("invitacion.album.titulo")} <em>{tx("invitacion.album.deFotos")}</em></h2>
+                      <h2 className="pop-h2 pop-h2--album">
+                        {tx("invitacion.album.titulo")} <span className="pop-acento">{tx("invitacion.album.deFotos")}</span>
+                      </h2>
                     )}
-                    <div className="pop-polaroids" data-cantidad={hoja.length}>
+                    <div className="pop-contactos" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="pop-polaroid"
+                          className="pop-contacto"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1026,14 +1065,15 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="pop-polaroid-img" />
-                          {i % 2 === 0 && <span className="pop-chinche" aria-hidden="true" />}
+                          <img src={url} alt="" loading="lazy" className="pop-contacto-img" />
+                          <span className="pop-contacto-tinta" aria-hidden="true" />
+                          <span className="pop-contacto-n">{String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="pop-panel-pie">
+                    <div className="pop-folio pop-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span className="pop-acento-plano">{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1043,111 +1083,145 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
           </div>
         )}
 
-        {/* ── 07 Música ──────────────────────────────────────────────── */}
+        {/* ── 07 Música ──────────────────────────────────────────────────
+            Pliego de tinta, con el ecualizador como única ilustración. */}
         {sugerenciaMusicaHabilitada && (
-          <section id="songs" data-tone={TONO} data-screen-label={tx("invitacion.musica.titulo")} className="pop-section pop-musica">
-            <div className="pop-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="pop-kicker">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="pop-h2">
-              {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "pop-acento")}
-            </h2>
-            <CancionesPop
-              invitationId={String(invitation.id ?? "")}
-              guestToken={guest?.uniqueToken}
-              guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-            />
+          <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="pop-section pop-musica">
+            <div className="pop-folio">
+              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
+            </div>
+            <div className="pop-spread">
+              <div className="pop-pagina">
+                <h2 data-xin="1" data-dist="-80" className="pop-h2">
+                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "pop-acento")}
+                </h2>
+                <div data-xin="1" data-delay="120" className="pop-eq" aria-hidden="true">
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                </div>
+              </div>
+              <div className="pop-pagina">
+                <CancionesPop
+                  invitationId={String(invitation.id ?? "")}
+                  guestToken={guest?.uniqueToken}
+                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+                />
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 08 Regalos ─────────────────────────────────────────────── */}
+        {/* ── 08 Regalos ─────────────────────────────────────────────────
+            Las tarjetas bancarias son fichas blancas con borde grueso. */}
         {hayRegalos && (
           <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="pop-section pop-regalos">
-            <span data-xin="1" data-dist="-20" className="pop-kicker pop-kicker--tinta">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="pop-h2">
-              {tx("invitacion.regalos.siQueresLinea1")}<br /><em>{tx("invitacion.regalos.siQueresLinea2")}</em>
-            </h2>
-            {Boolean(invitation.regaloMensaje) && (
-              <p data-xin="1" data-delay="120" className="pop-parrafo pop-parrafo--tinta">{String(invitation.regaloMensaje)}</p>
-            )}
-            {regaloHabilitado && (
-              <TarjetaBancaria
-                titulo={String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento"))}
-                alias={String(invitation.regaloAlias || "")}
-                cbu={String(invitation.regaloCbu || "")}
-                banco={String(invitation.regaloBanco || "")}
-                titular={String(invitation.regaloTitular || "")}
-                retraso={180}
-                dobleZ
-              />
-            )}
-            {pagoTarjetaHabilitado && (
-              <TarjetaBancaria
-                titulo={String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas"))}
-                mensaje={String(invitation.pagoTarjetaMensaje || "")}
-                alias={String(invitation.pagoTarjetaAlias || "")}
-                cbu={String(invitation.pagoTarjetaCbu || "")}
-                banco={String(invitation.pagoTarjetaBanco || "")}
-                titular={String(invitation.pagoTarjetaTitular || "")}
-                retraso={260}
-                inclinada
-              />
-            )}
+            <div className="pop-folio">
+              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
+            </div>
+            <div className="pop-spread">
+              <div className="pop-pagina">
+                <h2 data-xin="1" data-dist="-80" className="pop-h2">
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="pop-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                </h2>
+                {Boolean(invitation.regaloMensaje) && (
+                  <p data-xin="1" data-delay="120" className="pop-parrafo">{String(invitation.regaloMensaje)}</p>
+                )}
+              </div>
+              <div className="pop-pagina">
+                {regaloHabilitado && (
+                  <TarjetaBancaria
+                    titulo={String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento"))}
+                    alias={String(invitation.regaloAlias || "")}
+                    cbu={String(invitation.regaloCbu || "")}
+                    banco={String(invitation.regaloBanco || "")}
+                    titular={String(invitation.regaloTitular || "")}
+                    retraso={180}
+                  />
+                )}
+                {pagoTarjetaHabilitado && (
+                  <TarjetaBancaria
+                    titulo={String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas"))}
+                    mensaje={String(invitation.pagoTarjetaMensaje || "")}
+                    alias={String(invitation.pagoTarjetaAlias || "")}
+                    cbu={String(invitation.pagoTarjetaCbu || "")}
+                    banco={String(invitation.pagoTarjetaBanco || "")}
+                    titular={String(invitation.pagoTarjetaTitular || "")}
+                    retraso={260}
+                  />
+                )}
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 09 Trivia ──────────────────────────────────────────────── */}
+        {/* ── 09 Trivia ──────────────────────────────────────────────────
+            El único pliego que va entero en el acento. */}
         {quizHabilitado && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="pop-section pop-quiz">
-            <div className="pop-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="pop-kicker">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="pop-h2 pop-h2--claro">{triviaTitulo}</h2>
-            <TriviaPop
-              preguntas={triviaPreguntas}
-              invitationId={String(invitation.id ?? "")}
-              guestToken={guest?.uniqueToken}
-              guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-            />
+            <div className="pop-folio">
+              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
+            </div>
+            <div className="pop-spread">
+              <div className="pop-pagina">
+                <h2 data-xin="1" data-dist="-80" className="pop-h2">{triviaTitulo}</h2>
+              </div>
+              <div className="pop-pagina">
+                <TriviaPop
+                  preguntas={triviaPreguntas}
+                  invitationId={String(invitation.id ?? "")}
+                  guestToken={guest?.uniqueToken}
+                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+                />
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 10 Tu pase ─────────────────────────────────────────────── */}
+        {/* ── 10 Tu pase ─────────────────────────────────────────────────
+            La contratapa: el QR grande a la izquierda y los datos del pase
+            a la derecha, con el sello girando. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="pop-section pop-pase">
-          <div className="pop-trama" aria-hidden="true" />
-          <span data-xin="1" data-dist="-20" className="pop-kicker">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
-
-          <div data-xin="1" data-delay="80" data-dist="30" className="pop-ticket">
-            <div className="pop-ticket-izq">
-              <span className="pop-ticket-kicker">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
-              <span className="pop-ticket-nombre">{saludaAlInvitado ? nombreInvitado : titulo}</span>
-              <span className="pop-ticket-dato">
-                {[
-                  lugaresDelPase > 0 ? tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }) : null,
-                  guest?.mesas && guest.mesas.length > 0 ? guest.mesas.join(" · ") : null,
-                ].filter(Boolean).join(" · ")}
-              </span>
-              <span className="pop-ticket-fecha">{fechaPuntos} — {hora} H</span>
-              <span className="pop-ticket-muesca pop-ticket-muesca--arriba" aria-hidden="true" />
-              <span className="pop-ticket-muesca pop-ticket-muesca--abajo" aria-hidden="true" />
-            </div>
-            <div className="pop-ticket-der">
+          <div className="pop-folio">
+            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nPase)}</span>
+          </div>
+          <div className="pop-spread">
+            <div data-xin="1" data-dist="-60" className="pop-pagina pop-pagina--qr">
               <QrDeIngreso guest={guest as never} />
             </div>
-          </div>
-
-          {/* Alojamiento, estacionamiento, transporte: lo que el anfitrión
-              cargó en Info Adicional, con el vestido de esta sección. */}
-          <div data-xin="1" data-delay="160" className="pop-info-extra">
-            <InfoAdicionalSection invitation={invitation} />
-          </div>
-
-          <div className="pop-pase-pie">
-            <span className="pop-pase-firma">{tx("invitacion.frase.conAmor")}, {titulo}</span>
-            <div className="pop-pase-creditos">
-              <LogoFooterCredit bgColor="transparent" />
-              <span className="pop-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-                {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-              </span>
+            <div className="pop-pagina">
+              <div data-xin="1" data-delay="100" className="pop-pase-cabeza">
+                <div className="pop-pase-numero">
+                  <span className="pop-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
+                  <span>{pase}</span>
+                </div>
+                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+              </div>
+              <div className="pop-lineas">
+                <div className="pop-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+                {lugaresDelPase > 0 && (
+                  <div className="pop-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                )}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="pop-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                )}
+                <div className="pop-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+              </div>
+              <div className="pop-info-extra">
+                <InfoAdicionalSection invitation={invitation} />
+              </div>
             </div>
+          </div>
+          <div className="pop-folio pop-folio--pie">
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="pop-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
+            </span>
+          </div>
+          <div className="pop-credito">
+            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
           </div>
         </section>
       </div>
@@ -1161,53 +1235,58 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
         <span ref={rielEtiquetaRef} className="pop-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ─────────────────────────────────────────────────── */}
+      {/* ── La portada ──────────────────────────────────────────────────
+          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
+          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
+          sub-colección no monta además la sección de Bienvenida: sería
+          decir dos veces lo mismo, una arriba de la otra. */}
       <div ref={portadaRef} data-tone={TONO} className="pop-portada">
-        {/* La portada no tiene escena que levantar: lo que se va al abrir es la
-            trama y el titular, y de eso se encarga el motor moviendo [data-cl]. */}
-        <div ref={escenaPortadaRef} className="pop-portada-escena">
-          <div data-cl="1" className="pop-trama" aria-hidden="true" />
-        </div>
-        <div className="pop-portada-contenido">
-          <div className="pop-portada-arriba">
-            <div ref={cartelRef} className="pop-cartel">
-              <h1 className="pop-cartel-nombres">
-                {saludaAlInvitado ? (
-                  <span>{nombreInvitado}</span>
-                ) : (
-                  <>
-                    <span>{nombre1}</span>
-                    {nombre2 && <span className="pop-cartel-amp">&amp;</span>}
-                    {nombre2 && <span>{nombre2}</span>}
-                  </>
-                )}
-              </h1>
-              <span className="pop-cartel-chinche" aria-hidden="true" />
-            </div>
+        <div ref={escenaPortadaRef} className="pop-portada-hoja">
+          <div className="pop-trama pop-trama--tapa" aria-hidden="true" />
+
+          <div data-cl="1" className="pop-folio">
+            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
+            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
-          <div className="pop-portada-abajo">
-            <div className="pop-portada-datos">
-              <span className="pop-portada-saludo">
-                {saludaAlInvitado
-                  ? <>{tx("invitacion.bienvenida.hola", { nombre: nombreInvitado }).toUpperCase()} · <span className="pop-acento-plano">{titulo.toUpperCase()}</span></>
-                  : <span className="pop-acento-plano">{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>}
-              </span>
-              <div className="pop-portada-fila">
-                <span>{fechaPuntos}</span>
-                <span className="pop-meta-punto" aria-hidden="true" />
-                <span>{(lugarNombre || ciudad || direccion).toUpperCase()}</span>
-              </div>
+
+          <div data-cl="2" className="pop-tapa-centro">
+            <div className="pop-tapa-fila">
+              <span className="pop-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
+              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
+            </div>
+            <h1 ref={cartelRef} className="pop-tapa-nombres">
+              {saludaAlInvitado ? (
+                <span className="pop-tapa-linea"><span>{nombreInvitado}</span></span>
+              ) : (
+                <>
+                  <span className="pop-tapa-linea"><span>{nombre1}</span></span>
+                  {nombre2 && (
+                    <span className="pop-tapa-linea pop-tapa-linea--sangra">
+                      <span><span className="pop-acento">&amp;</span>{nombre2}</span>
+                    </span>
+                  )}
+                </>
+              )}
+            </h1>
+            <div className="pop-folio">
+              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
               {isPersonalized && guest && (
-                <div className="pop-portada-pase">
-                  <span>{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
-                  <span>·</span>
-                  <span>{tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}</span>
-                  <span>·</span>
-                  <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-                </div>
+                <span className="pop-tapa-pase">
+                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
+                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
+                </span>
               )}
             </div>
-            <button type="button" onClick={abrir} className="pop-portada-btn">
+          </div>
+
+          <div data-cl="3" className="pop-tapa-pie">
+            <span className="pop-regla" aria-hidden="true" />
+            <p className="pop-tapa-mensaje">
+              {saludaAlInvitado
+                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
+                : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
+            </p>
+            <button type="button" onClick={abrir} className="pop-tapa-btn">
               {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
             </button>
           </div>
@@ -1243,6 +1322,32 @@ export function PopTemplateLimon({ invitation, guest, isPersonalized = false }: 
   );
 }
 
+/**
+ * El sello circular: dos anillos y el texto siguiendo la circunferencia,
+ * girando una vuelta cada 26 segundos. Es el único elemento de la
+ * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
+ * (con el & en el centro) y en la contratapa.
+ */
+function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
+  // El id del arco tiene que ser único por instancia: dos <textPath> que
+  // apuntan al mismo id hacen que el segundo no se dibuje.
+  const id = useId().replace(/:/g, "");
+  return (
+    <div className="pop-sello-circular" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
+        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
+        <text>
+          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
+        </text>
+      </svg>
+      {amp && <span className="pop-sello-amp">&amp;</span>}
+    </div>
+  );
+}
 
 // ───────────────────────────────────────────────────────────────────────────
 // Piezas de la colección
@@ -1294,8 +1399,8 @@ function CuentaPop({ targetDate }: { targetDate: Date }) {
   return (
     <div className="pop-cuenta">
       {celdas.map((c, i) => (
-        <div key={c.l} data-xin="1" data-delay={80 + i * 80} data-dist="30" className={`pop-cuenta-caja pop-cuenta-caja--${i + 1}`}>
-          <span className={`pop-cuenta-num${i === 3 ? " pop-cuenta-num--acc" : ""}`}>{c.v}</span>
+        <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`pop-cuenta-caja pop-cuenta-caja--${i + 1}`}>
+          <span className="pop-cuenta-num">{c.v}</span>
           <span className="pop-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1788,430 +1893,311 @@ function TriviaPop({ preguntas, invitationId, guestToken, guestName }: { pregunt
 // leen la Bienvenida y el Post-evento compartidos (esperan `pop-section` y
 // `pop-kicker`).
 const CSS_POP = `
+  /* ── Tipográfica Editorial ────────────────────────────────────────────
+     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
+     pliego de revista -- folio arriba, spread de dos páginas, titular que
+     ocupa lo que quiera -- y el color aparece como fondo de página entera o
+     en una palabra, nunca como adorno. */
   .pop-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
     background: var(--pp-bg); color: var(--pp-ink); font-family: var(--pop-sans), 'Nunito', sans-serif; }
-  .pop-raiz a { color: var(--pp-acc); text-decoration: none; }
+  .pop-raiz a { color: inherit; text-decoration: none; }
   .pop-raiz button { font: inherit; }
-  .pop-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
   .pop-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0;
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .pop-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  @keyframes ppFloat { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(6px,-14px) rotate(8deg); } }
-  @keyframes ppDrift { 0% { transform: translateX(-14px); } 100% { transform: translateX(14px); } }
-  @keyframes ppSway { 0%,100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
-  @keyframes ppBreath { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
-  @keyframes ppRibbon { 0%,100% { transform: skewY(0deg) translateX(0); } 50% { transform: skewY(2deg) translateX(3px); } }
-  @keyframes ppBlink { 0%,94%,100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
-  @keyframes ppFly1 { 0% { transform: translate(0,0) rotate(-6deg); } 25% { transform: translate(26px,-22px) rotate(6deg); } 50% { transform: translate(54px,-4px) rotate(-4deg); } 75% { transform: translate(24px,16px) rotate(8deg); } 100% { transform: translate(0,0) rotate(-6deg); } }
-  @keyframes ppFly2 { 0% { transform: translate(0,0) rotate(4deg); } 30% { transform: translate(-30px,-18px) rotate(-8deg); } 60% { transform: translate(-48px,10px) rotate(6deg); } 100% { transform: translate(0,0) rotate(4deg); } }
-  @keyframes ppWingL { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.28); } }
-  @keyframes ppWingR { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.28); } }
-  @keyframes ppNoteUp { 0% { transform: translate(0,0) rotate(-8deg) scale(.7); opacity: 0; } 15% { opacity: .9; } 70% { opacity: .7; } 100% { transform: translate(26px,-120px) rotate(12deg) scale(1); opacity: 0; } }
-  @keyframes ppNoteUp2 { 0% { transform: translate(0,0) rotate(6deg) scale(.6); opacity: 0; } 18% { opacity: .85; } 100% { transform: translate(-30px,-140px) rotate(-14deg) scale(1); opacity: 0; } }
-  @keyframes ppBeat { 0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
-  @keyframes ppWindow { 0%,100% { opacity: .18; } 50% { opacity: .5; } }
-  @keyframes ppSpin { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-  @keyframes ppGlow { 0%,100% { filter: drop-shadow(0 8px 16px rgba(0,0,0,.14)) brightness(1); } 50% { filter: drop-shadow(0 8px 22px rgba(255,240,200,.5)) brightness(1.12); } }
-  @keyframes ppFall { 0% { transform: translate(0,-20px) rotate(0deg); opacity: 0; } 12% { opacity: .9; } 100% { transform: translate(34px,180px) rotate(220deg); opacity: 0; } }
-  @keyframes ppHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-  @keyframes ppSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
-  @keyframes ppTwinkle { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+  /* La trama de semitono: puntos de imprenta. Es la única textura de la
+     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
+  .pop-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
+    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
+  .pop-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
+  .pop-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
 
-  /* Lo que entra al scrollear se mueve en --pop-y y gira en --pop-giro: son
-     dos cosas distintas (el gesto de entrada y la inclinación del papel
-     apoyado) y tienen que poder convivir en un mismo transform. */
-  .pop-scroller [data-xin] { transform: translate3d(0, var(--pop-y, 0px), 0) rotate(var(--pop-giro, 0deg)); }
+  /* ── El pliego ─────────────────────────────────────────────────────── */
+  .pop-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
+    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .pop-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
 
-  /* Las escenas del mockup: quedan detrás y no atajan ningún toque. */
-  .pop-escena { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  .pop-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .22em;
+    color: color-mix(in srgb, currentColor 62%, transparent); }
+  .pop-folio--pie { align-items: center; margin-top: auto; }
+  .pop-folio-etq { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .22em;
+    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
 
-  /* ── Secciones ─────────────────────────────────────────────────────── */
-  .pop-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; display: flex;
-    flex-direction: column; justify-content: center; gap: 22px;
-    padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; }
-  .pop-kicker { position: relative; z-index: 1; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
-  .pop-kicker--tinta { color: var(--pp-ink); }
-  .pop-h2 { position: relative; z-index: 1; margin: 0; font-family: var(--pop-serif), 'Bangers', cursive;
-    font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96; color: inherit; }
-  .pop-h2 em, .pop-acento { font-style: italic; color: var(--pp-acc); }
-  .pop-h2--claro { color: var(--pp-night-ink); }
-  .pop-h2--album { font-size: clamp(38px, 10vw, 56px); }
-  .pop-acento-plano { color: var(--pp-acc); }
-  .pop-parrafo { position: relative; z-index: 1; margin: 0; font-size: 15px; line-height: 1.55; color: var(--pp-ink2); max-width: 420px; }
-  .pop-parrafo--tinta { color: var(--pp-ink); }
-  .pop-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
-    font-size: 14px; letter-spacing: .12em; color: var(--pp-ink2); }
-  .pop-meta-punto { width: 4px; height: 4px; border-radius: 50%; background: var(--pp-acc); display: inline-block; }
+  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
+     900 px se abren de verdad, como una revista apoyada. */
+  .pop-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
+  .pop-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  @media (min-width: 900px) {
+    .pop-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
+    .pop-spread > * { flex: 1 1 0; min-width: 0; }
+  }
+
+  /* ── Tipos ─────────────────────────────────────────────────────────── */
+  .pop-h2, .pop-panel-titulo, .pop-frase {
+    position: relative; z-index: 1; margin: 0; font-family: var(--pop-serif), 'Bangers', cursive;
+    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
+  .pop-h2 { font-size: clamp(40px, 12vw, 96px); }
+  .pop-h2--album { font-size: clamp(34px, 9vw, 64px); }
+  .pop-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
+  .pop-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
+  .pop-acento { font-style: italic; color: var(--pp-acc); }
+  .pop-acento--tinta { color: var(--pp-ink); }
+  .pop-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
+    color: color-mix(in srgb, currentColor 72%, transparent); }
+  .pop-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
+  .pop-regla { display: block; height: 2px; background: currentColor; }
 
   /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .pop-std { justify-content: flex-end; gap: 22px; padding: 46vh max(24px, calc((100% - 560px) / 2)) 90px;
-    background: linear-gradient(180deg, var(--pp-sky1) 0%, var(--pp-sky2) 48%, var(--pp-bg) 62%); }
-  .pop-std-fecha { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; }
-  .pop-std-dia { font-family: var(--pop-serif), 'Bangers', cursive; font-weight: 500;
-    font-size: clamp(120px, 34vw, 200px); line-height: .8; letter-spacing: -.04em; color: var(--pp-ink);
-    text-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .pop-std-fila { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .pop-cinta { display: inline-block; padding: 8px 26px; background: var(--pp-acc); color: ${CARTA};
-    font-family: var(--pop-serif), 'Bangers', cursive; font-style: italic; font-size: clamp(30px, 8vw, 44px);
-    line-height: 1; clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
-    box-shadow: 0 2px 0 rgba(0,0,0,.12); animation: ppRibbon 4s ease-in-out infinite; text-transform: capitalize; }
-  .pop-std-anio { font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(30px, 8vw, 44px); line-height: 1; color: var(--pp-ink); }
-
-  /* ── Nuestra foto: la ventana troquelada ───────────────────────────── */
-  .pop-foto-seccion { position: relative; overflow: hidden; padding: 20px max(24px, calc((100% - 900px) / 2)) 70px; background: var(--pp-bg); }
-  .pop-foto-marco { position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 4 / 5; max-height: 78vh; }
-  .pop-ventana { position: absolute; inset: 0; overflow: hidden;
-    clip-path: inset(44% 38% 44% 38% round 999px 999px 14px 14px);
-    background: repeating-linear-gradient(135deg, #DCD7CB 0 8px, #E9E5DC 8px 16px);
-    box-shadow: inset 0 0 0 4px rgba(200,107,90,.55), inset 0 0 60px rgba(200,107,90,.28);
-    transition: clip-path 120ms linear; }
+  .pop-std { justify-content: center; }
+  .pop-fecha { display: flex; flex-direction: column; font-family: var(--pop-serif), 'Bangers', cursive;
+    line-height: .82; letter-spacing: -.04em; }
+  .pop-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
+  .pop-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
+  .pop-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 13px; letter-spacing: .12em; }
+  /* La foto va enmarcada como una foto de tapa, con el año encima. */
+  .pop-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
+    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
   .pop-foto-capa { position: absolute; inset: 0; }
-  .pop-foto-firma { position: absolute; left: 6%; bottom: -26px; padding: 12px 18px; background: ${CARTA}; color: ${CARTA_TINTA};
-    font-family: var(--pop-serif), 'Bangers', cursive; font-style: italic; font-size: 20px;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-2deg); }
+  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
+     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
+  .pop-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(var(--pp-ink) calc(var(--pop-punto, 7.2) * 1px), transparent calc(var(--pop-punto, 7.2) * 1px + .6px));
+    background-size: 10px 10px; }
+  .pop-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--pop-serif), 'Bangers', cursive;
+    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
+  .pop-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--pop-sans), 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
 
-  /* ── 02 Falta poco ─────────────────────────────────────────────────── */
-  .pop-countdown { background: linear-gradient(180deg, var(--pp-bg), var(--pp-bg2)); }
-  .pop-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; max-width: 460px; }
-  .pop-cuenta-caja { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 20px 16px 16px;
-    display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  /* La esquina doblada: el mismo triángulo de papel del mockup. */
-  .pop-cuenta-caja::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0;
-    border-color: var(--pp-bg) var(--pp-bg) ${CARTA_LINEA} ${CARTA_LINEA}; }
-  .pop-cuenta-caja--1 { --pop-giro: -1.6deg; transform: rotate(var(--pop-giro)); }
-  .pop-cuenta-caja--2 { --pop-giro: 1.2deg; transform: rotate(var(--pop-giro)); margin-top: 10px; }
-  .pop-cuenta-caja--3 { --pop-giro: 1.8deg; transform: rotate(var(--pop-giro)); }
-  .pop-cuenta-caja--4 { --pop-giro: -1.1deg; transform: rotate(var(--pop-giro)); margin-top: 10px; }
-  .pop-cuenta-num { font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(56px, 15vw, 84px); line-height: .85; font-variant-numeric: tabular-nums; }
-  .pop-cuenta-num--acc { color: var(--pp-acc); }
-  .pop-cuenta-etq { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
+  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
+  .pop-countdown { justify-content: space-between; }
+  .pop-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    padding: 8px 0; font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .pop-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  .pop-marquesina--contraria .pop-marquesina-tira { animation-direction: reverse; }
+  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+
+  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
+     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
+     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
+     itálica y en el acento, que es lo único que se mueve de la página. */
+  .pop-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
+  .pop-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
+  .pop-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+  .pop-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
+  .pop-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
+  .pop-cuenta-num, .pop-cuenta-dias, .pop-cifra { font-family: var(--pop-serif), 'Bangers', cursive; font-weight: 400;
+    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .pop-cuenta-caja:nth-child(4) .pop-cuenta-num { font-style: italic; color: var(--pp-acc); }
+  .pop-cuenta-etq { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .24em;
+    text-transform: uppercase; color: var(--pp-acc); }
+  .pop-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
 
   /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .pop-frase-seccion { gap: 36px; padding: 100px max(24px, calc((100% - 620px) / 2)); background: var(--pp-bg2); }
-  .pop-frase { position: relative; z-index: 1; margin: 0; font-family: var(--pop-serif), 'Bangers', cursive;
-    font-weight: 400; font-size: clamp(40px, 11.5vw, 76px); line-height: 1; letter-spacing: -.01em; text-wrap: pretty; }
-  .pop-firma { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: .14em; color: var(--pp-ink2); }
-  .pop-firma-linea { width: 44px; height: 1.5px; background: var(--pp-acc); display: inline-block; }
+  .pop-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .pop-frase-seccion .pop-acento { color: var(--pp-bg); font-style: italic; }
+  .pop-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
 
-  /* ── Paneles del recorrido ─────────────────────────────────────────── */
-  .pop-pan { height: calc(100vh + var(--st-pasos, 2) * 90vh); position: relative; }
-  .pop-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
+  /* ── Paneles ───────────────────────────────────────────────────────── */
+  .pop-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
+  .pop-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
   .pop-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .pop-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; gap: 18px; padding: 80px max(24px, calc((100vw - 560px) / 2)) 96px; }
-  .pop-panel--abajo { justify-content: flex-end; }
-  .pop-panel--centro { justify-content: center; }
-  .pop-panel--album { gap: 14px; padding: clamp(52px, 8vh, 80px) max(24px, calc((100vw - 900px) / 2)) clamp(60px, 10vh, 96px); color: ${CARTA_TINTA}; }
-  /* Apilado: los mismos paneles, uno abajo del otro, recorridos bajando. */
+    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .pop-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .pop-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .pop-panel--acento .pop-acento { color: var(--pp-ink); }
   .pop-pan[data-scroll="vertical"] { height: auto; }
   .pop-pan[data-scroll="vertical"] .pop-pan-fijo { position: static; height: auto; overflow: visible; }
   .pop-pan[data-scroll="vertical"] .pop-tira { position: static; display: block; width: 100%; transform: none !important; }
   .pop-pan[data-scroll="vertical"] .pop-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-  .pop-panel-top { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
-    font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
-  .pop-panel-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
-    font-size: 12px; letter-spacing: .22em; color: var(--pp-ink2); margin-top: auto; }
-  .pop-seguir { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; font-size: 12px;
-    letter-spacing: .24em; color: var(--pp-ink2); }
-  .pop-flecha { display: inline-block; animation: ppSide 2.2s ease-in-out infinite; }
-  .pop-puntos { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
-  .pop-punto { width: 22px; height: 3px; transition: background 400ms ease; display: inline-block; }
 
-  /* ── Tarjetas de papel ─────────────────────────────────────────────── */
-  .pop-tarjeta { position: relative; z-index: 1; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 22px 20px;
-    display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .pop-tarjeta--izq { --pop-giro: -1deg; transform: rotate(var(--pop-giro)); }
-  .pop-tarjeta--der { --pop-giro: 1.1deg; transform: rotate(var(--pop-giro)); }
-  .pop-tarjeta--talon { --pop-giro: -.8deg; transform: rotate(var(--pop-giro)); overflow: visible; }
-  .pop-tarjeta--hoy { --pop-giro: -1deg; transform: rotate(var(--pop-giro)); align-items: flex-start; }
-  .pop-tarjeta--banco { margin-top: 4px; }
-  .pop-doblez::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 22px 22px 0;
-    border-color: var(--pp-bg2) var(--pp-bg2) ${CARTA_LINEA} ${CARTA_LINEA}; }
-  .pop-tarjeta-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
-  .pop-tarjeta-titulo { margin: 0; font-family: var(--pop-serif), 'Bangers', cursive; font-weight: 500;
-    font-size: clamp(30px, 8vw, 48px); line-height: .98; }
-  .pop-tarjeta-pregunta { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 26px; line-height: 1.15; }
-  .pop-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .pop-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
+  .pop-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  .pop-linea > span:first-child { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
+  .pop-linea > span:last-child { text-align: right; font-size: 15px; }
+  .pop-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
+    border: 2px solid currentColor; padding: 0 16px; font-family: var(--pop-sans), 'Nunito', sans-serif;
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  .pop-cta-flecha { font-family: var(--pop-serif), 'Bangers', cursive; font-style: italic; font-size: 22px; }
+  .pop-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .pop-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
+  .pop-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
 
-  .pop-filas { display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.4; }
-  .pop-fila { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid ${CARTA_LINEA}; padding-bottom: 8px; }
-  .pop-fila > span:first-child { color: var(--pp-ink2); }
-  .pop-fila--ultima { border-bottom: none; padding-bottom: 0; }
-  .pop-fila-valor { text-align: right; }
-  .pop-fila--copiable { align-items: center; }
-  .pop-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .pop-fila-etq { font-size: 12px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .pop-fila-dato { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
-  .pop-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 1.5px solid ${CARTA_TINTA}; background: transparent;
-    color: ${CARTA_TINTA}; font-size: 13px; letter-spacing: .12em; cursor: pointer; }
-  .pop-btn-copiar--hecho { background: ${CARTA_TINTA}; color: ${CARTA}; }
+  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
+  .pop-checkin { background: var(--pp-bg2); }
+  .pop-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
+    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .pop-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
+  .pop-cupon .pop-talon-top { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .2em; }
+  .pop-cupon input, .pop-cupon .pop-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
+  .pop-cupon .pop-contador button { border: 2px solid var(--pp-ink); }
+  .pop-sello, .pop-cupon .pop-sello { color: inherit; }
 
-  /* ── Check-in ──────────────────────────────────────────────────────── */
-  .pop-checkin { background: var(--pp-bg); }
-  .pop-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .24em; color: var(--pp-ink2); }
-  .pop-talon-estado { transition: color 400ms ease; flex-shrink: 0; }
-  .pop-campo { display: flex; flex-direction: column; gap: 6px; }
-  .pop-etiqueta { font-size: 12px; letter-spacing: .2em; color: var(--pp-ink2); }
-  .pop-contador { display: flex; align-items: center; gap: 12px; }
-  .pop-contador button { width: 48px; height: 48px; border: 1.5px solid ${CARTA_TINTA}; background: transparent; color: ${CARTA_TINTA}; font-size: 22px; line-height: 1; cursor: pointer; }
-  .pop-contador button:disabled { opacity: .35; cursor: default; }
-  .pop-contador > span { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 40px; min-width: 40px; text-align: center; line-height: 1; }
-  .pop-input { min-height: 44px; border: none; border-bottom: 1.5px solid #CFC4AE; background: transparent; color: ${CARTA_TINTA};
-    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 16px; padding: 6px 2px; }
-  .pop-input--serif { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 20px; }
-  .pop-input:focus { outline: none; border-bottom-color: var(--pp-acc); }
-  .pop-input::placeholder { color: #9A9388; }
-  .pop-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 1px dashed #CFC4AE; padding-top: 12px; font-size: 14px; color: var(--pp-ink2); }
-  .pop-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .pop-precio-total { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 26px; line-height: 1; color: ${CARTA_TINTA}; }
-  .pop-precio-detalle { font-size: 12px; color: var(--pp-ink2); }
-  .pop-sello { position: absolute; right: 14px; top: 44px; width: 92px; height: 92px; border-radius: 50%;
-    background: var(--pp-acc); color: ${CARTA}; display: flex; align-items: center; justify-content: center; text-align: center;
-    font-size: 11px; letter-spacing: .2em; line-height: 1.3; opacity: 0; transform: scale(1.6) rotate(-20deg);
-    box-shadow: 0 2px 0 rgba(0,0,0,.15); pointer-events: none;
-    clip-path: polygon(50% 0%, 61% 5%, 71% 2%, 79% 10%, 90% 11%, 93% 22%, 100% 30%, 97% 42%, 100% 52%, 95% 63%, 96% 75%, 88% 82%, 84% 93%, 72% 94%, 63% 100%, 50% 96%, 37% 100%, 28% 94%, 16% 93%, 12% 82%, 4% 75%, 5% 63%, 0% 52%, 3% 42%, 0% 30%, 7% 22%, 10% 11%, 21% 10%, 29% 2%, 39% 5%); }
-  .pop-petalos { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
-  .pop-error { position: relative; z-index: 1; margin: 0; font-size: 13px; color: var(--pp-acc); }
+  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
+  .pop-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
+  .pop-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr; gap: 10px; }
+  @media (min-width: 900px) { .pop-contactos { grid-template-columns: repeat(6, 1fr); } }
+  .pop-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
+  .pop-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
+  .pop-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
+  .pop-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--pop-sans), 'Nunito', sans-serif;
+    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
 
-  /* ── Botones ───────────────────────────────────────────────────────── */
-  .pop-btn-solido { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-    min-height: 52px; padding: 0 22px; border: none; background: var(--pp-acc); color: ${CARTA};
-    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 14px; letter-spacing: .2em; cursor: pointer;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .pop-btn-solido--tinta { background: var(--pp-ink); color: var(--pp-btn-fg); }
-  .pop-btn-solido:disabled { opacity: .6; cursor: default; }
-  .pop-btn-fantasma { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center;
-    min-height: 48px; padding: 0 22px; background: transparent; color: var(--pp-ink); border: 1.5px solid var(--pp-ink);
-    font-size: 13px; letter-spacing: .18em; cursor: pointer; }
-  .pop-btn-papel { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 10px; min-height: 48px;
-    padding: 0 22px; align-self: flex-start; border: 1.5px solid var(--pp-ink); color: var(--pp-ink); font-size: 14px;
-    letter-spacing: .14em; background: ${CARTA}; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);
-    --pop-giro: -1deg; transform: rotate(var(--pop-giro)); text-decoration: none; }
-
-  /* ── Mapa ──────────────────────────────────────────────────────────── */
-  .pop-mapa { position: relative; z-index: 1; height: 180px; border: 1.5px solid ${CARTA_LINEA}; background: ${CARTA}; overflow: hidden;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-
-  /* ── Cronograma ────────────────────────────────────────────────────── */
-  .pop-crono { position: relative; z-index: 1; display: flex; flex-direction: column; border-left: 2px solid var(--pp-acc); margin-left: 6px; }
-  .pop-crono-fila { display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline; }
-  .pop-crono-hora { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 26px; min-width: 64px; line-height: 1; }
-  .pop-crono-titulo { font-size: 15px; }
-
-  /* ── Álbum ─────────────────────────────────────────────────────────── */
-  .pop-polaroids { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr);
-    gap: 14px; max-width: 900px; width: 100%; margin: 0 auto; align-content: start; }
-  .pop-polaroid { position: relative; background: #FDFBF6; padding: 8px 8px 30px; min-height: 0; display: flex;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); cursor: pointer; grid-column: span 2; }
-  .pop-polaroids[data-cantidad="1"] .pop-polaroid { grid-column: span 6; }
-  .pop-polaroids[data-cantidad="2"] .pop-polaroid { grid-column: span 3; }
-  .pop-polaroids[data-cantidad="4"] .pop-polaroid { grid-column: span 3; }
-  .pop-polaroids[data-cantidad="5"] .pop-polaroid:nth-child(-n+2) { grid-column: span 3; }
-  .pop-polaroid:nth-child(odd) { transform: rotate(-2deg); }
-  .pop-polaroid:nth-child(even) { transform: rotate(1.5deg); margin-top: 14px; }
-  .pop-polaroid-img { width: 100%; height: 100%; min-height: 120px; object-fit: cover; display: block;
-    background: repeating-linear-gradient(135deg, #DCD7CB 0 8px, #E9E5DC 8px 16px); }
-  .pop-chinche { position: absolute; left: 50%; top: -10px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #fff 0 14%, var(--pp-acc) 16% 68%, rgba(0,0,0,.45) 70%);
-    box-shadow: 0 3px 4px rgba(0,0,0,.32); }
-
-  /* ── Música ────────────────────────────────────────────────────────── */
-  .pop-musica { background: linear-gradient(180deg, var(--pp-bg2), var(--pp-sky2)); }
-  .pop-lista { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
-  .pop-lista-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(43,42,51,.14); }
+  /* ── 07 Música ─────────────────────────────────────────────────────── */
+  .pop-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
+  .pop-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
+  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+  .pop-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
+  .pop-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
   .pop-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .pop-lista-tema { font-size: 15px; }
-  .pop-lista-quien { font-size: 13px; color: var(--pp-ink2); }
+  .pop-lista-quien { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .12em;
+    color: color-mix(in srgb, currentColor 62%, transparent); }
 
-  /* ── Regalos ───────────────────────────────────────────────────────── */
-  .pop-regalos { background: linear-gradient(180deg, var(--pp-sky2), var(--pp-hill1) 60%, var(--pp-night)); }
+  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
+  .pop-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
+    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
+  .pop-tarjeta + .pop-tarjeta { margin-top: 12px; }
+  .pop-tarjeta-kicker { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .pop-tarjeta-titulo { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 28px; line-height: 1; }
+  .pop-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .pop-tarjeta .pop-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
+  .pop-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
+  .pop-fila--ultima { border-bottom: none; }
+  .pop-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .pop-fila-etq { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
+  .pop-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
+  .pop-fila-valor { text-align: right; }
+  .pop-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
+    color: var(--pp-ink); font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; cursor: pointer; }
+  .pop-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
 
-  /* ── Trivia ────────────────────────────────────────────────────────── */
-  .pop-quiz { background: linear-gradient(180deg, var(--pp-hill1), var(--pp-night) 70%); color: var(--pp-night-ink); }
-  .pop-opciones { display: flex; flex-direction: column; gap: 8px; }
-  .pop-opcion { min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #CFC4AE; background: transparent;
-    color: ${CARTA_TINTA}; font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 300ms, border-color 300ms, color 300ms; }
-  .pop-opcion:disabled { cursor: default; }
-  .pop-opcion--bien { background: var(--pp-acc2); border-color: var(--pp-acc2); color: ${CARTA}; }
-  .pop-opcion--mal { border-color: var(--pp-acc); color: var(--pp-acc); }
+  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
+  .pop-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .pop-quiz .pop-acento { color: var(--pp-ink); }
+  .pop-opciones { display: flex; flex-direction: column; gap: 10px; }
+  .pop-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
+    color: inherit; font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 15px; cursor: pointer;
+    transition: background 200ms ease, color 200ms ease; }
+  .pop-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
+  .pop-opcion--mal { opacity: .55; }
 
-  /* ── Tu pase ───────────────────────────────────────────────────────── */
-  .pop-pase { justify-content: flex-end; gap: 20px; background: var(--pp-night); color: var(--pp-night-ink);
-    padding: 44vh max(24px, calc((100% - 560px) / 2)) calc(40px + env(safe-area-inset-bottom)); }
-  .pop-ticket { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr auto; background: ${CARTA};
-    color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.14); --pop-giro: -.6deg; transform: rotate(var(--pop-giro));
-    border-radius: 12px; overflow: hidden; }
-  .pop-ticket-izq { padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; border-right: 2px dashed #CFC4AE; position: relative; }
-  .pop-ticket-der { padding: 16px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .pop-ticket-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
-  .pop-ticket-nombre { font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(30px, 8vw, 40px); line-height: .95; }
-  .pop-ticket-dato { font-size: 14px; color: var(--pp-ink2); }
-  .pop-ticket-fecha { font-size: 14px; letter-spacing: .14em; color: var(--pp-acc); }
-  .pop-ticket-muesca { position: absolute; right: -12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pp-night); }
-  .pop-ticket-muesca--arriba { top: -12px; }
-  .pop-ticket-muesca--abajo { bottom: -12px; }
-  /* El QR compartido viene con su propio marco claro: acá va sobre el talón. */
-  .pop-ticket-der .qr-ingreso, .pop-ticket-der section { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; }
-  .pop-info-extra { position: relative; z-index: 1; }
+  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
+  .pop-pase { background: var(--pp-ink); color: var(--pp-bg); }
+  .pop-pagina--qr { align-items: flex-start; }
+  .pop-pagina--qr .qr-ingreso, .pop-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .pop-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .pop-pase-numero { display: flex; flex-direction: column; }
+  .pop-pase-numero > span:last-child { font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
+  .pop-info-extra { margin-top: 12px; }
   .pop-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .pop-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-night-ink) !important;
-    border: 1px solid rgba(243,235,221,.35) !important; border-radius: 0 !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran acá: el dibujo de la
-     colección es el papel recortado, y un ícono de trazo al lado desentona. */
-  .pop-raiz .ia-icon-box { display: none !important; }
-  .pop-pase-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-top: 10px; }
-  .pop-pase-firma { font-family: var(--pop-serif), 'Bangers', cursive; font-style: italic; font-size: 24px; color: var(--pp-night-ink); }
-  .pop-pase-creditos { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .pop-replay { cursor: pointer; font-size: 12px; letter-spacing: .18em; color: var(--pp-acc); }
+  .pop-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
+    border-radius: 0 !important; font-family: var(--pop-sans), 'Nunito', sans-serif !important; letter-spacing: .18em !important; }
+  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
+     tipografía. */
+  .pop-raiz .ia-icon-box, .pop-raiz svg.lucide { display: none !important; }
+  .pop-replay { cursor: pointer; }
+  .pop-credito { display: flex; justify-content: center; opacity: .6; }
+  .pop-error { margin: 0; font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 12px; }
 
-  /* ── Riel ──────────────────────────────────────────────────────────── */
+  /* ── El sello circular ─────────────────────────────────────────────── */
+  .pop-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
+  .pop-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
+  .pop-sello-circular text { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
+  .pop-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--pop-serif), 'Bangers', cursive; font-style: italic; font-size: 30px; color: var(--pp-acc); }
+  @keyframes ebnGira { to { transform: rotate(360deg); } }
+
+  /* ── La tapa ───────────────────────────────────────────────────────── */
+  .pop-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .pop-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
+  .pop-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
+  .pop-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .pop-tapa-fecha { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--pp-acc); }
+  .pop-tapa-nombres { margin: 0; font-family: var(--pop-serif), 'Bangers', cursive; font-weight: 400;
+    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
+  .pop-tapa-linea { overflow: hidden; display: block; }
+  .pop-tapa-linea > span { display: block; }
+  .pop-tapa-linea--sangra { padding-left: 14%; }
+  .pop-tapa-pase { text-align: right; }
+  .pop-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+  .pop-tapa-mensaje { margin: 0; font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(20px, 5.4vw, 26px);
+    line-height: 1.2; max-width: 34ch; }
+  .pop-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
+    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .pop-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
   .pop-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
     align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(43,42,51,.12); }
-  .pop-riel-top { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-ink2); transition: color 500ms ease; }
-  .pop-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: rgba(43,42,51,.14); position: relative; }
+    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
+  .pop-riel-top, .pop-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--pop-sans), 'Nunito', sans-serif;
+    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
+  .pop-riel-top { color: var(--pp-ink2); }
+  .pop-riel-etiqueta { color: var(--pp-acc); }
+  .pop-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
   .pop-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .pop-riel-etiqueta { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-acc); transition: color 500ms ease; }
-
-  /* ── Portada ───────────────────────────────────────────────────────── */
-  .pop-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden;
-    background: linear-gradient(180deg, var(--pp-sky1), var(--pp-sky2)); }
-  .pop-portada-escena { position: absolute; inset: 0; pointer-events: none; }
-  .pop-portada-contenido { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    align-items: center; text-align: center; pointer-events: none;
-    padding: calc(64px + env(safe-area-inset-top)) max(24px, calc((100% - 480px) / 2)) calc(26px + env(safe-area-inset-bottom)); }
-  .pop-portada-arriba { display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.6vh, 14px); width: 100%; }
-  .pop-cartel { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: clamp(16px, 3vh, 26px) clamp(18px, 5vw, 30px);
-    max-width: 100%; box-sizing: border-box; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);
-    transform: rotate(-1.2deg); transform-origin: 50% 0%; }
-  .pop-cartel-nombres { margin: 0; font-family: var(--pop-serif), 'Bangers', cursive; font-weight: 500;
-    font-size: min(clamp(34px, 10vw, 60px), 6.4vh); line-height: .96; letter-spacing: -.01em;
-    display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 .28em; }
-  .pop-cartel-amp { font-style: italic; font-weight: 400; font-size: .6em; color: var(--pp-acc); }
-  .pop-cartel-chinche { position: absolute; left: 50%; top: -10px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #fff 0 14%, var(--pp-acc) 16% 68%, rgba(0,0,0,.45) 70%);
-    box-shadow: 0 3px 5px rgba(0,0,0,.34); }
-  .pop-portada-abajo { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2vh, 16px); width: 100%; pointer-events: auto; }
-  .pop-portada-datos { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 20px; background: ${CARTA};
-    color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(.8deg);
-    max-width: 100%; box-sizing: border-box; }
-  .pop-portada-saludo { font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); }
-  .pop-portada-fila { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; font-size: 14px; letter-spacing: .14em; }
-  .pop-portada-pase { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .pop-portada-btn { width: 100%; max-width: 360px; min-height: 52px; border: none; background: var(--pp-btn-bg); color: var(--pp-btn-fg);
-    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 14px; letter-spacing: .22em; cursor: pointer;
-    box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 8px 14px rgba(0,0,0,.1); transition: background 300ms ease; }
-  @media (hover: hover) { .pop-portada-btn:hover { background: var(--pp-acc); color: ${CARTA}; } }
-
   .pop-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); opacity: 0; transition: opacity 600ms ease; pointer-events: none;
-    animation: ppHint 2.4s ease-in-out infinite; }
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
+  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
 
-  /* ── Lupa ──────────────────────────────────────────────────────────── */
-  .pop-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(43,42,51,.94); display: flex; align-items: center;
-    justify-content: center; padding: 24px; cursor: zoom-out; }
-  .pop-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid ${CARTA};
-    background: transparent; color: ${CARTA}; font-size: 18px; line-height: 1; cursor: pointer; }
-  .pop-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; background: ${CARTA}; padding: 10px 10px 30px; }
+  .pop-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .pop-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
+    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
+  .pop-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
 
-  /* En escritorio la invitación sigue siendo una hoja angosta centrada: las
-     escenas están dibujadas para una pantalla de teléfono y estiradas a 1440
-     px pierden la escala del recorte. */
-  @media (min-width: 1024px) {
-    .pop-section, .pop-panel { padding-left: max(24px, calc((100% - 620px) / 2)); padding-right: max(24px, calc((100% - 620px) / 2)); }
-    .pop-panel--album { padding-left: max(24px, calc((100vw - 900px) / 2)); padding-right: max(24px, calc((100vw - 900px) / 2)); }
-  }
+  /* ── Formularios (check-in y canciones) ────────────────────────────── */
+  .pop-campo { display: flex; flex-direction: column; gap: 6px; }
+  .pop-etiqueta { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 66%, transparent); }
+  .pop-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
+  .pop-input:focus { outline: none; border-color: var(--pp-acc); }
+  .pop-contador { display: flex; align-items: center; gap: 12px; }
+  .pop-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-size: 20px; line-height: 1; cursor: pointer; }
+  .pop-contador button:disabled { opacity: .35; cursor: default; }
+  .pop-contador > span { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
+  .pop-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+  .pop-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
+  .pop-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+  .pop-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
+  .pop-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .pop-precio-total { font-family: var(--pop-serif), 'Bangers', cursive; font-size: 28px; line-height: 1; }
+  .pop-precio-detalle { font-family: var(--pop-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .1em; }
+  .pop-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--pop-sans), 'Nunito', sans-serif;
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .pop-talon-estado { transition: color 400ms ease; }
+  .pop-filas { display: flex; flex-direction: column; }
+  .pop-petalos { display: none; }
 
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y tramas. La página es una
-     revista -- cada sección es una hoja con su folio arriba, el titular
-     ocupa lo que quiera y el color aparece en una palabra o en un fondo
-     entero, nunca en un ornamento. */
-  .pop-raiz { font-family: var(--pop-sans), 'Nunito', sans-serif; }
-
-  /* La trama de semitono, que es lo único "impreso" de la familia: puntos de
-     1 px cada 12. Va como gradiente y no como SVG para que no cueste nada. */
-  .pop-trama { position: absolute; inset: 0; pointer-events: none; opacity: .14; z-index: 0;
-    background-image: radial-gradient(currentColor .8px, transparent .9px); background-size: 12px 12px; }
-
-  /* Los kickers y los folios son mono: son los datos de la ficha técnica. */
-  .pop-kicker, .pop-panel-top, .pop-panel-pie, .pop-meta, .pop-riel-top, .pop-riel-etiqueta,
-  .pop-ticket-kicker, .pop-cuenta-etq, .pop-tarjeta-kicker, .pop-fila-etq, .pop-portada-pase {
-    font-family: var(--pop-sans), 'Nunito', sans-serif; }
-
-  /* El titular: Instrument Serif enorme, con la segunda línea en itálica y en
-     el acento. Es la firma de la sub-colección. */
-  .pop-h2, .pop-frase, .pop-tarjeta-titulo, .pop-std-dia, .pop-cartel-nombres, .pop-ticket-nombre, .pop-cifra, .pop-cuenta-num {
-    font-family: var(--pop-serif), 'Bangers', cursive; letter-spacing: -.03em; }
-  .pop-h2 em, .pop-acento { font-style: italic; color: var(--pp-acc); }
-
-  /* Save the Date: el día ocupa la hoja entera. */
-  .pop-std { background: var(--pp-ink); color: var(--pp-bg); padding: 64px max(22px, calc((100% - 560px) / 2)) 80px; justify-content: center; }
-  .pop-std-dia { font-size: clamp(64px, 22vw, 180px); line-height: .82; text-shadow: none; color: inherit; }
-  .pop-std-fila { justify-content: space-between; }
-  .pop-cinta { background: none; color: var(--pp-acc); font-style: italic; clip-path: none; box-shadow: none;
-    animation: none; padding: 0; font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
-  .pop-std-anio { font-family: var(--pop-serif), 'Bangers', cursive; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
-  .pop-std .pop-kicker, .pop-std .pop-meta { color: rgba(245,241,234,.62); }
-
-  /* La foto va enmarcada, como una foto de tapa. */
-  .pop-foto-marco { border: 3px solid var(--pp-ink); }
-  .pop-ventana { clip-path: none !important; box-shadow: none; }
-  .pop-foto-firma { background: var(--pp-acc); color: var(--pp-bg); transform: none; box-shadow: none;
-    font-family: var(--pop-serif), 'Bangers', cursive; font-style: italic; }
-
-  /* Las tarjetas son bloques de color, no papelitos inclinados. */
-  .pop-tarjeta { background: var(--pp-bg2); color: var(--pp-ink); box-shadow: none; border: 1px solid color-mix(in srgb, var(--pp-ink) 14%, transparent); }
-  .pop-tarjeta--izq, .pop-tarjeta--der, .pop-tarjeta--talon, .pop-tarjeta--hoy { transform: none; }
-  .pop-doblez::before { display: none; }
-  .pop-fila { border-bottom-color: color-mix(in srgb, var(--pp-ink) 14%, transparent); }
-  .pop-chinche { display: none; }
-
-  /* La cuenta regresiva: cuatro cifras al hilo, separadas por filetes. */
-  .pop-cuenta { grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 560px; }
-  .pop-cuenta-caja { background: none; box-shadow: none; transform: none !important; margin: 0 !important;
-    border-left: 1px solid color-mix(in srgb, var(--pp-ink) 18%, transparent); padding: 10px 12px; }
-  .pop-cuenta-caja:first-child { border-left: none; }
-  .pop-cuenta-caja::before { display: none; }
-  .pop-cuenta-num { font-size: clamp(38px, 12vw, 72px); line-height: .9; }
-
-  /* Los paneles del recorrido: cada uno es una hoja con su tono. El de
-     cronograma va en el acento, que es lo que le da el golpe editorial. */
-  .pop-panel { padding: 64px max(22px, calc((100vw - 560px) / 2)) 80px; }
-  .pop-panel[data-tone="dark"] { background: var(--pp-ink) !important; color: var(--pp-bg); }
-  .pop-panel[data-tone="dark"] .pop-tarjeta { background: transparent; border-color: rgba(245,241,234,.22); color: inherit; }
-  .pop-panel-top, .pop-panel-pie { letter-spacing: .22em; font-size: 11px; }
-
-  /* El pase es un cupón troquelado, no un ticket con muescas redondas. */
-  .pop-ticket { background: var(--pp-bg); color: var(--pp-ink); border: 1px solid var(--pp-ink); border-radius: 0; transform: none; box-shadow: none; }
-  .pop-ticket-izq { border-right: 1px dashed color-mix(in srgb, var(--pp-ink) 40%, transparent); }
-  .pop-ticket-muesca { display: none; }
-
-  /* Botones: rectángulos con el acento, sin sombra ni inclinación. */
-  .pop-btn-solido, .pop-btn-papel, .pop-portada-btn { border-radius: 0; box-shadow: none; transform: none; }
-  .pop-btn-papel { background: transparent; border: 1px solid currentColor; }
-  .pop-opcion { border-color: color-mix(in srgb, var(--pp-ink) 24%, transparent); border-radius: 0; }
-
-  /* La portada: sin capas de papel. Un titular enorme sobre la trama, el
-     folio arriba y el botón abajo. */
-  .pop-portada { background: var(--pp-bg); }
-  .pop-cartel { background: none; box-shadow: none; transform: none; padding: 0; }
-  .pop-cartel-nombres { font-size: min(clamp(52px, 17vw, 120px), 13vh); line-height: .86; display: block; }
-  .pop-cartel-amp { display: block; font-style: italic; color: var(--pp-acc); font-size: .7em; }
-  .pop-cartel-chinche { display: none; }
-  .pop-portada-datos { background: none; box-shadow: none; transform: none; padding: 0; gap: 12px; }
-  .pop-portada-btn { background: var(--pp-ink); color: var(--pp-bg); }
-  @media (hover: hover) { .pop-portada-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* Pop: el titular tiene contorno y sombra dura, como una viñeta. */
-  .pop-cartel-nombres, .pop-h2 { letter-spacing: .02em; -webkit-text-stroke: 2px var(--pp-ink); text-shadow: 4px 4px 0 var(--pp-acc); }
+  /* Pop: contorno y sombra dura, como una viñeta de cómic. */
+  .pop-tapa-nombres, .pop-h2, .pop-panel-titulo, .pop-fecha-linea { letter-spacing: .02em; -webkit-text-stroke: 2px var(--pp-bg); text-shadow: 5px 5px 0 var(--pp-acc); }
   .pop-trama { opacity: .18; background-size: 8px 8px; }
 
   @media (prefers-reduced-motion: reduce) {
     .pop-raiz * { animation: none !important; }
-    .pop-scroller [data-xin] { opacity: 1 !important; --pop-y: 0px; }
+    .pop-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
+    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
+    .pop-foto { --pop-punto: 0; }
   }
 `;

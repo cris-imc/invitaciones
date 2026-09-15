@@ -43,8 +43,9 @@
     "acc2": "#8E1B2C"
   },
   "cssExtra": [
-    "/* Noir: la luz entra de costado, como una persiana. */",
-    ".noi-trama { opacity: .10; background-image: repeating-linear-gradient(105deg, currentColor 0 2px, transparent 2px 22px); background-size: auto; }"
+    "/* Noir: la luz entra de costado, como por una persiana. */",
+    ".noi-trama { opacity: .09; background-image: repeating-linear-gradient(105deg, currentColor 0 2px, transparent 2px 24px); background-size: auto; }",
+    ".noi-tapa-nombres, .noi-h2, .noi-panel-titulo { letter-spacing: -.02em; }"
   ],
   "variantes": {
     "Esmeralda": {

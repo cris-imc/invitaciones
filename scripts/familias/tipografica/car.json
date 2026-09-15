@@ -41,8 +41,8 @@
     "acc2": "#FFC857"
   },
   "cssExtra": [
-    "/* Cartelera: las letras de la marquesina tienen halo, como las bombitas. */",
-    ".car-cartel-nombres, .car-h2 { text-shadow: 0 0 18px color-mix(in srgb, var(--pp-acc) 55%, transparent); }",
+    "/* Cartelera: las letras de la marquesina tienen el halo de las bombitas. */",
+    ".car-tapa-nombres, .car-h2, .car-panel-titulo, .car-fecha-linea { text-shadow: 0 0 20px color-mix(in srgb, var(--pp-acc) 55%, transparent); }",
     ".car-trama { opacity: .08; }"
   ],
   "variantes": {

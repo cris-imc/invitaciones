@@ -6,6 +6,30 @@
 
 ---
 
+> **Actualización 2026-09-15 — cuatro colecciones.** Lo que sigue describe el
+> flujo de la **Colección Flat** (la de siempre) y sigue siendo exacto para
+> ella. Desde la instalación de Paper e Iconic hay cuatro colecciones y dos
+> arquitecturas:
+>
+> | Colección | Arquitectura | Familias | Cómo se agrega una familia |
+> |---|---|---|---|
+> | **Flat** | la de esta guía | 58 | a mano, como dice esta guía |
+> | **Storytelling** | scroller propio | 36 | copiando `GuestPassVipTemplate.tsx` |
+> | **Paper** | Flat | 10 | `scripts/derivar-*.js` + ficha, ver `docs/PLAN_NUEVAS_COLECCIONES.md` §8 |
+> | **Iconic** | Storytelling | 19 | `scripts/derivar-capas.js` / `derivar-tipografica.js` + ficha |
+>
+> En Paper e Iconic **no se copia el archivo**: cada familia se DERIVA de la
+> base de su sub-colección con un script que aplica sólo sus diferencias, y el
+> cableado de los diez puntos lo hace `scripts/cablear-familia.js` a partir de
+> un JSON. `node scripts/auditar-colecciones.js` verifica que las 29 estén
+> enchufadas en todos lados.
+>
+> Dos reglas propias de las colecciones nuevas, que esta guía no contempla
+> porque no existían: **cada colección trae su propia cuenta regresiva** (el
+> paso "Countdown" del wizard queda sólo para Flat, igual que "Tipografía"), y
+> **una sola iconografía por sección** (los íconos de lucide que traen los
+> componentes compartidos se ocultan por CSS).
+
 ## 1. Arquitectura: dónde entra una plantilla nueva
 
 Hay una única familia real de plantillas de "diseño", tipada como:
@@ -110,6 +134,11 @@ Estos son los puntos de choque reales (confirmados, no la lista original estimad
 8. **`src/app/invite/[slug]/[token]/page.tsx`, `src/app/i/[slug]/page.tsx`, `src/app/preview/[slug]/page.tsx`** — las 3 páginas de render real: importar `XxxTemplate*` y agregar la rama `if (templateTipo === 'XXX') return <XxxTemplate .../>` (o el `switch(color)` equivalente, ver estas mismas páginas para Neon/Chic como referencia exacta).
 
 Después de tocar todos: `grep -rn "XXX" src/components/wizard src/app/preview-plantilla src/app/invite src/app/i src/app/preview src/lib/template-preview-samples.ts` para confirmar que ninguno quedó afuera.
+
+**En Paper e Iconic esto no se hace a mano.** `node scripts/cablear-familia.js scripts/familias/<familia>.json` enchufa los diez puntos a partir de un JSON, es idempotente y dice qué hizo y qué ya estaba; después va
+`node scripts/generar-plantillas-dinamicas.js`. Para verificar las 29 juntas
+(que es donde se ven los olvidos: una familia que aparece en el modal pero no
+se renderiza, o al revés), `node scripts/auditar-colecciones.js`.
 
 ### 2.6 Gating por tipo de evento
 

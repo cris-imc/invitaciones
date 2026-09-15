@@ -43,10 +43,12 @@
     "acc2": "#F2C319"
   },
   "cssExtra": [
-    "/* Bauhaus: sin itálicas y sin curvas. El acento es un bloque. */",
-    ".bau-h2 em, .bau-acento { font-style: normal; background: var(--pp-acc); color: var(--pp-bg); padding: 0 .12em; }",
-    ".bau-h2, .bau-cartel-nombres { letter-spacing: -.02em; text-transform: uppercase; }",
-    ".bau-trama { background-image: none; }"
+    "/* Bauhaus: sin itálicas y sin curvas. El acento es un bloque detrás de la",
+    "   palabra, no una inclinación. */",
+    ".bau-acento { font-style: normal !important; background: var(--pp-acc); color: var(--pp-bg); padding: 0 .1em; }",
+    ".bau-tapa-nombres, .bau-h2, .bau-panel-titulo, .bau-fecha-linea { text-transform: uppercase; letter-spacing: -.02em; }",
+    ".bau-trama { background-image: none; }",
+    ".bau-sello-circular svg { animation-duration: 40s; }"
   ],
   "variantes": {
     "Klein": {

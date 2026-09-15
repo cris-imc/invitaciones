@@ -43,8 +43,8 @@
     "acc2": "#FFD84D"
   },
   "cssExtra": [
-    "/* Pop: el titular tiene contorno y sombra dura, como una viñeta. */",
-    ".pop-cartel-nombres, .pop-h2 { letter-spacing: .02em; -webkit-text-stroke: 2px var(--pp-ink); text-shadow: 4px 4px 0 var(--pp-acc); }",
+    "/* Pop: contorno y sombra dura, como una viñeta de cómic. */",
+    ".pop-tapa-nombres, .pop-h2, .pop-panel-titulo, .pop-fecha-linea { letter-spacing: .02em; -webkit-text-stroke: 2px var(--pp-bg); text-shadow: 5px 5px 0 var(--pp-acc); }",
     ".pop-trama { opacity: .18; background-size: 8px 8px; }"
   ],
   "variantes": {

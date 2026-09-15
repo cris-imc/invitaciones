@@ -1,28 +1,31 @@
 #!/usr/bin/env node
 /**
- * Deriva la base de "Tipográfica Editorial" (Colección Iconic) --
- * EditorialBlancNoirTemplate.tsx -- de JardinDePapelTemplate.tsx.
+ * Escribe la base de "Tipográfica Editorial" (Colección Iconic) --
+ * EditorialBlancNoirTemplate.tsx -- tomando de JardinDePapelTemplate.tsx el
+ * MOTOR y reemplazando todo lo demás.
  *
- * Las dos sub-colecciones de Iconic comparten el MOTOR entero: el scroller
- * propio, los reveals, la frase palabra por palabra, los paneles pineados con
- * su recorrido lateral, el riel de progreso, la portada que se abre, el
- * check-in con sello, el álbum y el pase. Eso es lo que se hereda de Jardín,
- * que ya está probado.
+ * Qué se hereda de Jardín (y por qué): el scroller propio, los reveals, la
+ * frase palabra por palabra, los paneles pineados con su recorrido lateral y
+ * su gesto de arrastre, el riel de progreso, la apertura de la portada, el
+ * check-in que habla con la API, el álbum, la lupa y el post-evento. Todo eso
+ * ya está probado y no tiene nada que ver con cómo se ve una familia.
  *
- * Lo que NO comparten es todo lo demás, y es bastante:
+ * Qué se reemplaza entero, porque acá la página es OTRA:
  *
- *  - CAPAS DE PAPEL DIBUJA; TIPOGRÁFICA EDITORIAL COMPONE. Acá no hay ni un
- *    SVG de paisaje: la página es una revista -- titulares enormes en
- *    Instrument Serif, kickers y folios en mono, filetes, y una trama de
- *    semitono como única textura.
- *  - EL COLOR ES UN BLOQUE, NO UN ADORNO. Las secciones alternan papel,
- *    tinta y acento a página completa; el panel de cronograma va entero en el
- *    color de la variante.
- *  - NO HAY PARALLAX de capas ni inclinación: el papel no se mueve, se pasa.
+ *  - EL RENDER (scripts/jsx/editorial-render.jsx). Capas de papel dibuja un
+ *    paisaje; Tipográfica Editorial compone una revista: folio arriba y
+ *    abajo de cada pliego, spread de dos páginas, titulares enormes en
+ *    Instrument Serif, kickers y datos en mono, marquesinas que corren,
+ *    cupón troquelado en el check-in, hoja de contactos en el álbum y un
+ *    sello circular que gira. La tapa ES la bienvenida -- dice de quién es
+ *    la fiesta, cuándo, dónde y para cuántos --, así que esta sub-colección
+ *    no monta además la sección de Bienvenida: sería decir dos veces lo
+ *    mismo.
+ *  - LA HOJA DE ESTILOS (scripts/css/editorial.css).
+ *  - LAS CARAS y la PALETA.
  *
  * La PALETA conserva las trece claves de Capas de papel aunque acá sólo se
- * usen seis: así el generador de variantes es el mismo para las dos
- * sub-colecciones. Las claves de paisaje (sky, hill) se mapean a la tinta.
+ * usen seis: así las dos sub-colecciones comparten el generador de variantes.
  *
  * GENERADO: no editar EditorialBlancNoirTemplate.tsx a mano.
  *
@@ -63,28 +66,33 @@ s = s.replace(cabeceraVieja, L(
   " *",
   " * GENERADO por scripts/derivar-editorial.js a partir de",
   " * JardinDePapelTemplate.tsx — no editar a mano: el motor se arregla en",
-  " * Jardín y se vuelve a derivar; lo propio de esta sub-colección está en",
-  " * este script y en scripts/css/editorial.css.",
+  " * Jardín, el render en scripts/jsx/editorial-render.jsx y los estilos en",
+  " * scripts/css/editorial.css.",
   " *",
-  " * Comparte con Capas de papel el MOTOR (scroller propio, reveals, frase",
-  " * palabra por palabra, paneles pineados, riel, portada que se abre,",
-  " * check-in con sello, álbum, pase) y no comparte nada más:",
+  " * Comparte con Capas de papel el MOTOR (scroller, reveals, frase palabra",
+  " * por palabra, paneles pineados, riel, apertura de portada, check-in,",
+  " * álbum) y NADA de la composición:",
   " *",
-  " *  - CAPAS DE PAPEL DIBUJA; ACÁ SE COMPONE. Ni un SVG de paisaje: la",
-  " *    página es una revista, con titulares enormes en Instrument Serif,",
-  " *    kickers y folios en JetBrains Mono, filetes y una trama de semitono",
-  " *    como única textura (un gradiente, no una imagen).",
-  " *  - EL COLOR ES UN BLOQUE: las secciones alternan papel, tinta y acento a",
-  " *    página completa, y el panel de cronograma va entero en el acento.",
-  " *  - NO HAY PARALLAX ni inclinación: el papel no se mueve, se pasa.",
+  " *  - CAPAS DE PAPEL DIBUJA; ACÁ SE COMPONE. Cada sección es un pliego de",
+  " *    revista: folio arriba y abajo, spread de dos páginas (apiladas en el",
+  " *    teléfono, abiertas desde 900 px), titulares enormes en Instrument",
+  " *    Serif con la segunda línea en itálica y en el acento, y todo lo chico",
+  " *    en JetBrains Mono. La única textura es una trama de semitono hecha",
+  " *    con un gradiente.",
+  " *  - EL COLOR ES UNA PÁGINA ENTERA: los pliegos alternan crema, tinta y",
+  " *    acento; la frase y la trivia van enteras en el acento.",
+  " *  - LA TAPA ES LA BIENVENIDA. Dice de quién es la fiesta, cuándo, dónde y",
+  " *    para cuántos, con el mensaje del anfitrión abajo. Por eso esta",
+  " *    sub-colección NO monta además <BienvenidaStorytelling>: sería la",
+  " *    misma información dos veces, una arriba de la otra.",
+  " *  - SIN PARALLAX ni inclinación: el papel no se mueve, se pasa.",
   " *",
   " * PESO (Railway): cero imágenes propias. Toda la familia son tres fuentes",
   " * y CSS.",
   " */"
 ));
 
-// ── 2. Fuera las escenas ──────────────────────────────────────────────────
-// Esta sub-colección no dibuja: no hay nada que inyectar.
+// ── 2. Fuera lo que era dibujo ────────────────────────────────────────────
 const desdeImport = s.indexOf("import {\n  DEFS_");
 const hastaImport = s.indexOf('} from "@/components/templates/escenas/');
 if (desdeImport < 0 || hastaImport < 0) faltantes.push("import de escenas");
@@ -100,25 +108,14 @@ const hastaEscena = s.indexOf("export function EditorialBlancNoirTemplate", desd
 if (desdeEscena < 0 || hastaEscena < 0) faltantes.push("componente Escena");
 else s = s.slice(0, desdeEscena) + s.slice(hastaEscena);
 
-// Las apariciones: la de los defs, las de cada sección y la de la portada.
-s = s.replace(/^ *\{\/\* Los filtros de grano[\s\S]*?\*\/\}\n/m, "");
-s = s.replace(/^ *<Escena html=\{DEFS_JDP\} className="ebn-defs" \/>\n/m, "");
-s = s.replace(/^ *<Escena html=\{[^}]+\} className="ebn-escena" \/>\n/gm, "");
-s = s.replace(
-  /^( *)<div ref=\{escenaPortadaRef\} className="ebn-portada-escena" dangerouslySetInnerHTML=\{\{ __html: COVER_JDP \}\} \/>$/m,
-  L(
-    "$1{/* La portada no tiene escena que levantar: lo que se va al abrir es la",
-    "$1    trama y el titular, y de eso se encarga el motor moviendo [data-cl]. */}",
-    '$1<div ref={escenaPortadaRef} className="ebn-portada-escena">',
-    '$1  <div data-cl="1" className="ebn-trama" aria-hidden="true" />',
-    "$1</div>"
-  )
-);
-// La trama de semitono en cada sección, en lugar de la escena.
-s = s.replace(
-  /^( *)<span data-xin="1" data-dist="-20" className="ebn-kicker">/gm,
-  '$1<div className="ebn-trama" aria-hidden="true" />\n$1<span data-xin="1" data-dist="-20" className="ebn-kicker">'
-);
+// La Bienvenida compartida no se usa: la tapa ya la es.
+rep('import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";\n', "", "import de Bienvenida");
+// El papel de las tarjetas de Capas de papel tampoco: acá las fichas son
+// blancas y lo dice el CSS.
+const desdeCarta = s.indexOf("/** El papel de las tarjetas, que es el mismo en todas las variantes. */");
+const hastaCarta = s.indexOf("/** Blanco o negro según", desdeCarta);
+if (desdeCarta < 0 || hastaCarta < 0) faltantes.push("constantes de carta");
+else s = s.slice(0, desdeCarta) + s.slice(hastaCarta);
 
 // ── 3. Las caras ──────────────────────────────────────────────────────────
 rep(
@@ -126,6 +123,7 @@ rep(
   'import { Instrument_Serif, Archivo, JetBrains_Mono } from "next/font/google";',
   "import de fuentes"
 );
+rep('import { useCallback, useEffect, useRef, useState } from "react";', 'import { useCallback, useEffect, useId, useRef, useState } from "react";', "import de useId");
 rep(
   L(
     "const ebnSerif = Cormorant_Garamond({",
@@ -156,7 +154,7 @@ rep(
     '  display: "swap",',
     '  variable: "--ebn-sans",',
     "});",
-    "// El mono es la ficha técnica de la revista: kickers, folios y datos.",
+    "// El mono es la ficha técnica de la revista: folios, kickers y datos.",
     "const ebnMono = JetBrains_Mono({",
     '  subsets: ["latin"],',
     '  weight: ["400"],',
@@ -166,13 +164,10 @@ rep(
   ),
   "declaración de fuentes"
 );
-s = s.split("${ebnSerif.variable} ${ebnSans.variable}").join("${ebnSerif.variable} ${ebnSans.variable} ${ebnMono.variable}");
 s = s.split("'Cormorant Garamond', serif").join("'Instrument Serif', serif");
 s = s.split("'DM Sans', sans-serif").join("'Archivo', sans-serif");
 
 // ── 4. La paleta ──────────────────────────────────────────────────────────
-// Se mantienen las trece claves para que el generador de variantes de Capas
-// sirva igual; las de paisaje se mapean a la tinta.
 rep(
   L(
     "const PALETA = {",
@@ -199,7 +194,7 @@ rep(
     '  ink2: "#6B6760",',
     '  acc: "#E63B2E",',
     '  acc2: "#1F4FD1",',
-    "  // Las cuatro que siguen son de Capas de papel (cielo y cerros). Acá no",
+    "  // Las cinco que siguen son de Capas de papel (cielo y cerros). Acá no",
     "  // hay paisaje, pero se declaran igual para que las dos sub-colecciones",
     "  // compartan el generador de variantes.",
     '  sky1: "#F5F1EA",',
@@ -214,11 +209,110 @@ rep(
   "paleta"
 );
 
-// ── 5. El vestuario ───────────────────────────────────────────────────────
-const extra = fs.readFileSync(path.join(__dirname, "css", "editorial.css"), "utf8");
-const marca = "\n  @media (prefers-reduced-motion: reduce) {";
-if (!s.includes(marca)) faltantes.push("cierre del CSS");
-s = s.replace(marca, "\n" + extra.trimEnd() + "\n" + marca);
+// ── 5. La entrada de la tapa ──────────────────────────────────────────────
+// En Capas de papel el cartel se endereza como si lo levantaran del piso.
+// Acá los nombres entran desde abajo detrás de su propia máscara, que es el
+// gesto de una tapa de revista armándose.
+rep(
+  L(
+    "    if (cartel) {",
+    '      cartel.style.transition = "none";',
+    '      cartel.style.opacity = "0";',
+    '      cartel.style.transform = "perspective(700px) rotateX(-12deg) rotate(-1.2deg)";',
+    '      cartel.style.boxShadow = "0 2px 0 rgba(0,0,0,.12)";',
+    "      window.setTimeout(() => {",
+    '        cartel.style.transition = "transform 1100ms cubic-bezier(.16,1,.3,1), opacity 700ms ease, box-shadow 1100ms ease";',
+    '        cartel.style.opacity = "1";',
+    '        cartel.style.transform = "perspective(700px) rotateX(0deg) rotate(-1.2deg)";',
+    '        cartel.style.boxShadow = "0 2px 0 rgba(0,0,0,.12), 0 18px 30px rgba(0,0,0,.14)";',
+    "      }, 700);",
+    "    }"
+  ),
+  L(
+    "    // Cada renglón del nombre sube desde su propia máscara, uno atrás de",
+    "    // otro. Es el gesto de una tapa armándose, no el de un cartel que se",
+    "    // endereza.",
+    "    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>(\"span > span\")) : [];",
+    "    renglones.forEach((linea, i) => {",
+    '      linea.style.transition = "none";',
+    '      linea.style.transform = "translate3d(0,110%,0)";',
+    "      window.setTimeout(() => {",
+    '        linea.style.transition = "transform 1000ms cubic-bezier(.16,1,.3,1)";',
+    '        linea.style.transform = "translate3d(0,0,0)";',
+    "      }, 260 + i * 130);",
+    "    });"
+  ),
+  "entrada de la tapa"
+);
+
+// ── 5a. Las cifras entran de lados alternados ─────────────────────────────
+// En Capas de papel las cuatro tarjetitas entran desde abajo. Acá cada cifra
+// entra desde un costado distinto -- izquierda, derecha, izquierda, derecha --
+// que es lo que arma la cruz de filetes a medida que se llenan los cuadrantes.
+rep(
+  '        <div key={c.l} data-xin="1" data-delay={80 + i * 80} data-dist="30" className={`ebn-cuenta-caja ebn-cuenta-caja--${i + 1}`}>',
+  '        <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`ebn-cuenta-caja ebn-cuenta-caja--${i + 1}`}>',
+  "entrada de las cifras"
+);
+rep(
+  '          <span className={`ebn-cuenta-num${i === 3 ? " ebn-cuenta-num--acc" : ""}`}>{c.v}</span>',
+  "          <span className=\"ebn-cuenta-num\">{c.v}</span>",
+  "cifra"
+);
+
+// ── 5b. La foto no se abre: se REVELA ─────────────────────────────────────
+// En Capas de papel la foto entra recortada como una ventana ovalada que se
+// abre. Acá es una foto impresa: arranca tapada por la trama de semitono y
+// los puntos se van achicando hasta desaparecer, como un papel revelándose.
+rep(
+  L(
+    "          // La foto principal se abre como una ventana troquelada mientras",
+    "          // sube: de un óvalo angosto al rectángulo entero.",
+    "          const ven = ventanaRef.current;",
+    "          if (ven) {",
+    "            const r = ven.getBoundingClientRect();",
+    "            const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.7)));",
+    "            const v = (1 - p) * 44;",
+    "            const h = (1 - p) * 38;",
+    "            ven.style.clipPath = `inset(${v}% ${h}% ${v}% ${h}% round 999px 999px 14px 14px)`;",
+    "          }"
+  ),
+  L(
+    "          // La foto se revela: los puntos de la trama que la tapan se van",
+    "          // achicando de 7,2 a 0 mientras sube, como un papel en el",
+    "          // líquido. El radio va como variable CSS para no tocar el DOM.",
+    "          const ven = ventanaRef.current;",
+    "          if (ven) {",
+    "            const r = ven.getBoundingClientRect();",
+    "            const prog = 1 - (r.top + r.height / 2) / vh;",
+    "            const t = Math.min(1, Math.max(0, (prog - 0.15) / 0.6));",
+    '            ven.style.setProperty("--ebn-punto", (7.2 * (1 - t)).toFixed(2));',
+    "          }"
+  ),
+  "revelado de la foto"
+);
+
+// ── 6. El render ──────────────────────────────────────────────────────────
+// Desde el `return (` de la plantilla hasta el cierre del componente: todo
+// eso es composición y acá es otra.
+const marcaReturn = "\n  return (\n    <div\n      ref={raizRef}";
+const desdeReturn = s.indexOf(marcaReturn);
+const marcaFin = "\n// ───────────────────────────────────────────────────────────────────────────\n// Piezas de la colección";
+const hastaReturn = s.indexOf(marcaFin);
+if (desdeReturn < 0 || hastaReturn < 0) faltantes.push("bloque del render");
+else {
+  const render = fs.readFileSync(path.join(__dirname, "jsx", "editorial-render.jsx"), "utf8");
+  s = s.slice(0, desdeReturn + 1) + render.trimEnd() + "\n" + s.slice(hastaReturn);
+}
+
+// ── 7. La hoja de estilos ─────────────────────────────────────────────────
+const desdeCss = s.indexOf("const CSS_EBN = `");
+const finCss = s.indexOf("\n`;", desdeCss);
+if (desdeCss < 0 || finCss < 0) faltantes.push("bloque CSS");
+else {
+  const css = fs.readFileSync(path.join(__dirname, "css", "editorial.css"), "utf8");
+  s = s.slice(0, desdeCss) + css.trimEnd() + s.slice(finCss + 3);
+}
 
 if (faltantes.length) {
   console.error("No encontré estos anclajes en JardinDePapelTemplate.tsx (¿cambió?):\n  - " + faltantes.join("\n  - "));
@@ -226,4 +320,4 @@ if (faltantes.length) {
 }
 
 fs.writeFileSync(path.join(DIR, "EditorialBlancNoirTemplate.tsx"), s);
-console.log("EditorialBlancNoirTemplate.tsx (" + (s.length / 1024).toFixed(0) + " KB) derivado de JardinDePapelTemplate.tsx");
+console.log("EditorialBlancNoirTemplate.tsx (" + (s.length / 1024).toFixed(0) + " KB) — render y estilos propios");

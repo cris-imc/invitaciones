@@ -43,8 +43,9 @@
   },
   "cssExtra": [
     "/* Reino: filete dorado arriba y abajo de cada titular. */",
-    ".rei-h2 { padding: 10px 0; border-top: 1px solid var(--pp-acc2); border-bottom: 1px solid var(--pp-acc2); }",
-    ".rei-trama { opacity: .18; }"
+    ".rei-h2, .rei-panel-titulo { padding: 12px 0; border-top: 1px solid var(--pp-acc2); border-bottom: 1px solid var(--pp-acc2); }",
+    ".rei-tapa-nombres { letter-spacing: .02em; }",
+    ".rei-trama { opacity: .16; }"
   ],
   "variantes": {
     "Rosa": {

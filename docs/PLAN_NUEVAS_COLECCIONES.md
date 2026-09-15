@@ -395,3 +395,43 @@ Para regenerar toda la Colección Iconic:
       && node scripts/derivar-tipografica.js \
       && node scripts/gen-iconic-variants.js \
       && node scripts/generar-plantillas-dinamicas.js
+
+## 9. Lo que se rehízo el 2026-09-15 (Tipográfica Editorial)
+
+La primera versión de esta sub-colección estaba mal y el anfitrión lo vio en
+dos segundos: yo la había derivado de Jardín cambiando tipografías, paleta y
+un puñado de reglas, y eso alcanza cuando dos familias comparten la
+composición -- como pasa dentro de Capas de papel, donde los cinco mockups
+tienen la misma estructura y difieren en el dibujo. **No alcanzaba acá**: el
+mockup de Editorial Blanc & Noir compone de otra manera, y lo que se veía era
+Capas de papel con otra letra (incluido un cartelito tipo post-it en la tapa,
+que no existe en el diseño).
+
+Qué se rehízo, mirando el mockup:
+
+- **La tapa**: folio arriba (`NUESTRO CASAMIENTO / Nº 00 / 10`), la fecha en
+  mono y el sello circular girando con el & en el centro, los nombres en
+  Instrument Serif a 20vw con la segunda línea sangrada un 14 %, la meta de
+  lugar y pase, y abajo una regla de 2 px, el mensaje del anfitrión en serif
+  y el botón sólido. Los renglones del nombre suben desde su propia máscara.
+- **Save the Date**: pliego invertido (tinta sobre crema), la fecha en tres
+  renglones que se cruzan (el mes en itálica y en el acento, alineado a la
+  derecha) y la foto enmarcada con borde de 3 px en la página derecha.
+- **La foto no se abre como ventana: se REVELA.** La tapa una trama de
+  semitono cuyos puntos se achican de 7,2 a 0 mientras sube, como un papel en
+  el líquido. (El recorte ovalado era de Capas de papel.)
+- **El countdown** no es una grilla: son cuatro cuadrantes con una cruz de
+  filetes de 2 px, cada cifra entrando de un costado distinto, y los segundos
+  en itálica y en el acento. Arriba y abajo, dos marquesinas que corren en
+  sentidos opuestos.
+- **Los pliegos** alternan crema, tinta y acento a página completa; la frase y
+  la trivia van enteras en el acento; el check-in es un cupón blanco con línea
+  de corte punteada; el álbum es una hoja de contactos de seis columnas con la
+  tinta del acento en multiply.
+- **La tapa ES la bienvenida**, así que esta sub-colección no monta además
+  `<BienvenidaStorytelling>`: sería la misma información dos veces.
+
+Las trece familias restantes se derivan de esta base, así que el arreglo llegó
+a las catorce de una. La lección, que vale para lo que venga: **derivar sólo
+es válido cuando los mockups comparten la composición**; si cambia la manera
+de componer, hay que portar la base a mano aunque el motor se herede.

@@ -7,26 +7,32 @@
  *
  * GENERADO por scripts/derivar-editorial.js a partir de
  * JardinDePapelTemplate.tsx — no editar a mano: el motor se arregla en
- * Jardín y se vuelve a derivar; lo propio de esta sub-colección está en
- * este script y en scripts/css/editorial.css.
+ * Jardín, el render en scripts/jsx/editorial-render.jsx y los estilos en
+ * scripts/css/editorial.css.
  *
- * Comparte con Capas de papel el MOTOR (scroller propio, reveals, frase
- * palabra por palabra, paneles pineados, riel, portada que se abre,
- * check-in con sello, álbum, pase) y no comparte nada más:
+ * Comparte con Capas de papel el MOTOR (scroller, reveals, frase palabra
+ * por palabra, paneles pineados, riel, apertura de portada, check-in,
+ * álbum) y NADA de la composición:
  *
- *  - CAPAS DE PAPEL DIBUJA; ACÁ SE COMPONE. Ni un SVG de paisaje: la
- *    página es una revista, con titulares enormes en Instrument Serif,
- *    kickers y folios en JetBrains Mono, filetes y una trama de semitono
- *    como única textura (un gradiente, no una imagen).
- *  - EL COLOR ES UN BLOQUE: las secciones alternan papel, tinta y acento a
- *    página completa, y el panel de cronograma va entero en el acento.
- *  - NO HAY PARALLAX ni inclinación: el papel no se mueve, se pasa.
+ *  - CAPAS DE PAPEL DIBUJA; ACÁ SE COMPONE. Cada sección es un pliego de
+ *    revista: folio arriba y abajo, spread de dos páginas (apiladas en el
+ *    teléfono, abiertas desde 900 px), titulares enormes en Instrument
+ *    Serif con la segunda línea en itálica y en el acento, y todo lo chico
+ *    en JetBrains Mono. La única textura es una trama de semitono hecha
+ *    con un gradiente.
+ *  - EL COLOR ES UNA PÁGINA ENTERA: los pliegos alternan crema, tinta y
+ *    acento; la frase y la trivia van enteras en el acento.
+ *  - LA TAPA ES LA BIENVENIDA. Dice de quién es la fiesta, cuándo, dónde y
+ *    para cuántos, con el mensaje del anfitrión abajo. Por eso esta
+ *    sub-colección NO monta además <BienvenidaStorytelling>: sería la
+ *    misma información dos veces, una arriba de la otra.
+ *  - SIN PARALLAX ni inclinación: el papel no se mueve, se pasa.
  *
  * PESO (Railway): cero imágenes propias. Toda la familia son tres fuentes
  * y CSS.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Instrument_Serif, Archivo, JetBrains_Mono } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -36,7 +42,6 @@ import { InfoAdicionalSection } from "@/components/invitation/v2/InfoAdicionalSe
 import { useMusicPlayer, MusicToggleButton } from "@/components/invitation/MusicPlayer";
 import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
-import { BienvenidaStorytelling } from "@/components/invitation/BienvenidaStorytelling";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
 import { useCountdown, pad } from "@/components/invitation/v2/useCountdown";
 import { useTextos, useFormatoDeMoneda, tituloEnDosLineas } from "@/components/i18n/ProveedorIdioma";
@@ -56,7 +61,7 @@ const ebnSans = Archivo({
   display: "swap",
   variable: "--ebn-sans",
 });
-// El mono es la ficha técnica de la revista: kickers, folios y datos.
+// El mono es la ficha técnica de la revista: folios, kickers y datos.
 const ebnMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400"],
@@ -77,7 +82,7 @@ const PALETA = {
   ink2: "#6B6760",
   acc: "#E63B2E",
   acc2: "#1F4FD1",
-  // Las cuatro que siguen son de Capas de papel (cielo y cerros). Acá no
+  // Las cinco que siguen son de Capas de papel (cielo y cerros). Acá no
   // hay paisaje, pero se declaran igual para que las dos sub-colecciones
   // compartan el generador de variantes.
   sky1: "#F5F1EA",
@@ -100,11 +105,6 @@ const ES_OSCURA = (() => {
   return 0.2126 * ((n >> 16) / 255) + 0.7152 * (((n >> 8) & 255) / 255) + 0.0722 * ((n & 255) / 255) < 0.5;
 })();
 const TONO: "dark" | "light" = ES_OSCURA ? "dark" : "light";
-
-/** El papel de las tarjetas, que es el mismo en todas las variantes. */
-const CARTA = "#F8F2E6";
-const CARTA_LINEA = "#E2D8C4";
-const CARTA_TINTA = "#2B2A33";
 
 /** Blanco o negro según lo oscuro que sea el color de fondo del botón. */
 function tintaSobre(hex: string): string {
@@ -325,18 +325,18 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
         window.setTimeout(() => { capa.style.transition = "none"; }, 950);
       }, 80 + i * 90);
     });
-    if (cartel) {
-      cartel.style.transition = "none";
-      cartel.style.opacity = "0";
-      cartel.style.transform = "perspective(700px) rotateX(-12deg) rotate(-1.2deg)";
-      cartel.style.boxShadow = "0 2px 0 rgba(0,0,0,.12)";
+    // Cada renglón del nombre sube desde su propia máscara, uno atrás de
+    // otro. Es el gesto de una tapa armándose, no el de un cartel que se
+    // endereza.
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    renglones.forEach((linea, i) => {
+      linea.style.transition = "none";
+      linea.style.transform = "translate3d(0,110%,0)";
       window.setTimeout(() => {
-        cartel.style.transition = "transform 1100ms cubic-bezier(.16,1,.3,1), opacity 700ms ease, box-shadow 1100ms ease";
-        cartel.style.opacity = "1";
-        cartel.style.transform = "perspective(700px) rotateX(0deg) rotate(-1.2deg)";
-        cartel.style.boxShadow = "0 2px 0 rgba(0,0,0,.12), 0 18px 30px rgba(0,0,0,.14)";
-      }, 700);
-    }
+        linea.style.transition = "transform 1000ms cubic-bezier(.16,1,.3,1)";
+        linea.style.transform = "translate3d(0,0,0)";
+      }, 260 + i * 130);
+    });
   }, []);
 
   const dibujarRuta = useCallback(() => {
@@ -584,15 +584,15 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
             el.style.transform = `translate3d(${tx2 * prof}px,${dy + ty2 * prof}px,0)`;
           });
 
-          // La foto principal se abre como una ventana troquelada mientras
-          // sube: de un óvalo angosto al rectángulo entero.
+          // La foto se revela: los puntos de la trama que la tapan se van
+          // achicando de 7,2 a 0 mientras sube, como un papel en el
+          // líquido. El radio va como variable CSS para no tocar el DOM.
           const ven = ventanaRef.current;
           if (ven) {
             const r = ven.getBoundingClientRect();
-            const p = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.7)));
-            const v = (1 - p) * 44;
-            const h = (1 - p) * 38;
-            ven.style.clipPath = `inset(${v}% ${h}% ${v}% ${h}% round 999px 999px 14px 14px)`;
+            const prog = 1 - (r.top + r.height / 2) / vh;
+            const t = Math.min(1, Math.max(0, (prog - 0.15) / 0.6));
+            ven.style.setProperty("--ebn-punto", (7.2 * (1 - t)).toFixed(2));
           }
         }
 
@@ -744,13 +744,19 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
           fondo: PALETA.bg,
           tinta: PALETA.ink,
           acento: PALETA.acc,
-          clase: `${ebnSerif.variable} ${ebnSans.variable} ${ebnMono.variable}`,
+          clase: `${ebnSerif.variable} ${ebnSans.variable}`,
           fuente: "var(--ebn-sans), 'Archivo', sans-serif",
         }}
       />
     );
   }
 
+
+  // El total de pliegos, para los folios ("03 / 10"). Se cuenta lo que esta
+  // invitación realmente tiene: si no hay trivia, no existe el pliego 09 y el
+  // pase deja de ser 10 de 10.
+  const totalPliegos = cuenta;
+  const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
   return (
     <div
@@ -762,100 +768,121 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
       <style>{COVER_RESPONSIVE_STYLE}</style>
 
       <div ref={scrollerRef} className="ebn-scroller">
-        <BienvenidaStorytelling
-          prefijo="jdp"
-          acento={PALETA.acc}
-          titulo={titulo}
-          tipo={invitation.tipo ? String(invitation.tipo) : null}
-          fechaEvento={fechaEvento}
-          lugar={lugarNombre || null}
-          invitado={isPersonalized && guest?.name ? guest.name : null}
-          numeroDePase={guest?.orderNumber ?? null}
-          personas={guest?.expectedCount ?? null}
-          tono={TONO}
-        />
-
-        {/* ── 01 Guardá la fecha ─────────────────────────────────────── */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="ebn-section ebn-std">
-          <div className="ebn-trama" aria-hidden="true" />
-          <span data-xin="1" data-dist="-20" className="ebn-kicker">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-          <div className="ebn-std-fecha">
-            <span data-xin="1" data-delay="60" data-dist="40" className="ebn-std-dia">{diaNum}</span>
-            <div data-xin="1" data-delay="160" data-dist="30" className="ebn-std-fila">
-              <span className="ebn-cinta">{mesLargo}</span>
-              <span className="ebn-std-anio">{anio}</span>
+        {/* ── 01 Guardá la fecha ─────────────────────────────────────────
+            El pliego se invierte: tinta sobre crema. La fecha ocupa la
+            página izquierda en tres renglones que se cruzan, y la foto va
+            enmarcada en la derecha. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="ebn-section ebn-std">
+          <div className="ebn-trama ebn-trama--media" aria-hidden="true" />
+          <div className="ebn-spread">
+            <div className="ebn-pagina">
+              <div className="ebn-folio">
+                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+              </div>
+              <div className="ebn-fecha">
+                <span data-xin="1" data-dist="-160" className="ebn-fecha-linea">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="ebn-fecha-linea ebn-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="ebn-fecha-linea">{anio}</span>
+              </div>
+              <div data-xin="1" data-delay="360" className="ebn-fecha-pie">
+                <span>{diaSemana} · {hora} H</span>
+                <AddToCalendarLink
+                  eventName={titulo}
+                  targetDate={fechaHora}
+                  location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+                  className="ebn-link"
+                  showIcon={false}
+                >
+                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                </AddToCalendarLink>
+              </div>
             </div>
-          </div>
-          <div data-xin="1" data-delay="240" data-dist="20" className="ebn-meta">
-            <span>{diaSemana} · {hora} H</span>
-            <span className="ebn-meta-punto" aria-hidden="true" />
-            <span>{(ciudad || lugarNombre || direccion).toUpperCase()}</span>
-          </div>
-          <AddToCalendarLink
-            eventName={titulo}
-            targetDate={fechaHora}
-            location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-            description={String(invitation.portadaMensaje ?? "")}
-            className="ebn-btn-papel ebn-btn-papel--reveal"
-            showIcon={false}
-          >
-            {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} <span aria-hidden="true">↗</span>
-          </AddToCalendarLink>
-        </section>
 
-        {/* ── Nuestra foto: se abre como una ventana troquelada ───────── */}
-        {hayFoto && (
-          <section data-tone={TONO} data-screen-label={tx("invitacion.album.nuestraFoto")} className="ebn-foto-seccion">
-            <div className="ebn-foto-marco">
-              <div ref={ventanaRef} className="ebn-ventana">
+            {hayFoto && (
+              <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="ebn-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only ebn-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="243,235,221" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only ebn-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="243,235,221" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
                   </div>
                 )}
+                {/* La trama que tapa la foto y se disuelve al subir: el radio
+                    del punto lo mueve el motor en --ebn-punto. */}
+                <span className="ebn-foto-revelado" aria-hidden="true" />
+                <span className="ebn-foto-anio">{anio}</span>
+                <span className="ebn-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
               </div>
-              <div className="ebn-foto-firma">{titulo}</div>
-            </div>
-          </section>
-        )}
-
-        {/* ── 02 Falta poco ──────────────────────────────────────────── */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="ebn-section ebn-countdown">
-          <div className="ebn-trama" aria-hidden="true" />
-          <span data-xin="1" data-dist="-20" className="ebn-kicker">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
-          <h2 data-xin="1" data-delay="60" className="ebn-h2">
-            {tx("invitacion.cuentaRegresiva.estamosContando")}<br /><em>{tx("invitacion.cuentaRegresiva.losDias")}</em>
-          </h2>
-          <CuentaEditorial targetDate={fechaHora} />
+            )}
+          </div>
         </section>
 
-        {/* ── 03 Unas palabras ───────────────────────────────────────── */}
-        {hayFrase && (
-          <section data-tone={TONO} data-screen-label={tx("invitacion.frase.etiqueta")} className="ebn-section ebn-frase-seccion">
-            <div className="ebn-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="ebn-kicker">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
-            <h2 ref={fraseRef} className="ebn-frase">
-              {palabras.map((p, i) => (
-                // El espacio va FUERA del span: el motor pone cada palabra en
-                // inline-block para poder moverla, y un espacio de fin de
-                // línea adentro de un inline-block se colapsa a cero.
+        {/* ── 02 Falta poco ──────────────────────────────────────────────
+            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
+            las cuatro cifras. */}
+        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="ebn-section ebn-countdown">
+          <div className="ebn-folio">
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
+          </div>
+          <div className="ebn-marquesina" aria-hidden="true">
+            <div className="ebn-marquesina-tira">
+              {[0, 1].map((i) => (
                 <span key={i}>
-                  <span data-w="1" className={i >= desdeAcento ? "ebn-acento" : undefined}>{p}</span>{" "}
+                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
                 </span>
               ))}
-            </h2>
-            <div data-xin="1" data-delay="200" className="ebn-firma">
-              <span className="ebn-firma-linea" aria-hidden="true" />{titulo.toUpperCase()}
+            </div>
+          </div>
+          <CuentaEditorial targetDate={fechaHora} />
+          <div className="ebn-marquesina ebn-marquesina--contraria" aria-hidden="true">
+            <div className="ebn-marquesina-tira">
+              {[0, 1].map((i) => (
+                <span key={i}>
+                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 03 Unas palabras ───────────────────────────────────────────
+            El pliego del acento: la frase entra palabra por palabra y al
+            lado va el sello con la firma. */}
+        {hayFrase && (
+          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="ebn-section ebn-frase-seccion">
+            <div className="ebn-folio">
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
+            </div>
+            <div className="ebn-spread">
+              <h2 ref={fraseRef} className="ebn-frase">
+                {palabras.map((p, i) => (
+                  // El espacio va fuera del span: el motor pone cada palabra
+                  // en inline-block y un espacio adentro se colapsa a cero.
+                  <span key={i}>
+                    <span data-w="1" className={i >= desdeAcento ? "ebn-acento" : undefined}>{p}</span>{" "}
+                  </span>
+                ))}
+              </h2>
+              <div data-xin="1" data-delay="900" data-dist="60" className="ebn-sello">
+                <span>{tx("invitacion.frase.conAmor")}</span>
+              </div>
+            </div>
+            <div className="ebn-folio ebn-folio--pie">
+              <span>{titulo.toUpperCase()}</span>
+              <span>{fechaPuntos}</span>
             </div>
           </section>
         )}
 
-        {/* ── 04 Cuándo y dónde ──────────────────────────────────────── */}
+        {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
+            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
+            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
         <div
           id="details"
           data-pan="1"
@@ -866,104 +893,107 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
         >
           <div className="ebn-pan-fijo">
             <div data-strip="1" className="ebn-tira">
-              {/* Recepción */}
-              <div data-tone={TONO} className="ebn-panel ebn-panel--abajo" style={{ background: PALETA.bg }}>
-                <div className="ebn-panel-top">
-                  <span>{nCuando} — {tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
+              <div data-tone={TONO} className="ebn-panel">
+                <div className="ebn-folio">
+                  <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
-                <div className="ebn-tarjeta ebn-tarjeta--izq">
-                  <span className="ebn-tarjeta-kicker">{tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span>
-                  <h2 className="ebn-tarjeta-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
-                  <div className="ebn-filas">
-                    {direccion && (
-                      <div className="ebn-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="ebn-fila-valor">{direccion}</span></div>
-                    )}
-                    <div className="ebn-fila"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
-                    {dressCode && (
-                      <div className="ebn-fila ebn-fila--ultima"><span>{tx("invitacion.ubicacion.dressCode")}</span><span className="ebn-acento-plano">{dressCode}</span></div>
+                <div className="ebn-spread">
+                  <h2 className="ebn-panel-titulo">
+                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
+                    <br /><span className="ebn-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
+                  </h2>
+                  <div className="ebn-lineas">
+                    <div className="ebn-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
+                    {direccion && <div className="ebn-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
+                    {dressCode && <div className="ebn-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
+                    {mapUrl && (
+                      <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="ebn-cta">
+                        {tx("invitacion.ubicacion.comoLlegar")}<span className="ebn-cta-flecha">↗</span>
+                      </a>
                     )}
                   </div>
                 </div>
-                {!scrollVertical && panelesLugar.length > 1 && (
-                  <div className="ebn-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="ebn-flecha">→</span></div>
-                )}
+                <div className="ebn-folio ebn-folio--pie">
+                  <span>{(ciudad || direccion).toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                </div>
               </div>
 
-              {/* Ceremonia */}
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone={TONO} className="ebn-panel ebn-panel--abajo" style={{ background: PALETA.bg2 }}>
-                  <div className="ebn-panel-top">
-                    <span>{ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
+                <div id="ceremonia" data-tone="dark" className="ebn-panel">
+                  <div className="ebn-folio">
+                    <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
-                  <div className="ebn-tarjeta ebn-tarjeta--der">
-                    <h2 className="ebn-tarjeta-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
-                    <div className="ebn-filas">
-                      {ceremoniaDireccion && (
-                        <div className="ebn-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="ebn-fila-valor">{ceremoniaDireccion}</span></div>
-                      )}
-                      {ceremoniaHora && (
-                        <div className="ebn-fila ebn-fila--ultima"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>
-                      )}
+                  <div className="ebn-spread">
+                    <h2 className="ebn-panel-titulo">
+                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
+                      <br /><span className="ebn-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
+                    </h2>
+                    <div className="ebn-lineas">
+                      {ceremoniaHora && <div className="ebn-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
+                      {ceremoniaDireccion && <div className="ebn-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
+                  </div>
+                  <div className="ebn-folio ebn-folio--pie">
+                    <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
-              {/* Cómo llegar */}
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="ebn-panel ebn-panel--abajo" style={{ background: PALETA.bg }}>
-                  <svg viewBox="0 0 430 700" preserveAspectRatio="xMidYMid slice" className="ebn-escena" aria-hidden="true">
-                    <path d="M0 520 C120 470 200 500 300 470 S420 380 430 400 V700 H0Z" style={{ fill: "var(--pp-hill1, #BCCBB6)" }} />
-                    <path
-                      ref={rutaRef}
-                      d="M40 560 C120 500 80 380 180 340 S300 250 330 150"
-                      fill="none"
-                      style={{ stroke: "var(--pp-acc, #C86B5A)" }}
-                      strokeWidth={3}
-                      strokeDasharray="10 8"
-                      strokeLinecap="round"
-                    />
-                    <circle cx={40} cy={560} r={7} style={{ fill: "var(--pp-ink, #2B2A33)" }} />
-                    <path d="M330 150 m-16 0 a16 16 0 1 1 32 0 c0 12 -16 30 -16 30 s-16 -18 -16 -30Z" style={{ fill: "var(--pp-acc, #C86B5A)" }} />
-                  </svg>
-                  <div className="ebn-panel-top">
-                    <span>{tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
+                <div id="location" data-tone={TONO} className="ebn-panel">
+                  <div className="ebn-folio">
+                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
-                  <h2 className="ebn-h2">{tx("invitacion.ubicacion.comoLlegar")}</h2>
-                  {(direccion || ciudad) && <p className="ebn-parrafo">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>}
-                  {embedMapUrl && (
-                    <div className="ebn-mapa">
-                      <iframe
-                        src={embedMapUrl}
-                        width="100%"
-                        height="100%"
-                        style={{ border: 0, display: "block" }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer-when-downgrade"
-                        title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
-                      />
+                  <div className="ebn-spread">
+                    <h2 className="ebn-panel-titulo">
+                      {tx("invitacion.ubicacion.comoLlegar")}
+                    </h2>
+                    <div className="ebn-lineas">
+                      {embedMapUrl && (
+                        <div className="ebn-mapa">
+                          <iframe
+                            src={embedMapUrl}
+                            width="100%"
+                            height="100%"
+                            style={{ border: 0, display: "block" }}
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })}
+                          />
+                        </div>
+                      )}
+                      <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="ebn-cta">
+                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="ebn-cta-flecha">↗</span>
+                      </a>
                     </div>
-                  )}
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="ebn-btn-solido">
-                    {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()} <span aria-hidden="true">↗</span>
-                  </a>
+                  </div>
+                  <div className="ebn-folio ebn-folio--pie">
+                    <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  </div>
                 </div>
               )}
 
-              {/* Cronograma */}
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone={TONO} className="ebn-panel ebn-panel--centro" style={{ background: PALETA.bg2 }}>
-                  <div className="ebn-panel-top">
-                    <span>{tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
+                <div id="schedule" data-tone="dark" className="ebn-panel ebn-panel--acento">
+                  <div className="ebn-folio">
+                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
-                  <h2 className="ebn-h2">{tx("invitacion.ubicacion.laNochePasoAPaso")}</h2>
-                  <div className="ebn-crono">
-                    {cronograma.map((item, i) => (
-                      <div key={i} className="ebn-crono-fila">
-                        <span className="ebn-crono-hora">{item.time || ""}</span>
-                        <span className="ebn-crono-titulo">{item.title}</span>
-                      </div>
-                    ))}
+                  <div className="ebn-spread">
+                    <h2 className="ebn-panel-titulo">
+                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
+                      <br /><span className="ebn-acento ebn-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
+                    </h2>
+                    <div className="ebn-lineas">
+                      {cronograma.map((item, i) => (
+                        <div key={i} className="ebn-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="ebn-folio ebn-folio--pie">
+                    <span>{fechaPuntos}</span>
                   </div>
                 </div>
               )}
@@ -972,45 +1002,58 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
           </div>
         </div>
 
-        {/* ── 05 Check-in ────────────────────────────────────────────── */}
+        {/* ── 05 Check-in ────────────────────────────────────────────────
+            El cupón: papel blanco con borde grueso, línea de corte punteada
+            y el estado arriba a la derecha. */}
         {rsvpHabilitado && (
           <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="ebn-section ebn-checkin">
-            <div className="ebn-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="ebn-kicker">{nCheckin} — CHECK-IN</span>
-            <h2 data-xin="1" data-delay="60" className="ebn-h2">
-              {tx("invitacion.rsvp.confirmaLinea1")}<br /><em>{tx("invitacion.rsvp.confirmaLinea2")}</em>
-            </h2>
-            <CheckinEditorial
-              invitationId={String(invitation.id ?? "")}
-              guestToken={guest?.uniqueToken}
-              guestName={nombreInvitado}
-              pase={pase}
-              maxAdultos={guest?.expectedAdults ?? guest?.expectedCount ?? 1}
-              maxAdolescentes={guest?.expectedTeens ?? 0}
-              maxNinos={guest?.expectedChildren ?? 0}
-              estadoInicial={estadoInvitado}
-              adultosIniciales={guest?.attendingAdults}
-              adolescentesIniciales={guest?.attendingTeens}
-              ninosIniciales={guest?.attendingChildren}
-              restricciones={guest?.dietaryRestrictions ?? ""}
-              hayPago={pagoHabilitado}
-              monto={montoPago}
-              precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
-              precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
-              exento={guest?.isExempt ?? false}
-              estadoDePago={guest?.paymentStatus ?? "PENDING"}
-              vistaDePago={guest?.paymentView ?? null}
-              confirmado={confirmado}
-              tarjetaRef={tarjetaCheckinRef}
-              selloRef={selloRef}
-              petalosRef={petalosRef}
-              estadoRef={estadoRef}
-              alConfirmar={alConfirmar}
-            />
+            <div className="ebn-folio">
+              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+              <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
+            </div>
+            <div className="ebn-spread">
+              <div className="ebn-pagina">
+                <h2 data-xin="1" data-dist="-80" className="ebn-h2">
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="ebn-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                </h2>
+              </div>
+              <div className="ebn-cupon">
+                <span className="ebn-cupon-corte" aria-hidden="true" />
+                <CheckinEditorial
+                  invitationId={String(invitation.id ?? "")}
+                  guestToken={guest?.uniqueToken}
+                  guestName={nombreInvitado}
+                  pase={pase}
+                  maxAdultos={guest?.expectedAdults ?? guest?.expectedCount ?? 1}
+                  maxAdolescentes={guest?.expectedTeens ?? 0}
+                  maxNinos={guest?.expectedChildren ?? 0}
+                  estadoInicial={estadoInvitado}
+                  adultosIniciales={guest?.attendingAdults}
+                  adolescentesIniciales={guest?.attendingTeens}
+                  ninosIniciales={guest?.attendingChildren}
+                  restricciones={guest?.dietaryRestrictions ?? ""}
+                  hayPago={pagoHabilitado}
+                  monto={montoPago}
+                  precioNino={invitation.precioNino ? Number(invitation.precioNino) : undefined}
+                  precioAdolescente={invitation.precioAdolescente ? Number(invitation.precioAdolescente) : undefined}
+                  exento={guest?.isExempt ?? false}
+                  estadoDePago={guest?.paymentStatus ?? "PENDING"}
+                  vistaDePago={guest?.paymentView ?? null}
+                  confirmado={confirmado}
+                  tarjetaRef={tarjetaCheckinRef}
+                  selloRef={selloRef}
+                  petalosRef={petalosRef}
+                  estadoRef={estadoRef}
+                  alConfirmar={alConfirmar}
+                />
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 06 Álbum ───────────────────────────────────────────────── */}
+        {/* ── 06 Álbum ───────────────────────────────────────────────────
+            Hoja de contactos: la grilla de seis columnas de una plancha de
+            fotografía, con la tinta del acento por encima. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1023,19 +1066,21 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
             <div className="ebn-pan-fijo">
               <div data-strip="1" className="ebn-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="ebn-panel ebn-panel--album" style={{ background: iHoja % 2 === 0 ? "#F6F1E7" : "#F1EBDF" }}>
-                    <div className="ebn-panel-top">
-                      <span>{iHoja === 0 ? `${nAlbum} — ${tx("invitacion.album.titulo").toUpperCase()}` : tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
-                      {hojasDeFotos.length > 1 && <span>{String(iHoja + 1).padStart(2, "0")} / {String(hojasDeFotos.length).padStart(2, "0")}</span>}
+                  <div key={iHoja} data-tone={TONO} className="ebn-panel ebn-panel--album">
+                    <div className="ebn-folio">
+                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
                     </div>
                     {iHoja === 0 && (
-                      <h2 className="ebn-h2 ebn-h2--album">{tx("invitacion.album.titulo")} <em>{tx("invitacion.album.deFotos")}</em></h2>
+                      <h2 className="ebn-h2 ebn-h2--album">
+                        {tx("invitacion.album.titulo")} <span className="ebn-acento">{tx("invitacion.album.deFotos")}</span>
+                      </h2>
                     )}
-                    <div className="ebn-polaroids" data-cantidad={hoja.length}>
+                    <div className="ebn-contactos" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="ebn-polaroid"
+                          className="ebn-contacto"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1043,14 +1088,15 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="ebn-polaroid-img" />
-                          {i % 2 === 0 && <span className="ebn-chinche" aria-hidden="true" />}
+                          <img src={url} alt="" loading="lazy" className="ebn-contacto-img" />
+                          <span className="ebn-contacto-tinta" aria-hidden="true" />
+                          <span className="ebn-contacto-n">{String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="ebn-panel-pie">
+                    <div className="ebn-folio ebn-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span className="ebn-acento-plano">{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1060,111 +1106,145 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
           </div>
         )}
 
-        {/* ── 07 Música ──────────────────────────────────────────────── */}
+        {/* ── 07 Música ──────────────────────────────────────────────────
+            Pliego de tinta, con el ecualizador como única ilustración. */}
         {sugerenciaMusicaHabilitada && (
-          <section id="songs" data-tone={TONO} data-screen-label={tx("invitacion.musica.titulo")} className="ebn-section ebn-musica">
-            <div className="ebn-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="ebn-kicker">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="ebn-h2">
-              {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "ebn-acento")}
-            </h2>
-            <CancionesEditorial
-              invitationId={String(invitation.id ?? "")}
-              guestToken={guest?.uniqueToken}
-              guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-            />
+          <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="ebn-section ebn-musica">
+            <div className="ebn-folio">
+              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
+            </div>
+            <div className="ebn-spread">
+              <div className="ebn-pagina">
+                <h2 data-xin="1" data-dist="-80" className="ebn-h2">
+                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "ebn-acento")}
+                </h2>
+                <div data-xin="1" data-delay="120" className="ebn-eq" aria-hidden="true">
+                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                </div>
+              </div>
+              <div className="ebn-pagina">
+                <CancionesEditorial
+                  invitationId={String(invitation.id ?? "")}
+                  guestToken={guest?.uniqueToken}
+                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+                />
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 08 Regalos ─────────────────────────────────────────────── */}
+        {/* ── 08 Regalos ─────────────────────────────────────────────────
+            Las tarjetas bancarias son fichas blancas con borde grueso. */}
         {hayRegalos && (
           <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="ebn-section ebn-regalos">
-            <span data-xin="1" data-dist="-20" className="ebn-kicker ebn-kicker--tinta">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="ebn-h2">
-              {tx("invitacion.regalos.siQueresLinea1")}<br /><em>{tx("invitacion.regalos.siQueresLinea2")}</em>
-            </h2>
-            {Boolean(invitation.regaloMensaje) && (
-              <p data-xin="1" data-delay="120" className="ebn-parrafo ebn-parrafo--tinta">{String(invitation.regaloMensaje)}</p>
-            )}
-            {regaloHabilitado && (
-              <TarjetaBancaria
-                titulo={String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento"))}
-                alias={String(invitation.regaloAlias || "")}
-                cbu={String(invitation.regaloCbu || "")}
-                banco={String(invitation.regaloBanco || "")}
-                titular={String(invitation.regaloTitular || "")}
-                retraso={180}
-                dobleZ
-              />
-            )}
-            {pagoTarjetaHabilitado && (
-              <TarjetaBancaria
-                titulo={String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas"))}
-                mensaje={String(invitation.pagoTarjetaMensaje || "")}
-                alias={String(invitation.pagoTarjetaAlias || "")}
-                cbu={String(invitation.pagoTarjetaCbu || "")}
-                banco={String(invitation.pagoTarjetaBanco || "")}
-                titular={String(invitation.pagoTarjetaTitular || "")}
-                retraso={260}
-                inclinada
-              />
-            )}
+            <div className="ebn-folio">
+              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
+            </div>
+            <div className="ebn-spread">
+              <div className="ebn-pagina">
+                <h2 data-xin="1" data-dist="-80" className="ebn-h2">
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="ebn-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                </h2>
+                {Boolean(invitation.regaloMensaje) && (
+                  <p data-xin="1" data-delay="120" className="ebn-parrafo">{String(invitation.regaloMensaje)}</p>
+                )}
+              </div>
+              <div className="ebn-pagina">
+                {regaloHabilitado && (
+                  <TarjetaBancaria
+                    titulo={String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento"))}
+                    alias={String(invitation.regaloAlias || "")}
+                    cbu={String(invitation.regaloCbu || "")}
+                    banco={String(invitation.regaloBanco || "")}
+                    titular={String(invitation.regaloTitular || "")}
+                    retraso={180}
+                  />
+                )}
+                {pagoTarjetaHabilitado && (
+                  <TarjetaBancaria
+                    titulo={String(invitation.pagoTarjetaTitulo || tx("invitacion.regalos.pagoTarjetas"))}
+                    mensaje={String(invitation.pagoTarjetaMensaje || "")}
+                    alias={String(invitation.pagoTarjetaAlias || "")}
+                    cbu={String(invitation.pagoTarjetaCbu || "")}
+                    banco={String(invitation.pagoTarjetaBanco || "")}
+                    titular={String(invitation.pagoTarjetaTitular || "")}
+                    retraso={260}
+                  />
+                )}
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 09 Trivia ──────────────────────────────────────────────── */}
+        {/* ── 09 Trivia ──────────────────────────────────────────────────
+            El único pliego que va entero en el acento. */}
         {quizHabilitado && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="ebn-section ebn-quiz">
-            <div className="ebn-trama" aria-hidden="true" />
-            <span data-xin="1" data-dist="-20" className="ebn-kicker">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="ebn-h2 ebn-h2--claro">{triviaTitulo}</h2>
-            <TriviaEditorial
-              preguntas={triviaPreguntas}
-              invitationId={String(invitation.id ?? "")}
-              guestToken={guest?.uniqueToken}
-              guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-            />
+            <div className="ebn-folio">
+              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
+            </div>
+            <div className="ebn-spread">
+              <div className="ebn-pagina">
+                <h2 data-xin="1" data-dist="-80" className="ebn-h2">{triviaTitulo}</h2>
+              </div>
+              <div className="ebn-pagina">
+                <TriviaEditorial
+                  preguntas={triviaPreguntas}
+                  invitationId={String(invitation.id ?? "")}
+                  guestToken={guest?.uniqueToken}
+                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+                />
+              </div>
+            </div>
           </section>
         )}
 
-        {/* ── 10 Tu pase ─────────────────────────────────────────────── */}
+        {/* ── 10 Tu pase ─────────────────────────────────────────────────
+            La contratapa: el QR grande a la izquierda y los datos del pase
+            a la derecha, con el sello girando. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="ebn-section ebn-pase">
-          <div className="ebn-trama" aria-hidden="true" />
-          <span data-xin="1" data-dist="-20" className="ebn-kicker">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
-
-          <div data-xin="1" data-delay="80" data-dist="30" className="ebn-ticket">
-            <div className="ebn-ticket-izq">
-              <span className="ebn-ticket-kicker">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
-              <span className="ebn-ticket-nombre">{saludaAlInvitado ? nombreInvitado : titulo}</span>
-              <span className="ebn-ticket-dato">
-                {[
-                  lugaresDelPase > 0 ? tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }) : null,
-                  guest?.mesas && guest.mesas.length > 0 ? guest.mesas.join(" · ") : null,
-                ].filter(Boolean).join(" · ")}
-              </span>
-              <span className="ebn-ticket-fecha">{fechaPuntos} — {hora} H</span>
-              <span className="ebn-ticket-muesca ebn-ticket-muesca--arriba" aria-hidden="true" />
-              <span className="ebn-ticket-muesca ebn-ticket-muesca--abajo" aria-hidden="true" />
-            </div>
-            <div className="ebn-ticket-der">
+          <div className="ebn-folio">
+            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nPase)}</span>
+          </div>
+          <div className="ebn-spread">
+            <div data-xin="1" data-dist="-60" className="ebn-pagina ebn-pagina--qr">
               <QrDeIngreso guest={guest as never} />
             </div>
-          </div>
-
-          {/* Alojamiento, estacionamiento, transporte: lo que el anfitrión
-              cargó en Info Adicional, con el vestido de esta sección. */}
-          <div data-xin="1" data-delay="160" className="ebn-info-extra">
-            <InfoAdicionalSection invitation={invitation} />
-          </div>
-
-          <div className="ebn-pase-pie">
-            <span className="ebn-pase-firma">{tx("invitacion.frase.conAmor")}, {titulo}</span>
-            <div className="ebn-pase-creditos">
-              <LogoFooterCredit bgColor="transparent" />
-              <span className="ebn-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-                {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-              </span>
+            <div className="ebn-pagina">
+              <div data-xin="1" data-delay="100" className="ebn-pase-cabeza">
+                <div className="ebn-pase-numero">
+                  <span className="ebn-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
+                  <span>{pase}</span>
+                </div>
+                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+              </div>
+              <div className="ebn-lineas">
+                <div className="ebn-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+                {lugaresDelPase > 0 && (
+                  <div className="ebn-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                )}
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="ebn-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                )}
+                <div className="ebn-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+              </div>
+              <div className="ebn-info-extra">
+                <InfoAdicionalSection invitation={invitation} />
+              </div>
             </div>
+          </div>
+          <div className="ebn-folio ebn-folio--pie">
+            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
+            <span className="ebn-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
+            </span>
+          </div>
+          <div className="ebn-credito">
+            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
           </div>
         </section>
       </div>
@@ -1178,53 +1258,58 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
         <span ref={rielEtiquetaRef} className="ebn-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ─────────────────────────────────────────────────── */}
+      {/* ── La portada ──────────────────────────────────────────────────
+          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
+          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
+          sub-colección no monta además la sección de Bienvenida: sería
+          decir dos veces lo mismo, una arriba de la otra. */}
       <div ref={portadaRef} data-tone={TONO} className="ebn-portada">
-        {/* La portada no tiene escena que levantar: lo que se va al abrir es la
-            trama y el titular, y de eso se encarga el motor moviendo [data-cl]. */}
-        <div ref={escenaPortadaRef} className="ebn-portada-escena">
-          <div data-cl="1" className="ebn-trama" aria-hidden="true" />
-        </div>
-        <div className="ebn-portada-contenido">
-          <div className="ebn-portada-arriba">
-            <div ref={cartelRef} className="ebn-cartel">
-              <h1 className="ebn-cartel-nombres">
-                {saludaAlInvitado ? (
-                  <span>{nombreInvitado}</span>
-                ) : (
-                  <>
-                    <span>{nombre1}</span>
-                    {nombre2 && <span className="ebn-cartel-amp">&amp;</span>}
-                    {nombre2 && <span>{nombre2}</span>}
-                  </>
-                )}
-              </h1>
-              <span className="ebn-cartel-chinche" aria-hidden="true" />
-            </div>
+        <div ref={escenaPortadaRef} className="ebn-portada-hoja">
+          <div className="ebn-trama ebn-trama--tapa" aria-hidden="true" />
+
+          <div data-cl="1" className="ebn-folio">
+            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
+            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
-          <div className="ebn-portada-abajo">
-            <div className="ebn-portada-datos">
-              <span className="ebn-portada-saludo">
-                {saludaAlInvitado
-                  ? <>{tx("invitacion.bienvenida.hola", { nombre: nombreInvitado }).toUpperCase()} · <span className="ebn-acento-plano">{titulo.toUpperCase()}</span></>
-                  : <span className="ebn-acento-plano">{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>}
-              </span>
-              <div className="ebn-portada-fila">
-                <span>{fechaPuntos}</span>
-                <span className="ebn-meta-punto" aria-hidden="true" />
-                <span>{(lugarNombre || ciudad || direccion).toUpperCase()}</span>
-              </div>
+
+          <div data-cl="2" className="ebn-tapa-centro">
+            <div className="ebn-tapa-fila">
+              <span className="ebn-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
+              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
+            </div>
+            <h1 ref={cartelRef} className="ebn-tapa-nombres">
+              {saludaAlInvitado ? (
+                <span className="ebn-tapa-linea"><span>{nombreInvitado}</span></span>
+              ) : (
+                <>
+                  <span className="ebn-tapa-linea"><span>{nombre1}</span></span>
+                  {nombre2 && (
+                    <span className="ebn-tapa-linea ebn-tapa-linea--sangra">
+                      <span><span className="ebn-acento">&amp;</span>{nombre2}</span>
+                    </span>
+                  )}
+                </>
+              )}
+            </h1>
+            <div className="ebn-folio">
+              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
               {isPersonalized && guest && (
-                <div className="ebn-portada-pase">
-                  <span>{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
-                  <span>·</span>
-                  <span>{tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}</span>
-                  <span>·</span>
-                  <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-                </div>
+                <span className="ebn-tapa-pase">
+                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
+                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
+                </span>
               )}
             </div>
-            <button type="button" onClick={abrir} className="ebn-portada-btn">
+          </div>
+
+          <div data-cl="3" className="ebn-tapa-pie">
+            <span className="ebn-regla" aria-hidden="true" />
+            <p className="ebn-tapa-mensaje">
+              {saludaAlInvitado
+                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
+                : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
+            </p>
+            <button type="button" onClick={abrir} className="ebn-tapa-btn">
               {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
             </button>
           </div>
@@ -1260,6 +1345,32 @@ export function EditorialBlancNoirTemplate({ invitation, guest, isPersonalized =
   );
 }
 
+/**
+ * El sello circular: dos anillos y el texto siguiendo la circunferencia,
+ * girando una vuelta cada 26 segundos. Es el único elemento de la
+ * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
+ * (con el & en el centro) y en la contratapa.
+ */
+function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
+  // El id del arco tiene que ser único por instancia: dos <textPath> que
+  // apuntan al mismo id hacen que el segundo no se dibuje.
+  const id = useId().replace(/:/g, "");
+  return (
+    <div className="ebn-sello-circular" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <defs>
+          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
+        </defs>
+        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
+        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
+        <text>
+          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
+        </text>
+      </svg>
+      {amp && <span className="ebn-sello-amp">&amp;</span>}
+    </div>
+  );
+}
 
 // ───────────────────────────────────────────────────────────────────────────
 // Piezas de la colección
@@ -1311,8 +1422,8 @@ function CuentaEditorial({ targetDate }: { targetDate: Date }) {
   return (
     <div className="ebn-cuenta">
       {celdas.map((c, i) => (
-        <div key={c.l} data-xin="1" data-delay={80 + i * 80} data-dist="30" className={`ebn-cuenta-caja ebn-cuenta-caja--${i + 1}`}>
-          <span className={`ebn-cuenta-num${i === 3 ? " ebn-cuenta-num--acc" : ""}`}>{c.v}</span>
+        <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`ebn-cuenta-caja ebn-cuenta-caja--${i + 1}`}>
+          <span className="ebn-cuenta-num">{c.v}</span>
           <span className="ebn-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1805,426 +1916,307 @@ function TriviaEditorial({ preguntas, invitationId, guestToken, guestName }: { p
 // leen la Bienvenida y el Post-evento compartidos (esperan `ebn-section` y
 // `ebn-kicker`).
 const CSS_EBN = `
+  /* ── Tipográfica Editorial ────────────────────────────────────────────
+     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
+     pliego de revista -- folio arriba, spread de dos páginas, titular que
+     ocupa lo que quiera -- y el color aparece como fondo de página entera o
+     en una palabra, nunca como adorno. */
   .ebn-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
     background: var(--pp-bg); color: var(--pp-ink); font-family: var(--ebn-sans), 'Archivo', sans-serif; }
-  .ebn-raiz a { color: var(--pp-acc); text-decoration: none; }
+  .ebn-raiz a { color: inherit; text-decoration: none; }
   .ebn-raiz button { font: inherit; }
-  .ebn-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
   .ebn-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0;
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .ebn-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  @keyframes ppFloat { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(6px,-14px) rotate(8deg); } }
-  @keyframes ppDrift { 0% { transform: translateX(-14px); } 100% { transform: translateX(14px); } }
-  @keyframes ppSway { 0%,100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
-  @keyframes ppBreath { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
-  @keyframes ppRibbon { 0%,100% { transform: skewY(0deg) translateX(0); } 50% { transform: skewY(2deg) translateX(3px); } }
-  @keyframes ppBlink { 0%,94%,100% { transform: scaleY(1); } 97% { transform: scaleY(.1); } }
-  @keyframes ppFly1 { 0% { transform: translate(0,0) rotate(-6deg); } 25% { transform: translate(26px,-22px) rotate(6deg); } 50% { transform: translate(54px,-4px) rotate(-4deg); } 75% { transform: translate(24px,16px) rotate(8deg); } 100% { transform: translate(0,0) rotate(-6deg); } }
-  @keyframes ppFly2 { 0% { transform: translate(0,0) rotate(4deg); } 30% { transform: translate(-30px,-18px) rotate(-8deg); } 60% { transform: translate(-48px,10px) rotate(6deg); } 100% { transform: translate(0,0) rotate(4deg); } }
-  @keyframes ppWingL { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.28); } }
-  @keyframes ppWingR { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.28); } }
-  @keyframes ppNoteUp { 0% { transform: translate(0,0) rotate(-8deg) scale(.7); opacity: 0; } 15% { opacity: .9; } 70% { opacity: .7; } 100% { transform: translate(26px,-120px) rotate(12deg) scale(1); opacity: 0; } }
-  @keyframes ppNoteUp2 { 0% { transform: translate(0,0) rotate(6deg) scale(.6); opacity: 0; } 18% { opacity: .85; } 100% { transform: translate(-30px,-140px) rotate(-14deg) scale(1); opacity: 0; } }
-  @keyframes ppBeat { 0%,100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
-  @keyframes ppWindow { 0%,100% { opacity: .18; } 50% { opacity: .5; } }
-  @keyframes ppSpin { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-  @keyframes ppGlow { 0%,100% { filter: drop-shadow(0 8px 16px rgba(0,0,0,.14)) brightness(1); } 50% { filter: drop-shadow(0 8px 22px rgba(255,240,200,.5)) brightness(1.12); } }
-  @keyframes ppFall { 0% { transform: translate(0,-20px) rotate(0deg); opacity: 0; } 12% { opacity: .9; } 100% { transform: translate(34px,180px) rotate(220deg); opacity: 0; } }
-  @keyframes ppHint { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-  @keyframes ppSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
-  @keyframes ppTwinkle { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+  /* La trama de semitono: puntos de imprenta. Es la única textura de la
+     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
+  .ebn-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
+    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
+  .ebn-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
+  .ebn-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
 
-  /* Lo que entra al scrollear se mueve en --ebn-y y gira en --ebn-giro: son
-     dos cosas distintas (el gesto de entrada y la inclinación del papel
-     apoyado) y tienen que poder convivir en un mismo transform. */
-  .ebn-scroller [data-xin] { transform: translate3d(0, var(--ebn-y, 0px), 0) rotate(var(--ebn-giro, 0deg)); }
+  /* ── El pliego ─────────────────────────────────────────────────────── */
+  .ebn-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
+    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
 
-  /* Las escenas del mockup: quedan detrás y no atajan ningún toque. */
-  .ebn-escena { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  .ebn-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    color: color-mix(in srgb, currentColor 62%, transparent); }
+  .ebn-folio--pie { align-items: center; margin-top: auto; }
+  .ebn-folio-etq { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
 
-  /* ── Secciones ─────────────────────────────────────────────────────── */
-  .ebn-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; display: flex;
-    flex-direction: column; justify-content: center; gap: 22px;
-    padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; }
-  .ebn-kicker { position: relative; z-index: 1; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
-  .ebn-kicker--tinta { color: var(--pp-ink); }
-  .ebn-h2 { position: relative; z-index: 1; margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif;
-    font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96; color: inherit; }
-  .ebn-h2 em, .ebn-acento { font-style: italic; color: var(--pp-acc); }
-  .ebn-h2--claro { color: var(--pp-night-ink); }
-  .ebn-h2--album { font-size: clamp(38px, 10vw, 56px); }
-  .ebn-acento-plano { color: var(--pp-acc); }
-  .ebn-parrafo { position: relative; z-index: 1; margin: 0; font-size: 15px; line-height: 1.55; color: var(--pp-ink2); max-width: 420px; }
-  .ebn-parrafo--tinta { color: var(--pp-ink); }
-  .ebn-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
-    font-size: 14px; letter-spacing: .12em; color: var(--pp-ink2); }
-  .ebn-meta-punto { width: 4px; height: 4px; border-radius: 50%; background: var(--pp-acc); display: inline-block; }
+  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
+     900 px se abren de verdad, como una revista apoyada. */
+  .ebn-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
+  .ebn-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  @media (min-width: 900px) {
+    .ebn-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
+    .ebn-spread > * { flex: 1 1 0; min-width: 0; }
+  }
+
+  /* ── Tipos ─────────────────────────────────────────────────────────── */
+  .ebn-h2, .ebn-panel-titulo, .ebn-frase {
+    position: relative; z-index: 1; margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif;
+    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
+  .ebn-h2 { font-size: clamp(40px, 12vw, 96px); }
+  .ebn-h2--album { font-size: clamp(34px, 9vw, 64px); }
+  .ebn-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
+  .ebn-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
+  .ebn-acento { font-style: italic; color: var(--pp-acc); }
+  .ebn-acento--tinta { color: var(--pp-ink); }
+  .ebn-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
+    color: color-mix(in srgb, currentColor 72%, transparent); }
+  .ebn-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
+  .ebn-regla { display: block; height: 2px; background: currentColor; }
 
   /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .ebn-std { justify-content: flex-end; gap: 22px; padding: 46vh max(24px, calc((100% - 560px) / 2)) 90px;
-    background: linear-gradient(180deg, var(--pp-sky1) 0%, var(--pp-sky2) 48%, var(--pp-bg) 62%); }
-  .ebn-std-fecha { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; }
-  .ebn-std-dia { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 500;
-    font-size: clamp(120px, 34vw, 200px); line-height: .8; letter-spacing: -.04em; color: var(--pp-ink);
-    text-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .ebn-std-fila { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .ebn-cinta { display: inline-block; padding: 8px 26px; background: var(--pp-acc); color: ${CARTA};
-    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: clamp(30px, 8vw, 44px);
-    line-height: 1; clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
-    box-shadow: 0 2px 0 rgba(0,0,0,.12); animation: ppRibbon 4s ease-in-out infinite; text-transform: capitalize; }
-  .ebn-std-anio { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(30px, 8vw, 44px); line-height: 1; color: var(--pp-ink); }
-
-  /* ── Nuestra foto: la ventana troquelada ───────────────────────────── */
-  .ebn-foto-seccion { position: relative; overflow: hidden; padding: 20px max(24px, calc((100% - 900px) / 2)) 70px; background: var(--pp-bg); }
-  .ebn-foto-marco { position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 4 / 5; max-height: 78vh; }
-  .ebn-ventana { position: absolute; inset: 0; overflow: hidden;
-    clip-path: inset(44% 38% 44% 38% round 999px 999px 14px 14px);
-    background: repeating-linear-gradient(135deg, #DCD7CB 0 8px, #E9E5DC 8px 16px);
-    box-shadow: inset 0 0 0 4px rgba(200,107,90,.55), inset 0 0 60px rgba(200,107,90,.28);
-    transition: clip-path 120ms linear; }
+  .ebn-std { justify-content: center; }
+  .ebn-fecha { display: flex; flex-direction: column; font-family: var(--ebn-serif), 'Instrument Serif', serif;
+    line-height: .82; letter-spacing: -.04em; }
+  .ebn-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
+  .ebn-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
+  .ebn-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: .12em; }
+  /* La foto va enmarcada como una foto de tapa, con el año encima. */
+  .ebn-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
+    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
   .ebn-foto-capa { position: absolute; inset: 0; }
-  .ebn-foto-firma { position: absolute; left: 6%; bottom: -26px; padding: 12px 18px; background: ${CARTA}; color: ${CARTA_TINTA};
-    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: 20px;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-2deg); }
+  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
+     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
+  .ebn-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(var(--pp-ink) calc(var(--ebn-punto, 7.2) * 1px), transparent calc(var(--ebn-punto, 7.2) * 1px + .6px));
+    background-size: 10px 10px; }
+  .ebn-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--ebn-serif), 'Instrument Serif', serif;
+    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
+  .ebn-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
 
-  /* ── 02 Falta poco ─────────────────────────────────────────────────── */
-  .ebn-countdown { background: linear-gradient(180deg, var(--pp-bg), var(--pp-bg2)); }
-  .ebn-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; max-width: 460px; }
-  .ebn-cuenta-caja { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 20px 16px 16px;
-    display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  /* La esquina doblada: el mismo triángulo de papel del mockup. */
-  .ebn-cuenta-caja::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0;
-    border-color: var(--pp-bg) var(--pp-bg) ${CARTA_LINEA} ${CARTA_LINEA}; }
-  .ebn-cuenta-caja--1 { --ebn-giro: -1.6deg; transform: rotate(var(--ebn-giro)); }
-  .ebn-cuenta-caja--2 { --ebn-giro: 1.2deg; transform: rotate(var(--ebn-giro)); margin-top: 10px; }
-  .ebn-cuenta-caja--3 { --ebn-giro: 1.8deg; transform: rotate(var(--ebn-giro)); }
-  .ebn-cuenta-caja--4 { --ebn-giro: -1.1deg; transform: rotate(var(--ebn-giro)); margin-top: 10px; }
-  .ebn-cuenta-num { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85; font-variant-numeric: tabular-nums; }
-  .ebn-cuenta-num--acc { color: var(--pp-acc); }
-  .ebn-cuenta-etq { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
+  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
+  .ebn-countdown { justify-content: space-between; }
+  .ebn-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    padding: 8px 0; font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .ebn-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  .ebn-marquesina--contraria .ebn-marquesina-tira { animation-direction: reverse; }
+  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+
+  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
+     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
+     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
+     itálica y en el acento, que es lo único que se mueve de la página. */
+  .ebn-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
+  .ebn-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
+  .ebn-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+  .ebn-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
+  .ebn-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
+  .ebn-cuenta-num, .ebn-cuenta-dias, .ebn-cifra { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 400;
+    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .ebn-cuenta-caja:nth-child(4) .ebn-cuenta-num { font-style: italic; color: var(--pp-acc); }
+  .ebn-cuenta-etq { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .24em;
+    text-transform: uppercase; color: var(--pp-acc); }
+  .ebn-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
 
   /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .ebn-frase-seccion { gap: 36px; padding: 100px max(24px, calc((100% - 620px) / 2)); background: var(--pp-bg2); }
-  .ebn-frase { position: relative; z-index: 1; margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif;
-    font-weight: 400; font-size: clamp(40px, 11.5vw, 76px); line-height: 1; letter-spacing: -.01em; text-wrap: pretty; }
-  .ebn-firma { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: .14em; color: var(--pp-ink2); }
-  .ebn-firma-linea { width: 44px; height: 1.5px; background: var(--pp-acc); display: inline-block; }
+  .ebn-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .ebn-frase-seccion .ebn-acento { color: var(--pp-bg); font-style: italic; }
+  .ebn-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
 
-  /* ── Paneles del recorrido ─────────────────────────────────────────── */
-  .ebn-pan { height: calc(100vh + var(--st-pasos, 2) * 90vh); position: relative; }
-  .ebn-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
+  /* ── Paneles ───────────────────────────────────────────────────────── */
+  .ebn-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
+  .ebn-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
   .ebn-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .ebn-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; gap: 18px; padding: 80px max(24px, calc((100vw - 560px) / 2)) 96px; }
-  .ebn-panel--abajo { justify-content: flex-end; }
-  .ebn-panel--centro { justify-content: center; }
-  .ebn-panel--album { gap: 14px; padding: clamp(52px, 8vh, 80px) max(24px, calc((100vw - 900px) / 2)) clamp(60px, 10vh, 96px); color: ${CARTA_TINTA}; }
-  /* Apilado: los mismos paneles, uno abajo del otro, recorridos bajando. */
+    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .ebn-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .ebn-panel--acento .ebn-acento { color: var(--pp-ink); }
   .ebn-pan[data-scroll="vertical"] { height: auto; }
   .ebn-pan[data-scroll="vertical"] .ebn-pan-fijo { position: static; height: auto; overflow: visible; }
   .ebn-pan[data-scroll="vertical"] .ebn-tira { position: static; display: block; width: 100%; transform: none !important; }
   .ebn-pan[data-scroll="vertical"] .ebn-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-  .ebn-panel-top { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
-    font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
-  .ebn-panel-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
-    font-size: 12px; letter-spacing: .22em; color: var(--pp-ink2); margin-top: auto; }
-  .ebn-seguir { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; font-size: 12px;
-    letter-spacing: .24em; color: var(--pp-ink2); }
-  .ebn-flecha { display: inline-block; animation: ppSide 2.2s ease-in-out infinite; }
-  .ebn-puntos { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
-  .ebn-punto { width: 22px; height: 3px; transition: background 400ms ease; display: inline-block; }
 
-  /* ── Tarjetas de papel ─────────────────────────────────────────────── */
-  .ebn-tarjeta { position: relative; z-index: 1; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 22px 20px;
-    display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .ebn-tarjeta--izq { --ebn-giro: -1deg; transform: rotate(var(--ebn-giro)); }
-  .ebn-tarjeta--der { --ebn-giro: 1.1deg; transform: rotate(var(--ebn-giro)); }
-  .ebn-tarjeta--talon { --ebn-giro: -.8deg; transform: rotate(var(--ebn-giro)); overflow: visible; }
-  .ebn-tarjeta--hoy { --ebn-giro: -1deg; transform: rotate(var(--ebn-giro)); align-items: flex-start; }
-  .ebn-tarjeta--banco { margin-top: 4px; }
-  .ebn-doblez::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 22px 22px 0;
-    border-color: var(--pp-bg2) var(--pp-bg2) ${CARTA_LINEA} ${CARTA_LINEA}; }
-  .ebn-tarjeta-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
-  .ebn-tarjeta-titulo { margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 500;
-    font-size: clamp(30px, 8vw, 48px); line-height: .98; }
-  .ebn-tarjeta-pregunta { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 26px; line-height: 1.15; }
-  .ebn-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .ebn-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
+  .ebn-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  .ebn-linea > span:first-child { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
+  .ebn-linea > span:last-child { text-align: right; font-size: 15px; }
+  .ebn-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
+    border: 2px solid currentColor; padding: 0 16px; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  .ebn-cta-flecha { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: 22px; }
+  .ebn-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .ebn-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
+  .ebn-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
 
-  .ebn-filas { display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.4; }
-  .ebn-fila { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid ${CARTA_LINEA}; padding-bottom: 8px; }
-  .ebn-fila > span:first-child { color: var(--pp-ink2); }
-  .ebn-fila--ultima { border-bottom: none; padding-bottom: 0; }
-  .ebn-fila-valor { text-align: right; }
-  .ebn-fila--copiable { align-items: center; }
-  .ebn-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ebn-fila-etq { font-size: 12px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .ebn-fila-dato { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
-  .ebn-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 1.5px solid ${CARTA_TINTA}; background: transparent;
-    color: ${CARTA_TINTA}; font-size: 13px; letter-spacing: .12em; cursor: pointer; }
-  .ebn-btn-copiar--hecho { background: ${CARTA_TINTA}; color: ${CARTA}; }
+  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
+  .ebn-checkin { background: var(--pp-bg2); }
+  .ebn-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
+    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .ebn-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
+  .ebn-cupon .ebn-talon-top { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; }
+  .ebn-cupon input, .ebn-cupon .ebn-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
+  .ebn-cupon .ebn-contador button { border: 2px solid var(--pp-ink); }
+  .ebn-sello, .ebn-cupon .ebn-sello { color: inherit; }
 
-  /* ── Check-in ──────────────────────────────────────────────────────── */
-  .ebn-checkin { background: var(--pp-bg); }
-  .ebn-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .24em; color: var(--pp-ink2); }
-  .ebn-talon-estado { transition: color 400ms ease; flex-shrink: 0; }
-  .ebn-campo { display: flex; flex-direction: column; gap: 6px; }
-  .ebn-etiqueta { font-size: 12px; letter-spacing: .2em; color: var(--pp-ink2); }
-  .ebn-contador { display: flex; align-items: center; gap: 12px; }
-  .ebn-contador button { width: 48px; height: 48px; border: 1.5px solid ${CARTA_TINTA}; background: transparent; color: ${CARTA_TINTA}; font-size: 22px; line-height: 1; cursor: pointer; }
-  .ebn-contador button:disabled { opacity: .35; cursor: default; }
-  .ebn-contador > span { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 40px; min-width: 40px; text-align: center; line-height: 1; }
-  .ebn-input { min-height: 44px; border: none; border-bottom: 1.5px solid #CFC4AE; background: transparent; color: ${CARTA_TINTA};
-    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 16px; padding: 6px 2px; }
-  .ebn-input--serif { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 20px; }
-  .ebn-input:focus { outline: none; border-bottom-color: var(--pp-acc); }
-  .ebn-input::placeholder { color: #9A9388; }
-  .ebn-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 1px dashed #CFC4AE; padding-top: 12px; font-size: 14px; color: var(--pp-ink2); }
-  .ebn-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .ebn-precio-total { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 26px; line-height: 1; color: ${CARTA_TINTA}; }
-  .ebn-precio-detalle { font-size: 12px; color: var(--pp-ink2); }
-  .ebn-sello { position: absolute; right: 14px; top: 44px; width: 92px; height: 92px; border-radius: 50%;
-    background: var(--pp-acc); color: ${CARTA}; display: flex; align-items: center; justify-content: center; text-align: center;
-    font-size: 11px; letter-spacing: .2em; line-height: 1.3; opacity: 0; transform: scale(1.6) rotate(-20deg);
-    box-shadow: 0 2px 0 rgba(0,0,0,.15); pointer-events: none;
-    clip-path: polygon(50% 0%, 61% 5%, 71% 2%, 79% 10%, 90% 11%, 93% 22%, 100% 30%, 97% 42%, 100% 52%, 95% 63%, 96% 75%, 88% 82%, 84% 93%, 72% 94%, 63% 100%, 50% 96%, 37% 100%, 28% 94%, 16% 93%, 12% 82%, 4% 75%, 5% 63%, 0% 52%, 3% 42%, 0% 30%, 7% 22%, 10% 11%, 21% 10%, 29% 2%, 39% 5%); }
-  .ebn-petalos { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
-  .ebn-error { position: relative; z-index: 1; margin: 0; font-size: 13px; color: var(--pp-acc); }
+  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
+  .ebn-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
+  .ebn-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr; gap: 10px; }
+  @media (min-width: 900px) { .ebn-contactos { grid-template-columns: repeat(6, 1fr); } }
+  .ebn-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
+  .ebn-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
+  .ebn-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
+  .ebn-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
 
-  /* ── Botones ───────────────────────────────────────────────────────── */
-  .ebn-btn-solido { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-    min-height: 52px; padding: 0 22px; border: none; background: var(--pp-acc); color: ${CARTA};
-    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 14px; letter-spacing: .2em; cursor: pointer;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .ebn-btn-solido--tinta { background: var(--pp-ink); color: var(--pp-btn-fg); }
-  .ebn-btn-solido:disabled { opacity: .6; cursor: default; }
-  .ebn-btn-fantasma { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center;
-    min-height: 48px; padding: 0 22px; background: transparent; color: var(--pp-ink); border: 1.5px solid var(--pp-ink);
-    font-size: 13px; letter-spacing: .18em; cursor: pointer; }
-  .ebn-btn-papel { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 10px; min-height: 48px;
-    padding: 0 22px; align-self: flex-start; border: 1.5px solid var(--pp-ink); color: var(--pp-ink); font-size: 14px;
-    letter-spacing: .14em; background: ${CARTA}; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);
-    --ebn-giro: -1deg; transform: rotate(var(--ebn-giro)); text-decoration: none; }
-
-  /* ── Mapa ──────────────────────────────────────────────────────────── */
-  .ebn-mapa { position: relative; z-index: 1; height: 180px; border: 1.5px solid ${CARTA_LINEA}; background: ${CARTA}; overflow: hidden;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-
-  /* ── Cronograma ────────────────────────────────────────────────────── */
-  .ebn-crono { position: relative; z-index: 1; display: flex; flex-direction: column; border-left: 2px solid var(--pp-acc); margin-left: 6px; }
-  .ebn-crono-fila { display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline; }
-  .ebn-crono-hora { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 26px; min-width: 64px; line-height: 1; }
-  .ebn-crono-titulo { font-size: 15px; }
-
-  /* ── Álbum ─────────────────────────────────────────────────────────── */
-  .ebn-polaroids { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr);
-    gap: 14px; max-width: 900px; width: 100%; margin: 0 auto; align-content: start; }
-  .ebn-polaroid { position: relative; background: #FDFBF6; padding: 8px 8px 30px; min-height: 0; display: flex;
-    box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); cursor: pointer; grid-column: span 2; }
-  .ebn-polaroids[data-cantidad="1"] .ebn-polaroid { grid-column: span 6; }
-  .ebn-polaroids[data-cantidad="2"] .ebn-polaroid { grid-column: span 3; }
-  .ebn-polaroids[data-cantidad="4"] .ebn-polaroid { grid-column: span 3; }
-  .ebn-polaroids[data-cantidad="5"] .ebn-polaroid:nth-child(-n+2) { grid-column: span 3; }
-  .ebn-polaroid:nth-child(odd) { transform: rotate(-2deg); }
-  .ebn-polaroid:nth-child(even) { transform: rotate(1.5deg); margin-top: 14px; }
-  .ebn-polaroid-img { width: 100%; height: 100%; min-height: 120px; object-fit: cover; display: block;
-    background: repeating-linear-gradient(135deg, #DCD7CB 0 8px, #E9E5DC 8px 16px); }
-  .ebn-chinche { position: absolute; left: 50%; top: -10px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #fff 0 14%, var(--pp-acc) 16% 68%, rgba(0,0,0,.45) 70%);
-    box-shadow: 0 3px 4px rgba(0,0,0,.32); }
-
-  /* ── Música ────────────────────────────────────────────────────────── */
-  .ebn-musica { background: linear-gradient(180deg, var(--pp-bg2), var(--pp-sky2)); }
-  .ebn-lista { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
-  .ebn-lista-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(43,42,51,.14); }
+  /* ── 07 Música ─────────────────────────────────────────────────────── */
+  .ebn-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
+  .ebn-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
+  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+  .ebn-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
+  .ebn-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
   .ebn-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .ebn-lista-tema { font-size: 15px; }
-  .ebn-lista-quien { font-size: 13px; color: var(--pp-ink2); }
+  .ebn-lista-quien { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em;
+    color: color-mix(in srgb, currentColor 62%, transparent); }
 
-  /* ── Regalos ───────────────────────────────────────────────────────── */
-  .ebn-regalos { background: linear-gradient(180deg, var(--pp-sky2), var(--pp-hill1) 60%, var(--pp-night)); }
+  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
+  .ebn-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
+    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
+  .ebn-tarjeta + .ebn-tarjeta { margin-top: 12px; }
+  .ebn-tarjeta-kicker { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .ebn-tarjeta-titulo { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 28px; line-height: 1; }
+  .ebn-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .ebn-tarjeta .ebn-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
+  .ebn-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
+  .ebn-fila--ultima { border-bottom: none; }
+  .ebn-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ebn-fila-etq { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
+  .ebn-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
+  .ebn-fila-valor { text-align: right; }
+  .ebn-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
+    color: var(--pp-ink); font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; cursor: pointer; }
+  .ebn-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
 
-  /* ── Trivia ────────────────────────────────────────────────────────── */
-  .ebn-quiz { background: linear-gradient(180deg, var(--pp-hill1), var(--pp-night) 70%); color: var(--pp-night-ink); }
-  .ebn-opciones { display: flex; flex-direction: column; gap: 8px; }
-  .ebn-opcion { min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #CFC4AE; background: transparent;
-    color: ${CARTA_TINTA}; font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 300ms, border-color 300ms, color 300ms; }
-  .ebn-opcion:disabled { cursor: default; }
-  .ebn-opcion--bien { background: var(--pp-acc2); border-color: var(--pp-acc2); color: ${CARTA}; }
-  .ebn-opcion--mal { border-color: var(--pp-acc); color: var(--pp-acc); }
+  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
+  .ebn-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .ebn-quiz .ebn-acento { color: var(--pp-ink); }
+  .ebn-opciones { display: flex; flex-direction: column; gap: 10px; }
+  .ebn-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
+    color: inherit; font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 15px; cursor: pointer;
+    transition: background 200ms ease, color 200ms ease; }
+  .ebn-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-opcion--mal { opacity: .55; }
 
-  /* ── Tu pase ───────────────────────────────────────────────────────── */
-  .ebn-pase { justify-content: flex-end; gap: 20px; background: var(--pp-night); color: var(--pp-night-ink);
-    padding: 44vh max(24px, calc((100% - 560px) / 2)) calc(40px + env(safe-area-inset-bottom)); }
-  .ebn-ticket { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr auto; background: ${CARTA};
-    color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.14); --ebn-giro: -.6deg; transform: rotate(var(--ebn-giro));
-    border-radius: 12px; overflow: hidden; }
-  .ebn-ticket-izq { padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; border-right: 2px dashed #CFC4AE; position: relative; }
-  .ebn-ticket-der { padding: 16px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .ebn-ticket-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
-  .ebn-ticket-nombre { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(30px, 8vw, 40px); line-height: .95; }
-  .ebn-ticket-dato { font-size: 14px; color: var(--pp-ink2); }
-  .ebn-ticket-fecha { font-size: 14px; letter-spacing: .14em; color: var(--pp-acc); }
-  .ebn-ticket-muesca { position: absolute; right: -12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pp-night); }
-  .ebn-ticket-muesca--arriba { top: -12px; }
-  .ebn-ticket-muesca--abajo { bottom: -12px; }
-  /* El QR compartido viene con su propio marco claro: acá va sobre el talón. */
-  .ebn-ticket-der .qr-ingreso, .ebn-ticket-der section { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; }
-  .ebn-info-extra { position: relative; z-index: 1; }
+  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
+  .ebn-pase { background: var(--pp-ink); color: var(--pp-bg); }
+  .ebn-pagina--qr { align-items: flex-start; }
+  .ebn-pagina--qr .qr-ingreso, .ebn-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .ebn-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .ebn-pase-numero { display: flex; flex-direction: column; }
+  .ebn-pase-numero > span:last-child { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
+  .ebn-info-extra { margin-top: 12px; }
   .ebn-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .ebn-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-night-ink) !important;
-    border: 1px solid rgba(243,235,221,.35) !important; border-radius: 0 !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran acá: el dibujo de la
-     colección es el papel recortado, y un ícono de trazo al lado desentona. */
-  .ebn-raiz .ia-icon-box { display: none !important; }
-  .ebn-pase-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-top: 10px; }
-  .ebn-pase-firma { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: 24px; color: var(--pp-night-ink); }
-  .ebn-pase-creditos { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .ebn-replay { cursor: pointer; font-size: 12px; letter-spacing: .18em; color: var(--pp-acc); }
+  .ebn-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
+    border-radius: 0 !important; font-family: var(--ebn-mono), 'JetBrains Mono', monospace !important; letter-spacing: .18em !important; }
+  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
+     tipografía. */
+  .ebn-raiz .ia-icon-box, .ebn-raiz svg.lucide { display: none !important; }
+  .ebn-replay { cursor: pointer; }
+  .ebn-credito { display: flex; justify-content: center; opacity: .6; }
+  .ebn-error { margin: 0; font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; }
 
-  /* ── Riel ──────────────────────────────────────────────────────────── */
+  /* ── El sello circular ─────────────────────────────────────────────── */
+  .ebn-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
+  .ebn-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
+  .ebn-sello-circular text { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
+  .ebn-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
+  @keyframes ebnGira { to { transform: rotate(360deg); } }
+
+  /* ── La tapa ───────────────────────────────────────────────────────── */
+  .ebn-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
+  .ebn-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
+  .ebn-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .ebn-tapa-fecha { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--pp-acc); }
+  .ebn-tapa-nombres { margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 400;
+    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
+  .ebn-tapa-linea { overflow: hidden; display: block; }
+  .ebn-tapa-linea > span { display: block; }
+  .ebn-tapa-linea--sangra { padding-left: 14%; }
+  .ebn-tapa-pase { text-align: right; }
+  .ebn-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+  .ebn-tapa-mensaje { margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(20px, 5.4vw, 26px);
+    line-height: 1.2; max-width: 34ch; }
+  .ebn-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
+    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
+    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .ebn-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
   .ebn-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
     align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(43,42,51,.12); }
-  .ebn-riel-top { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-ink2); transition: color 500ms ease; }
-  .ebn-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: rgba(43,42,51,.14); position: relative; }
+    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
+  .ebn-riel-top, .ebn-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
+  .ebn-riel-top { color: var(--pp-ink2); }
+  .ebn-riel-etiqueta { color: var(--pp-acc); }
+  .ebn-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
   .ebn-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .ebn-riel-etiqueta { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-acc); transition: color 500ms ease; }
-
-  /* ── Portada ───────────────────────────────────────────────────────── */
-  .ebn-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden;
-    background: linear-gradient(180deg, var(--pp-sky1), var(--pp-sky2)); }
-  .ebn-portada-escena { position: absolute; inset: 0; pointer-events: none; }
-  .ebn-portada-contenido { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    align-items: center; text-align: center; pointer-events: none;
-    padding: calc(64px + env(safe-area-inset-top)) max(24px, calc((100% - 480px) / 2)) calc(26px + env(safe-area-inset-bottom)); }
-  .ebn-portada-arriba { display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.6vh, 14px); width: 100%; }
-  .ebn-cartel { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: clamp(16px, 3vh, 26px) clamp(18px, 5vw, 30px);
-    max-width: 100%; box-sizing: border-box; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);
-    transform: rotate(-1.2deg); transform-origin: 50% 0%; }
-  .ebn-cartel-nombres { margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 500;
-    font-size: min(clamp(34px, 10vw, 60px), 6.4vh); line-height: .96; letter-spacing: -.01em;
-    display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 .28em; }
-  .ebn-cartel-amp { font-style: italic; font-weight: 400; font-size: .6em; color: var(--pp-acc); }
-  .ebn-cartel-chinche { position: absolute; left: 50%; top: -10px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #fff 0 14%, var(--pp-acc) 16% 68%, rgba(0,0,0,.45) 70%);
-    box-shadow: 0 3px 5px rgba(0,0,0,.34); }
-  .ebn-portada-abajo { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2vh, 16px); width: 100%; pointer-events: auto; }
-  .ebn-portada-datos { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 20px; background: ${CARTA};
-    color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(.8deg);
-    max-width: 100%; box-sizing: border-box; }
-  .ebn-portada-saludo { font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); }
-  .ebn-portada-fila { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; font-size: 14px; letter-spacing: .14em; }
-  .ebn-portada-pase { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .ebn-portada-btn { width: 100%; max-width: 360px; min-height: 52px; border: none; background: var(--pp-btn-bg); color: var(--pp-btn-fg);
-    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 14px; letter-spacing: .22em; cursor: pointer;
-    box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 8px 14px rgba(0,0,0,.1); transition: background 300ms ease; }
-  @media (hover: hover) { .ebn-portada-btn:hover { background: var(--pp-acc); color: ${CARTA}; } }
-
   .ebn-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); opacity: 0; transition: opacity 600ms ease; pointer-events: none;
-    animation: ppHint 2.4s ease-in-out infinite; }
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
+  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
 
-  /* ── Lupa ──────────────────────────────────────────────────────────── */
-  .ebn-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(43,42,51,.94); display: flex; align-items: center;
-    justify-content: center; padding: 24px; cursor: zoom-out; }
-  .ebn-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid ${CARTA};
-    background: transparent; color: ${CARTA}; font-size: 18px; line-height: 1; cursor: pointer; }
-  .ebn-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; background: ${CARTA}; padding: 10px 10px 30px; }
+  .ebn-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .ebn-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
+    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
+  .ebn-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
 
-  /* En escritorio la invitación sigue siendo una hoja angosta centrada: las
-     escenas están dibujadas para una pantalla de teléfono y estiradas a 1440
-     px pierden la escala del recorte. */
-  @media (min-width: 1024px) {
-    .ebn-section, .ebn-panel { padding-left: max(24px, calc((100% - 620px) / 2)); padding-right: max(24px, calc((100% - 620px) / 2)); }
-    .ebn-panel--album { padding-left: max(24px, calc((100vw - 900px) / 2)); padding-right: max(24px, calc((100vw - 900px) / 2)); }
-  }
-
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y tramas. La página es una
-     revista -- cada sección es una hoja con su folio arriba, el titular
-     ocupa lo que quiera y el color aparece en una palabra o en un fondo
-     entero, nunca en un ornamento. */
-  .ebn-raiz { font-family: var(--ebn-sans), 'Archivo', sans-serif; }
-
-  /* La trama de semitono, que es lo único "impreso" de la familia: puntos de
-     1 px cada 12. Va como gradiente y no como SVG para que no cueste nada. */
-  .ebn-trama { position: absolute; inset: 0; pointer-events: none; opacity: .14; z-index: 0;
-    background-image: radial-gradient(currentColor .8px, transparent .9px); background-size: 12px 12px; }
-
-  /* Los kickers y los folios son mono: son los datos de la ficha técnica. */
-  .ebn-kicker, .ebn-panel-top, .ebn-panel-pie, .ebn-meta, .ebn-riel-top, .ebn-riel-etiqueta,
-  .ebn-ticket-kicker, .ebn-cuenta-etq, .ebn-tarjeta-kicker, .ebn-fila-etq, .ebn-portada-pase {
-    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; }
-
-  /* El titular: Instrument Serif enorme, con la segunda línea en itálica y en
-     el acento. Es la firma de la sub-colección. */
-  .ebn-h2, .ebn-frase, .ebn-tarjeta-titulo, .ebn-std-dia, .ebn-cartel-nombres, .ebn-ticket-nombre, .ebn-cifra, .ebn-cuenta-num {
-    font-family: var(--ebn-serif), 'Instrument Serif', serif; letter-spacing: -.03em; }
-  .ebn-h2 em, .ebn-acento { font-style: italic; color: var(--pp-acc); }
-
-  /* Save the Date: el día ocupa la hoja entera. */
-  .ebn-std { background: var(--pp-ink); color: var(--pp-bg); padding: 64px max(22px, calc((100% - 560px) / 2)) 80px; justify-content: center; }
-  .ebn-std-dia { font-size: clamp(64px, 22vw, 180px); line-height: .82; text-shadow: none; color: inherit; }
-  .ebn-std-fila { justify-content: space-between; }
-  .ebn-cinta { background: none; color: var(--pp-acc); font-style: italic; clip-path: none; box-shadow: none;
-    animation: none; padding: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
-  .ebn-std-anio { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
-  .ebn-std .ebn-kicker, .ebn-std .ebn-meta { color: rgba(245,241,234,.62); }
-
-  /* La foto va enmarcada, como una foto de tapa. */
-  .ebn-foto-marco { border: 3px solid var(--pp-ink); }
-  .ebn-ventana { clip-path: none !important; box-shadow: none; }
-  .ebn-foto-firma { background: var(--pp-acc); color: var(--pp-bg); transform: none; box-shadow: none;
-    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; }
-
-  /* Las tarjetas son bloques de color, no papelitos inclinados. */
-  .ebn-tarjeta { background: var(--pp-bg2); color: var(--pp-ink); box-shadow: none; border: 1px solid color-mix(in srgb, var(--pp-ink) 14%, transparent); }
-  .ebn-tarjeta--izq, .ebn-tarjeta--der, .ebn-tarjeta--talon, .ebn-tarjeta--hoy { transform: none; }
-  .ebn-doblez::before { display: none; }
-  .ebn-fila { border-bottom-color: color-mix(in srgb, var(--pp-ink) 14%, transparent); }
-  .ebn-chinche { display: none; }
-
-  /* La cuenta regresiva: cuatro cifras al hilo, separadas por filetes. */
-  .ebn-cuenta { grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 560px; }
-  .ebn-cuenta-caja { background: none; box-shadow: none; transform: none !important; margin: 0 !important;
-    border-left: 1px solid color-mix(in srgb, var(--pp-ink) 18%, transparent); padding: 10px 12px; }
-  .ebn-cuenta-caja:first-child { border-left: none; }
-  .ebn-cuenta-caja::before { display: none; }
-  .ebn-cuenta-num { font-size: clamp(38px, 12vw, 72px); line-height: .9; }
-
-  /* Los paneles del recorrido: cada uno es una hoja con su tono. El de
-     cronograma va en el acento, que es lo que le da el golpe editorial. */
-  .ebn-panel { padding: 64px max(22px, calc((100vw - 560px) / 2)) 80px; }
-  .ebn-panel[data-tone="dark"] { background: var(--pp-ink) !important; color: var(--pp-bg); }
-  .ebn-panel[data-tone="dark"] .ebn-tarjeta { background: transparent; border-color: rgba(245,241,234,.22); color: inherit; }
-  .ebn-panel-top, .ebn-panel-pie { letter-spacing: .22em; font-size: 11px; }
-
-  /* El pase es un cupón troquelado, no un ticket con muescas redondas. */
-  .ebn-ticket { background: var(--pp-bg); color: var(--pp-ink); border: 1px solid var(--pp-ink); border-radius: 0; transform: none; box-shadow: none; }
-  .ebn-ticket-izq { border-right: 1px dashed color-mix(in srgb, var(--pp-ink) 40%, transparent); }
-  .ebn-ticket-muesca { display: none; }
-
-  /* Botones: rectángulos con el acento, sin sombra ni inclinación. */
-  .ebn-btn-solido, .ebn-btn-papel, .ebn-portada-btn { border-radius: 0; box-shadow: none; transform: none; }
-  .ebn-btn-papel { background: transparent; border: 1px solid currentColor; }
-  .ebn-opcion { border-color: color-mix(in srgb, var(--pp-ink) 24%, transparent); border-radius: 0; }
-
-  /* La portada: sin capas de papel. Un titular enorme sobre la trama, el
-     folio arriba y el botón abajo. */
-  .ebn-portada { background: var(--pp-bg); }
-  .ebn-cartel { background: none; box-shadow: none; transform: none; padding: 0; }
-  .ebn-cartel-nombres { font-size: min(clamp(52px, 17vw, 120px), 13vh); line-height: .86; display: block; }
-  .ebn-cartel-amp { display: block; font-style: italic; color: var(--pp-acc); font-size: .7em; }
-  .ebn-cartel-chinche { display: none; }
-  .ebn-portada-datos { background: none; box-shadow: none; transform: none; padding: 0; gap: 12px; }
-  .ebn-portada-btn { background: var(--pp-ink); color: var(--pp-bg); }
-  @media (hover: hover) { .ebn-portada-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }
+  /* ── Formularios (check-in y canciones) ────────────────────────────── */
+  .ebn-campo { display: flex; flex-direction: column; gap: 6px; }
+  .ebn-etiqueta { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 66%, transparent); }
+  .ebn-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
+  .ebn-input:focus { outline: none; border-color: var(--pp-acc); }
+  .ebn-contador { display: flex; align-items: center; gap: 12px; }
+  .ebn-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-size: 20px; line-height: 1; cursor: pointer; }
+  .ebn-contador button:disabled { opacity: .35; cursor: default; }
+  .ebn-contador > span { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
+  .ebn-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+  .ebn-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
+  .ebn-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+  .ebn-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
+  .ebn-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .ebn-precio-total { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 28px; line-height: 1; }
+  .ebn-precio-detalle { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .1em; }
+  .ebn-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .ebn-talon-estado { transition: color 400ms ease; }
+  .ebn-filas { display: flex; flex-direction: column; }
+  .ebn-petalos { display: none; }
 
   @media (prefers-reduced-motion: reduce) {
     .ebn-raiz * { animation: none !important; }
-    .ebn-scroller [data-xin] { opacity: 1 !important; --ebn-y: 0px; }
+    .ebn-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
+    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
+    .ebn-foto { --ebn-punto: 0; }
   }
 `;

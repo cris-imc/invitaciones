@@ -1,80 +1,305 @@
+const CSS_EBN = `
   /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y tramas. La página es una
-     revista -- cada sección es una hoja con su folio arriba, el titular
-     ocupa lo que quiera y el color aparece en una palabra o en un fondo
-     entero, nunca en un ornamento. */
-  .ebn-raiz { font-family: var(--ebn-sans), 'Archivo', sans-serif; }
+     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
+     pliego de revista -- folio arriba, spread de dos páginas, titular que
+     ocupa lo que quiera -- y el color aparece como fondo de página entera o
+     en una palabra, nunca como adorno. */
+  .ebn-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--ebn-sans), 'Archivo', sans-serif; }
+  .ebn-raiz a { color: inherit; text-decoration: none; }
+  .ebn-raiz button { font: inherit; }
 
-  /* La trama de semitono, que es lo único "impreso" de la familia: puntos de
-     1 px cada 12. Va como gradiente y no como SVG para que no cueste nada. */
-  .ebn-trama { position: absolute; inset: 0; pointer-events: none; opacity: .14; z-index: 0;
-    background-image: radial-gradient(currentColor .8px, transparent .9px); background-size: 12px 12px; }
+  .ebn-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0;
+    transition: opacity 900ms ease 260ms; scrollbar-width: none; }
+  .ebn-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* Los kickers y los folios son mono: son los datos de la ficha técnica. */
-  .ebn-kicker, .ebn-panel-top, .ebn-panel-pie, .ebn-meta, .ebn-riel-top, .ebn-riel-etiqueta,
-  .ebn-ticket-kicker, .ebn-cuenta-etq, .ebn-tarjeta-kicker, .ebn-fila-etq, .ebn-portada-pase {
-    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; }
+  /* La trama de semitono: puntos de imprenta. Es la única textura de la
+     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
+  .ebn-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
+    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
+  .ebn-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
+  .ebn-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
+    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
 
-  /* El titular: Instrument Serif enorme, con la segunda línea en itálica y en
-     el acento. Es la firma de la sub-colección. */
-  .ebn-h2, .ebn-frase, .ebn-tarjeta-titulo, .ebn-std-dia, .ebn-cartel-nombres, .ebn-ticket-nombre, .ebn-cifra, .ebn-cuenta-num {
-    font-family: var(--ebn-serif), 'Instrument Serif', serif; letter-spacing: -.03em; }
-  .ebn-h2 em, .ebn-acento { font-style: italic; color: var(--pp-acc); }
+  /* ── El pliego ─────────────────────────────────────────────────────── */
+  .ebn-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
+    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
 
-  /* Save the Date: el día ocupa la hoja entera. */
-  .ebn-std { background: var(--pp-ink); color: var(--pp-bg); padding: 64px max(22px, calc((100% - 560px) / 2)) 80px; justify-content: center; }
-  .ebn-std-dia { font-size: clamp(64px, 22vw, 180px); line-height: .82; text-shadow: none; color: inherit; }
-  .ebn-std-fila { justify-content: space-between; }
-  .ebn-cinta { background: none; color: var(--pp-acc); font-style: italic; clip-path: none; box-shadow: none;
-    animation: none; padding: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
-  .ebn-std-anio { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(64px, 22vw, 180px); line-height: .82; }
-  .ebn-std .ebn-kicker, .ebn-std .ebn-meta { color: rgba(245,241,234,.62); }
+  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  .ebn-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    color: color-mix(in srgb, currentColor 62%, transparent); }
+  .ebn-folio--pie { align-items: center; margin-top: auto; }
+  .ebn-folio-etq { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
 
-  /* La foto va enmarcada, como una foto de tapa. */
-  .ebn-foto-marco { border: 3px solid var(--pp-ink); }
-  .ebn-ventana { clip-path: none !important; box-shadow: none; }
-  .ebn-foto-firma { background: var(--pp-acc); color: var(--pp-bg); transform: none; box-shadow: none;
-    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; }
+  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
+     900 px se abren de verdad, como una revista apoyada. */
+  .ebn-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
+  .ebn-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  @media (min-width: 900px) {
+    .ebn-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
+    .ebn-spread > * { flex: 1 1 0; min-width: 0; }
+  }
 
-  /* Las tarjetas son bloques de color, no papelitos inclinados. */
-  .ebn-tarjeta { background: var(--pp-bg2); color: var(--pp-ink); box-shadow: none; border: 1px solid color-mix(in srgb, var(--pp-ink) 14%, transparent); }
-  .ebn-tarjeta--izq, .ebn-tarjeta--der, .ebn-tarjeta--talon, .ebn-tarjeta--hoy { transform: none; }
-  .ebn-doblez::before { display: none; }
-  .ebn-fila { border-bottom-color: color-mix(in srgb, var(--pp-ink) 14%, transparent); }
-  .ebn-chinche { display: none; }
+  /* ── Tipos ─────────────────────────────────────────────────────────── */
+  .ebn-h2, .ebn-panel-titulo, .ebn-frase {
+    position: relative; z-index: 1; margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif;
+    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
+  .ebn-h2 { font-size: clamp(40px, 12vw, 96px); }
+  .ebn-h2--album { font-size: clamp(34px, 9vw, 64px); }
+  .ebn-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
+  .ebn-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
+  .ebn-acento { font-style: italic; color: var(--pp-acc); }
+  .ebn-acento--tinta { color: var(--pp-ink); }
+  .ebn-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
+    color: color-mix(in srgb, currentColor 72%, transparent); }
+  .ebn-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
+  .ebn-regla { display: block; height: 2px; background: currentColor; }
 
-  /* La cuenta regresiva: cuatro cifras al hilo, separadas por filetes. */
-  .ebn-cuenta { grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 560px; }
-  .ebn-cuenta-caja { background: none; box-shadow: none; transform: none !important; margin: 0 !important;
-    border-left: 1px solid color-mix(in srgb, var(--pp-ink) 18%, transparent); padding: 10px 12px; }
-  .ebn-cuenta-caja:first-child { border-left: none; }
-  .ebn-cuenta-caja::before { display: none; }
-  .ebn-cuenta-num { font-size: clamp(38px, 12vw, 72px); line-height: .9; }
+  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
+  .ebn-std { justify-content: center; }
+  .ebn-fecha { display: flex; flex-direction: column; font-family: var(--ebn-serif), 'Instrument Serif', serif;
+    line-height: .82; letter-spacing: -.04em; }
+  .ebn-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
+  .ebn-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
+  .ebn-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: .12em; }
+  /* La foto va enmarcada como una foto de tapa, con el año encima. */
+  .ebn-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
+    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
+  .ebn-foto-capa { position: absolute; inset: 0; }
+  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
+     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
+  .ebn-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background-image: radial-gradient(var(--pp-ink) calc(var(--ebn-punto, 7.2) * 1px), transparent calc(var(--ebn-punto, 7.2) * 1px + .6px));
+    background-size: 10px 10px; }
+  .ebn-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--ebn-serif), 'Instrument Serif', serif;
+    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
+  .ebn-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
 
-  /* Los paneles del recorrido: cada uno es una hoja con su tono. El de
-     cronograma va en el acento, que es lo que le da el golpe editorial. */
-  .ebn-panel { padding: 64px max(22px, calc((100vw - 560px) / 2)) 80px; }
-  .ebn-panel[data-tone="dark"] { background: var(--pp-ink) !important; color: var(--pp-bg); }
-  .ebn-panel[data-tone="dark"] .ebn-tarjeta { background: transparent; border-color: rgba(245,241,234,.22); color: inherit; }
-  .ebn-panel-top, .ebn-panel-pie { letter-spacing: .22em; font-size: 11px; }
+  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
+  .ebn-countdown { justify-content: space-between; }
+  .ebn-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
+    padding: 8px 0; font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .ebn-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  .ebn-marquesina--contraria .ebn-marquesina-tira { animation-direction: reverse; }
+  @keyframes ebnCorre { to { transform: translateX(-50%); } }
 
-  /* El pase es un cupón troquelado, no un ticket con muescas redondas. */
-  .ebn-ticket { background: var(--pp-bg); color: var(--pp-ink); border: 1px solid var(--pp-ink); border-radius: 0; transform: none; box-shadow: none; }
-  .ebn-ticket-izq { border-right: 1px dashed color-mix(in srgb, var(--pp-ink) 40%, transparent); }
-  .ebn-ticket-muesca { display: none; }
+  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
+     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
+     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
+     itálica y en el acento, que es lo único que se mueve de la página. */
+  .ebn-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
+  .ebn-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
+  .ebn-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
+  .ebn-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
+  .ebn-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
+  .ebn-cuenta-num, .ebn-cuenta-dias, .ebn-cifra { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 400;
+    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .ebn-cuenta-caja:nth-child(4) .ebn-cuenta-num { font-style: italic; color: var(--pp-acc); }
+  .ebn-cuenta-etq { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .24em;
+    text-transform: uppercase; color: var(--pp-acc); }
+  .ebn-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
 
-  /* Botones: rectángulos con el acento, sin sombra ni inclinación. */
-  .ebn-btn-solido, .ebn-btn-papel, .ebn-portada-btn { border-radius: 0; box-shadow: none; transform: none; }
-  .ebn-btn-papel { background: transparent; border: 1px solid currentColor; }
-  .ebn-opcion { border-color: color-mix(in srgb, var(--pp-ink) 24%, transparent); border-radius: 0; }
+  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
+  .ebn-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .ebn-frase-seccion .ebn-acento { color: var(--pp-bg); font-style: italic; }
+  .ebn-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
 
-  /* La portada: sin capas de papel. Un titular enorme sobre la trama, el
-     folio arriba y el botón abajo. */
-  .ebn-portada { background: var(--pp-bg); }
-  .ebn-cartel { background: none; box-shadow: none; transform: none; padding: 0; }
-  .ebn-cartel-nombres { font-size: min(clamp(52px, 17vw, 120px), 13vh); line-height: .86; display: block; }
-  .ebn-cartel-amp { display: block; font-style: italic; color: var(--pp-acc); font-size: .7em; }
-  .ebn-cartel-chinche { display: none; }
-  .ebn-portada-datos { background: none; box-shadow: none; transform: none; padding: 0; gap: 12px; }
-  .ebn-portada-btn { background: var(--pp-ink); color: var(--pp-bg); }
-  @media (hover: hover) { .ebn-portada-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }
+  /* ── Paneles ───────────────────────────────────────────────────────── */
+  .ebn-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
+  .ebn-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .ebn-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
+  .ebn-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
+    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .ebn-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .ebn-panel--acento .ebn-acento { color: var(--pp-ink); }
+  .ebn-pan[data-scroll="vertical"] { height: auto; }
+  .ebn-pan[data-scroll="vertical"] .ebn-pan-fijo { position: static; height: auto; overflow: visible; }
+  .ebn-pan[data-scroll="vertical"] .ebn-tira { position: static; display: block; width: 100%; transform: none !important; }
+  .ebn-pan[data-scroll="vertical"] .ebn-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
+
+  .ebn-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
+  .ebn-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  .ebn-linea > span:first-child { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .14em;
+    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
+  .ebn-linea > span:last-child { text-align: right; font-size: 15px; }
+  .ebn-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
+    border: 2px solid currentColor; padding: 0 16px; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  .ebn-cta-flecha { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: 22px; }
+  .ebn-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .ebn-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
+  .ebn-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+
+  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
+  .ebn-checkin { background: var(--pp-bg2); }
+  .ebn-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
+    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .ebn-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
+  .ebn-cupon .ebn-talon-top { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; }
+  .ebn-cupon input, .ebn-cupon .ebn-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
+  .ebn-cupon .ebn-contador button { border: 2px solid var(--pp-ink); }
+  .ebn-sello, .ebn-cupon .ebn-sello { color: inherit; }
+
+  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
+  .ebn-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
+  .ebn-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr; gap: 10px; }
+  @media (min-width: 900px) { .ebn-contactos { grid-template-columns: repeat(6, 1fr); } }
+  .ebn-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
+  .ebn-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
+  .ebn-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
+  .ebn-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
+
+  /* ── 07 Música ─────────────────────────────────────────────────────── */
+  .ebn-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
+  .ebn-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
+  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
+  .ebn-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
+  .ebn-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  .ebn-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ebn-lista-tema { font-size: 15px; }
+  .ebn-lista-quien { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em;
+    color: color-mix(in srgb, currentColor 62%, transparent); }
+
+  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
+  .ebn-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
+    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
+  .ebn-tarjeta + .ebn-tarjeta { margin-top: 12px; }
+  .ebn-tarjeta-kicker { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .ebn-tarjeta-titulo { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 28px; line-height: 1; }
+  .ebn-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .ebn-tarjeta .ebn-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
+  .ebn-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
+  .ebn-fila--ultima { border-bottom: none; }
+  .ebn-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ebn-fila-etq { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
+  .ebn-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
+  .ebn-fila-valor { text-align: right; }
+  .ebn-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
+    color: var(--pp-ink); font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em;
+    text-transform: uppercase; cursor: pointer; }
+  .ebn-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
+
+  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
+  .ebn-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .ebn-quiz .ebn-acento { color: var(--pp-ink); }
+  .ebn-opciones { display: flex; flex-direction: column; gap: 10px; }
+  .ebn-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
+    color: inherit; font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 15px; cursor: pointer;
+    transition: background 200ms ease, color 200ms ease; }
+  .ebn-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-opcion--mal { opacity: .55; }
+
+  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
+  .ebn-pase { background: var(--pp-ink); color: var(--pp-bg); }
+  .ebn-pagina--qr { align-items: flex-start; }
+  .ebn-pagina--qr .qr-ingreso, .ebn-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .ebn-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .ebn-pase-numero { display: flex; flex-direction: column; }
+  .ebn-pase-numero > span:last-child { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
+  .ebn-info-extra { margin-top: 12px; }
+  .ebn-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .ebn-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
+    border-radius: 0 !important; font-family: var(--ebn-mono), 'JetBrains Mono', monospace !important; letter-spacing: .18em !important; }
+  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
+     tipografía. */
+  .ebn-raiz .ia-icon-box, .ebn-raiz svg.lucide { display: none !important; }
+  .ebn-replay { cursor: pointer; }
+  .ebn-credito { display: flex; justify-content: center; opacity: .6; }
+  .ebn-error { margin: 0; font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; }
+
+  /* ── El sello circular ─────────────────────────────────────────────── */
+  .ebn-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
+  .ebn-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
+  .ebn-sello-circular text { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
+  .ebn-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--ebn-serif), 'Instrument Serif', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
+  @keyframes ebnGira { to { transform: rotate(360deg); } }
+
+  /* ── La tapa ───────────────────────────────────────────────────────── */
+  .ebn-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .ebn-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
+  .ebn-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
+  .ebn-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .ebn-tapa-fecha { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; color: var(--pp-acc); }
+  .ebn-tapa-nombres { margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-weight: 400;
+    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
+  .ebn-tapa-linea { overflow: hidden; display: block; }
+  .ebn-tapa-linea > span { display: block; }
+  .ebn-tapa-linea--sangra { padding-left: 14%; }
+  .ebn-tapa-pase { text-align: right; }
+  .ebn-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+  .ebn-tapa-mensaje { margin: 0; font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: clamp(20px, 5.4vw, 26px);
+    line-height: 1.2; max-width: 34ch; }
+  .ebn-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
+    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
+    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .ebn-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .ebn-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
+  .ebn-riel-top, .ebn-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
+  .ebn-riel-top { color: var(--pp-ink2); }
+  .ebn-riel-etiqueta { color: var(--pp-acc); }
+  .ebn-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
+  .ebn-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
+  .ebn-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
+  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+
+  .ebn-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .ebn-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
+    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
+  .ebn-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
+
+  /* ── Formularios (check-in y canciones) ────────────────────────────── */
+  .ebn-campo { display: flex; flex-direction: column; gap: 6px; }
+  .ebn-etiqueta { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+    color: color-mix(in srgb, currentColor 66%, transparent); }
+  .ebn-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-family: var(--ebn-sans), 'Archivo', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
+  .ebn-input:focus { outline: none; border-color: var(--pp-acc); }
+  .ebn-contador { display: flex; align-items: center; gap: 12px; }
+  .ebn-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-size: 20px; line-height: 1; cursor: pointer; }
+  .ebn-contador button:disabled { opacity: .35; cursor: default; }
+  .ebn-contador > span { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
+  .ebn-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+  .ebn-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
+  .ebn-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
+    font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+  .ebn-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
+  .ebn-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .ebn-precio-total { font-family: var(--ebn-serif), 'Instrument Serif', serif; font-size: 28px; line-height: 1; }
+  .ebn-precio-detalle { font-family: var(--ebn-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .1em; }
+  .ebn-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--ebn-mono), 'JetBrains Mono', monospace;
+    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .ebn-talon-estado { transition: color 400ms ease; }
+  .ebn-filas { display: flex; flex-direction: column; }
+  .ebn-petalos { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ebn-raiz * { animation: none !important; }
+    .ebn-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
+    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
+    .ebn-foto { --ebn-punto: 0; }
+  }
+`;
