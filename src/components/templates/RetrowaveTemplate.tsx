@@ -5,18 +5,21 @@
  * Variante: Miami (base).
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/rtw.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/rtw.jsx, los
+ * estilos en scripts/css/tipografica/rtw.css y las caras y la paleta en
+ * scripts/familias/tipografica/rtw.json.
  *
- * 1987: Righteous sobre un degradé de atardecer, con la grilla en fuga y
- * el sol partido en franjas. Manrope para el texto. Es la más nocturna de
- * la sub-colección.
+ * El atardecer de los 80: Righteous siempre en itálica con doble sombra dura
+ * (magenta y cian), Manrope para el texto, la grilla en fuga que corre,
+ * líneas de barrido VHS y el sol rayado. La tapa es un escenario: cielo
+ * con estrellas, sol y palmeras (WebP) sobre el horizonte, y el nombre
+ * como logo de los 80. Cinta VHS, display digital, walkman y ticket.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Righteous, Manrope } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -40,7 +43,7 @@ const rtwSerif = Righteous({
 });
 const rtwSans = Manrope({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["500", "700", "800"],
   display: "swap",
   variable: "--rtw-sans",
 });
@@ -66,6 +69,10 @@ const PALETA = {
   hill3: "#FFF3E0",
   night: "#FFF3E0",
   nightInk: "#1A0B2E",
+  sky: "#2A1050",
+  ground: "#12061F",
+  acc3: "#19E3FF",
+  sun: "#FF7A3D",
 };
 
 /**
@@ -302,7 +309,7 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -535,6 +542,16 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            bano.style.opacity = String(Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3)));
           });
         });
 
@@ -703,6 +720,10 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-sky": PALETA.sky,
+    "--pp-ground": PALETA.ground,
+    "--pp-acc3": PALETA.acc3,
+    "--pp-sun": PALETA.sun,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -732,6 +753,26 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre como logo de los 80: crema con doble sombra dura (magenta y
+  // cian, invertidas en la segunda línea). El renglón más largo manda el
+  // cuerpo.
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(5, ...renglones.map((n) => n.length));
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // La frase: el medio en magenta y el cierre en cian.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.7)) return "rtw-cian";
+    if (i >= Math.floor(n * 0.25) && i < desdeAcento) return "rtw-magenta";
+    return undefined;
+  };
+
+  const kickerDelEvento = tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const mesCorto = mesLargo.slice(0, 3).toUpperCase();
+  // Diez estrellas fijas sobre el cielo de la tapa, cada una con su ritmo.
+  const ESTRELLAS: [number, number, number][] = [[6, 6, 3], [18, 14, 2], [30, 4, 2], [44, 12, 3], [58, 6, 2], [72, 16, 2], [86, 8, 3], [94, 20, 2], [12, 28, 2], [80, 30, 2]];
+
   return (
     <div
       ref={raizRef}
@@ -743,21 +784,21 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
 
       <div ref={scrollerRef} className="rtw-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
+            La cinta VHS: pliego magenta con líneas de barrido, la fecha en
+            Righteous itálica con sombra dura y la foto como un cuadro de
+            video con "● REC". */}
         <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="rtw-section rtw-std">
-          <div className="rtw-trama rtw-trama--media" aria-hidden="true" />
+          <span className="rtw-vhs" aria-hidden="true" />
+          <div className="rtw-folio">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">● REC · {folio(nSaveTheDate)}</span>
+          </div>
           <div className="rtw-spread">
             <div className="rtw-pagina">
-              <div className="rtw-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
               <div className="rtw-fecha">
-                <span data-xin="1" data-dist="-160" className="rtw-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="rtw-fecha-linea rtw-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="rtw-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="rtw-fecha-linea rtw-fecha-linea--dia">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="rtw-fecha-linea rtw-fecha-linea--mes">{mesLargo}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="rtw-fecha-linea rtw-fecha-linea--anio">{anio}</span>
               </div>
               <div data-xin="1" data-delay="360" className="rtw-fecha-pie">
                 <span>{diaSemana} · {hora} H</span>
@@ -765,10 +806,10 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="rtw-link"
+                  className="rtw-chip rtw-chip--oscuro"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ▶
                 </AddToCalendarLink>
               </div>
             </div>
@@ -777,47 +818,53 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="rtw-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only rtw-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="26,11,46" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only rtw-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="26,11,46" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --rtw-punto. */}
                 <span className="rtw-foto-revelado" aria-hidden="true" />
-                <span className="rtw-foto-anio">{anio}</span>
-                <span className="rtw-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <div className="rtw-foto-cabeza"><span>● REC</span><span>SP 0:00:{String(fechaEvento.getDate()).padStart(2, "0")}</span></div>
+                <div className="rtw-foto-pie"><span>{tx("invitacion.album.nuestraFoto").toUpperCase()}</span><span>{diaNum} {mesCorto} {anio}</span></div>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="rtw-section rtw-countdown">
-          <div className="rtw-folio">
+            El display digital: dos marquesinas inclinadas y cuatro
+            pantallas con borde y sombra dura de su color, sobre la grilla
+            magenta en fuga. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="rtw-section rtw-countdown">
+          <div className="rtw-grilla3d rtw-grilla3d--magenta" aria-hidden="true"><span /></div>
+          <div className="rtw-folio rtw-folio--cian">
             <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
-          <div className="rtw-marquesina" aria-hidden="true">
+          <div className="rtw-marquesina rtw-marquesina--cian" aria-hidden="true">
             <div className="rtw-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.cuentaRegresiva.dias")} ▶ {tx("invitacion.cuentaRegresiva.horas")} ▶ {tx("invitacion.cuentaRegresiva.minutos")} ▶ {tx("invitacion.cuentaRegresiva.segundos")} ▶ {diaSemana.toLowerCase()} {diaNum} {tx("invitacion.evento.de")} {mesLargo} ▶&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaRetrowave targetDate={fechaHora} />
-          <div className="rtw-marquesina rtw-marquesina--contraria" aria-hidden="true">
+          <div className="rtw-spread">
+            <div className="rtw-pagina rtw-pagina--entera">
+              <CuentaRetrowave targetDate={fechaHora} />
+            </div>
+          </div>
+          <div className="rtw-marquesina rtw-marquesina--magenta rtw-marquesina--contraria" aria-hidden="true">
             <div className="rtw-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode, "Side A"].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -825,11 +872,12 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            Las letras cromadas: sobre el cielo, con el sol rayado detrás,
+            la frase en itálica con sombra y la tarjeta que flota. */}
         {hayFrase && (
           <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="rtw-section rtw-frase-seccion">
-            <div className="rtw-folio">
+            <span className="rtw-sol-rayado" aria-hidden="true" />
+            <div className="rtw-folio rtw-folio--cian">
               <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
@@ -839,24 +887,25 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                   // El espacio va fuera del span: el motor pone cada palabra
                   // en inline-block y un espacio adentro se colapsa a cero.
                   <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "rtw-acento" : undefined}>{p}</span>{" "}
+                    <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
                   </span>
                 ))}
               </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="rtw-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div data-xin="1" data-delay="900" data-dist="60" className="rtw-firma">
+                <span className="rtw-firma-play" aria-hidden="true">▶</span>
+                <span>{tx("invitacion.frase.conAmor")} · {titulo}</span>
               </div>
             </div>
-            <div className="rtw-folio rtw-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+            <div className="rtw-folio rtw-folio--cian rtw-folio--pie">
+              <span>Side A · Track {nFrase}</span>
+              <span className="rtw-barra" aria-hidden="true" />
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Un track por lugar: fondo, cielo y suelo, cada uno con su neón
+            (magenta, cian, sol) en el título, la tarjeta y la grilla. */}
         <div
           id="details"
           data-pan="1"
@@ -867,64 +916,68 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         >
           <div className="rtw-pan-fijo">
             <div data-strip="1" className="rtw-tira">
-              <div data-tone={TONO} className="rtw-panel">
-                <div className="rtw-folio">
+              <div data-tone="dark" className="rtw-panel rtw-panel--magenta">
+                <div className="rtw-grilla3d" aria-hidden="true"><span /></div>
+                <div className="rtw-folio rtw-folio--acento">
                   <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="rtw-spread">
-                  <h2 className="rtw-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="rtw-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="rtw-lineas">
+                  <div className="rtw-pagina">
+                    <span className="rtw-panel-sub">Track {deLugar("recepcion").split(" ")[0]}</span>
+                    <h2 className="rtw-panel-titulo">{lugarNombre || ciudad}</h2>
+                  </div>
+                  <div className="rtw-tarjeta-lugar">
                     <div className="rtw-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {direccion && <div className="rtw-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="rtw-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="rtw-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="rtw-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}<span>▶</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="rtw-folio rtw-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} ▶▶</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="rtw-panel">
-                  <div className="rtw-folio">
+                <div id="ceremonia" data-tone="dark" className="rtw-panel rtw-panel--cian">
+                  <div className="rtw-grilla3d" aria-hidden="true"><span /></div>
+                  <div className="rtw-folio rtw-folio--acento">
                     <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="rtw-spread">
-                    <h2 className="rtw-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="rtw-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="rtw-lineas">
+                    <div className="rtw-pagina">
+                      <span className="rtw-panel-sub">Track {deLugar("ceremonia").split(" ")[0]}</span>
+                      <h2 className="rtw-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="rtw-tarjeta-lugar">
                       {ceremoniaHora && <div className="rtw-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="rtw-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="rtw-folio rtw-folio--pie">
                     <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} ▶▶</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="rtw-panel">
-                  <div className="rtw-folio">
+                <div id="location" data-tone="dark" className="rtw-panel rtw-panel--sol">
+                  <div className="rtw-grilla3d" aria-hidden="true"><span /></div>
+                  <div className="rtw-folio rtw-folio--acento">
                     <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="rtw-spread">
-                    <h2 className="rtw-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="rtw-lineas">
+                    <div className="rtw-pagina">
+                      <span className="rtw-panel-sub">Track {deLugar("llegar").split(" ")[0]}</span>
+                      <h2 className="rtw-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="rtw-tarjeta-lugar">
                       {embedMapUrl && (
                         <div className="rtw-mapa">
                           <iframe
@@ -939,28 +992,29 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="rtw-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="rtw-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()}<span>▶</span>
                       </a>
                     </div>
                   </div>
                   <div className="rtw-folio rtw-folio--pie">
                     <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} ▶▶</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="rtw-panel rtw-panel--acento">
-                  <div className="rtw-folio">
+                <div id="schedule" data-tone="dark" className="rtw-panel rtw-panel--sol rtw-panel--suelo">
+                  <div className="rtw-grilla3d" aria-hidden="true"><span /></div>
+                  <div className="rtw-folio rtw-folio--acento">
                     <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="rtw-spread">
-                    <h2 className="rtw-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="rtw-acento rtw-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="rtw-lineas">
+                    <div className="rtw-pagina">
+                      <span className="rtw-panel-sub">Track {deLugar("cronograma").split(" ")[0]}</span>
+                      <h2 className="rtw-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="rtw-tarjeta-lugar">
                       {cronograma.map((item, i) => (
                         <div key={i} className="rtw-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -977,22 +1031,23 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            La carátula del cassette: pliego cian con barrido, la tarjeta
+            crema con borde y sombra dura, "● REC" y el sello triangular
+            GRABADO al confirmar. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="rtw-section rtw-checkin">
+          <section id="rsvp" data-tone="dark" data-screen-label={tx("invitacion.rsvp.confirmar")} className="rtw-section rtw-checkin">
+            <span className="rtw-vhs rtw-vhs--suave" aria-hidden="true" />
             <div className="rtw-folio">
               <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="rtw-spread">
               <div className="rtw-pagina">
-                <h2 data-xin="1" data-dist="-80" className="rtw-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="rtw-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                <h2 data-xin="1" data-dist="-80" className="rtw-h2 rtw-h2--sombra-crema">
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="rtw-magenta">{tx("invitacion.rsvp.confirmaLinea2")}</span>
                 </h2>
               </div>
-              <div className="rtw-cupon">
-                <span className="rtw-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="rtw-cupon">
                 <CheckinRetrowave
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1026,8 +1081,8 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            Polaroids: marco blanco con el borde de abajo más ancho, sombra
+            dura y cada una apenas girada. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1037,24 +1092,21 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
             className="rtw-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="rtw-pan-fijo">
+            <div className="rtw-pan-fijo rtw-pan-fijo--album">
               <div data-strip="1" className="rtw-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="rtw-panel rtw-panel--album">
-                    <div className="rtw-folio">
+                  <div key={iHoja} data-tone="light" className={`rtw-panel rtw-panel--album${iHoja % 2 === 1 ? " rtw-panel--album-b" : ""}`}>
+                    <div className="rtw-folio rtw-folio--gris">
                       <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="rtw-h2 rtw-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="rtw-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="rtw-contactos" data-cantidad={hoja.length}>
+                    <h2 className="rtw-h2 rtw-h2--album">Polaroids</h2>
+                    <div className="rtw-polaroids" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="rtw-contacto"
+                          data-sheet="1"
+                          className="rtw-polaroid"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1062,15 +1114,15 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="rtw-contacto-img" />
-                          <span className="rtw-contacto-tinta" aria-hidden="true" />
-                          <span className="rtw-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="rtw-polaroid-img" />
+                          <span data-colorwash="1" className={`rtw-bano rtw-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                          <span className="rtw-polaroid-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="rtw-folio rtw-folio--pie">
+                    <div className="rtw-folio rtw-folio--gris rtw-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} ▶▶</span>}
                     </div>
                   </div>
                 ))}
@@ -1081,20 +1133,21 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            El walkman: dos carretes girando con la cinta entre ellos, y la
+            lista con "A1, A2…" en el neón de cada tema. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="rtw-section rtw-musica">
-            <div className="rtw-folio">
-              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+            <div className="rtw-folio rtw-folio--cian">
+              <span data-xin="1" data-dist="-40">{nMusica} — SIDE B</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="rtw-spread">
               <div className="rtw-pagina">
-                <h2 data-xin="1" data-dist="-80" className="rtw-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "rtw-acento")}
+                <h2 data-xin="1" data-dist="-80" className="rtw-h2 rtw-h2--sombra-magenta">
+                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "rtw-cian")}
                 </h2>
-                <div data-xin="1" data-delay="120" className="rtw-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                <div data-xin="1" data-delay="120" className="rtw-walkman" aria-hidden="true">
+                  <span className="rtw-carrete rtw-carrete--magenta" /><span className="rtw-cinta" /><span className="rtw-carrete rtw-carrete--cian" />
                 </div>
               </div>
               <div className="rtw-pagina">
@@ -1109,17 +1162,19 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Pliego del sol: naranja con barrido, y las cuentas en tarjetas
+            oscuras con borde y sombra de neón. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="rtw-section rtw-regalos">
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="rtw-section rtw-regalos">
+            <span className="rtw-vhs rtw-vhs--suave" aria-hidden="true" />
             <div className="rtw-folio">
               <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
             </div>
             <div className="rtw-spread">
               <div className="rtw-pagina">
-                <h2 data-xin="1" data-dist="-80" className="rtw-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="rtw-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                <h2 data-xin="1" data-dist="-80" className="rtw-h2 rtw-h2--sombra-crema">
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="rtw-magenta">{tx("invitacion.regalos.siQueresLinea2")}</span>
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="rtw-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1133,7 +1188,7 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1144,7 +1199,8 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1153,40 +1209,41 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            El arcade: "LEVEL 1 / 3" sobre el cielo, la grilla cian en fuga
+            y las opciones que dicen WIN o MISS. */}
         {quizHabilitado && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="rtw-section rtw-quiz">
-            <div className="rtw-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
-              <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
+            <div className="rtw-grilla3d rtw-grilla3d--cian" aria-hidden="true"><span /></div>
+            <div className="rtw-folio rtw-folio--cian">
+              <span data-xin="1" data-dist="-40">{nQuiz} — {triviaTitulo.toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">HIGH SCORE · {folio(nQuiz)}</span>
             </div>
             <div className="rtw-spread">
-              <div className="rtw-pagina">
-                <h2 data-xin="1" data-dist="-80" className="rtw-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="rtw-pagina">
-                <TriviaRetrowave
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaRetrowave
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            El ticket de entrada: el QR sobre crema con borde cian y sombra
+            magenta, el pase enorme en itálica y "◀◀ Rebobinar". */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="rtw-section rtw-pase">
-          <div className="rtw-folio">
+          <span className="rtw-sol-rayado rtw-sol-rayado--chico" aria-hidden="true" />
+          <div className="rtw-folio rtw-folio--cian">
             <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="rtw-spread">
             <div data-xin="1" data-dist="-60" className="rtw-pagina rtw-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="rtw-qr">
+                <QrDeIngreso guest={guest as never} />
+                <span className="rtw-qr-etq">{tx("invitacion.pase.tuPase").toUpperCase()}</span>
+              </div>
             </div>
             <div className="rtw-pagina">
               <div data-xin="1" data-delay="100" className="rtw-pase-cabeza">
@@ -1194,103 +1251,120 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
                   <span className="rtw-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="rtw-pase-mesa">
+                    <span className="rtw-folio-etq">{tx("invitacion.pase.tuMesa").toUpperCase()}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="rtw-lineas">
-                <div className="rtw-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="rtw-caja">
+                <div className="rtw-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="rtw-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="rtw-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="rtw-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="rtw-linea"><span>Sector</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="rtw-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="rtw-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} H</span></div>
               </div>
               <div className="rtw-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="rtw-folio rtw-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="rtw-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="rtw-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="rtw-pase-pie">
+            <span className="rtw-despedida">{tx("invitacion.pase.losEsperamos")} {iniciales(nombre1, nombre2)}</span>
+            <div className="rtw-folio rtw-folio--cian rtw-folio--colofon">
+              <span className="rtw-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.ink} /></span>
+              <span className="rtw-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                ◀◀ {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()}
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="rtw-riel">
-        <span ref={rielTopRef} className="rtw-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="rtw-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="rtw-riel-linea">
           <span ref={rielBarraRef} className="rtw-riel-barra" />
         </div>
         <span ref={rielEtiquetaRef} className="rtw-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          El atardecer: cielo con estrellas, el sol y las palmeras sobre el
+          horizonte, la grilla en fuga que corre hacia adelante y el nombre
+          como logo de los 80. Es la bienvenida: dice de quién es la
+          fiesta, cuándo, dónde y para cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="rtw-portada">
         <div ref={escenaPortadaRef} className="rtw-portada-hoja">
-          <div className="rtw-trama rtw-trama--tapa" aria-hidden="true" />
+          <div className="rtw-escenario" aria-hidden="true">
+            <span className="rtw-cielo" />
+            {ESTRELLAS.map(([x, y, s], i) => (
+              <span key={i} className="rtw-estrella" style={{ left: `${x}%`, top: `${y}%`, width: s, height: s, animationDuration: `${(1.6 + (i % 4) * 0.5).toFixed(1)}s`, animationDelay: `${(i * 0.33).toFixed(2)}s` }} />
+            ))}
+            <div className="rtw-horizonte-escena">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img data-depth="-0.4" src="/templates/retrowave/sol.webp" alt="" className="rtw-sol" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img data-depth="0.8" src="/templates/retrowave/palmera-izq.webp" alt="" className="rtw-palmera rtw-palmera--izq" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img data-depth="1.2" src="/templates/retrowave/palmera-der.webp" alt="" className="rtw-palmera rtw-palmera--der" />
+            </div>
+            <div className="rtw-suelo"><div className="rtw-suelo-plano"><span className="rtw-suelo-grilla" /></div></div>
+            <span className="rtw-horizonte" />
+            <span className="rtw-scan" />
+          </div>
 
-          <div data-cl="1" className="rtw-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
+          <div data-cl="1" className="rtw-folio rtw-folio--cian rtw-folio--tapa">
+            <span>{kickerDelEvento}</span>
             <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="rtw-tapa-centro">
-            <div className="rtw-tapa-fila">
-              <span className="rtw-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="rtw-tapa-nombres">
+            <span className="rtw-tapa-kicker">Now playing</span>
+            <h1 ref={cartelRef} className="rtw-tapa-nombres" style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
               {saludaAlInvitado ? (
-                <span className="rtw-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="rtw-tapa-linea"><span data-pieza="1" className="rtw-tapa-logo"><Letras texto={nombreInvitado} desde={0} /></span></span>
               ) : (
                 <>
-                  <span className="rtw-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="rtw-tapa-linea"><span data-pieza="1" className="rtw-tapa-logo"><Letras texto={nombre1} desde={0} /></span></span>
                   {nombre2 && (
-                    <span className="rtw-tapa-linea rtw-tapa-linea--sangra">
-                      <span><span className="rtw-acento">&amp;</span>{nombre2}</span>
-                    </span>
+                    <>
+                      <span className="rtw-tapa-linea rtw-tapa-linea--amp"><span data-pieza="1">&amp;</span></span>
+                      <span className="rtw-tapa-linea"><span data-pieza="1" className="rtw-tapa-logo rtw-tapa-logo--inv"><Letras texto={nombre2} desde={nombre1.replace(/\s/g, "").length} /></span></span>
+                    </>
                   )}
                 </>
               )}
             </h1>
-            <div className="rtw-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="rtw-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <div className="rtw-placa rtw-placa--datos">
+              <span>{lugarNombre || "—"}<br /><span className="rtw-cian">{[direccion, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="rtw-placa-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br /><span className="rtw-cian">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{hora} h<br /><span className="rtw-cian">{fechaPuntos}</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="rtw-tapa-pie">
-            <span className="rtw-regla" aria-hidden="true" />
-            <p className="rtw-tapa-mensaje">
+            <p className="rtw-placa rtw-tapa-mensaje">
               {saludaAlInvitado
                 ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
                 : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
             </p>
             <button type="button" onClick={abrir} className="rtw-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              <span>▶ Play</span><span className="rtw-tapa-btn-etq">{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div ref={pistaRef} className="rtw-pista">{tx("invitacion.portada.desliza").toUpperCase()} ↓</div>
+      <div ref={pistaRef} className="rtw-pista">{tx("invitacion.portada.desliza").toUpperCase()} ▼</div>
 
       {fotoAmpliada && (
         <div className="rtw-lupa" onClick={() => setFotoAmpliada(null)} onContextMenu={(e) => e.preventDefault()}>
@@ -1319,30 +1393,25 @@ export function RetrowaveTemplate({ invitation, guest, isPersonalized = false }:
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El nombre letra por letra: cada tanto una hace "glitch" (se corre y se
+ * inclina tres pasos y vuelve), como una cinta que tiembla. El CSS
+ * escalona el turno de cada letra.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
-  const id = useId().replace(/:/g, "");
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
   return (
-    <div className="rtw-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="rtw-sello-amp">&amp;</span>}
-    </div>
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="rtw-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
   );
 }
 
@@ -1397,7 +1466,7 @@ function CuentaRetrowave({ targetDate }: { targetDate: Date }) {
     <div className="rtw-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`rtw-cuenta-caja rtw-cuenta-caja--${i + 1}`}>
-          <span className="rtw-cuenta-num">{c.v}</span>
+          <span className="rtw-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="rtw-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1890,13 +1959,17 @@ function TriviaRetrowave({ preguntas, invitationId, guestToken, guestName }: { p
 // leen la Bienvenida y el Post-evento compartidos (esperan `rtw-section` y
 // `rtw-kicker`).
 const CSS_RTW = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Retrowave ────────────────────────────────────────────────────────
+     El atardecer de los 80: Righteous siempre en itálica con sombras duras
+     desplazadas (magenta y cian), Manrope para el texto, la grilla en fuga
+     hecha con dos gradientes sobre un plano en perspectiva, líneas de
+     barrido VHS y el sol rayado. Las únicas imágenes son el sol y las dos
+     palmeras de la tapa, en WebP. */
   .rtw-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--rtw-sans), 'Manrope', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--rtw-sans), 'Manrope', sans-serif;
+    --rtw-sky: ${PALETA.sky}; --rtw-ground: ${PALETA.ground}; --rtw-acc3: ${PALETA.acc3}; --rtw-sun: ${PALETA.sun};
+    --rtw-vhs: color-mix(in srgb, var(--pp-bg) 12%, transparent);
+    --rtw-linea: color-mix(in srgb, var(--pp-ink) 25%, transparent); }
   .rtw-raiz a { color: inherit; text-decoration: none; }
   .rtw-raiz button { font: inherit; }
 
@@ -1904,297 +1977,401 @@ const CSS_RTW = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .rtw-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .rtw-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .rtw-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .rtw-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
+  /* Las líneas de barrido del VHS, el sol rayado y la grilla en fuga. */
+  .rtw-vhs { position: absolute; inset: 0; pointer-events: none; z-index: 0; background: repeating-linear-gradient(180deg, transparent 0 22px, var(--rtw-vhs) 22px 24px); }
+  .rtw-vhs--suave { --rtw-vhs: color-mix(in srgb, var(--pp-bg) 8%, transparent); }
+  .rtw-sol-rayado { position: absolute; right: -10%; top: 6%; width: 60vw; height: 60vw; max-width: 460px; max-height: 460px; border-radius: 50%;
+    background: var(--rtw-sun); pointer-events: none; opacity: .9; z-index: 0;
+    -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 14px, transparent 14px 20px); mask-image: repeating-linear-gradient(180deg, #000 0 14px, transparent 14px 20px); }
+  .rtw-sol-rayado--chico { top: 4%; width: 50vw; height: 50vw; max-width: 400px; max-height: 400px; opacity: .8;
+    -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 12px, transparent 12px 18px); mask-image: repeating-linear-gradient(180deg, #000 0 12px, transparent 12px 18px); }
+  .rtw-grilla3d { position: absolute; left: -20%; right: -20%; bottom: -10%; height: 45%; perspective: 420px; perspective-origin: 50% 0; pointer-events: none; opacity: .45; z-index: 0; }
+  .rtw-grilla3d > span { position: absolute; inset: 0; transform-origin: 50% 0; transform: rotateX(62deg);
+    background-image: linear-gradient(var(--rtw-neon, var(--pp-acc)) 2px, transparent 2px), linear-gradient(90deg, var(--rtw-neon, var(--pp-acc)) 2px, transparent 2px); background-size: 64px 64px; }
+  .rtw-grilla3d--magenta { height: 50%; opacity: .5; --rtw-neon: var(--pp-acc); }
+  .rtw-grilla3d--cian { --rtw-neon: var(--rtw-acc3); }
 
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .rtw-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .rtw-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .rtw-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: Manrope 800 con tracking, en cian cuando va sobre oscuro. */
   .rtw-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .rtw-folio--pie { align-items: center; margin-top: auto; }
-  .rtw-folio-etq { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+    font-weight: 800; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; }
+  .rtw-folio--cian { color: var(--rtw-acc3); }
+  .rtw-folio--acento { color: var(--rtw-neon, var(--pp-acc)); }
+  .rtw-folio--gris { color: #6E6A78; }
+  .rtw-folio--pie { align-items: center; margin-top: auto; letter-spacing: .22em; }
+  .rtw-panel > .rtw-folio--pie { color: inherit; opacity: .8; }
+  .rtw-folio--colofon { align-items: center; border-top: 1px solid var(--rtw-linea); padding-top: 12px; }
+  .rtw-folio-etq { font-weight: 800; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--rtw-acc3); display: block; }
+  .rtw-barra { width: 40%; height: 2px; background: var(--pp-acc); }
+  .rtw-magenta { color: var(--pp-acc); }
+  .rtw-cian { color: var(--rtw-acc3); }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .rtw-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .rtw-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .rtw-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .rtw-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .rtw-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .rtw-pagina { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .rtw-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .rtw-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .rtw-spread > *:first-child { justify-self: end; }
+    .rtw-spread > *:last-child { justify-self: start; }
+    .rtw-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .rtw-h2, .rtw-panel-titulo, .rtw-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--rtw-serif), 'Righteous', cursive;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .rtw-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .rtw-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .rtw-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .rtw-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .rtw-acento { font-style: italic; color: var(--pp-acc); }
-  .rtw-acento--tinta { color: var(--pp-ink); }
-  .rtw-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .rtw-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .rtw-regla { display: block; height: 2px; background: currentColor; }
+  .rtw-h2, .rtw-panel-titulo, .rtw-frase, .rtw-fecha-linea, .rtw-tapa-nombres {
+    font-family: var(--rtw-serif), 'Righteous', cursive; font-weight: 400; font-style: italic; }
+  .rtw-h2, .rtw-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .92; font-size: clamp(48px, 14vw, 120px); }
+  .rtw-h2--album { font-size: clamp(44px, 12vw, 100px); text-shadow: 4px 4px 0 var(--rtw-acc3); }
+  .rtw-h2--sombra-crema { text-shadow: 4px 4px 0 var(--pp-ink); }
+  .rtw-h2--sombra-magenta { text-shadow: 4px 4px 0 var(--pp-acc); }
+  .rtw-panel-titulo { text-shadow: 4px 4px 0 var(--rtw-neon, var(--pp-acc)); }
+  .rtw-panel-sub { font-weight: 800; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--rtw-neon, var(--pp-acc)); }
+  .rtw-parrafo { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; max-width: 40ch; }
+  .rtw-chip { display: inline-block; padding: 12px 18px; font-weight: 800; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  .rtw-chip--oscuro { background: var(--pp-bg); color: var(--pp-ink); }
+  .rtw-cta { margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    background: var(--rtw-neon, var(--pp-acc)); color: var(--pp-bg); font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .rtw-std { justify-content: center; }
-  .rtw-fecha { display: flex; flex-direction: column; font-family: var(--rtw-serif), 'Righteous', cursive;
-    line-height: .82; letter-spacing: -.04em; }
-  .rtw-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .rtw-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .rtw-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .rtw-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
+  /* ── 01 Guardá la fecha: la cinta VHS ──────────────────────────────── */
+  .rtw-std { background: var(--pp-acc); color: var(--pp-bg); }
+  .rtw-fecha { display: flex; flex-direction: column; line-height: .9; }
+  .rtw-fecha-linea { font-size: clamp(56px, 18vw, 150px); text-shadow: 4px 4px 0 var(--pp-bg); }
+  .rtw-fecha-linea--dia { font-size: clamp(96px, 32vw, 240px); color: var(--pp-bg); text-shadow: none; }
+  .rtw-fecha-linea--mes { text-align: right; color: var(--pp-ink); text-transform: capitalize; }
+  .rtw-fecha-linea--anio { color: var(--rtw-acc3); }
+  .rtw-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    font-weight: 800; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  /* La foto: un cuadro de video 4:3 con borde oscuro y sombra dura cian. */
+  .rtw-foto { position: relative; width: 100%; aspect-ratio: 4 / 3; box-sizing: border-box; overflow: hidden; border: 4px solid var(--pp-bg);
+    box-shadow: 8px 8px 0 var(--rtw-acc3); background: repeating-linear-gradient(135deg, #3A2450 0 8px, #2C1A3E 8px 16px); }
   .rtw-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
   .rtw-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background-image: radial-gradient(var(--pp-ink) calc(var(--rtw-punto, 7.2) * 1px), transparent calc(var(--rtw-punto, 7.2) * 1px + .6px));
+    background-image: radial-gradient(var(--pp-bg) calc(var(--rtw-punto, 7.2) * 1px), transparent calc(var(--rtw-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .rtw-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--rtw-serif), 'Righteous', cursive;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .rtw-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--rtw-sans), 'Manrope', sans-serif;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .rtw-foto-cabeza, .rtw-foto-pie { position: absolute; left: 12px; right: 12px; z-index: 2; display: flex; justify-content: space-between; color: var(--pp-ink); }
+  .rtw-foto-cabeza { top: 10px; font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 14px; letter-spacing: .1em; }
+  .rtw-foto-pie { bottom: 10px; font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .rtw-countdown { justify-content: space-between; }
-  .rtw-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .rtw-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  /* ── 02 Falta poco: el display digital ─────────────────────────────── */
+  .rtw-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .rtw-countdown > .rtw-folio, .rtw-countdown > .rtw-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .rtw-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap; color: var(--pp-bg);
+    font-weight: 800; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; }
+  .rtw-marquesina--cian { background: var(--rtw-acc3); transform: skewY(-2deg); font-family: var(--rtw-serif), 'Righteous', cursive; font-weight: 400; font-size: 24px; letter-spacing: .1em; }
+  .rtw-marquesina--magenta { background: var(--pp-acc); transform: skewY(2deg); }
+  .rtw-marquesina-tira { display: flex; width: max-content; animation: rtwCorre 16s linear infinite; }
+  .rtw-marquesina-tira > span { padding-right: 36px; }
   .rtw-marquesina--contraria .rtw-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  @keyframes rtwCorre { to { transform: translate3d(-50%, 0, 0); } }
+  /* Cuatro pantallas: fondo cielo, borde y sombra dura del neón de cada una,
+     la cifra en itálica del mismo color. */
+  .rtw-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rtw-cuenta-caja { --rtw-neon: var(--pp-acc); position: relative; overflow: hidden; background: var(--rtw-sky); border: 2px solid var(--rtw-neon);
+    box-shadow: 5px 5px 0 var(--rtw-neon); padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .rtw-cuenta-caja:nth-child(2) { --rtw-neon: var(--rtw-acc3); }
+  .rtw-cuenta-caja:nth-child(3) { --rtw-neon: var(--rtw-sun); }
+  .rtw-cuenta-caja:nth-child(4) { --rtw-neon: var(--pp-ink); }
+  .rtw-cuenta-num { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: clamp(60px, 19vw, 140px); line-height: .9; color: var(--rtw-neon); font-variant-numeric: tabular-nums; }
+  .rtw-cuenta-num > span { display: inline-block; animation: rtwCifra 300ms cubic-bezier(.16,1,.3,1); }
+  @keyframes rtwCifra { from { transform: translateY(18%); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+  .rtw-cuenta-etq { font-weight: 800; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; }
+  .rtw-tarjeta--hoy { background: var(--rtw-sky); border: 2px solid var(--pp-acc); box-shadow: 5px 5px 0 var(--pp-acc); padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .rtw-tarjeta--hoy .rtw-tarjeta-kicker { font-weight: 800; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--rtw-acc3); }
+  .rtw-tarjeta--hoy .rtw-tarjeta-titulo { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: clamp(36px, 10vw, 84px); line-height: .92; text-shadow: 4px 4px 0 var(--pp-acc); }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .rtw-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .rtw-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .rtw-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .rtw-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .rtw-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .rtw-cuenta-num, .rtw-cuenta-dias, .rtw-cifra { font-family: var(--rtw-serif), 'Righteous', cursive; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .rtw-cuenta-caja:nth-child(4) .rtw-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .rtw-cuenta-etq { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .rtw-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: letras cromadas ─────────────────────────────── */
+  .rtw-frase-seccion { background: var(--rtw-sky); justify-content: space-between; gap: 30px; }
+  .rtw-frase { margin: 0; font-size: clamp(34px, 9.5vw, 80px); line-height: 1.02; max-width: 15ch; text-shadow: 3px 3px 0 var(--pp-bg); }
+  .rtw-firma { align-self: flex-end; display: flex; align-items: center; gap: 12px; background: var(--pp-bg); border: 1px solid var(--pp-acc); padding: 12px 16px; max-width: 320px;
+    font-weight: 700; font-size: 14px; line-height: 1.4; animation: rtwFlota 4s ease-in-out infinite; }
+  .rtw-firma-play { font-family: var(--rtw-serif), 'Righteous', cursive; color: var(--pp-acc); font-size: 20px; }
+  @keyframes rtwFlota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .rtw-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .rtw-frase-seccion .rtw-acento { color: var(--pp-bg); font-style: italic; }
-  .rtw-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Paneles: un track por lugar ────────────────────────────────── */
   .rtw-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
   .rtw-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .rtw-pan-fijo--album { background: #F7F5F0; }
   .rtw-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .rtw-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .rtw-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .rtw-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .rtw-panel--acento .rtw-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .rtw-panel--magenta { --rtw-neon: var(--pp-acc); background: var(--pp-bg); }
+  .rtw-panel--cian { --rtw-neon: var(--rtw-acc3); background: var(--rtw-sky); }
+  .rtw-panel--sol { --rtw-neon: var(--rtw-sun); background: var(--rtw-ground); }
+  .rtw-panel--suelo { background: var(--rtw-ground); }
   .rtw-pan[data-scroll="vertical"] { height: auto; }
   .rtw-pan[data-scroll="vertical"] .rtw-pan-fijo { position: static; height: auto; overflow: visible; }
   .rtw-pan[data-scroll="vertical"] .rtw-tira { position: static; display: block; width: 100%; transform: none !important; }
   .rtw-pan[data-scroll="vertical"] .rtw-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
+  .rtw-tarjeta-lugar { background: var(--pp-bg); border: 2px solid var(--rtw-neon, var(--pp-acc)); box-shadow: 6px 6px 0 var(--rtw-neon, var(--pp-acc));
+    padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .rtw-linea { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px solid var(--rtw-linea); font-size: 15px; line-height: 1.3; }
+  .rtw-linea > span:first-child { font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--rtw-neon, var(--rtw-acc3)); flex: 0 0 auto; padding-top: 2px; }
+  .rtw-linea > span:last-child { text-align: right; font-weight: 700; }
+  .rtw-mapa { height: 190px; overflow: hidden; border: 2px solid var(--rtw-neon, var(--pp-acc)); }
+  .rtw-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: var(--rtw-acc3); }
+  .rtw-punto { width: 28px; height: 4px; background: currentColor !important; opacity: .25; transition: opacity 300ms ease; display: inline-block; }
+  .rtw-punto[data-activo="1"] { opacity: 1; }
+  .rtw-pan-fijo--album .rtw-puntos { color: #1A0B2E; }
 
-  .rtw-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .rtw-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .rtw-linea > span:first-child { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .rtw-linea > span:last-child { text-align: right; font-size: 15px; }
-  .rtw-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--rtw-sans), 'Manrope', sans-serif;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .rtw-cta-flecha { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: 22px; }
-  .rtw-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
-  .rtw-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .rtw-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
-
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .rtw-checkin { background: var(--pp-bg2); }
-  .rtw-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .rtw-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .rtw-cupon .rtw-talon-top { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .2em; }
-  .rtw-cupon input, .rtw-cupon .rtw-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .rtw-cupon .rtw-contador button { border: 2px solid var(--pp-ink); }
-  .rtw-sello, .rtw-cupon .rtw-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .rtw-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .rtw-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .rtw-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .rtw-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .rtw-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .rtw-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .rtw-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--rtw-sans), 'Manrope', sans-serif;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .rtw-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .rtw-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .rtw-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .rtw-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .rtw-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .rtw-lista-tema { font-size: 15px; }
-  .rtw-lista-quien { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .rtw-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .rtw-tarjeta + .rtw-tarjeta { margin-top: 12px; }
-  .rtw-tarjeta-kicker { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .rtw-tarjeta-titulo { font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 28px; line-height: 1; }
-  .rtw-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .rtw-tarjeta .rtw-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .rtw-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .rtw-fila--ultima { border-bottom: none; }
-  .rtw-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .rtw-fila-etq { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .rtw-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .rtw-fila-valor { text-align: right; }
-  .rtw-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .rtw-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .rtw-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .rtw-quiz .rtw-acento { color: var(--pp-ink); }
-  .rtw-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .rtw-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .rtw-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .rtw-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .rtw-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .rtw-pagina--qr { align-items: flex-start; }
-  .rtw-pagina--qr .qr-ingreso, .rtw-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .rtw-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .rtw-pase-numero { display: flex; flex-direction: column; }
-  .rtw-pase-numero > span:last-child { font-family: var(--rtw-serif), 'Righteous', cursive; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .rtw-info-extra { margin-top: 12px; }
-  .rtw-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .rtw-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--rtw-sans), 'Manrope', sans-serif !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .rtw-raiz .ia-icon-box, .rtw-raiz svg.lucide { display: none !important; }
-  .rtw-replay { cursor: pointer; }
-  .rtw-credito { display: flex; justify-content: center; opacity: .6; }
-  .rtw-error { margin: 0; font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .rtw-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .rtw-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .rtw-sello-circular text { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .rtw-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .rtw-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .rtw-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .rtw-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .rtw-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .rtw-tapa-fecha { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .rtw-tapa-nombres { margin: 0; font-family: var(--rtw-serif), 'Righteous', cursive; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .rtw-tapa-linea { overflow: hidden; display: block; }
-  .rtw-tapa-linea > span { display: block; }
-  .rtw-tapa-linea--sangra { padding-left: 14%; }
-  .rtw-tapa-pase { text-align: right; }
-  .rtw-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .rtw-tapa-mensaje { margin: 0; font-family: var(--rtw-serif), 'Righteous', cursive; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .rtw-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .rtw-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .rtw-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .rtw-riel-top, .rtw-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--rtw-sans), 'Manrope', sans-serif;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .rtw-riel-top { color: var(--pp-ink2); }
-  .rtw-riel-etiqueta { color: var(--pp-acc); }
-  .rtw-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .rtw-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .rtw-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .rtw-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .rtw-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .rtw-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
-  .rtw-campo { display: flex; flex-direction: column; gap: 6px; }
-  .rtw-etiqueta { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .rtw-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .rtw-input:focus { outline: none; border-color: var(--pp-acc); }
-  .rtw-contador { display: flex; align-items: center; gap: 12px; }
-  .rtw-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
-  .rtw-contador button:disabled { opacity: .35; cursor: default; }
-  .rtw-contador > span { font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .rtw-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .rtw-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .rtw-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .rtw-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .rtw-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .rtw-precio-total { font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 28px; line-height: 1; }
-  .rtw-precio-detalle { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-size: 11px; letter-spacing: .1em; }
-  .rtw-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--rtw-sans), 'Manrope', sans-serif;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  /* ── 05 Check-in: la carátula del cassette ─────────────────────────── */
+  .rtw-checkin { background: var(--rtw-acc3); color: var(--pp-bg); --rtw-vhs: color-mix(in srgb, var(--pp-bg) 8%, transparent); }
+  .rtw-checkin .rtw-h2--sombra-crema { text-shadow: 4px 4px 0 var(--pp-ink); }
+  .rtw-cupon { position: relative; background: var(--pp-ink); color: var(--pp-bg); border: 3px solid var(--pp-bg); box-shadow: 8px 8px 0 var(--pp-bg);
+    padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; transition: box-shadow 400ms ease; }
+  .rtw-cupon:has(.rtw-filas) { box-shadow: 8px 8px 0 var(--pp-acc); }
+  .rtw-cupon .rtw-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .rtw-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 800; font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; border-bottom: 3px solid var(--pp-bg); padding-bottom: 12px; }
+  /* "● REC": el punto es magenta mientras graba y cian cuando ya grabó. */
+  .rtw-talon-top > span:first-child { display: flex; align-items: center; gap: 8px; }
+  .rtw-talon-top > span:first-child::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--pp-acc); transition: background 300ms ease; }
+  .rtw-cupon:has(.rtw-filas) .rtw-talon-top > span:first-child::before { background: var(--rtw-acc3); }
   .rtw-talon-estado { transition: color 400ms ease; }
+  .rtw-campo { display: flex; flex-direction: column; gap: 6px; }
+  .rtw-etiqueta { font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .rtw-input { min-height: 48px; border: 0; border-bottom: 2px solid var(--pp-bg); border-radius: 0; background: transparent; color: var(--pp-bg);
+    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-weight: 600; font-size: 15px; padding: 0; outline: none; }
+  .rtw-contador { display: flex; align-items: center; border-bottom: 2px solid var(--pp-bg); min-height: 48px; }
+  .rtw-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-bg); cursor: pointer;
+    font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 24px; line-height: 1; }
+  .rtw-contador button:disabled { opacity: .35; cursor: default; }
+  .rtw-contador > span { flex: 1; text-align: center; font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 28px; line-height: 1; color: var(--pp-acc); }
   .rtw-filas { display: flex; flex-direction: column; }
+  .rtw-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid color-mix(in srgb, var(--pp-bg) 25%, transparent); font-size: 15px; }
+  .rtw-fila--ultima { border-bottom: 0; }
+  .rtw-fila-valor { text-align: right; font-weight: 700; }
+  .rtw-precio { display: flex; justify-content: space-between; gap: 12px; font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .rtw-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .rtw-precio-total { font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 22px; line-height: 1; letter-spacing: 0; color: var(--pp-acc); }
+  .rtw-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .rtw-btn-solido { min-height: 54px; border: 2px solid var(--pp-bg); background: var(--pp-bg); color: var(--rtw-acc3); cursor: pointer;
+    font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 17px; letter-spacing: .12em; text-transform: uppercase; padding: 0 18px;
+    box-shadow: 4px 4px 0 var(--pp-acc); transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .rtw-btn-solido:hover { background: var(--pp-acc); color: var(--pp-bg); } }
+  .rtw-btn-solido:disabled { opacity: .6; cursor: default; }
+  .rtw-btn-fantasma { min-height: 48px; border: 2px solid var(--pp-bg); background: transparent; color: var(--pp-bg); cursor: pointer;
+    font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 15px; letter-spacing: .1em; text-transform: uppercase; padding: 0 18px; }
+  .rtw-error { margin: 0; font-weight: 800; font-size: 12px; color: var(--pp-acc); }
+  /* El sello GRABADO: un triángulo magenta con otro cian adentro. */
+  .rtw-cupon .rtw-sello { position: absolute; right: 12px; bottom: 78px; width: 130px; aspect-ratio: 1; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    background: var(--pp-acc); clip-path: polygon(50% 4%, 96% 90%, 4% 90%);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 18px; box-sizing: border-box;
+    font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 12px; letter-spacing: .04em; color: var(--pp-ink); }
+  .rtw-cupon .rtw-sello::before { content: ""; position: absolute; left: 18%; right: 18%; top: 24%; bottom: 16%; background: var(--rtw-acc3);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .rtw-cupon .rtw-sello::after { content: ""; position: absolute; left: 22%; right: 22%; top: 31%; bottom: 20%; background: var(--pp-acc);
+    clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .rtw-cupon .rtw-sello > * { position: relative; z-index: 1; }
   .rtw-petalos { display: none; }
 
-  /* Retrowave: la grilla en fuga sobre el horizonte y el neón en el titular. */
-  .rtw-tapa-nombres, .rtw-h2, .rtw-fecha-linea { text-shadow: 0 0 24px color-mix(in srgb, var(--pp-acc) 60%, transparent); }
-  .rtw-trama { opacity: .2; background-image: linear-gradient(color-mix(in srgb, var(--pp-acc) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--pp-acc) 45%, transparent) 1px, transparent 1px); background-size: 42px 42px; }
+  /* ── 06 Álbum: polaroids ───────────────────────────────────────────── */
+  .rtw-panel--album { background: #F7F5F0; color: #1A0B2E; justify-content: flex-start; gap: 14px; }
+  .rtw-panel--album-b { background: #EFEBE3; }
+  .rtw-polaroids { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .rtw-polaroid { position: relative; overflow: hidden; min-height: 0; cursor: pointer; border: 6px solid #FFFFFF; border-bottom-width: 22px;
+    box-shadow: 4px 4px 0 #1A0B2E; background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .rtw-polaroid:nth-child(1) { transform: rotate(-1.5deg); }
+  .rtw-polaroid:nth-child(2) { transform: rotate(1.5deg); }
+  .rtw-polaroid:nth-child(3) { transform: rotate(-1deg); }
+  .rtw-polaroid:nth-child(4) { transform: rotate(2deg); }
+  .rtw-polaroid:nth-child(5) { transform: rotate(.5deg); }
+  .rtw-polaroid-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rtw-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .rtw-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .rtw-bano--2 { background: color-mix(in srgb, var(--rtw-acc3) 50%, transparent); }
+  .rtw-bano--3 { background: color-mix(in srgb, var(--rtw-sun) 55%, transparent); }
+  .rtw-bano--4 { background: color-mix(in srgb, var(--rtw-sky) 50%, transparent); }
+  .rtw-bano--5 { background: color-mix(in srgb, var(--pp-acc) 40%, transparent); }
+  .rtw-polaroid-n { position: absolute; left: 6px; bottom: -18px; font-weight: 800; font-size: 11px; letter-spacing: .14em; color: #1A0B2E; }
+  .rtw-polaroids[data-cantidad="5"] .rtw-polaroid:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .rtw-polaroids[data-cantidad="5"] .rtw-polaroid:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .rtw-polaroids[data-cantidad="5"] .rtw-polaroid:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .rtw-polaroids[data-cantidad="5"] .rtw-polaroid:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .rtw-polaroids[data-cantidad="5"] .rtw-polaroid:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .rtw-polaroids[data-cantidad="4"] .rtw-polaroid:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .rtw-polaroids[data-cantidad="4"] .rtw-polaroid:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .rtw-polaroids[data-cantidad="4"] .rtw-polaroid:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .rtw-polaroids[data-cantidad="4"] .rtw-polaroid:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .rtw-polaroids[data-cantidad="3"] .rtw-polaroid:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .rtw-polaroids[data-cantidad="3"] .rtw-polaroid:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .rtw-polaroids[data-cantidad="3"] .rtw-polaroid:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .rtw-polaroids[data-cantidad="2"] .rtw-polaroid:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .rtw-polaroids[data-cantidad="2"] .rtw-polaroid:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .rtw-polaroids[data-cantidad="1"] .rtw-polaroid:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: el walkman ─────────────────────────────────────────── */
+  .rtw-walkman { display: flex; align-items: center; gap: 18px; }
+  .rtw-carrete { width: 44px; height: 44px; border-radius: 50%; border: 6px solid var(--pp-acc); border-top-color: var(--pp-ink); box-sizing: border-box; animation: rtwGira 3s linear infinite; }
+  .rtw-carrete--cian { border-color: var(--rtw-acc3); border-top-color: var(--pp-ink); }
+  .rtw-cinta { flex: 1; height: 6px; background: var(--rtw-sky); border-top: 2px solid var(--rtw-acc3); border-bottom: 2px solid var(--rtw-acc3); }
+  @keyframes rtwGira { to { transform: rotate(360deg); } }
+  .rtw-musica form.rtw-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .rtw-musica .rtw-etiqueta { display: none; }
+  .rtw-musica .rtw-input { min-height: 48px; border: 2px solid var(--rtw-acc3); background: var(--rtw-sky); color: var(--pp-ink); font-weight: 700; padding: 0 14px; min-width: 0; }
+  .rtw-musica .rtw-error { grid-column: 1 / -1; }
+  .rtw-musica .rtw-btn-solido { grid-column: 1 / -1; min-height: 50px; border-color: var(--pp-acc); background: var(--pp-acc); color: var(--pp-bg); font-size: 16px; box-shadow: 4px 4px 0 var(--rtw-acc3); }
+  @media (hover: hover) { .rtw-musica .rtw-btn-solido:hover { background: var(--rtw-acc3); border-color: var(--rtw-acc3); box-shadow: 4px 4px 0 var(--pp-acc); } }
+  .rtw-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; counter-reset: tema; }
+  .rtw-lista-fila { --rtw-neon: var(--pp-acc); display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--rtw-sky); border-left: 4px solid var(--rtw-neon); counter-increment: tema; }
+  .rtw-lista-fila:nth-child(3n+2) { --rtw-neon: var(--rtw-acc3); }
+  .rtw-lista-fila:nth-child(3n+3) { --rtw-neon: var(--rtw-sun); }
+  .rtw-lista-fila::before { content: "A" counter(tema); font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 16px; color: var(--rtw-neon); width: 28px; flex: 0 0 auto; }
+  .rtw-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .rtw-lista-tema { font-weight: 800; font-size: 17px; line-height: 1.1; }
+  .rtw-lista-quien { font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--rtw-neon); }
+
+  /* ── 08 Regalos: el pliego del sol ─────────────────────────────────── */
+  .rtw-regalos { background: var(--rtw-sun); color: var(--pp-bg); --rtw-vhs: color-mix(in srgb, var(--pp-bg) 10%, transparent); }
+  .rtw-tarjeta--banco { --rtw-neon: var(--pp-acc); position: relative; z-index: 1; background: var(--pp-bg); color: var(--pp-ink); border: 2px solid var(--rtw-neon);
+    box-shadow: 6px 6px 0 var(--rtw-neon); padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .rtw-tarjeta--der { --rtw-neon: var(--rtw-acc3); }
+  .rtw-tarjeta--banco + .rtw-tarjeta--banco { margin-top: 14px; }
+  .rtw-tarjeta-kicker { font-weight: 800; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--rtw-neon); }
+  .rtw-tarjeta-mensaje { margin: 0; font-weight: 600; font-size: 14px; line-height: 1.5; opacity: .85; }
+  .rtw-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .rtw-fila-etq { font-weight: 800; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; opacity: .7; }
+  .rtw-fila-dato { font-weight: 700; font-size: 14px; letter-spacing: .06em; overflow-wrap: anywhere; }
+  .rtw-fila--copiable:first-child { border-bottom: 1px solid var(--rtw-linea); }
+  .rtw-fila--copiable:first-child .rtw-fila-dato { font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 20px; line-height: 1; letter-spacing: .04em; color: var(--rtw-neon); }
+  .rtw-tarjeta--banco .rtw-fila--ultima { border-bottom: 0; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .7; }
+  .rtw-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 2px solid var(--rtw-neon); background: transparent; color: var(--rtw-neon); cursor: pointer;
+    font-weight: 800; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; }
+  .rtw-btn-copiar--hecho { background: var(--rtw-neon); color: var(--pp-bg); }
+
+  /* ── 09 Trivia: el arcade ──────────────────────────────────────────── */
+  .rtw-quiz { background: var(--rtw-sky); }
+  .rtw-quiz .rtw-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .rtw-quiz .rtw-tarjeta-kicker { align-self: flex-start; background: var(--pp-acc); color: var(--pp-bg); font-family: var(--rtw-serif), 'Righteous', cursive;
+    font-size: 15px; letter-spacing: .1em; padding: 6px 14px 4px; text-transform: uppercase; }
+  .rtw-quiz .rtw-tarjeta-pregunta, .rtw-quiz .rtw-tarjeta-titulo { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: clamp(38px, 10.5vw, 90px); line-height: .96; max-width: 14ch; text-shadow: 4px 4px 0 var(--pp-acc); }
+  .rtw-quiz .rtw-tarjeta-mensaje { margin: 0; font-weight: 700; font-size: 15px; }
+  .rtw-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .rtw-opcion { min-height: 54px; border: 2px solid color-mix(in srgb, var(--pp-ink) 35%, transparent); background: var(--pp-bg); color: var(--pp-ink); cursor: pointer; counter-increment: opcion;
+    font-family: var(--rtw-sans), 'Manrope', sans-serif; font-weight: 800; font-size: 16px; text-align: left; padding: 0 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease, border-color 200ms ease; }
+  .rtw-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 15px; letter-spacing: .08em; }
+  .rtw-opcion--bien { background: var(--rtw-acc3); border-color: var(--rtw-acc3); color: var(--pp-bg); }
+  .rtw-opcion--bien::after { content: "WIN"; }
+  .rtw-opcion--mal { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
+  .rtw-opcion--mal::after { content: "MISS"; }
+  @media (min-width: 1024px) {
+    .rtw-quiz .rtw-spread > .rtw-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .rtw-quiz .rtw-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .rtw-quiz .rtw-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .rtw-quiz .rtw-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: el ticket de entrada ──────────────────────────────── */
+  .rtw-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .rtw-pagina--qr { align-items: flex-start; }
+  .rtw-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: var(--pp-ink); padding: 16px; box-sizing: border-box;
+    border: 3px solid var(--rtw-acc3); box-shadow: 8px 8px 0 var(--pp-acc); margin-bottom: 28px; }
+  .rtw-qr .qr-ingreso, .rtw-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .rtw-qr img, .rtw-qr svg, .rtw-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .rtw-qr-etq { position: absolute; left: 0; right: 0; bottom: -24px; text-align: center; font-weight: 800; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--rtw-acc3); }
+  .rtw-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .rtw-pase-numero, .rtw-pase-mesa { display: flex; flex-direction: column; }
+  .rtw-pase-mesa { align-items: flex-end; text-align: right; }
+  .rtw-pase-numero > span:last-child { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: clamp(72px, 22vw, 160px); line-height: .88; text-shadow: 5px 5px 0 var(--pp-acc); }
+  .rtw-pase-mesa > span:last-child { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: clamp(44px, 13vw, 96px); line-height: .9; color: var(--rtw-acc3); }
+  .rtw-caja { display: flex; flex-direction: column; background: var(--rtw-sky); border-left: 4px solid var(--pp-acc); padding: 6px 16px; }
+  .rtw-caja .rtw-linea { font-size: 14px; padding: 10px 0; }
+  .rtw-caja .rtw-linea:last-child { border-bottom: 0; }
+  .rtw-caja .rtw-linea > span:first-child { color: var(--rtw-acc3); }
+  .rtw-caja .rtw-linea > span:last-child { font-weight: 600; line-height: 1.35; }
+  .rtw-info-extra { margin-top: 4px; }
+  .rtw-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .rtw-info-extra #ia-trigger-btn { background: var(--rtw-sky) !important; color: var(--rtw-acc3) !important; border: 2px solid var(--rtw-acc3) !important;
+    border-radius: 0 !important; font-weight: 800 !important; letter-spacing: .22em !important; text-transform: uppercase; }
+  .rtw-raiz .ia-icon-box, .rtw-raiz svg.lucide { display: none !important; }
+  .rtw-pase-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+  .rtw-despedida { font-family: var(--rtw-serif), 'Righteous', cursive; font-style: italic; font-size: clamp(26px, 7vw, 44px); line-height: 1; color: var(--pp-acc); text-shadow: 3px 3px 0 var(--rtw-acc3); }
+  .rtw-replay { cursor: pointer; color: var(--pp-ink); }
+  .rtw-credito { display: inline-flex; opacity: .8; }
+
+  /* ── La tapa: el atardecer ─────────────────────────────────────────── */
+  .rtw-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .rtw-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(16px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom)); }
+  .rtw-escenario { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .rtw-cielo { position: absolute; left: 0; right: 0; top: 0; height: 52%; background: var(--rtw-sky); }
+  .rtw-estrella { position: absolute; border-radius: 50%; background: #FFFFFF; animation: rtwTitila 2s ease-in-out infinite; }
+  @keyframes rtwTitila { 0%, 100% { opacity: .2; transform: scale(.7); } 50% { opacity: 1; transform: scale(1); } }
+  /* El escenario: sol al centro y palmeras en los bordes, apoyados en el
+     horizonte. En el teléfono las palmeras salen del borde; en escritorio
+     abrazan el sol. El motor las mueve con data-depth. */
+  .rtw-horizonte-escena { position: absolute; left: 50%; bottom: 46%; width: min(100%, 1100px); height: 60%; transform: translateX(-50%); }
+  .rtw-sol { position: absolute; left: 50%; bottom: 0; width: min(70vw, 460px); margin-left: calc(min(70vw, 460px) / -2); z-index: 1; }
+  .rtw-palmera { position: absolute; bottom: 0; height: clamp(220px, 60vw, 480px); width: auto; z-index: 2; }
+  .rtw-palmera--izq { left: max(-8%, calc(50% - 560px)); }
+  .rtw-palmera--der { right: max(-8%, calc(50% - 560px)); }
+  .rtw-suelo { position: absolute; left: -20%; right: -20%; top: 52%; height: 60%; perspective: 420px; perspective-origin: 50% 0; z-index: 1; }
+  .rtw-suelo-plano { position: absolute; inset: 0; transform-origin: 50% 0; transform: rotateX(62deg); overflow: hidden; background: var(--rtw-ground); }
+  .rtw-suelo-grilla { position: absolute; left: 0; right: 0; top: -64px; bottom: 0; opacity: .75; animation: rtwGrilla 1.6s linear infinite;
+    background-image: linear-gradient(var(--rtw-acc3) 2px, transparent 2px), linear-gradient(90deg, var(--rtw-acc3) 2px, transparent 2px); background-size: 64px 64px; }
+  @keyframes rtwGrilla { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(0, 64px, 0); } }
+  .rtw-horizonte { position: absolute; left: 0; right: 0; top: 52%; height: 3px; background: var(--rtw-acc3); z-index: 2; }
+  .rtw-scan { position: absolute; left: 0; right: 0; top: 0; height: 24vh; opacity: .8; z-index: 3;
+    background: linear-gradient(180deg, transparent, color-mix(in srgb, var(--rtw-acc3) 6%, transparent), transparent); animation: rtwScan 7s linear infinite; }
+  @keyframes rtwScan { from { transform: translateY(-100%); } to { transform: translateY(100vh); } }
+  .rtw-folio--tapa { z-index: 3; }
+  .rtw-tapa-centro { position: relative; z-index: 3; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; text-align: center; padding-top: 6vh; }
+  .rtw-tapa-kicker { font-weight: 800; font-size: 12px; letter-spacing: .3em; text-transform: uppercase; background: var(--pp-bg); padding: 6px 12px; border: 1px solid var(--pp-acc); }
+  /* El nombre: crema con contorno del fondo y doble sombra dura, magenta y
+     cian (invertidas en el segundo renglón). El más largo manda el cuerpo. */
+  .rtw-tapa-nombres { margin: 0; line-height: .92; letter-spacing: -.01em; display: flex; flex-direction: column; align-items: center;
+    -webkit-text-stroke: 2px var(--pp-bg); paint-order: stroke fill;
+    font-size: min(clamp(52px, 17vw, 160px), 16vh, calc((100vw - 60px) / (var(--largo, 9) * 0.6))); }
+  @media (min-width: 1024px) { .rtw-tapa-nombres { font-size: min(12vw, 200px, 22vh, calc((min(100vw, 1100px) - 60px) / (var(--largo, 9) * 0.6))); } }
+  .rtw-tapa-linea { overflow: hidden; display: block; white-space: nowrap; }
+  .rtw-tapa-linea > span { display: block; }
+  .rtw-tapa-logo { color: var(--pp-ink); text-shadow: 4px 4px 0 var(--pp-acc), 8px 8px 0 var(--rtw-acc3); padding: 0 .08em; }
+  .rtw-tapa-logo--inv { text-shadow: 4px 4px 0 var(--rtw-acc3), 8px 8px 0 var(--pp-acc); }
+  .rtw-tapa-linea--amp { font-size: .5em; line-height: 1.1; }
+  .rtw-tapa-linea--amp > span { color: var(--pp-acc); font-family: var(--rtw-sans), 'Manrope', sans-serif; font-weight: 800; font-style: normal; letter-spacing: .3em; -webkit-text-stroke: 0; }
+  .rtw-letra { display: inline-block; animation: rtwGlitch calc(var(--n, 12) * 3.4s) steps(1) infinite; animation-delay: calc(var(--i, 0) * -3.4s); }
+  @keyframes rtwGlitch { 0%, 99.2% { transform: none; } 99.3% { transform: translateX(-6px) skewX(-12deg); } 99.5% { transform: translateX(6px) skewX(12deg); } 99.7% { transform: translateX(-3px) skewX(-6deg); } 99.9%, 100% { transform: none; } }
+  .rtw-placa { background: color-mix(in srgb, var(--pp-bg) 85%, transparent); padding: 10px 14px; }
+  .rtw-placa--datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; box-sizing: border-box;
+    font-weight: 700; font-size: 13px; line-height: 1.35; text-align: left; border-left: 3px solid var(--pp-acc); }
+  .rtw-placa-der { text-align: right; }
+  .rtw-tapa-pie { position: relative; z-index: 3; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; }
+  .rtw-tapa-mensaje { margin: 0; font-weight: 700; font-size: clamp(15px, 4.2vw, 19px); line-height: 1.35; max-width: 34ch; padding: 8px 14px; }
+  .rtw-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 2px solid var(--pp-acc); background: var(--pp-acc); color: var(--pp-bg); cursor: pointer;
+    font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 18px; letter-spacing: .12em; text-transform: uppercase; padding: 2px 22px 0;
+    display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 4px 4px 0 var(--rtw-acc3);
+    transition: background 200ms ease, border-color 200ms ease, box-shadow 200ms ease; }
+  .rtw-tapa-btn-etq { font-family: var(--rtw-sans), 'Manrope', sans-serif; font-weight: 800; font-size: 11px; letter-spacing: .24em; }
+  @media (hover: hover) { .rtw-tapa-btn:hover { background: var(--rtw-acc3); border-color: var(--rtw-acc3); box-shadow: 4px 4px 0 var(--pp-acc); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .rtw-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--rtw-acc3); border-left: 2px solid var(--rtw-acc3) !important; }
+  .rtw-riel-top { writing-mode: vertical-rl; font-family: var(--rtw-serif), 'Righteous', cursive; font-size: 13px; letter-spacing: .2em; color: var(--rtw-acc3) !important; }
+  .rtw-riel-etiqueta { writing-mode: vertical-rl; font-weight: 800; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--rtw-acc3); }
+  .rtw-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .rtw-riel-barra { position: absolute; left: -2px; top: 0; width: 4px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .rtw-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-weight: 800; font-size: 11px; letter-spacing: .28em; color: var(--rtw-acc3);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: rtwPista 2.4s ease-in-out infinite; }
+  @keyframes rtwPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .rtw-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-bg) 94%, transparent);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .rtw-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--rtw-acc3);
+    background: var(--pp-bg); color: var(--rtw-acc3); font-size: 18px; line-height: 1; cursor: pointer; box-shadow: 3px 3px 0 var(--pp-acc); }
+  .rtw-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 6px solid #FFFFFF; box-shadow: 6px 6px 0 var(--pp-acc); }
 
   @media (prefers-reduced-motion: reduce) {
     .rtw-raiz * { animation: none !important; }
     .rtw-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .rtw-foto { --rtw-punto: 0; }
   }
 `;

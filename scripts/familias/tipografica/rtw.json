@@ -5,9 +5,11 @@
   "titulo": "RETROWAVE",
   "varianteBase": "Miami",
   "resumen": [
-    "1987: Righteous sobre un degradé de atardecer, con la grilla en fuga y",
-    "el sol partido en franjas. Manrope para el texto. Es la más nocturna de",
-    "la sub-colección."
+    "El atardecer de los 80: Righteous siempre en itálica con doble sombra dura",
+    "(magenta y cian), Manrope para el texto, la grilla en fuga que corre,",
+    "líneas de barrido VHS y el sol rayado. La tapa es un escenario: cielo",
+    "con estrellas, sol y palmeras (WebP) sobre el horizonte, y el nombre",
+    "como logo de los 80. Cinta VHS, display digital, walkman y ticket."
   ],
   "serif": {
     "modulo": "Righteous",
@@ -20,16 +22,18 @@
     "modulo": "Manrope",
     "css": "'Manrope', sans-serif",
     "pesos": [
-      "400",
-      "500"
+      "500",
+      "700",
+      "800"
     ]
   },
   "mono": {
     "modulo": "Manrope",
     "css": "'Manrope', sans-serif",
     "pesos": [
-      "400",
-      "500"
+      "500",
+      "700",
+      "800"
     ]
   },
   "paleta": {
@@ -38,13 +42,12 @@
     "ink": "#FFF3E0",
     "ink2": "#FFF3E0",
     "acc": "#FF2D95",
-    "acc2": "#19E3FF"
+    "acc2": "#19E3FF",
+    "sky": "#2A1050",
+    "ground": "#12061F",
+    "acc3": "#19E3FF",
+    "sun": "#FF7A3D"
   },
-  "cssExtra": [
-    "/* Retrowave: la grilla en fuga sobre el horizonte y el neón en el titular. */",
-    ".rtw-tapa-nombres, .rtw-h2, .rtw-fecha-linea { text-shadow: 0 0 24px color-mix(in srgb, var(--pp-acc) 60%, transparent); }",
-    ".rtw-trama { opacity: .2; background-image: linear-gradient(color-mix(in srgb, var(--pp-acc) 45%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--pp-acc) 45%, transparent) 1px, transparent 1px); background-size: 42px 42px; }"
-  ],
   "variantes": {
     "Outrun": {
       "etiqueta": "Outrun",
@@ -53,7 +56,11 @@
       "ink": "#FFF3E0",
       "ink2": "#FFF3E0",
       "acc": "#19E3FF",
-      "acc2": "#FF2D95"
+      "acc2": "#FF2D95",
+      "sky": "#141A55",
+      "ground": "#07071F",
+      "acc3": "#FF2D95",
+      "sun": "#FFB627"
     },
     "Laser": {
       "etiqueta": "Láser",
@@ -62,7 +69,11 @@
       "ink": "#F4FFF7",
       "ink2": "#F4FFF7",
       "acc": "#B6FF3C",
-      "acc2": "#FF2D95"
+      "acc2": "#FF2D95",
+      "sky": "#14301F",
+      "ground": "#07110B",
+      "acc3": "#FF2D95",
+      "sun": "#FF7A3D"
     },
     "Sunset": {
       "etiqueta": "Sunset",
@@ -71,7 +82,11 @@
       "ink": "#FFF3E0",
       "ink2": "#FFF3E0",
       "acc": "#FFB627",
-      "acc2": "#FF5E5B"
+      "acc2": "#FF5E5B",
+      "sky": "#4A1030",
+      "ground": "#1F0714",
+      "acc3": "#FF5E5B",
+      "sun": "#FF2D95"
     },
     "Chrome": {
       "etiqueta": "Cromo",
@@ -80,7 +95,19 @@
       "ink": "#F4F4FF",
       "ink2": "#F4F4FF",
       "acc": "#B455FF",
-      "acc2": "#19E3FF"
+      "acc2": "#19E3FF",
+      "sky": "#1C1C2C",
+      "ground": "#0A0A10",
+      "acc3": "#19E3FF",
+      "sun": "#FF2D95"
     }
-  }
+  },
+  "extras": [
+    "sky",
+    "ground",
+    "acc3",
+    "sun"
+  ],
+  "render": "rtw.jsx",
+  "css": "rtw.css"
 }
