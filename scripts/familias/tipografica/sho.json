@@ -5,8 +5,10 @@
   "titulo": "SHŌJO",
   "varianteBase": "Sakura",
   "resumen": [
-    "El manga romántico: Cherry Bomb One redondeada sobre pasteles, con",
-    "M PLUS Rounded para el texto. Todo tiene brillo y nada tiene esquinas."
+    "Title card de anime: Cherry Bomb One en blanco con trazo de tinta y",
+    "sombra plana doble, M PLUS Rounded 1c para el texto y los acentos en",
+    "japonés. Líneas de velocidad, screentone, destellos que titilan, pétalos",
+    "que caen, globos de pensamiento y el nombre que salta letra por letra."
   ],
   "serif": {
     "modulo": "Cherry_Bomb_One",
@@ -20,7 +22,9 @@
     "css": "'M PLUS Rounded 1c', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "700",
+      "800"
     ]
   },
   "mono": {
@@ -28,7 +32,9 @@
     "css": "'M PLUS Rounded 1c', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "700",
+      "800"
     ]
   },
   "paleta": {
@@ -37,14 +43,10 @@
     "ink": "#3B2A4A",
     "ink2": "#8A7A9C",
     "acc": "#FF6FAE",
-    "acc2": "#B58CFF"
+    "acc2": "#B58CFF",
+    "acc3": "#7FD3FF",
+    "star": "#FFE380"
   },
-  "cssExtra": [
-    "/* Shōjo: nada tiene esquinas y todo tiene un brillo. */",
-    ".sho-tarjeta, .sho-cupon, .sho-btn-solido, .sho-tapa-btn, .sho-opcion, .sho-input, .sho-cta { border-radius: 18px; }",
-    ".sho-tapa-nombres, .sho-h2, .sho-panel-titulo, .sho-fecha-linea { letter-spacing: 0; text-shadow: 0 4px 0 color-mix(in srgb, var(--pp-acc) 40%, transparent); }",
-    ".sho-trama { opacity: .22; background-image: radial-gradient(currentColor 1.2px, transparent 1.4px); background-size: 20px 20px; }"
-  ],
   "variantes": {
     "Lavanda": {
       "etiqueta": "Lavanda",
@@ -53,7 +55,9 @@
       "ink": "#2F2440",
       "ink2": "#857A99",
       "acc": "#B58CFF",
-      "acc2": "#FF6FAE"
+      "acc2": "#FF6FAE",
+      "acc3": "#8DF0D2",
+      "star": "#FFE380"
     },
     "Cielo": {
       "etiqueta": "Cielo",
@@ -62,7 +66,9 @@
       "ink": "#243447",
       "ink2": "#7C8A9C",
       "acc": "#7FD3FF",
-      "acc2": "#FF8FC2"
+      "acc2": "#FF8FC2",
+      "acc3": "#B58CFF",
+      "star": "#FFF0A0"
     },
     "Menta": {
       "etiqueta": "Menta",
@@ -71,7 +77,9 @@
       "ink": "#22403A",
       "ink2": "#7C9A92",
       "acc": "#5FE0B5",
-      "acc2": "#FF8FA3"
+      "acc2": "#FF8FA3",
+      "acc3": "#FFD27A",
+      "star": "#FFF6B0"
     },
     "Durazno": {
       "etiqueta": "Durazno",
@@ -80,7 +88,15 @@
       "ink": "#4A2E2A",
       "ink2": "#9C7F78",
       "acc": "#FF9C7A",
-      "acc2": "#FF6FAE"
+      "acc2": "#FF6FAE",
+      "acc3": "#8DE0FF",
+      "star": "#FFE380"
     }
-  }
+  },
+  "extras": [
+    "acc3",
+    "star"
+  ],
+  "render": "sho.jsx",
+  "css": "sho.css"
 }

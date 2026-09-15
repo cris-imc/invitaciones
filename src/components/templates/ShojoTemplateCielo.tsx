@@ -9,19 +9,19 @@
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
  * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
- * Editorial Blanc & Noir y se vuelve a derivar; lo propio de esta familia
- * está en scripts/familias/tipografica/sho.json.
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/sho.jsx, los
+ * estilos en scripts/css/tipografica/sho.css y las caras y la paleta en
+ * scripts/familias/tipografica/sho.json.
  *
- * PROVISORIO: todavía usa el render de Editorial. Falta portar el suyo
- * desde el mockup.
- *
- * El manga romántico: Cherry Bomb One redondeada sobre pasteles, con
- * M PLUS Rounded para el texto. Todo tiene brillo y nada tiene esquinas.
+ * Title card de anime: Cherry Bomb One en blanco con trazo de tinta y
+ * sombra plana doble, M PLUS Rounded 1c para el texto y los acentos en
+ * japonés. Líneas de velocidad, screentone, destellos que titilan, pétalos
+ * que caen, globos de pensamiento y el nombre que salta letra por letra.
  *
  * Sin imágenes propias: son fuentes y CSS.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Cherry_Bomb_One, M_PLUS_Rounded_1c } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -45,7 +45,7 @@ const shoSerif = Cherry_Bomb_One({
 });
 const shoSans = M_PLUS_Rounded_1c({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "700", "800"],
   display: "swap",
   variable: "--sho-sans",
 });
@@ -71,6 +71,8 @@ const PALETA = {
   hill3: "#243447",
   night: "#243447",
   nightInk: "#E3F3FF",
+  acc3: "#B58CFF",
+  star: "#FFF0A0",
 };
 
 /**
@@ -733,6 +735,8 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-acc3": PALETA.acc3,
+    "--pp-star": PALETA.star,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -762,6 +766,42 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre como título de opening: dos renglones, el segundo sangrado.
+  // Con una sola persona el nombre se parte en dos (Valen / tina, como en el
+  // mockup); con dos, uno por renglón y el cuerpo baja a .7em si son largos.
+  const partirNombre = (n: string): [string, string] => {
+    const limpio = n.trim();
+    const partes = limpio.split(/\s+/);
+    if (partes.length > 1) return [partes[0], partes.slice(1).join(" ")];
+    const corte = Math.ceil(limpio.length / 2);
+    return [limpio.slice(0, corte), limpio.slice(corte)];
+  };
+  const renglones: [string, string] = saludaAlInvitado ? partirNombre(nombreInvitado) : nombre2 ? [nombre1, nombre2] : partirNombre(nombre1);
+  const renglonMasLargo = Math.max(4, ...renglones.map((n) => n.length));
+  const nombreLargo = Boolean(nombre2) && renglonMasLargo > 7;
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // La frase: una palabra del medio en el acento y el cierre sobre la
+  // estrella amarilla.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.8)) return "sho-resalte";
+    if (i === Math.min(desdeAcento, n - 1) || i === Math.floor(n * 0.3)) return "sho-acento";
+    return undefined;
+  };
+
+  const esXV = invitation.tipo === "QUINCE_ANOS";
+  const esBoda = invitation.tipo === "CASAMIENTO";
+  const kickerDelEvento = tx(esBoda ? "invitacion.evento.nosCasamos" : esXV ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const subtituloJp = tx(esXV ? "invitacion.saveTheDate.jpQuince" : esBoda ? "invitacion.saveTheDate.jpBoda" : "invitacion.saveTheDate.jpFiesta");
+  const numeroDeEpisodio = esXV ? "15" : "01";
+  const emblema = esXV ? "✦ 15 ✦" : nombre2 ? "✦ & ✦" : "✦ ✦ ✦";
+  const firma = esXV ? nombre1.trim().split(/\s+/)[0] : iniciales(nombre1, nombre2);
+  // Los nueve destellos de la tapa y del pase: posición, tamaño, color y
+  // ritmo, como en el mockup.
+  const DESTELLOS = [[6, 14, 26], [86, 10, 34], [70, 26, 18], [14, 44, 22], [92, 52, 20], [30, 62, 16], [80, 74, 30], [10, 84, 20], [56, 90, 18]];
+  const PETALOS = [8, 22, 38, 55, 68, 82, 94];
+
   return (
     <div
       ref={raizRef}
@@ -773,32 +813,31 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
 
       <div ref={scrollerRef} className="sho-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
+            "Próximo episodio": sobre la tinta, la fecha en Cherry Bomb a
+            tres colores, y la foto con marco blanco y el sticker つづく. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="sho-section sho-std">
-          <div className="sho-trama sho-trama--media" aria-hidden="true" />
+          <span className="sho-lineas sho-lineas--std" aria-hidden="true" />
+          <div className="sho-folio sho-folio--celeste">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.proximoEpisodio")}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="sho-spread">
             <div className="sho-pagina">
-              <div className="sho-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
               <div className="sho-fecha">
-                <span data-xin="1" data-dist="-160" className="sho-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="sho-fecha-linea sho-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="sho-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="sho-fecha-linea sho-fecha-linea--dia">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="sho-fecha-linea sho-fecha-linea--mes">{mesLargo}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="sho-fecha-linea sho-fecha-linea--anio">{anio}</span>
               </div>
               <div data-xin="1" data-delay="360" className="sho-fecha-pie">
-                <span>{diaSemana} · {hora} H</span>
+                <span>{diaSemana} · {hora} h · {tx("invitacion.saveTheDate.guardaLaFecha")}</span>
                 <AddToCalendarLink
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="sho-link"
+                  className="sho-pildora sho-pildora--blanca"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.agregarAlCalendario")} ↗
                 </AddToCalendarLink>
               </div>
             </div>
@@ -807,47 +846,51 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="sho-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only sho-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="59,42,74" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only sho-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="59,42,74" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --sho-punto. */}
                 <span className="sho-foto-revelado" aria-hidden="true" />
-                <span className="sho-foto-anio">{anio}</span>
-                <span className="sho-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="sho-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="sho-sticker sho-sticker--tsuzuku">{tx("invitacion.saveTheDate.tsuzuku")}</span>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="sho-section sho-countdown">
-          <div className="sho-folio">
-            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            Secuencia de transformación: cuatro viñetas blancas con líneas
+            de velocidad entre dos marquesinas inclinadas. */}
+        <section data-tone="light" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="sho-section sho-countdown">
+          <div className="sho-folio sho-folio--suave">
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.saveTheDate.transformacionEn")}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
-          <div className="sho-marquesina" aria-hidden="true">
+          <div className="sho-marquesina sho-marquesina--acento" aria-hidden="true">
             <div className="sho-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.cuentaRegresiva.dias")} ✦ {tx("invitacion.cuentaRegresiva.horas")} ✦ {tx("invitacion.cuentaRegresiva.minutos")} ✦ {tx("invitacion.cuentaRegresiva.segundos")} ✦ {diaNum} {tx("invitacion.evento.de")} {mesLargo} ✦ カウントダウン ✦&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaShojo targetDate={fechaHora} />
-          <div className="sho-marquesina sho-marquesina--contraria" aria-hidden="true">
+          <div className="sho-spread">
+            <div className="sho-pagina sho-pagina--entera">
+              <CuentaShojo targetDate={fechaHora} />
+            </div>
+          </div>
+          <div className="sho-marquesina sho-marquesina--celeste sho-marquesina--contraria" aria-hidden="true">
             <div className="sho-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -855,38 +898,44 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            Monólogo interior: la frase dentro de un globo de pensamiento y
+            el cartel キラキラ flotando al costado. */}
         {hayFrase && (
-          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="sho-section sho-frase-seccion">
-            <div className="sho-folio">
-              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+          <section data-tone="light" data-screen-label={tx("invitacion.frase.etiqueta")} className="sho-section sho-frase-seccion">
+            <span className="sho-trama sho-trama--frase" aria-hidden="true" />
+            <div className="sho-folio sho-folio--suave">
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.saveTheDate.monologoInterior")}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
             <div className="sho-spread">
-              <h2 ref={fraseRef} className="sho-frase">
-                {palabras.map((p, i) => (
-                  // El espacio va fuera del span: el motor pone cada palabra
-                  // en inline-block y un espacio adentro se colapsa a cero.
-                  <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "sho-acento" : undefined}>{p}</span>{" "}
-                  </span>
-                ))}
-              </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="sho-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div className="sho-pensamiento">
+                <h2 ref={fraseRef} className="sho-frase">
+                  {palabras.map((p, i) => (
+                    // El espacio va fuera del span: el motor pone cada palabra
+                    // en inline-block y un espacio adentro se colapsa a cero.
+                    <span key={i}>
+                      <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
+                    </span>
+                  ))}
+                </h2>
+                <span className="sho-burbujita sho-burbujita--grande" aria-hidden="true" /><span className="sho-burbujita sho-burbujita--chica" aria-hidden="true" />
+              </div>
+              <div data-xin="1" data-delay="900" data-dist="60" className="sho-kirakira">
+                <span className="sho-kirakira-titulo">{tx("invitacion.saveTheDate.kirakira")}</span>
+                <span className="sho-kirakira-texto">{tx("invitacion.frase.conAmor")} · {titulo}</span>
               </div>
             </div>
-            <div className="sho-folio sho-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+            <div className="sho-folio sho-folio--suave sho-folio--pie">
+              <span>{titulo} · {tx("invitacion.saveTheDate.epAbrev")} {numeroDeEpisodio}</span>
+              <span className="sho-barra" aria-hidden="true" />
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Viñetas de manga: el escenario sobre lila, la escena 1 sobre
+            tinta y el guion sobre rosa, con el título blanco con trazo y
+            la ficha blanca. */}
         <div
           id="details"
           data-pan="1"
@@ -897,64 +946,68 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         >
           <div className="sho-pan-fijo">
             <div data-strip="1" className="sho-tira">
-              <div data-tone={TONO} className="sho-panel">
+              <div data-tone="light" className="sho-panel sho-panel--escenario">
+                <span className="sho-lineas sho-lineas--panel" aria-hidden="true" />
                 <div className="sho-folio">
-                  <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
+                  <span>{nCuando} — {tx("invitacion.saveTheDate.escenario")}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="sho-spread">
-                  <h2 className="sho-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="sho-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="sho-lineas">
-                    <div className="sho-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
+                  <div className="sho-pagina sho-pagina--titulo">
+                    <span className="sho-panel-sub">{tx("invitacion.ubicacion.elSalon")}</span>
+                    <h2 className="sho-panel-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
+                  </div>
+                  <div className="sho-ficha">
+                    <div className="sho-linea"><span>{tx("invitacion.ubicacion.recepcion")}</span><span>{hora} h</span></div>
                     {direccion && <div className="sho-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="sho-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="sho-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="sho-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar")}<span>→</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="sho-folio sho-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza")} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="sho-panel">
+                <div id="ceremonia" data-tone="dark" className="sho-panel sho-panel--escena">
+                  <span className="sho-lineas sho-lineas--panel" aria-hidden="true" />
                   <div className="sho-folio">
-                    <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
+                    <span>{nCuando} — {tx("invitacion.saveTheDate.escena")} 1</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="sho-spread">
-                    <h2 className="sho-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="sho-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="sho-lineas">
+                    <div className="sho-pagina sho-pagina--titulo">
+                      <span className="sho-panel-sub">{ceremoniaTitulo}</span>
+                      <h2 className="sho-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="sho-ficha">
                       {ceremoniaHora && <div className="sho-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="sho-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="sho-folio sho-folio--pie">
-                    <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <span>{tx("invitacion.ubicacion.ceremoniaCivil")}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza")} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="sho-panel">
+                <div id="location" data-tone="light" className="sho-panel sho-panel--mapa">
+                  <span className="sho-lineas sho-lineas--panel" aria-hidden="true" />
                   <div className="sho-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
+                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar")}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="sho-spread">
-                    <h2 className="sho-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="sho-lineas">
+                    <div className="sho-pagina sho-pagina--titulo">
+                      <span className="sho-panel-sub">{tx("invitacion.ubicacion.tuUbicacion")}</span>
+                      <h2 className="sho-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="sho-ficha">
                       {embedMapUrl && (
                         <div className="sho-mapa">
                           <iframe
@@ -969,28 +1022,29 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="sho-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="sho-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas")}<span>→</span>
                       </a>
                     </div>
                   </div>
                   <div className="sho-folio sho-folio--pie">
-                    <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <span>{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza")} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="sho-panel sho-panel--acento">
+                <div id="schedule" data-tone="light" className="sho-panel sho-panel--guion">
+                  <span className="sho-lineas sho-lineas--panel" aria-hidden="true" />
                   <div className="sho-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
+                    <span>{nCuando} — {tx("invitacion.saveTheDate.guion")}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="sho-spread">
-                    <h2 className="sho-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="sho-acento sho-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="sho-lineas">
+                    <div className="sho-pagina sho-pagina--titulo">
+                      <span className="sho-panel-sub">{tx("invitacion.ubicacion.cronograma")}</span>
+                      <h2 className="sho-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="sho-ficha">
                       {cronograma.map((item, i) => (
                         <div key={i} className="sho-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -1007,22 +1061,24 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            Ficha de personaje: pliego celeste con líneas de velocidad, la
+            tarjeta blanca con sombra de tinta y el sello "¡Sí!" de
+            estrella al confirmar. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="sho-section sho-checkin">
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="sho-section sho-checkin">
+            <span className="sho-lineas sho-lineas--checkin" aria-hidden="true" />
             <div className="sho-folio">
-              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+              <span data-xin="1" data-dist="-40">{nCheckin} — {tx("invitacion.saveTheDate.fichaDePersonaje")}</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="sho-spread">
               <div className="sho-pagina">
                 <h2 data-xin="1" data-dist="-80" className="sho-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="sho-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                  {tx("invitacion.saveTheDate.teSumas")}<br />{tx("invitacion.saveTheDate.alElenco")}
                 </h2>
+                <p data-xin="1" data-delay="120" className="sho-parrafo sho-parrafo--tinta">{tx("invitacion.rsvp.kicker")}.</p>
               </div>
-              <div className="sho-cupon">
-                <span className="sho-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="sho-cupon">
                 <CheckinShojo
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1056,8 +1112,8 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            Fotogramas: la hoja de contactos con marcos de tinta, esquinas
+            redondas, sombra plana y apenas torcidos. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1067,24 +1123,21 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
             className="sho-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="sho-pan-fijo">
+            <div className="sho-pan-fijo sho-pan-fijo--album">
               <div data-strip="1" className="sho-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="sho-panel sho-panel--album">
-                    <div className="sho-folio">
-                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                  <div key={iHoja} data-tone="light" className={`sho-panel sho-panel--album${iHoja % 2 === 1 ? " sho-panel--album-b" : ""}`}>
+                    <div className="sho-folio sho-folio--gris">
+                      <span>{nAlbum} — {tx("invitacion.saveTheDate.galeria")}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") })} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="sho-h2 sho-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="sho-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="sho-contactos" data-cantidad={hoja.length}>
+                    <h2 className="sho-h2 sho-h2--album">{tx("invitacion.saveTheDate.fotogramas")}</h2>
+                    <div className="sho-hoja" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="sho-contacto"
+                          data-sheet="1"
+                          className="sho-foto-hoja"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1092,15 +1145,15 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="sho-contacto-img" />
-                          <span className="sho-contacto-tinta" aria-hidden="true" />
-                          <span className="sho-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="sho-foto-hoja-img" />
+                          <span data-colorwash="1" className={`sho-bano sho-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                          <span className="sho-foto-hoja-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="sho-folio sho-folio--pie">
-                      <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <div className="sho-folio sho-folio--gris sho-folio--pie">
+                      <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length })}</span>
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza")} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1111,20 +1164,23 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            Opening / ending: pliego lila con trama blanca abajo, el
+            ecualizador y la lista en fichas blancas. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="sho-section sho-musica">
+            <span className="sho-trama sho-trama--musica" aria-hidden="true" />
             <div className="sho-folio">
-              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.saveTheDate.opening")}</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="sho-spread">
               <div className="sho-pagina">
-                <h2 data-xin="1" data-dist="-80" className="sho-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "sho-acento")}
+                <h2 data-xin="1" data-dist="-80" className="sho-h2 sho-h2--sombra-tinta">
+                  {tituloEnDosLineas(tx("invitacion.saveTheDate.cualEsTuOpening"), "sho-h2-sub")}
                 </h2>
+                <p data-xin="1" data-delay="100" className="sho-parrafo sho-parrafo--tinta">{tx("invitacion.musica.dejanosElTema")}</p>
                 <div data-xin="1" data-delay="120" className="sho-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4].map((i) => <span key={i} style={{ animationDelay: `${i * 0.18}s` }} />)}
                 </div>
               </div>
               <div className="sho-pagina">
@@ -1139,17 +1195,17 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Ítems: sobre rosa, fichas blancas con sombra de color. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="sho-section sho-regalos">
-            <div className="sho-folio">
-              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="sho-section sho-regalos">
+            <div className="sho-folio sho-folio--suave">
+              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.saveTheDate.items")}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
             </div>
             <div className="sho-spread">
               <div className="sho-pagina">
-                <h2 data-xin="1" data-dist="-80" className="sho-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="sho-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                <h2 data-xin="1" data-dist="-80" className="sho-h2 sho-h2--sombra-lila">
+                  {tx("invitacion.saveTheDate.tuRegalo")}<br />{tx("invitacion.saveTheDate.esVenir")}
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="sho-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1163,7 +1219,7 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1174,7 +1230,8 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1183,144 +1240,161 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            Trivia de fans: sobre la estrella amarilla con líneas de
+            velocidad desde abajo, chip de tinta y opciones con sombra. */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="sho-section sho-quiz">
+          <section id="quiz" data-tone="light" data-screen-label={triviaTitulo} className="sho-section sho-quiz">
+            <span className="sho-lineas sho-lineas--quiz" aria-hidden="true" />
             <div className="sho-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.saveTheDate.triviaDeFans")}</span>
               <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
             </div>
             <div className="sho-spread">
-              <div className="sho-pagina">
-                <h2 data-xin="1" data-dist="-80" className="sho-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="sho-pagina">
-                <TriviaShojo
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaShojo
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            El ticket del festival: sobre tinta con destellos, el QR con
+            marco rosa, el pase gigante, la mesa en amarillo y el "fin del
+            episodio". */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="sho-section sho-pase">
-          <div className="sho-folio">
-            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+          <div className="sho-destellos" aria-hidden="true">
+            {DESTELLOS.map(([x, y, s], i) => (
+              <svg key={i} viewBox="0 0 40 40" className={`sho-destello sho-destello--${i % 4}`} style={{ left: `${x}%`, top: `${y}%`, width: s, height: s, animationDuration: `${(1.8 + (i % 4) * 0.45).toFixed(2)}s`, animationDelay: `${(i * 0.37).toFixed(2)}s` }}><path d="M20 2 C22 14 26 18 38 20 C26 22 22 26 20 38 C18 26 14 22 2 20 C14 18 18 14 20 2 Z" fill="currentColor" /></svg>
+            ))}
+          </div>
+          <div className="sho-folio sho-folio--celeste">
+            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase")}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="sho-spread">
             <div data-xin="1" data-dist="-60" className="sho-pagina sho-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="sho-qr">
+                <QrDeIngreso guest={guest as never} />
+                <span className="sho-qr-etq">{tx("invitacion.pase.tuPase")}</span>
+              </div>
             </div>
             <div className="sho-pagina">
               <div data-xin="1" data-delay="100" className="sho-pase-cabeza">
                 <div className="sho-pase-numero">
-                  <span className="sho-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
+                  <span className="sho-folio-etq">{tx("invitacion.pase.pase")} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="sho-pase-mesa">
+                    <span className="sho-folio-etq">{tx("invitacion.pase.tuMesa")}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="sho-lineas">
-                <div className="sho-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="sho-caja">
+                <div className="sho-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="sho-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="sho-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="sho-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="sho-linea"><span>{tx("invitacion.pase.sector")} · {tx("invitacion.pase.tuMesa")}</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="sho-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="sho-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} h</span></div>
               </div>
               <div className="sho-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="sho-folio sho-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="sho-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="sho-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="sho-pase-pie">
+            <span className="sho-despedida">{tx("invitacion.saveTheDate.finDelEpisodio")} — {firma}</span>
+            <div className="sho-folio sho-folio--celeste sho-folio--colofon">
+              <span className="sho-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.acc3} /></span>
+              <span className="sho-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.saveTheDate.volverAlOpening")} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="sho-riel">
-        <span ref={rielTopRef} className="sho-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="sho-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="sho-riel-linea">
           <span ref={rielBarraRef} className="sho-riel-barra" />
         </div>
-        <span ref={rielEtiquetaRef} className="sho-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+        <span ref={rielEtiquetaRef} className="sho-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha")}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          Title card del episodio: líneas de velocidad lilas, screentone
+          rosa abajo, destellos y pétalos cayendo. El nombre en Cherry
+          Bomb blanco con trazo y doble sombra, el emblema entre barras,
+          el globo del mensaje y el botón "▶". Es la bienvenida: dice de
+          quién es la fiesta, cuándo, dónde y para cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="sho-portada">
         <div ref={escenaPortadaRef} className="sho-portada-hoja">
-          <div className="sho-trama sho-trama--tapa" aria-hidden="true" />
+          <span className="sho-lineas sho-lineas--tapa" aria-hidden="true" />
+          <span className="sho-trama sho-trama--tapa" aria-hidden="true" />
+          <div className="sho-destellos" data-drift="24" aria-hidden="true">
+            {DESTELLOS.map(([x, y, s], i) => (
+              <svg key={i} viewBox="0 0 40 40" className={`sho-destello sho-destello--${i % 4}`} style={{ left: `${x}%`, top: `${y}%`, width: s, height: s, animationDuration: `${(1.8 + (i % 4) * 0.45).toFixed(2)}s`, animationDelay: `${(i * 0.37).toFixed(2)}s` }}><path d="M20 2 C22 14 26 18 38 20 C26 22 22 26 20 38 C18 26 14 22 2 20 C14 18 18 14 20 2 Z" fill="currentColor" /></svg>
+            ))}
+            {PETALOS.map((x, i) => (
+              <svg key={`p${i}`} viewBox="0 0 24 24" className="sho-petalo" style={{ left: `${x}%`, animationDuration: `${9 + (i % 3) * 2.5}s`, animationDelay: `${i * 1.7}s` }}><path d="M12 2 C18 6 20 12 12 22 C4 12 6 6 12 2 Z" fill="currentColor" opacity=".7" /></svg>
+            ))}
+          </div>
 
-          <div data-cl="1" className="sho-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
-            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
+          <div data-cl="1" className="sho-tapa-cabecera">
+            <div className="sho-tapa-episodio">
+              <span className="sho-chip">{tx("invitacion.saveTheDate.episodio")} {numeroDeEpisodio}</span>
+              <span className="sho-tapa-jp">{subtituloJp}</span>
+            </div>
+            <span className="sho-tapa-numero">Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="sho-tapa-centro">
-            <div className="sho-tapa-fila">
-              <span className="sho-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="sho-tapa-nombres">
-              {saludaAlInvitado ? (
-                <span className="sho-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
-              ) : (
-                <>
-                  <span className="sho-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
-                  {nombre2 && (
-                    <span className="sho-tapa-linea sho-tapa-linea--sangra">
-                      <span data-pieza="1"><span className="sho-acento">&amp;</span>{nombre2}</span>
-                    </span>
-                  )}
-                </>
+            <span className="sho-tapa-kicker">{diaSemana} {diaNum} · {mesLargo} · {anio}</span>
+            <h1 ref={cartelRef} className={`sho-tapa-nombres${nombreLargo ? " sho-tapa-nombres--largo" : ""}`} style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
+              <span className="sho-tapa-linea"><span data-pieza="1"><Letras texto={renglones[0]} desde={0} /></span></span>
+              {renglones[1] && (
+                <span className="sho-tapa-linea sho-tapa-linea--sangra"><span data-pieza="1"><Letras texto={renglones[1]} desde={renglones[0].replace(/\s/g, "").length} /></span></span>
               )}
             </h1>
-            <div className="sho-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="sho-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <div className="sho-emblema" aria-hidden="true">
+              <span className="sho-emblema-barra" /><span className="sho-emblema-texto">{emblema}</span><span className="sho-emblema-barra" />
+            </div>
+            <div className="sho-tapa-datos">
+              <span>{lugarNombre || kickerDelEvento}<br /><span className="sho-suave">{[direccion, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="sho-tapa-datos-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br /><span className="sho-suave">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{hora} h<br /><span className="sho-suave">{fechaPuntos}</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="sho-tapa-pie">
-            <span className="sho-regla" aria-hidden="true" />
-            <p className="sho-tapa-mensaje">
-              {saludaAlInvitado
-                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
-                : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
-            </p>
+            <div className="sho-globo">
+              <p className="sho-tapa-mensaje">
+                {saludaAlInvitado
+                  ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}, ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
+                  : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
+              </p>
+              <svg viewBox="0 0 40 40" className="sho-globo-estrella" aria-hidden="true"><path d="M20 2 C22 14 26 18 38 20 C26 22 22 26 20 38 C18 26 14 22 2 20 C14 18 18 14 20 2 Z" /></svg>
+            </div>
             <button type="button" onClick={abrir} className="sho-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              <span>{tx("invitacion.portada.abrirInvitacion")}</span><span>▶</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div ref={pistaRef} className="sho-pista">{tx("invitacion.portada.desliza").toUpperCase()} ↓</div>
+      <div ref={pistaRef} className="sho-pista">{tx("invitacion.portada.desliza")} ↓</div>
 
       {fotoAmpliada && (
         <div className="sho-lupa" onClick={() => setFotoAmpliada(null)} onContextMenu={(e) => e.preventDefault()}>
@@ -1349,30 +1423,25 @@ export function ShojoTemplateCielo({ invitation, guest, isPersonalized = false }
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El nombre letra por letra: cada tanto una sube 16 px y crece un poco,
+ * y vuelve rebotando ("sparkle bounce"). El CSS escalona el turno de cada
+ * letra.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
-  const id = useId().replace(/:/g, "");
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
   return (
-    <div className="sho-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="sho-sello-amp">&amp;</span>}
-    </div>
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="sho-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
   );
 }
 
@@ -1920,13 +1989,15 @@ function TriviaShojo({ preguntas, invitationId, guestToken, guestName }: { pregu
 // leen la Bienvenida y el Post-evento compartidos (esperan `sho-section` y
 // `sho-kicker`).
 const CSS_SHO = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Shōjo ────────────────────────────────────────────────────────────
+     Title card de anime: Cherry Bomb One en blanco con trazo de tinta y
+     sombra plana doble (rosa y lila), M PLUS Rounded para el texto y los
+     acentos en japonés. Líneas de velocidad, screentone, destellos que
+     titilan, pétalos que caen, globos con cola de burbujas, bordes de
+     tinta de 3 px con sombra sin blur. Todo CSS. */
   .sho-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif;
+    --sho-acc3: ${PALETA.acc3}; --sho-star: ${PALETA.star}; --sho-blanco: #FFFFFF; }
   .sho-raiz a { color: inherit; text-decoration: none; }
   .sho-raiz button { font: inherit; }
 
@@ -1934,298 +2005,400 @@ const CSS_SHO = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .sho-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .sho-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .sho-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .sho-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
+  /* Las líneas de velocidad: un abanico cónico desde un punto. */
+  .sho-lineas { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+  .sho-lineas--tapa { background: repeating-conic-gradient(from 0deg at 62% 42%, var(--pp-acc2) 0deg 3deg, transparent 3deg 12deg); opacity: .18;
+    -webkit-mask-image: radial-gradient(circle at 62% 42%, transparent 18%, #000 60%); mask-image: radial-gradient(circle at 62% 42%, transparent 18%, #000 60%); }
+  .sho-lineas--std { background: repeating-conic-gradient(from 0deg at 20% 30%, #FFFFFF 0deg 2deg, transparent 2deg 14deg); opacity: .08; }
+  .sho-lineas--panel { background: repeating-conic-gradient(from 0deg at 80% 20%, currentColor 0deg 2deg, transparent 2deg 14deg); opacity: .07; }
+  .sho-lineas--checkin { background: repeating-conic-gradient(from 0deg at 90% 10%, #FFFFFF 0deg 2deg, transparent 2deg 12deg); opacity: .35; }
+  .sho-lineas--quiz { background: repeating-conic-gradient(from 0deg at 50% 110%, #FFFFFF 0deg 3deg, transparent 3deg 12deg); opacity: .5; }
+  /* El screentone: puntitos del acento. */
+  .sho-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(var(--pp-acc) 1.4px, transparent 1.6px); background-size: 9px 9px; }
+  .sho-trama--tapa { opacity: .35; -webkit-mask-image: linear-gradient(180deg, transparent 35%, #000 100%); mask-image: linear-gradient(180deg, transparent 35%, #000 100%); }
+  .sho-trama--frase { opacity: .4; }
+  .sho-trama--musica { opacity: .25; background-image: radial-gradient(#FFFFFF 2.4px, transparent 2.6px); background-size: 12px 12px;
+    -webkit-mask-image: linear-gradient(0deg, #000, transparent 55%); mask-image: linear-gradient(0deg, #000, transparent 55%); }
+  /* Los destellos y los pétalos. */
+  .sho-destellos { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .sho-destello { position: absolute; animation: shoTitila 2.4s ease-in-out infinite; }
+  .sho-destello--0 { color: var(--sho-star); } .sho-destello--1 { color: #FFFFFF; } .sho-destello--2 { color: var(--pp-acc); } .sho-destello--3 { color: var(--sho-acc3); }
+  @keyframes shoTitila { 0%, 100% { opacity: .2; transform: scale(.6) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(20deg); } }
+  .sho-petalo { position: absolute; top: 0; width: 18px; height: 18px; color: var(--pp-acc); animation: shoPetalo 11s linear infinite; }
+  @keyframes shoPetalo { 0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate3d(-12vw, 110vh, 0) rotate(300deg); opacity: 0; } }
 
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .sho-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .sho-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .sho-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 22px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: M PLUS 800 con tracking. */
   .sho-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .sho-folio--pie { align-items: center; margin-top: auto; }
-  .sho-folio-etq { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+    font-weight: 800; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .sho-folio--suave { color: var(--pp-ink2); }
+  .sho-folio--gris { color: #8A7A9C; }
+  .sho-folio--celeste { color: var(--sho-acc3); }
+  .sho-folio--pie { align-items: center; margin-top: auto; letter-spacing: .2em; }
+  .sho-panel > .sho-folio { opacity: .8; }
+  .sho-folio--colofon { align-items: center; border-top: 2px dotted var(--sho-acc3); padding-top: 12px; }
+  .sho-folio-etq { font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; display: block; color: var(--sho-acc3); }
+  .sho-barra { width: 40%; height: 3px; background: var(--pp-ink); border-radius: 2px; }
+  .sho-suave { color: var(--pp-ink2); }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .sho-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .sho-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .sho-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .sho-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .sho-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .sho-pagina { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .sho-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .sho-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .sho-spread > *:first-child { justify-self: end; }
+    .sho-spread > *:last-child { justify-self: start; }
+    .sho-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .sho-h2, .sho-panel-titulo, .sho-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--sho-serif), 'Cherry Bomb One', cursive;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .sho-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .sho-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .sho-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .sho-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .sho-acento { font-style: italic; color: var(--pp-acc); }
-  .sho-acento--tinta { color: var(--pp-ink); }
-  .sho-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .sho-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .sho-regla { display: block; height: 2px; background: currentColor; }
+  .sho-h2, .sho-panel-titulo, .sho-frase, .sho-fecha-linea, .sho-tapa-nombres { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-weight: 400; }
+  /* El título de opening: relleno blanco, trazo de tinta y sombra plana. */
+  .sho-h2, .sho-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .9; font-size: clamp(52px, 15vw, 130px);
+    color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--pp-acc); }
+  .sho-h2--album { font-size: clamp(44px, 12vw, 100px); text-shadow: 4px 5px 0 var(--pp-acc); }
+  .sho-h2--sombra-tinta { text-shadow: 5px 6px 0 var(--pp-ink); }
+  .sho-h2--sombra-lila { text-shadow: 5px 6px 0 var(--pp-acc2); }
+  .sho-panel-titulo { font-size: clamp(52px, 16vw, 140px); text-shadow: 5px 6px 0 var(--sho-panel-acc, var(--pp-acc)); -webkit-text-stroke: 2px var(--sho-panel-trazo, var(--pp-ink)); }
+  .sho-panel-sub { font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--sho-panel-acc, var(--pp-acc)); }
+  .sho-pagina--titulo { gap: 6px; }
+  .sho-parrafo { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; color: var(--pp-ink2); max-width: 40ch; }
+  .sho-parrafo--tinta { color: var(--pp-ink); }
+  .sho-acento { color: var(--pp-acc); }
+  .sho-resalte { background: var(--sho-star); border-radius: 8px; padding: 0 .14em; }
+  /* Píldoras, chips y stickers: borde de tinta y sombra plana. */
+  .sho-pildora { display: inline-flex; align-items: center; gap: 8px; border: 3px solid var(--pp-acc); border-radius: 999px; padding: 10px 18px;
+    font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+  .sho-pildora--blanca { background: #FFFFFF; color: var(--pp-ink); }
+  .sho-chip { background: var(--pp-ink); color: #FFFFFF; font-weight: 800; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; padding: 6px 12px; border-radius: 6px 6px 6px 0; align-self: flex-start; }
+  .sho-sticker { display: inline-block; background: var(--sho-star); color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 999px; padding: 6px 16px 4px;
+    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 24px; box-shadow: 3px 3px 0 var(--pp-ink); white-space: nowrap; }
+  .sho-cta { margin-top: 4px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; border: 3px solid var(--pp-ink); border-radius: 999px; padding: 0 18px;
+    color: var(--pp-ink); background: var(--sho-panel-acc, var(--pp-acc)); font-weight: 800; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .sho-std { justify-content: center; }
-  .sho-fecha { display: flex; flex-direction: column; font-family: var(--sho-serif), 'Cherry Bomb One', cursive;
-    line-height: .82; letter-spacing: -.04em; }
-  .sho-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .sho-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .sho-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .sho-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
-  .sho-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
-  .sho-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background-image: radial-gradient(var(--pp-ink) calc(var(--sho-punto, 7.2) * 1px), transparent calc(var(--sho-punto, 7.2) * 1px + .6px));
+  /* ── 01 Guardá la fecha: próximo episodio ──────────────────────────── */
+  .sho-std { background: var(--pp-ink); color: #FFFFFF; }
+  .sho-fecha { display: flex; flex-direction: column; line-height: .88; }
+  .sho-fecha-linea { font-size: clamp(64px, 20vw, 170px); }
+  .sho-fecha-linea--dia { font-size: clamp(96px, 32vw, 240px); color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-acc); paint-order: stroke fill; text-shadow: 6px 6px 0 var(--pp-acc); }
+  .sho-fecha-linea--mes { text-align: right; color: var(--sho-acc3); }
+  .sho-fecha-linea--anio { color: var(--sho-star); }
+  .sho-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; font-weight: 800; font-size: 13px; letter-spacing: .12em; text-transform: uppercase; }
+  /* La foto: marco blanco, sombra rosa y apenas torcida. */
+  .sho-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 4px solid #FFFFFF; border-radius: 18px; box-sizing: border-box; overflow: visible;
+    box-shadow: 8px 8px 0 var(--pp-acc); transform: rotate(-2deg); background: repeating-linear-gradient(135deg, #5A4470 0 8px, #4A3660 8px 16px); }
+  .sho-foto-capa { position: absolute; inset: 0; overflow: hidden; border-radius: 14px; }
+  .sho-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none; border-radius: 14px;
+    background-image: radial-gradient(var(--pp-acc) calc(var(--sho-punto, 7.2) * 1px), transparent calc(var(--sho-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .sho-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--sho-serif), 'Cherry Bomb One', cursive;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .sho-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .sho-foto-etq { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #FFFFFF; }
+  .sho-sticker--tsuzuku { position: absolute; right: -8px; top: 16px; z-index: 2; transform: rotate(6deg); }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .sho-countdown { justify-content: space-between; }
-  .sho-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .sho-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  /* ── 02 Falta poco: la transformación ──────────────────────────────── */
+  .sho-countdown { background: var(--pp-bg2); justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .sho-countdown > .sho-folio, .sho-countdown > .sho-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .sho-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap; color: var(--pp-ink);
+    border-top: 3px solid var(--pp-ink); border-bottom: 3px solid var(--pp-ink); font-weight: 800; font-size: 14px; letter-spacing: .2em; text-transform: uppercase; }
+  .sho-marquesina--acento { background: var(--pp-acc); color: #FFFFFF; transform: rotate(-2deg) scale(1.04); padding: 6px 0;
+    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-weight: 400; font-size: 28px; letter-spacing: .04em; text-transform: none; -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; }
+  .sho-marquesina--celeste { background: var(--sho-acc3); transform: rotate(2deg) scale(1.04); }
+  .sho-marquesina-tira { display: flex; width: max-content; animation: shoCorre 16s linear infinite; }
+  .sho-marquesina-tira > span { padding-right: 32px; }
   .sho-marquesina--contraria .sho-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  @keyframes shoCorre { to { transform: translate3d(-50%, 0, 0); } }
+  .sho-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sho-cuenta-caja { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 20px; padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 4px; overflow: hidden;
+    --sho-caja: var(--pp-acc); box-shadow: 5px 6px 0 var(--sho-caja); }
+  .sho-cuenta-caja::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: repeating-conic-gradient(from 0deg at 50% 50%, var(--sho-caja) 0deg 4deg, transparent 4deg 16deg); opacity: .14; }
+  .sho-cuenta-caja--2 { --sho-caja: var(--pp-acc2); }
+  .sho-cuenta-caja--3 { --sho-caja: var(--sho-acc3); }
+  .sho-cuenta-caja--4 { --sho-caja: var(--sho-star); }
+  .sho-cuenta-num { position: relative; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(64px, 20vw, 150px); line-height: .9; color: var(--sho-caja); -webkit-text-stroke: 1.5px var(--pp-ink); paint-order: stroke fill; font-variant-numeric: tabular-nums; }
+  .sho-cuenta-num > span { display: inline-block; animation: shoCifra 300ms cubic-bezier(.16,1,.3,1); }
+  @keyframes shoCifra { from { transform: translateY(18%); opacity: .4; } to { transform: none; opacity: 1; } }
+  .sho-cuenta-etq { position: relative; font-weight: 800; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+  .sho-tarjeta--hoy { background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 20px; padding: 18px; box-shadow: 5px 6px 0 var(--pp-acc); transform: rotate(-1deg);
+    display: flex; flex-direction: column; gap: 6px; }
+  .sho-tarjeta--hoy .sho-tarjeta-kicker { font-weight: 800; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-ink2); }
+  .sho-tarjeta--hoy .sho-tarjeta-titulo { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(40px, 11vw, 90px); line-height: .9; color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--pp-acc); }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .sho-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .sho-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .sho-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .sho-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .sho-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .sho-cuenta-num, .sho-cuenta-dias, .sho-cifra { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .sho-cuenta-caja:nth-child(4) .sho-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .sho-cuenta-etq { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .sho-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: el monólogo interior ────────────────────────── */
+  .sho-frase-seccion { justify-content: space-between; gap: 30px; }
+  .sho-pensamiento { position: relative; background: #FFFFFF; border: 3px solid var(--pp-ink); border-radius: 34px; padding: 24px 22px 26px; box-shadow: 7px 8px 0 var(--pp-acc2); max-width: 520px; }
+  .sho-burbujita { position: absolute; border-radius: 50%; background: #FFFFFF; border: 3px solid var(--pp-ink); }
+  .sho-burbujita--grande { left: 40px; bottom: -18px; width: 22px; height: 22px; }
+  .sho-burbujita--chica { left: 24px; bottom: -34px; width: 12px; height: 12px; }
+  .sho-frase { margin: 0; font-size: clamp(30px, 8.5vw, 64px); line-height: 1.05; letter-spacing: .01em; }
+  /* El cartel キラキラ: celeste, flota. */
+  .sho-kirakira { position: relative; align-self: flex-end; background: var(--sho-acc3); color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 16px; padding: 14px 18px; max-width: 260px; box-shadow: 5px 6px 0 var(--pp-ink);
+    animation: shoFlota 4s ease-in-out infinite; }
+  .sho-kirakira-titulo { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 28px; line-height: 1; display: block; }
+  .sho-kirakira-texto { display: block; font-weight: 700; font-size: 14px; margin-top: 4px; }
+  @keyframes shoFlota { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-8px) rotate(4deg); } }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .sho-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .sho-frase-seccion .sho-acento { color: var(--pp-bg); font-style: italic; }
-  .sho-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Viñetas ────────────────────────────────────────────────────── */
   .sho-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
-  .sho-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .sho-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg2); }
+  .sho-pan-fijo--album { background: #F7F5F0; }
   .sho-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .sho-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .sho-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .sho-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .sho-panel--acento .sho-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg2); color: var(--pp-ink); }
+  .sho-panel--escenario { --sho-panel-acc: var(--pp-acc); --sho-panel-trazo: var(--pp-ink); }
+  .sho-panel--escena { --sho-panel-acc: var(--sho-acc3); --sho-panel-trazo: var(--pp-acc); background: var(--pp-ink); color: #FFFFFF; }
+  .sho-panel--mapa { --sho-panel-acc: var(--sho-acc3); --sho-panel-trazo: var(--pp-ink); background: var(--pp-bg); }
+  .sho-panel--guion { --sho-panel-acc: var(--pp-acc2); --sho-panel-trazo: var(--pp-ink); background: var(--pp-bg); }
   .sho-pan[data-scroll="vertical"] { height: auto; }
   .sho-pan[data-scroll="vertical"] .sho-pan-fijo { position: static; height: auto; overflow: visible; }
   .sho-pan[data-scroll="vertical"] .sho-tira { position: static; display: block; width: 100%; transform: none !important; }
   .sho-pan[data-scroll="vertical"] .sho-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-
-  .sho-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .sho-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .sho-linea > span:first-child { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .sho-linea > span:last-child { text-align: right; font-size: 15px; }
-  .sho-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .sho-cta-flecha { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-style: italic; font-size: 22px; }
-  .sho-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .sho-ficha { background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 18px; padding: 14px 16px; box-shadow: 5px 6px 0 var(--sho-panel-acc, var(--pp-acc)); display: flex; flex-direction: column; gap: 8px; }
+  .sho-linea { display: flex; justify-content: space-between; gap: 14px; padding: 6px 0; border-bottom: 2px dotted var(--pp-ink2); font-size: 15px; line-height: 1.3; }
+  .sho-linea > span:first-child { font-weight: 800; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--pp-ink2); flex: 0 0 auto; padding-top: 2px; }
+  .sho-linea > span:last-child { text-align: right; font-weight: 700; }
+  .sho-mapa { height: 190px; overflow: hidden; border: 3px solid var(--pp-ink); border-radius: 12px; }
+  /* Los puntos son destellos de cuatro puntas. */
   .sho-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .sho-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+  .sho-punto { width: 18px; height: 18px; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block;
+    clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%); }
+  .sho-punto[data-activo="1"] { opacity: 1; }
 
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .sho-checkin { background: var(--pp-bg2); }
-  .sho-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .sho-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .sho-cupon .sho-talon-top { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .2em; }
-  .sho-cupon input, .sho-cupon .sho-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .sho-cupon .sho-contador button { border: 2px solid var(--pp-ink); }
-  .sho-sello, .sho-cupon .sho-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .sho-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .sho-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .sho-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .sho-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .sho-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .sho-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .sho-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .sho-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .sho-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .sho-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .sho-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .sho-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .sho-lista-tema { font-size: 15px; }
-  .sho-lista-quien { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .sho-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .sho-tarjeta + .sho-tarjeta { margin-top: 12px; }
-  .sho-tarjeta-kicker { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .sho-tarjeta-titulo { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 28px; line-height: 1; }
-  .sho-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .sho-tarjeta .sho-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .sho-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .sho-fila--ultima { border-bottom: none; }
-  .sho-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .sho-fila-etq { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .sho-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .sho-fila-valor { text-align: right; }
-  .sho-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .sho-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .sho-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .sho-quiz .sho-acento { color: var(--pp-ink); }
-  .sho-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .sho-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .sho-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .sho-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .sho-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .sho-pagina--qr { align-items: flex-start; }
-  .sho-pagina--qr .qr-ingreso, .sho-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .sho-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .sho-pase-numero { display: flex; flex-direction: column; }
-  .sho-pase-numero > span:last-child { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .sho-info-extra { margin-top: 12px; }
-  .sho-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .sho-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .sho-raiz .ia-icon-box, .sho-raiz svg.lucide { display: none !important; }
-  .sho-replay { cursor: pointer; }
-  .sho-credito { display: flex; justify-content: center; opacity: .6; }
-  .sho-error { margin: 0; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .sho-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .sho-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .sho-sello-circular text { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .sho-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .sho-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .sho-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .sho-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .sho-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .sho-tapa-fecha { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .sho-tapa-nombres { margin: 0; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .sho-tapa-linea { overflow: hidden; display: block; }
-  .sho-tapa-linea > span { display: block; }
-  .sho-tapa-linea--sangra { padding-left: 14%; }
-  .sho-tapa-pase { text-align: right; }
-  .sho-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .sho-tapa-mensaje { margin: 0; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .sho-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .sho-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .sho-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .sho-riel-top, .sho-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .sho-riel-top { color: var(--pp-ink2); }
-  .sho-riel-etiqueta { color: var(--pp-acc); }
-  .sho-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .sho-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .sho-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .sho-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .sho-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .sho-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
+  /* ── 05 Check-in: ficha de personaje ───────────────────────────────── */
+  .sho-checkin { background: var(--sho-acc3); color: var(--pp-ink); }
+  .sho-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+    box-shadow: 7px 8px 0 var(--pp-ink); transition: border-color 400ms ease; }
+  .sho-cupon:has(.sho-filas) { border-color: var(--pp-acc); }
+  .sho-cupon .sho-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .sho-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-ink2); border-bottom: 3px dotted var(--pp-ink2); padding-bottom: 12px; }
+  .sho-talon-estado { display: flex; align-items: center; gap: 6px; transition: color 400ms ease; }
+  .sho-talon-estado::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: shoParpadea 1.4s ease-in-out infinite; }
+  .sho-cupon:has(.sho-filas) .sho-talon-estado { color: var(--pp-acc); }
+  .sho-cupon:has(.sho-filas) .sho-talon-estado::before { animation: none; }
+  @keyframes shoParpadea { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
   .sho-campo { display: flex; flex-direction: column; gap: 6px; }
-  .sho-etiqueta { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .sho-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .sho-input:focus { outline: none; border-color: var(--pp-acc); }
-  .sho-contador { display: flex; align-items: center; gap: 12px; }
-  .sho-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
+  .sho-etiqueta { font-weight: 800; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-ink2); }
+  .sho-input { min-height: 48px; border: 0; border-bottom: 3px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-weight: 700; font-size: 16px; padding: 0; outline: none; }
+  .sho-contador { display: flex; align-items: center; border-bottom: 3px solid var(--pp-ink); min-height: 48px; }
+  .sho-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 26px; line-height: 1; }
   .sho-contador button:disabled { opacity: .35; cursor: default; }
-  .sho-contador > span { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .sho-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .sho-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .sho-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .sho-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .sho-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .sho-precio-total { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 28px; line-height: 1; }
-  .sho-precio-detalle { font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-size: 11px; letter-spacing: .1em; }
-  .sho-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .sho-talon-estado { transition: color 400ms ease; }
+  .sho-contador > span { flex: 1; text-align: center; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 30px; line-height: 1; color: var(--pp-acc); }
   .sho-filas { display: flex; flex-direction: column; }
+  .sho-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 2px dotted var(--pp-ink2); font-size: 15px; }
+  .sho-fila--ultima { border-bottom: 0; }
+  .sho-fila-valor { text-align: right; font-weight: 700; }
+  .sho-precio { display: flex; justify-content: space-between; gap: 12px; font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--pp-ink2); padding-top: 4px; }
+  .sho-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; color: var(--pp-ink); }
+  .sho-precio-total { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 24px; line-height: 1; color: var(--pp-acc); }
+  .sho-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .sho-btn-solido { min-height: 54px; border: 3px solid var(--pp-ink); border-radius: 999px; background: var(--pp-acc2); color: #FFFFFF; cursor: pointer;
+    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 22px; padding: 2px 18px 0; box-shadow: 4px 5px 0 var(--pp-ink); -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; transition: background 200ms ease; }
+  @media (hover: hover) { .sho-btn-solido:hover { background: var(--pp-acc); } }
+  .sho-btn-solido:disabled { opacity: .6; cursor: default; }
+  .sho-btn-fantasma { min-height: 48px; border: 3px solid var(--pp-ink); border-radius: 999px; background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 19px; padding: 2px 18px 0; }
+  .sho-error { margin: 0; font-weight: 800; font-size: 12px; color: var(--pp-acc); }
+  /* El sello "¡Sí!": la estrella de diez puntas amarilla. */
+  .sho-cupon .sho-sello { position: absolute; right: 10px; bottom: 78px; width: 140px; aspect-ratio: 1; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    background: var(--sho-star); clip-path: polygon(50% 4%, 57% 20%, 74% 12%, 70% 30%, 88% 34%, 76% 46%, 90% 58%, 72% 62%, 74% 80%, 58% 72%, 50% 88%, 42% 72%, 26% 80%, 28% 62%, 10% 58%, 24% 46%, 12% 34%, 30% 30%, 26% 12%, 43% 20%);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 28px; box-sizing: border-box;
+    font-weight: 800; font-size: 8px; letter-spacing: .12em; text-transform: uppercase; color: var(--pp-ink); }
+  .sho-cupon .sho-sello::before { content: "¡Sí!"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 30px; letter-spacing: 0; color: var(--pp-acc); -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; }
   .sho-petalos { display: none; }
 
-  /* Shōjo: nada tiene esquinas y todo tiene un brillo. */
-  .sho-tarjeta, .sho-cupon, .sho-btn-solido, .sho-tapa-btn, .sho-opcion, .sho-input, .sho-cta { border-radius: 18px; }
-  .sho-tapa-nombres, .sho-h2, .sho-panel-titulo, .sho-fecha-linea { letter-spacing: 0; text-shadow: 0 4px 0 color-mix(in srgb, var(--pp-acc) 40%, transparent); }
-  .sho-trama { opacity: .22; background-image: radial-gradient(currentColor 1.2px, transparent 1.4px); background-size: 20px 20px; }
+  /* ── 06 Álbum: fotogramas ──────────────────────────────────────────── */
+  .sho-panel--album { background: #F7F5F0; color: #3B2A4A; justify-content: flex-start; gap: 14px; }
+  .sho-panel--album-b { background: #EFEBE3; }
+  .sho-panel--album .sho-h2 { -webkit-text-stroke: 2px #3B2A4A; }
+  .sho-hoja { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .sho-foto-hoja { position: relative; overflow: hidden; min-height: 0; cursor: pointer; border: 3px solid #3B2A4A; border-radius: 14px; box-shadow: 4px 4px 0 #3B2A4A;
+    background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .sho-foto-hoja:nth-child(1) { transform: rotate(-1.5deg); }
+  .sho-foto-hoja:nth-child(2) { transform: rotate(1.5deg); }
+  .sho-foto-hoja:nth-child(3) { transform: rotate(-1deg); }
+  .sho-foto-hoja:nth-child(4) { transform: rotate(2deg); }
+  .sho-foto-hoja:nth-child(5) { transform: rotate(.5deg); }
+  .sho-foto-hoja-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sho-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .sho-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .sho-bano--2 { background: color-mix(in srgb, var(--pp-acc2) 50%, transparent); }
+  .sho-bano--3 { background: color-mix(in srgb, var(--sho-acc3) 55%, transparent); }
+  .sho-bano--4 { background: color-mix(in srgb, var(--sho-star) 60%, transparent); }
+  .sho-bano--5 { background: rgba(141,240,210,.5); }
+  .sho-foto-hoja-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-weight: 800; font-size: 11px; letter-spacing: .14em; color: #3B2A4A; }
+  .sho-hoja[data-cantidad="5"] .sho-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .sho-hoja[data-cantidad="5"] .sho-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .sho-hoja[data-cantidad="5"] .sho-foto-hoja:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .sho-hoja[data-cantidad="5"] .sho-foto-hoja:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .sho-hoja[data-cantidad="5"] .sho-foto-hoja:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .sho-hoja[data-cantidad="4"] .sho-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .sho-hoja[data-cantidad="4"] .sho-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .sho-hoja[data-cantidad="4"] .sho-foto-hoja:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .sho-hoja[data-cantidad="4"] .sho-foto-hoja:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .sho-hoja[data-cantidad="3"] .sho-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .sho-hoja[data-cantidad="3"] .sho-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .sho-hoja[data-cantidad="3"] .sho-foto-hoja:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .sho-hoja[data-cantidad="2"] .sho-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .sho-hoja[data-cantidad="2"] .sho-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .sho-hoja[data-cantidad="1"] .sho-foto-hoja:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: opening / ending ───────────────────────────────────── */
+  .sho-musica { background: var(--pp-acc2); color: var(--pp-ink); }
+  .sho-h2-sub { color: #FFFFFF; }
+  .sho-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
+  .sho-eq span { width: 9px; height: 100%; background: var(--pp-ink); border-radius: 5px; transform-origin: bottom; animation: shoEq 1.1s ease-in-out infinite; }
+  .sho-eq span:nth-child(2) { background: var(--pp-acc); }
+  .sho-eq span:nth-child(3) { background: #FFFFFF; }
+  .sho-eq span:nth-child(4) { background: var(--sho-star); }
+  @keyframes shoEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .sho-musica form.sho-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .sho-musica .sho-etiqueta { display: none; }
+  .sho-musica .sho-input { min-height: 48px; border: 3px solid var(--pp-ink); border-radius: 14px; background: #FFFFFF; color: var(--pp-ink); font-weight: 700; font-size: 15px; padding: 0 14px; min-width: 0; }
+  .sho-musica .sho-error { grid-column: 1 / -1; }
+  .sho-musica .sho-btn-solido { grid-column: 1 / -1; min-height: 50px; background: var(--sho-star); color: var(--pp-ink); font-size: 20px; -webkit-text-stroke: 0; }
+  @media (hover: hover) { .sho-musica .sho-btn-solido:hover { background: var(--pp-acc); color: #FFFFFF; } }
+  .sho-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .sho-lista-fila { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #FFFFFF; border: 3px solid var(--pp-ink); border-radius: 16px; box-shadow: 3px 4px 0 var(--pp-ink); counter-increment: tema; }
+  .sho-lista { counter-reset: tema; }
+  .sho-lista-fila::before { content: "♪"; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 20px; color: var(--pp-acc); width: 28px; text-align: center; flex: 0 0 auto; }
+  .sho-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .sho-lista-tema { font-weight: 800; font-size: 17px; line-height: 1.1; }
+  .sho-lista-quien { font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-ink2); }
+
+  /* ── 08 Regalos: ítems ─────────────────────────────────────────────── */
+  .sho-tarjeta--banco { --sho-sombra: var(--pp-acc); position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 18px; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px; box-shadow: 5px 6px 0 var(--sho-sombra); transform: none !important; }
+  .sho-tarjeta--der { --sho-sombra: var(--sho-acc3); }
+  .sho-tarjeta--banco + .sho-tarjeta--banco { margin-top: 14px; }
+  .sho-tarjeta-kicker { font-weight: 800; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-ink2); }
+  .sho-tarjeta-mensaje { margin: 0; font-weight: 600; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .sho-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .sho-fila-etq { font-weight: 800; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-ink2); }
+  .sho-fila-dato { font-weight: 800; font-size: 14px; letter-spacing: .04em; overflow-wrap: anywhere; }
+  .sho-fila--copiable:first-child .sho-fila-dato { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-weight: 400; font-size: 22px; line-height: 1; color: var(--sho-sombra); -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; }
+  .sho-tarjeta--banco .sho-fila--ultima { border-bottom: 0; font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-ink2); }
+  .sho-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 3px solid var(--pp-ink); border-radius: 999px; background: var(--sho-sombra); color: var(--pp-ink); cursor: pointer;
+    font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .sho-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
+
+  /* ── 09 Trivia de fans ─────────────────────────────────────────────── */
+  .sho-quiz { background: var(--sho-star); color: var(--pp-ink); }
+  .sho-quiz .sho-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .sho-quiz .sho-tarjeta-kicker { align-self: flex-start; background: var(--pp-ink); color: #FFFFFF; border-radius: 999px; font-weight: 800; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 8px 16px; }
+  .sho-quiz .sho-tarjeta-pregunta, .sho-quiz .sho-tarjeta-titulo { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(40px, 11vw, 96px); line-height: .95; max-width: 14ch;
+    color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--pp-acc); }
+  .sho-quiz .sho-tarjeta-mensaje { margin: 0; font-weight: 700; font-size: 15px; color: var(--pp-ink); }
+  .sho-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .sho-opcion { min-height: 54px; border: 3px solid var(--pp-ink); border-radius: 18px; background: #FFFFFF; color: var(--pp-ink); cursor: pointer; counter-increment: opcion;
+    font-family: var(--sho-sans), 'M PLUS Rounded 1c', sans-serif; font-weight: 800; font-size: 16px; text-align: left; padding: 0 18px; box-shadow: 4px 5px 0 var(--pp-ink);
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease; }
+  .sho-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 20px; }
+  .sho-opcion--bien { background: var(--sho-acc3); }
+  .sho-opcion--bien::after { content: "✦ ¡Sí!"; }
+  .sho-opcion--mal { background: var(--pp-acc); color: #FFFFFF; }
+  .sho-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .sho-quiz .sho-spread > .sho-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .sho-quiz .sho-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .sho-quiz .sho-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .sho-quiz .sho-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: el ticket del festival ────────────────────────────── */
+  .sho-pase { background: var(--pp-ink); color: #FFFFFF; justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .sho-pagina--qr { align-items: flex-start; }
+  .sho-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: #FFFFFF; padding: 16px; box-sizing: border-box; border: 4px solid var(--pp-acc); border-radius: 22px;
+    box-shadow: 8px 8px 0 var(--pp-acc2); transform: rotate(-2deg); margin-bottom: 30px; }
+  .sho-qr .qr-ingreso, .sho-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .sho-qr img, .sho-qr svg, .sho-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .sho-qr-etq { position: absolute; left: 0; right: 0; bottom: -28px; text-align: center; font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--sho-acc3); }
+  .sho-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .sho-pase-numero, .sho-pase-mesa { display: flex; flex-direction: column; }
+  .sho-pase-mesa { align-items: flex-end; text-align: right; }
+  .sho-pase-numero > span:last-child { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(72px, 22vw, 160px); line-height: .88; color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-acc); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--pp-acc); }
+  .sho-pase-mesa > span:last-child { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(44px, 13vw, 96px); line-height: .9; color: var(--sho-star); }
+  .sho-caja { display: flex; flex-direction: column; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-acc); border-radius: 18px; padding: 6px 16px; box-shadow: 5px 6px 0 var(--pp-acc2); }
+  .sho-caja .sho-linea { padding: 10px 0; font-size: 14px; }
+  .sho-caja .sho-linea:last-child { border-bottom: 0; }
+  .sho-caja .sho-linea > span:last-child { font-weight: 700; line-height: 1.35; }
+  .sho-info-extra { margin-top: 4px; }
+  .sho-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .sho-info-extra #ia-trigger-btn { background: #FFFFFF !important; color: var(--pp-ink) !important; border: 3px solid var(--pp-acc) !important;
+    border-radius: 999px !important; font-weight: 800 !important; letter-spacing: .14em !important; text-transform: uppercase; box-shadow: 3px 4px 0 var(--pp-acc2); }
+  .sho-raiz .ia-icon-box, .sho-raiz svg.lucide { display: none !important; }
+  .sho-pase-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+  .sho-despedida { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(30px, 8vw, 50px); line-height: 1; color: #FFFFFF; -webkit-text-stroke: 1px var(--pp-acc); paint-order: stroke fill; text-shadow: 3px 4px 0 var(--pp-acc); }
+  .sho-replay { cursor: pointer; color: var(--sho-star); }
+  .sho-credito { display: inline-flex; opacity: .85; }
+
+  /* ── La tapa: title card ───────────────────────────────────────────── */
+  .sho-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .sho-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;
+    padding: calc(16px + env(safe-area-inset-top)) max(20px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); }
+  .sho-tapa-cabecera { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .sho-tapa-episodio { display: flex; flex-direction: column; gap: 4px; }
+  .sho-tapa-jp { font-weight: 700; font-size: 12px; color: var(--pp-acc2); letter-spacing: .1em; }
+  .sho-tapa-numero { font-weight: 800; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; text-align: right; line-height: 1.3; color: var(--pp-ink2); }
+  .sho-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; }
+  .sho-tapa-kicker { font-weight: 800; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-acc); }
+  /* El nombre: blanco con trazo de tinta y doble sombra (rosa y lila); el
+     segundo renglón sangrado. El más largo manda el cuerpo. */
+  .sho-tapa-nombres { margin: 0; line-height: .9; letter-spacing: .01em; display: flex; flex-direction: column;
+    color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--pp-acc), 10px 12px 0 var(--pp-acc2);
+    font-size: min(clamp(64px, 23vw, 200px), 20vh, calc((100vw - 44px) / (var(--largo, 6) * 0.56))); }
+  @media (min-width: 1024px) { .sho-tapa-nombres { font-size: min(15vw, 250px, 24vh, calc((min(100vw, 1100px) - 44px) / (var(--largo, 6) * 0.56))); } }
+  .sho-tapa-nombres--largo { font-size: min(clamp(48px, 16vw, 140px), 14vh, calc((100vw - 44px) / (var(--largo, 9) * 0.56))); }
+  .sho-tapa-linea { overflow: hidden; display: block; white-space: nowrap; padding: 0 12px 12px 0; margin: 0 -12px -12px 0; }
+  .sho-tapa-linea > span { display: block; }
+  .sho-tapa-linea--sangra { padding-left: 20%; }
+  .sho-tapa-nombres--largo .sho-tapa-linea--sangra { padding-left: 8%; }
+  .sho-letra { display: inline-block; animation: shoSalta calc(var(--n, 9) * 3.2s) cubic-bezier(.34,1.56,.64,1) infinite; animation-delay: calc(var(--i, 0) * -3.2s); }
+  @keyframes shoSalta { 0%, 99% { transform: none; } 99.3% { transform: translateY(-16px) scale(1.12); } 100% { transform: none; } }
+  .sho-emblema { display: flex; align-items: center; gap: 10px; }
+  .sho-emblema-barra { flex: 1; height: 3px; background: var(--pp-ink); border-radius: 2px; }
+  .sho-emblema-texto { font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: clamp(20px, 6vw, 30px); color: var(--pp-acc); -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; }
+  .sho-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; font-weight: 700; font-size: 13px; line-height: 1.35; }
+  .sho-tapa-datos-der { text-align: right; }
+  .sho-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
+  /* El globo del mensaje: blanco, esquina recta abajo a la izquierda,
+     sombra lila y un destello en la esquina. */
+  .sho-globo { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 24px 24px 24px 6px; padding: 14px 18px; max-width: 340px; box-shadow: 4px 5px 0 var(--pp-acc2); }
+  .sho-globo-estrella { position: absolute; right: -14px; top: -14px; width: 30px; height: 30px; fill: var(--sho-star); stroke: var(--pp-ink); stroke-width: 2; animation: shoTitila 2.4s ease-in-out infinite; }
+  .sho-tapa-mensaje { margin: 0; font-weight: 700; font-size: clamp(16px, 4.4vw, 20px); line-height: 1.35; }
+  .sho-tapa-btn { min-height: 54px; min-width: 250px; align-self: flex-start; border: 3px solid var(--pp-ink); border-radius: 999px; background: var(--pp-acc); color: #FFFFFF; cursor: pointer;
+    font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 22px; letter-spacing: .04em; padding: 2px 24px 0; -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; box-shadow: 4px 5px 0 var(--pp-ink); transition: background 200ms ease; }
+  @media (hover: hover) { .sho-tapa-btn:hover { background: var(--pp-acc2); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .sho-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--pp-ink); border-left: 3px dotted currentColor !important; }
+  .sho-riel-top { writing-mode: vertical-rl; font-family: var(--sho-serif), 'Cherry Bomb One', cursive; font-size: 14px; letter-spacing: .2em; color: inherit !important; }
+  .sho-riel-etiqueta { writing-mode: vertical-rl; font-weight: 800; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: inherit; }
+  .sho-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .sho-riel-barra { position: absolute; left: -3px; top: 0; width: 6px; height: 0%; background: var(--pp-acc); border-radius: 3px; transition: height 200ms linear; display: block; }
+  .sho-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-weight: 800; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--pp-acc);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: shoPista 2.4s ease-in-out infinite; }
+  @keyframes shoPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .sho-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(59,42,74,.94);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .sho-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 3px solid var(--pp-ink); border-radius: 50%;
+    background: var(--sho-star); color: var(--pp-ink); font-size: 18px; line-height: 1; cursor: pointer; box-shadow: 3px 4px 0 var(--pp-acc); }
+  .sho-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 4px solid #FFFFFF; border-radius: 14px; box-shadow: 8px 8px 0 var(--pp-acc); }
 
   @media (prefers-reduced-motion: reduce) {
     .sho-raiz * { animation: none !important; }
     .sho-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .sho-foto { --sho-punto: 0; }
   }
 `;
