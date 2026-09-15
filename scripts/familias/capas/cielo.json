@@ -1,0 +1,121 @@
+{
+  "archivo": "CieloDePapelTemplate",
+  "prefijo": "cdp",
+  "mote": "Cielo",
+  "titulo": "CIELO DE PAPEL",
+  "varianteBase": "Cielo rosado",
+  "resumen": [
+    "El quince de la sub-colección: el mismo papel recortado que Jardín, con",
+    "su propio dibujo (la quinceañera, la luna, el salón), Playfair Display en",
+    "vez de Cormorant y cinco paletas de cielo.",
+    "",
+    "Su mockup no trae panel de ceremonia, porque un quince no suele tenerla.",
+    "Si el anfitrión igual la activa, ese panel se dibuja sin decoración propia",
+    "en vez de robarle la escena a otro."
+  ],
+  "serif": {
+    "modulo": "Playfair_Display",
+    "css": "'Playfair Display', serif",
+    "pesos": [
+      "400",
+      "500",
+      "600"
+    ]
+  },
+  "sans": {
+    "modulo": "Jost",
+    "css": "'Jost', sans-serif",
+    "pesos": [
+      "300",
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#F7E9EC",
+    "bg2": "#F0DDE4",
+    "ink": "#241C3A",
+    "ink2": "#7A6C7E",
+    "acc": "#D9738F",
+    "acc2": "#C9A24D",
+    "sky1": "#F7E9EC",
+    "sky2": "#F2C9D8",
+    "hill1": "#E6D2E8",
+    "hill2": "#C3A6D6",
+    "hill3": "#8E77A8",
+    "night": "#2E2C3D",
+    "nightInk": "#F7E9EC"
+  },
+  "paneles": {
+    "recepcion": 0,
+    "ceremonia": null,
+    "llegar": 1,
+    "cronograma": 2
+  },
+  "variantes": {
+    "Noche": {
+      "etiqueta": "Noche azul",
+      "bg": "#1B2347",
+      "bg2": "#141B3A",
+      "ink": "#F7E9EC",
+      "ink2": "#A9B0D6",
+      "acc": "#E9A8C2",
+      "acc2": "#E3C27E",
+      "sky1": "#1B2347",
+      "sky2": "#3C3B78",
+      "hill1": "#3A4372",
+      "hill2": "#2A3159",
+      "hill3": "#171D3C",
+      "night": "#0F1526",
+      "nightInk": "#F7E9EC"
+    },
+    "Lila": {
+      "etiqueta": "Lila",
+      "bg": "#F3ECF7",
+      "bg2": "#E8DDF2",
+      "ink": "#2A2144",
+      "ink2": "#766A8C",
+      "acc": "#8E5FB5",
+      "acc2": "#E3C27E",
+      "sky1": "#F3ECF7",
+      "sky2": "#DCC7EE",
+      "hill1": "#DDCBEE",
+      "hill2": "#B79AD8",
+      "hill3": "#6F5796",
+      "night": "#2E2C3D",
+      "nightInk": "#F3ECF7"
+    },
+    "Dorado": {
+      "etiqueta": "Dorado",
+      "bg": "#FAF1E4",
+      "bg2": "#F2E3CD",
+      "ink": "#2B2438",
+      "ink2": "#7B7060",
+      "acc": "#C9962F",
+      "acc2": "#D98FA8",
+      "sky1": "#FAF1E4",
+      "sky2": "#F1D9B6",
+      "hill1": "#EBDAC2",
+      "hill2": "#D3B98C",
+      "hill3": "#8C7450",
+      "night": "#2E2C3D",
+      "nightInk": "#FAF1E4"
+    },
+    "Menta": {
+      "etiqueta": "Menta",
+      "bg": "#EAF3EF",
+      "bg2": "#DAEAE3",
+      "ink": "#1F2E2C",
+      "ink2": "#647A74",
+      "acc": "#2E9C8A",
+      "acc2": "#E3C27E",
+      "sky1": "#EAF3EF",
+      "sky2": "#C8E3DA",
+      "hill1": "#CFE5DC",
+      "hill2": "#96C4B5",
+      "hill3": "#4F7E72",
+      "night": "#2E2C3D",
+      "nightInk": "#EAF3EF"
+    }
+  }
+}

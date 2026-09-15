@@ -199,6 +199,22 @@ export default async function InvitationPage({
                 case 'Menta': return <PlantillaDinamica nombre="CieloDePapelTemplateMenta" invitation={invRecord} guest={null} isPersonalized={false} />;
                 default: return <PlantillaDinamica nombre="CieloDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
             }
+        } else if (invitation!.templateTipo === 'CUENTODEPAPEL') {
+            switch (color) {
+                case 'Bosque': return <PlantillaDinamica nombre="CuentoDePapelTemplateBosque" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Rosa': return <PlantillaDinamica nombre="CuentoDePapelTemplateRosa" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Medianoche': return <PlantillaDinamica nombre="CuentoDePapelTemplateMedianoche" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Oro': return <PlantillaDinamica nombre="CuentoDePapelTemplateOro" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CuentoDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
+        } else if (invitation!.templateTipo === 'CIUDADDEPAPEL') {
+            switch (color) {
+                case 'Neon': return <PlantillaDinamica nombre="CiudadDePapelTemplateNeon" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Concreto': return <PlantillaDinamica nombre="CiudadDePapelTemplateConcreto" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Puerto': return <PlantillaDinamica nombre="CiudadDePapelTemplatePuerto" invitation={invRecord} guest={null} isPersonalized={false} />;
+                case 'Terracota': return <PlantillaDinamica nombre="CiudadDePapelTemplateTerracota" invitation={invRecord} guest={null} isPersonalized={false} />;
+                default: return <PlantillaDinamica nombre="CiudadDePapelTemplate" invitation={invRecord} guest={null} isPersonalized={false} />;
+            }
         } else if (invitation!.templateTipo === 'PRENSA') {
             switch (color) {
                 case 'Hueso': return <PlantillaDinamica nombre="PrensaTemplateHueso" invitation={invRecord} guest={null} isPersonalized={false} />;

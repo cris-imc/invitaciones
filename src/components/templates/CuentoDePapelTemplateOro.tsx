@@ -1,27 +1,26 @@
 "use client";
 
 // GENERADO por scripts/gen-capas-de-papel-variants.js a partir de
-// CieloDePapelTemplate.tsx — no editar a mano: los cambios se pierden al regenerar.
+// CuentoDePapelTemplate.tsx — no editar a mano: los cambios se pierden al regenerar.
 
 /**
- * CIELO DE PAPEL · Colección Iconic — sub-colección "Capas de papel"
- * Variante: Menta
+ * CUENTO DE PAPEL · Colección Iconic — sub-colección "Capas de papel"
+ * Variante: Oro viejo
  *
  * GENERADO por scripts/derivar-capas.js a partir de
  * JardinDePapelTemplate.tsx — no editar a mano: el motor se arregla en
  * Jardín y se vuelve a derivar; lo propio de esta familia está en
- * scripts/familias/capas/cielo.json.
+ * scripts/familias/capas/cuento.json.
  *
- * El quince de la sub-colección: el mismo papel recortado que Jardín, con
- * su propio dibujo (la quinceañera, la luna, el salón), Playfair Display en
- * vez de Cormorant y cinco paletas de cielo.
+ * El quince de cuento de hadas: mismo papel recortado, con un castillo en
+ * la portada y la quinceañera de espaldas mirándolo. Playfair Display +
+ * Jost, y cinco paletas que van del lila al oro viejo pasando por una
+ * medianoche azul.
  * 
- * Su mockup no trae panel de ceremonia, porque un quince no suele tenerla.
- * Si el anfitrión igual la activa, ese panel se dibuja sin decoración propia
- * en vez de robarle la escena a otro.
+ * Como Cielo, su mockup no trae panel de ceremonia.
  *
  * Las escenas son las del mockup, byte por byte (ver
- * escenas/CdpEscenas.ts y scripts/extraer-escenas-capas.js): son
+ * escenas/CuhEscenas.ts y scripts/extraer-escenas-capas.js): son
  * decoración pura -- ni un dato del invitado pasa por ahí -- y montarlas
  * como HTML es lo único que garantiza que el dibujo llegue igual.
  */
@@ -43,22 +42,22 @@ import { useTextos, useFormatoDeMoneda, tituloEnDosLineas } from "@/components/i
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { esVistaMiniatura } from "@/lib/miniatura";
 import {
-  DEFS_CDP, SAVETHEDATE_CDP, COUNTDOWN_CDP, FRASE_CDP, CUANDO_CDP,
-  CHECKIN_CDP, ALBUM_CDP, MUSICA_CDP, REGALOS_CDP, QUIZ_CDP, PASE_CDP, COVER_CDP,
-} from "@/components/templates/escenas/CdpEscenas";
+  DEFS_CUH, SAVETHEDATE_CUH, COUNTDOWN_CUH, FRASE_CUH, CUANDO_CUH,
+  CHECKIN_CUH, ALBUM_CUH, MUSICA_CUH, REGALOS_CUH, QUIZ_CUH, PASE_CUH, COVER_CUH,
+} from "@/components/templates/escenas/CuhEscenas";
 
-const cdpSerif = Playfair_Display({
+const cuhSerif = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
   display: "swap",
-  variable: "--cdp-serif",
+  variable: "--cuh-serif",
 });
-const cdpSans = Jost({
+const cuhSans = Jost({
   subsets: ["latin"],
   weight: ["300", "400", "500"],
   display: "swap",
-  variable: "--cdp-sans",
+  variable: "--cuh-sans",
 });
 
 // ─── Paleta ─────────────────────────────────────────────────────────────────
@@ -68,19 +67,19 @@ const cdpSans = Jost({
 // las escenas leen var(--pp-…), así que un cambio acá repinta cerros, cielo,
 // sol y figuras de una sola vez.
 const PALETA = {
-  bg: "#EAF3EF",
-  bg2: "#DAEAE3",
-  ink: "#1F2E2C",
-  ink2: "#647A74",
-  acc: "#2E9C8A",
-  acc2: "#E3C27E",
-  sky1: "#EAF3EF",
-  sky2: "#C8E3DA",
-  hill1: "#CFE5DC",
-  hill2: "#96C4B5",
-  hill3: "#4F7E72",
+  bg: "#FAF3E6",
+  bg2: "#F1E5CE",
+  ink: "#2C2536",
+  ink2: "#7A7060",
+  acc: "#C08A2E",
+  acc2: "#9B6BD6",
+  sky1: "#FAF3E6",
+  sky2: "#F0DCB4",
+  hill1: "#EBDCC0",
+  hill2: "#D2B98A",
+  hill3: "#8A7250",
   night: "#2E2C3D",
-  nightInk: "#EAF3EF",
+  nightInk: "#FAF3E6",
 };
 
 /**
@@ -136,7 +135,7 @@ interface GuestRecord {
   paymentView?: { total: number; paid: number; pending: number; lines: string[] } | null;
 }
 
-interface CieloDePapelTemplateProps {
+interface CuentoDePapelTemplateProps {
   invitation: Record<string, unknown>;
   guest?: GuestRecord | null;
   isPersonalized?: boolean;
@@ -159,10 +158,10 @@ function numeroDePase(orderNumber: number | undefined): string {
  * decoración (Escena devuelve null con string vacío).
  */
 const ESCENA_DE_PANEL: Record<string, string> = {
-  recepcion: CUANDO_CDP[0] ?? "",
+  recepcion: CUANDO_CUH[0] ?? "",
   ceremonia: "", // su mockup no dibuja este panel
-  llegar: CUANDO_CDP[1] ?? "",
-  cronograma: CUANDO_CDP[2] ?? "",
+  llegar: CUANDO_CUH[1] ?? "",
+  cronograma: CUANDO_CUH[2] ?? "",
 };
 
 /** Un trozo de escena del mockup, montado tal cual. */
@@ -171,7 +170,7 @@ function Escena({ html, className, style }: { html: string; className?: string; 
   return <div className={className} style={style} aria-hidden="true" dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = false }: CieloDePapelTemplateProps) {
+export function CuentoDePapelTemplateOro({ invitation, guest, isPersonalized = false }: CuentoDePapelTemplateProps) {
   const tx = useTextos();
 
   // ── Los datos de la invitación ─────────────────────────────────────────
@@ -486,7 +485,7 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
     reveals.forEach((el) => {
       const dist = el.dataset.dist ? parseFloat(el.dataset.dist) : 24;
       el.style.opacity = "0";
-      el.style.setProperty("--cdp-y", `${dist}px`);
+      el.style.setProperty("--cuh-y", `${dist}px`);
       el.style.transition = "opacity 900ms cubic-bezier(.16,1,.3,1), transform 900ms cubic-bezier(.16,1,.3,1)";
       el.style.transitionDelay = `${el.dataset.delay || 0}ms`;
     });
@@ -546,7 +545,7 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
           const r = el.getBoundingClientRect();
           if (r.top < vh * 0.92 && r.bottom > 0 && r.left < window.innerWidth && r.right > 0) {
             el.style.opacity = "1";
-            el.style.setProperty("--cdp-y", "0px");
+            el.style.setProperty("--cuh-y", "0px");
             pendientes.splice(i, 1);
           }
         }
@@ -762,8 +761,8 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
           fondo: PALETA.bg,
           tinta: PALETA.ink,
           acento: PALETA.acc,
-          clase: `${cdpSerif.variable} ${cdpSans.variable}`,
-          fuente: "var(--cdp-sans), 'Jost', sans-serif",
+          clase: `${cuhSerif.variable} ${cuhSans.variable}`,
+          fuente: "var(--cuh-sans), 'Jost', sans-serif",
         }}
       />
     );
@@ -773,16 +772,16 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
   return (
     <div
       ref={raizRef}
-      className={`${cdpSerif.variable} ${cdpSans.variable} cdp-raiz`}
+      className={`${cuhSerif.variable} ${cuhSans.variable} cuh-raiz`}
       style={varsDePaleta}
     >
-      <style>{CSS_CDP}</style>
+      <style>{CSS_CUH}</style>
       <style>{COVER_RESPONSIVE_STYLE}</style>
       {/* Los filtros de grano, fibra y borde rasgado que usan todas las
           escenas. Van una sola vez, fuera del scroller. */}
-      <Escena html={DEFS_CDP} className="cdp-defs" />
+      <Escena html={DEFS_CUH} className="cuh-defs" />
 
-      <div ref={scrollerRef} className="cdp-scroller">
+      <div ref={scrollerRef} className="cuh-scroller">
         <BienvenidaStorytelling
           prefijo="jdp"
           acento={PALETA.acc}
@@ -797,19 +796,19 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
         />
 
         {/* ── 01 Guardá la fecha ─────────────────────────────────────── */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="cdp-section cdp-std">
-          <Escena html={SAVETHEDATE_CDP} className="cdp-escena" />
-          <span data-xin="1" data-dist="-20" className="cdp-kicker">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-          <div className="cdp-std-fecha">
-            <span data-xin="1" data-delay="60" data-dist="40" className="cdp-std-dia">{diaNum}</span>
-            <div data-xin="1" data-delay="160" data-dist="30" className="cdp-std-fila">
-              <span className="cdp-cinta">{mesLargo}</span>
-              <span className="cdp-std-anio">{anio}</span>
+        <section data-tone={TONO} data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="cuh-section cuh-std">
+          <Escena html={SAVETHEDATE_CUH} className="cuh-escena" />
+          <span data-xin="1" data-dist="-20" className="cuh-kicker">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+          <div className="cuh-std-fecha">
+            <span data-xin="1" data-delay="60" data-dist="40" className="cuh-std-dia">{diaNum}</span>
+            <div data-xin="1" data-delay="160" data-dist="30" className="cuh-std-fila">
+              <span className="cuh-cinta">{mesLargo}</span>
+              <span className="cuh-std-anio">{anio}</span>
             </div>
           </div>
-          <div data-xin="1" data-delay="240" data-dist="20" className="cdp-meta">
+          <div data-xin="1" data-delay="240" data-dist="20" className="cuh-meta">
             <span>{diaSemana} · {hora} H</span>
-            <span className="cdp-meta-punto" aria-hidden="true" />
+            <span className="cuh-meta-punto" aria-hidden="true" />
             <span>{(ciudad || lugarNombre || direccion).toUpperCase()}</span>
           </div>
           <AddToCalendarLink
@@ -817,7 +816,7 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
             targetDate={fechaHora}
             location={[lugarNombre, direccion].filter(Boolean).join(", ")}
             description={String(invitation.portadaMensaje ?? "")}
-            className="cdp-btn-papel cdp-btn-papel--reveal"
+            className="cuh-btn-papel cuh-btn-papel--reveal"
             showIcon={false}
           >
             {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} <span aria-hidden="true">↗</span>
@@ -826,52 +825,52 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
         {/* ── Nuestra foto: se abre como una ventana troquelada ───────── */}
         {hayFoto && (
-          <section data-tone={TONO} data-screen-label={tx("invitacion.album.nuestraFoto")} className="cdp-foto-seccion">
-            <div className="cdp-foto-marco">
-              <div ref={ventanaRef} className="cdp-ventana">
+          <section data-tone={TONO} data-screen-label={tx("invitacion.album.nuestraFoto")} className="cuh-foto-seccion">
+            <div className="cuh-foto-marco">
+              <div ref={ventanaRef} className="cuh-ventana">
                 {fotoMobile && (
-                  <div className="acp-mobile-only cdp-foto-capa">
+                  <div className="acp-mobile-only cuh-foto-capa">
                     <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="243,235,221" />
                   </div>
                 )}
                 {fotoDesktop && (
-                  <div className="acp-desktop-only cdp-foto-capa">
+                  <div className="acp-desktop-only cuh-foto-capa">
                     <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="243,235,221" />
                   </div>
                 )}
               </div>
-              <div className="cdp-foto-firma">{titulo}</div>
+              <div className="cuh-foto-firma">{titulo}</div>
             </div>
           </section>
         )}
 
         {/* ── 02 Falta poco ──────────────────────────────────────────── */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="cdp-section cdp-countdown">
-          <Escena html={COUNTDOWN_CDP} className="cdp-escena" />
-          <span data-xin="1" data-dist="-20" className="cdp-kicker">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
-          <h2 data-xin="1" data-delay="60" className="cdp-h2">
+        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="cuh-section cuh-countdown">
+          <Escena html={COUNTDOWN_CUH} className="cuh-escena" />
+          <span data-xin="1" data-dist="-20" className="cuh-kicker">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+          <h2 data-xin="1" data-delay="60" className="cuh-h2">
             {tx("invitacion.cuentaRegresiva.estamosContando")}<br /><em>{tx("invitacion.cuentaRegresiva.losDias")}</em>
           </h2>
-          <CuentaCielo targetDate={fechaHora} />
+          <CuentaCuento targetDate={fechaHora} />
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────── */}
         {hayFrase && (
-          <section data-tone={TONO} data-screen-label={tx("invitacion.frase.etiqueta")} className="cdp-section cdp-frase-seccion">
-            <Escena html={FRASE_CDP} className="cdp-escena" />
-            <span data-xin="1" data-dist="-20" className="cdp-kicker">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
-            <h2 ref={fraseRef} className="cdp-frase">
+          <section data-tone={TONO} data-screen-label={tx("invitacion.frase.etiqueta")} className="cuh-section cuh-frase-seccion">
+            <Escena html={FRASE_CUH} className="cuh-escena" />
+            <span data-xin="1" data-dist="-20" className="cuh-kicker">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+            <h2 ref={fraseRef} className="cuh-frase">
               {palabras.map((p, i) => (
                 // El espacio va FUERA del span: el motor pone cada palabra en
                 // inline-block para poder moverla, y un espacio de fin de
                 // línea adentro de un inline-block se colapsa a cero.
                 <span key={i}>
-                  <span data-w="1" className={i >= desdeAcento ? "cdp-acento" : undefined}>{p}</span>{" "}
+                  <span data-w="1" className={i >= desdeAcento ? "cuh-acento" : undefined}>{p}</span>{" "}
                 </span>
               ))}
             </h2>
-            <div data-xin="1" data-delay="200" className="cdp-firma">
-              <span className="cdp-firma-linea" aria-hidden="true" />{titulo.toUpperCase()}
+            <div data-xin="1" data-delay="200" className="cuh-firma">
+              <span className="cuh-firma-linea" aria-hidden="true" />{titulo.toUpperCase()}
             </div>
           </section>
         )}
@@ -882,50 +881,50 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
           data-pan="1"
           data-scroll={scrollVertical || panelesLugar.length <= 1 ? "vertical" : "lateral"}
           data-screen-label={tx("invitacion.ubicacion.cuandoYDonde")}
-          className="cdp-pan"
+          className="cuh-pan"
           style={{ "--st-pasos": Math.max(0, panelesLugar.length - 1) } as React.CSSProperties}
         >
-          <div className="cdp-pan-fijo">
-            <div data-strip="1" className="cdp-tira">
+          <div className="cuh-pan-fijo">
+            <div data-strip="1" className="cuh-tira">
               {/* Recepción */}
-              <div data-tone={TONO} className="cdp-panel cdp-panel--abajo" style={{ background: PALETA.bg }}>
-                <Escena html={ESCENA_DE_PANEL.recepcion} className="cdp-escena" />
-                <div className="cdp-panel-top">
+              <div data-tone={TONO} className="cuh-panel cuh-panel--abajo" style={{ background: PALETA.bg }}>
+                <Escena html={ESCENA_DE_PANEL.recepcion} className="cuh-escena" />
+                <div className="cuh-panel-top">
                   <span>{nCuando} — {tx("invitacion.ubicacion.cuandoYDonde").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
-                <div className="cdp-tarjeta cdp-tarjeta--izq">
-                  <span className="cdp-tarjeta-kicker">{tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span>
-                  <h2 className="cdp-tarjeta-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
-                  <div className="cdp-filas">
+                <div className="cuh-tarjeta cuh-tarjeta--izq">
+                  <span className="cuh-tarjeta-kicker">{tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span>
+                  <h2 className="cuh-tarjeta-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
+                  <div className="cuh-filas">
                     {direccion && (
-                      <div className="cdp-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="cdp-fila-valor">{direccion}</span></div>
+                      <div className="cuh-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="cuh-fila-valor">{direccion}</span></div>
                     )}
-                    <div className="cdp-fila"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
+                    <div className="cuh-fila"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {dressCode && (
-                      <div className="cdp-fila cdp-fila--ultima"><span>{tx("invitacion.ubicacion.dressCode")}</span><span className="cdp-acento-plano">{dressCode}</span></div>
+                      <div className="cuh-fila cuh-fila--ultima"><span>{tx("invitacion.ubicacion.dressCode")}</span><span className="cuh-acento-plano">{dressCode}</span></div>
                     )}
                   </div>
                 </div>
                 {!scrollVertical && panelesLugar.length > 1 && (
-                  <div className="cdp-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cdp-flecha">→</span></div>
+                  <div className="cuh-seguir">{tx("invitacion.portada.seguiBajando").toUpperCase()} <span className="cuh-flecha">→</span></div>
                 )}
               </div>
 
               {/* Ceremonia */}
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone={TONO} className="cdp-panel cdp-panel--abajo" style={{ background: PALETA.bg2 }}>
-                  <Escena html={ESCENA_DE_PANEL.ceremonia} className="cdp-escena" />
-                  <div className="cdp-panel-top">
+                <div id="ceremonia" data-tone={TONO} className="cuh-panel cuh-panel--abajo" style={{ background: PALETA.bg2 }}>
+                  <Escena html={ESCENA_DE_PANEL.ceremonia} className="cuh-escena" />
+                  <div className="cuh-panel-top">
                     <span>{ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
-                  <div className="cdp-tarjeta cdp-tarjeta--der">
-                    <h2 className="cdp-tarjeta-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
-                    <div className="cdp-filas">
+                  <div className="cuh-tarjeta cuh-tarjeta--der">
+                    <h2 className="cuh-tarjeta-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    <div className="cuh-filas">
                       {ceremoniaDireccion && (
-                        <div className="cdp-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="cdp-fila-valor">{ceremoniaDireccion}</span></div>
+                        <div className="cuh-fila"><span>{tx("invitacion.ubicacion.direccion")}</span><span className="cuh-fila-valor">{ceremoniaDireccion}</span></div>
                       )}
                       {ceremoniaHora && (
-                        <div className="cdp-fila cdp-fila--ultima"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>
+                        <div className="cuh-fila cuh-fila--ultima"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>
                       )}
                     </div>
                   </div>
@@ -934,8 +933,8 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
               {/* Cómo llegar */}
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="cdp-panel cdp-panel--abajo" style={{ background: PALETA.bg }}>
-                  <svg viewBox="0 0 430 700" preserveAspectRatio="xMidYMid slice" className="cdp-escena" aria-hidden="true">
+                <div id="location" data-tone={TONO} className="cuh-panel cuh-panel--abajo" style={{ background: PALETA.bg }}>
+                  <svg viewBox="0 0 430 700" preserveAspectRatio="xMidYMid slice" className="cuh-escena" aria-hidden="true">
                     <path d="M0 520 C120 470 200 500 300 470 S420 380 430 400 V700 H0Z" style={{ fill: "var(--pp-hill1, #BCCBB6)" }} />
                     <path
                       ref={rutaRef}
@@ -949,14 +948,14 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
                     <circle cx={40} cy={560} r={7} style={{ fill: "var(--pp-ink, #2B2A33)" }} />
                     <path d="M330 150 m-16 0 a16 16 0 1 1 32 0 c0 12 -16 30 -16 30 s-16 -18 -16 -30Z" style={{ fill: "var(--pp-acc, #C86B5A)" }} />
                   </svg>
-                  <Escena html={ESCENA_DE_PANEL.llegar} className="cdp-escena" />
-                  <div className="cdp-panel-top">
+                  <Escena html={ESCENA_DE_PANEL.llegar} className="cuh-escena" />
+                  <div className="cuh-panel-top">
                     <span>{tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
-                  <h2 className="cdp-h2">{tx("invitacion.ubicacion.comoLlegar")}</h2>
-                  {(direccion || ciudad) && <p className="cdp-parrafo">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>}
+                  <h2 className="cuh-h2">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                  {(direccion || ciudad) && <p className="cuh-parrafo">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>}
                   {embedMapUrl && (
-                    <div className="cdp-mapa">
+                    <div className="cuh-mapa">
                       <iframe
                         src={embedMapUrl}
                         width="100%"
@@ -968,7 +967,7 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
                       />
                     </div>
                   )}
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cdp-btn-solido">
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="cuh-btn-solido">
                     {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()} <span aria-hidden="true">↗</span>
                   </a>
                 </div>
@@ -976,17 +975,17 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
               {/* Cronograma */}
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone={TONO} className="cdp-panel cdp-panel--centro" style={{ background: PALETA.bg2 }}>
-                  <Escena html={ESCENA_DE_PANEL.cronograma} className="cdp-escena" />
-                  <div className="cdp-panel-top">
+                <div id="schedule" data-tone={TONO} className="cuh-panel cuh-panel--centro" style={{ background: PALETA.bg2 }}>
+                  <Escena html={ESCENA_DE_PANEL.cronograma} className="cuh-escena" />
+                  <div className="cuh-panel-top">
                     <span>{tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
-                  <h2 className="cdp-h2">{tx("invitacion.ubicacion.laNochePasoAPaso")}</h2>
-                  <div className="cdp-crono">
+                  <h2 className="cuh-h2">{tx("invitacion.ubicacion.laNochePasoAPaso")}</h2>
+                  <div className="cuh-crono">
                     {cronograma.map((item, i) => (
-                      <div key={i} className="cdp-crono-fila">
-                        <span className="cdp-crono-hora">{item.time || ""}</span>
-                        <span className="cdp-crono-titulo">{item.title}</span>
+                      <div key={i} className="cuh-crono-fila">
+                        <span className="cuh-crono-hora">{item.time || ""}</span>
+                        <span className="cuh-crono-titulo">{item.title}</span>
                       </div>
                     ))}
                   </div>
@@ -999,13 +998,13 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
         {/* ── 05 Check-in ────────────────────────────────────────────── */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="cdp-section cdp-checkin">
-            <Escena html={CHECKIN_CDP} className="cdp-escena" />
-            <span data-xin="1" data-dist="-20" className="cdp-kicker">{nCheckin} — CHECK-IN</span>
-            <h2 data-xin="1" data-delay="60" className="cdp-h2">
+          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="cuh-section cuh-checkin">
+            <Escena html={CHECKIN_CUH} className="cuh-escena" />
+            <span data-xin="1" data-dist="-20" className="cuh-kicker">{nCheckin} — CHECK-IN</span>
+            <h2 data-xin="1" data-delay="60" className="cuh-h2">
               {tx("invitacion.rsvp.confirmaLinea1")}<br /><em>{tx("invitacion.rsvp.confirmaLinea2")}</em>
             </h2>
-            <CheckinCielo
+            <CheckinCuento
               invitationId={String(invitation.id ?? "")}
               guestToken={guest?.uniqueToken}
               guestName={nombreInvitado}
@@ -1042,26 +1041,26 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
             data-pan="1"
             data-scroll={scrollVertical || hojasDeFotos.length <= 1 ? "vertical" : "lateral"}
             data-screen-label={tx("invitacion.album.titulo")}
-            className="cdp-pan"
+            className="cuh-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="cdp-pan-fijo">
-              <div data-strip="1" className="cdp-tira">
+            <div className="cuh-pan-fijo">
+              <div data-strip="1" className="cuh-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="cdp-panel cdp-panel--album" style={{ background: iHoja % 2 === 0 ? "#F6F1E7" : "#F1EBDF" }}>
-                    <Escena html={ALBUM_CDP[iHoja % ALBUM_CDP.length]} className="cdp-escena" />
-                    <div className="cdp-panel-top">
+                  <div key={iHoja} data-tone={TONO} className="cuh-panel cuh-panel--album" style={{ background: iHoja % 2 === 0 ? "#F6F1E7" : "#F1EBDF" }}>
+                    <Escena html={ALBUM_CUH[iHoja % ALBUM_CUH.length]} className="cuh-escena" />
+                    <div className="cuh-panel-top">
                       <span>{iHoja === 0 ? `${nAlbum} — ${tx("invitacion.album.titulo").toUpperCase()}` : tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
                       {hojasDeFotos.length > 1 && <span>{String(iHoja + 1).padStart(2, "0")} / {String(hojasDeFotos.length).padStart(2, "0")}</span>}
                     </div>
                     {iHoja === 0 && (
-                      <h2 className="cdp-h2 cdp-h2--album">{tx("invitacion.album.titulo")} <em>{tx("invitacion.album.deFotos")}</em></h2>
+                      <h2 className="cuh-h2 cuh-h2--album">{tx("invitacion.album.titulo")} <em>{tx("invitacion.album.deFotos")}</em></h2>
                     )}
-                    <div className="cdp-polaroids" data-cantidad={hoja.length}>
+                    <div className="cuh-polaroids" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="cdp-polaroid"
+                          className="cuh-polaroid"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1069,14 +1068,14 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="cdp-polaroid-img" />
-                          {i % 2 === 0 && <span className="cdp-chinche" aria-hidden="true" />}
+                          <img src={url} alt="" loading="lazy" className="cuh-polaroid-img" />
+                          {i % 2 === 0 && <span className="cuh-chinche" aria-hidden="true" />}
                         </div>
                       ))}
                     </div>
-                    <div className="cdp-panel-pie">
+                    <div className="cuh-panel-pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span className="cdp-acento-plano">{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span className="cuh-acento-plano">{tx("invitacion.portada.segui").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1088,13 +1087,13 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
         {/* ── 07 Música ──────────────────────────────────────────────── */}
         {sugerenciaMusicaHabilitada && (
-          <section id="songs" data-tone={TONO} data-screen-label={tx("invitacion.musica.titulo")} className="cdp-section cdp-musica">
-            <Escena html={MUSICA_CDP} className="cdp-escena" />
-            <span data-xin="1" data-dist="-20" className="cdp-kicker">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="cdp-h2">
-              {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "cdp-acento")}
+          <section id="songs" data-tone={TONO} data-screen-label={tx("invitacion.musica.titulo")} className="cuh-section cuh-musica">
+            <Escena html={MUSICA_CUH} className="cuh-escena" />
+            <span data-xin="1" data-dist="-20" className="cuh-kicker">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="60" className="cuh-h2">
+              {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "cuh-acento")}
             </h2>
-            <CancionesCielo
+            <CancionesCuento
               invitationId={String(invitation.id ?? "")}
               guestToken={guest?.uniqueToken}
               guestName={nombreInvitado || tx("invitacion.evento.invitado")}
@@ -1104,14 +1103,14 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
         {/* ── 08 Regalos ─────────────────────────────────────────────── */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="cdp-section cdp-regalos">
-            <Escena html={REGALOS_CDP} className="cdp-escena" />
-            <span data-xin="1" data-dist="-20" className="cdp-kicker cdp-kicker--tinta">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="cdp-h2">
+          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="cuh-section cuh-regalos">
+            <Escena html={REGALOS_CUH} className="cuh-escena" />
+            <span data-xin="1" data-dist="-20" className="cuh-kicker cuh-kicker--tinta">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="60" className="cuh-h2">
               {tx("invitacion.regalos.siQueresLinea1")}<br /><em>{tx("invitacion.regalos.siQueresLinea2")}</em>
             </h2>
             {Boolean(invitation.regaloMensaje) && (
-              <p data-xin="1" data-delay="120" className="cdp-parrafo cdp-parrafo--tinta">{String(invitation.regaloMensaje)}</p>
+              <p data-xin="1" data-delay="120" className="cuh-parrafo cuh-parrafo--tinta">{String(invitation.regaloMensaje)}</p>
             )}
             {regaloHabilitado && (
               <TarjetaBancaria
@@ -1141,11 +1140,11 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 
         {/* ── 09 Trivia ──────────────────────────────────────────────── */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cdp-section cdp-quiz">
-            <Escena html={QUIZ_CDP} className="cdp-escena" />
-            <span data-xin="1" data-dist="-20" className="cdp-kicker">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
-            <h2 data-xin="1" data-delay="60" className="cdp-h2 cdp-h2--claro">{triviaTitulo}</h2>
-            <TriviaCielo
+          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="cuh-section cuh-quiz">
+            <Escena html={QUIZ_CUH} className="cuh-escena" />
+            <span data-xin="1" data-dist="-20" className="cuh-kicker">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+            <h2 data-xin="1" data-delay="60" className="cuh-h2 cuh-h2--claro">{triviaTitulo}</h2>
+            <TriviaCuento
               preguntas={triviaPreguntas}
               invitationId={String(invitation.id ?? "")}
               guestToken={guest?.uniqueToken}
@@ -1155,40 +1154,40 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────── */}
-        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="cdp-section cdp-pase">
-          <Escena html={PASE_CDP} className="cdp-escena" />
-          <span data-xin="1" data-dist="-20" className="cdp-kicker">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+        <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="cuh-section cuh-pase">
+          <Escena html={PASE_CUH} className="cuh-escena" />
+          <span data-xin="1" data-dist="-20" className="cuh-kicker">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
 
-          <div data-xin="1" data-delay="80" data-dist="30" className="cdp-ticket">
-            <div className="cdp-ticket-izq">
-              <span className="cdp-ticket-kicker">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
-              <span className="cdp-ticket-nombre">{saludaAlInvitado ? nombreInvitado : titulo}</span>
-              <span className="cdp-ticket-dato">
+          <div data-xin="1" data-delay="80" data-dist="30" className="cuh-ticket">
+            <div className="cuh-ticket-izq">
+              <span className="cuh-ticket-kicker">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+              <span className="cuh-ticket-nombre">{saludaAlInvitado ? nombreInvitado : titulo}</span>
+              <span className="cuh-ticket-dato">
                 {[
                   lugaresDelPase > 0 ? tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }) : null,
                   guest?.mesas && guest.mesas.length > 0 ? guest.mesas.join(" · ") : null,
                 ].filter(Boolean).join(" · ")}
               </span>
-              <span className="cdp-ticket-fecha">{fechaPuntos} — {hora} H</span>
-              <span className="cdp-ticket-muesca cdp-ticket-muesca--arriba" aria-hidden="true" />
-              <span className="cdp-ticket-muesca cdp-ticket-muesca--abajo" aria-hidden="true" />
+              <span className="cuh-ticket-fecha">{fechaPuntos} — {hora} H</span>
+              <span className="cuh-ticket-muesca cuh-ticket-muesca--arriba" aria-hidden="true" />
+              <span className="cuh-ticket-muesca cuh-ticket-muesca--abajo" aria-hidden="true" />
             </div>
-            <div className="cdp-ticket-der">
+            <div className="cuh-ticket-der">
               <QrDeIngreso guest={guest as never} />
             </div>
           </div>
 
           {/* Alojamiento, estacionamiento, transporte: lo que el anfitrión
               cargó en Info Adicional, con el vestido de esta sección. */}
-          <div data-xin="1" data-delay="160" className="cdp-info-extra">
+          <div data-xin="1" data-delay="160" className="cuh-info-extra">
             <InfoAdicionalSection invitation={invitation} />
           </div>
 
-          <div className="cdp-pase-pie">
-            <span className="cdp-pase-firma">{tx("invitacion.frase.conAmor")}, {titulo}</span>
-            <div className="cdp-pase-creditos">
+          <div className="cuh-pase-pie">
+            <span className="cuh-pase-firma">{tx("invitacion.frase.conAmor")}, {titulo}</span>
+            <div className="cuh-pase-creditos">
               <LogoFooterCredit bgColor="transparent" />
-              <span className="cdp-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+              <span className="cuh-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
                 {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
               </span>
             </div>
@@ -1197,48 +1196,48 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
-      <div ref={rielRef} className="cdp-riel">
-        <span ref={rielTopRef} className="cdp-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
-        <div ref={rielLineaRef} className="cdp-riel-linea">
-          <span ref={rielBarraRef} className="cdp-riel-barra" />
+      <div ref={rielRef} className="cuh-riel">
+        <span ref={rielTopRef} className="cuh-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <div ref={rielLineaRef} className="cuh-riel-linea">
+          <span ref={rielBarraRef} className="cuh-riel-barra" />
         </div>
-        <span ref={rielEtiquetaRef} className="cdp-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+        <span ref={rielEtiquetaRef} className="cuh-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
       {/* ── La portada ─────────────────────────────────────────────────── */}
-      <div ref={portadaRef} data-tone={TONO} className="cdp-portada">
-        <div ref={escenaPortadaRef} className="cdp-portada-escena" dangerouslySetInnerHTML={{ __html: COVER_CDP }} />
-        <div className="cdp-portada-contenido">
-          <div className="cdp-portada-arriba">
-            <div ref={cartelRef} className="cdp-cartel">
-              <h1 className="cdp-cartel-nombres">
+      <div ref={portadaRef} data-tone={TONO} className="cuh-portada">
+        <div ref={escenaPortadaRef} className="cuh-portada-escena" dangerouslySetInnerHTML={{ __html: COVER_CUH }} />
+        <div className="cuh-portada-contenido">
+          <div className="cuh-portada-arriba">
+            <div ref={cartelRef} className="cuh-cartel">
+              <h1 className="cuh-cartel-nombres">
                 {saludaAlInvitado ? (
                   <span>{nombreInvitado}</span>
                 ) : (
                   <>
                     <span>{nombre1}</span>
-                    {nombre2 && <span className="cdp-cartel-amp">&amp;</span>}
+                    {nombre2 && <span className="cuh-cartel-amp">&amp;</span>}
                     {nombre2 && <span>{nombre2}</span>}
                   </>
                 )}
               </h1>
-              <span className="cdp-cartel-chinche" aria-hidden="true" />
+              <span className="cuh-cartel-chinche" aria-hidden="true" />
             </div>
           </div>
-          <div className="cdp-portada-abajo">
-            <div className="cdp-portada-datos">
-              <span className="cdp-portada-saludo">
+          <div className="cuh-portada-abajo">
+            <div className="cuh-portada-datos">
+              <span className="cuh-portada-saludo">
                 {saludaAlInvitado
-                  ? <>{tx("invitacion.bienvenida.hola", { nombre: nombreInvitado }).toUpperCase()} · <span className="cdp-acento-plano">{titulo.toUpperCase()}</span></>
-                  : <span className="cdp-acento-plano">{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>}
+                  ? <>{tx("invitacion.bienvenida.hola", { nombre: nombreInvitado }).toUpperCase()} · <span className="cuh-acento-plano">{titulo.toUpperCase()}</span></>
+                  : <span className="cuh-acento-plano">{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>}
               </span>
-              <div className="cdp-portada-fila">
+              <div className="cuh-portada-fila">
                 <span>{fechaPuntos}</span>
-                <span className="cdp-meta-punto" aria-hidden="true" />
+                <span className="cuh-meta-punto" aria-hidden="true" />
                 <span>{(lugarNombre || ciudad || direccion).toUpperCase()}</span>
               </div>
               {isPersonalized && guest && (
-                <div className="cdp-portada-pase">
+                <div className="cuh-portada-pase">
                   <span>{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
                   <span>·</span>
                   <span>{tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}</span>
@@ -1247,27 +1246,27 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
                 </div>
               )}
             </div>
-            <button type="button" onClick={abrir} className="cdp-portada-btn">
+            <button type="button" onClick={abrir} className="cuh-portada-btn">
               {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
             </button>
           </div>
         </div>
       </div>
 
-      <div ref={pistaRef} className="cdp-pista">{tx("invitacion.portada.desliza").toUpperCase()} ↓</div>
+      <div ref={pistaRef} className="cuh-pista">{tx("invitacion.portada.desliza").toUpperCase()} ↓</div>
 
       {fotoAmpliada && (
-        <div className="cdp-lupa" onClick={() => setFotoAmpliada(null)} onContextMenu={(e) => e.preventDefault()}>
+        <div className="cuh-lupa" onClick={() => setFotoAmpliada(null)} onContextMenu={(e) => e.preventDefault()}>
           <button
             type="button"
-            className="cdp-lupa-cerrar"
+            className="cuh-lupa-cerrar"
             onClick={(e) => { e.stopPropagation(); setFotoAmpliada(null); }}
             aria-label={tx("invitacion.cerrar")}
           >
             ✕
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={fotoAmpliada} alt={tx("invitacion.album.fotoAmpliada")} className="cdp-lupa-img" draggable={false} onClick={(e) => e.stopPropagation()} />
+          <img src={fotoAmpliada} alt={tx("invitacion.album.fotoAmpliada")} className="cuh-lupa-img" draggable={false} onClick={(e) => e.stopPropagation()} />
         </div>
       )}
 
@@ -1292,9 +1291,9 @@ export function CieloDePapelTemplateMenta({ invitation, guest, isPersonalized = 
 function Puntos({ cantidad }: { cantidad: number }) {
   if (cantidad <= 1) return null;
   return (
-    <div className="cdp-puntos" aria-hidden="true">
+    <div className="cuh-puntos" aria-hidden="true">
       {Array.from({ length: cantidad }).map((_, i) => (
-        <span key={i} data-dot={i} className="cdp-punto" style={{ background: i === 0 ? PALETA.acc : "rgba(43,42,51,.18)" }} />
+        <span key={i} data-dot={i} className="cuh-punto" style={{ background: i === 0 ? PALETA.acc : "rgba(43,42,51,.18)" }} />
       ))}
     </div>
   );
@@ -1309,15 +1308,15 @@ function Puntos({ cantidad }: { cantidad: number }) {
  * Paper e Iconic, ver wizard-steps-config.ts): las cajas redondeadas del
  * componente compartido no pegan con el papel recortado.
  */
-function CuentaCielo({ targetDate }: { targetDate: Date }) {
+function CuentaCuento({ targetDate }: { targetDate: Date }) {
   const tx = useTextos();
   const { time, isEventDay, isPast, hasEnded } = useCountdown(targetDate);
 
   if (isEventDay || hasEnded || isPast) {
     return (
-      <div className="cdp-tarjeta cdp-tarjeta--hoy" data-xin="1" data-delay="80" data-dist="30">
-        <span className="cdp-tarjeta-kicker">{tx("invitacion.cuentaRegresiva.kicker").toUpperCase()}</span>
-        <span className="cdp-tarjeta-titulo">
+      <div className="cuh-tarjeta cuh-tarjeta--hoy" data-xin="1" data-delay="80" data-dist="30">
+        <span className="cuh-tarjeta-kicker">{tx("invitacion.cuentaRegresiva.kicker").toUpperCase()}</span>
+        <span className="cuh-tarjeta-titulo">
           {isEventDay ? tx("invitacion.cuentaRegresiva.llegoElDia") : tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}
         </span>
       </div>
@@ -1332,11 +1331,11 @@ function CuentaCielo({ targetDate }: { targetDate: Date }) {
   ];
 
   return (
-    <div className="cdp-cuenta">
+    <div className="cuh-cuenta">
       {celdas.map((c, i) => (
-        <div key={c.l} data-xin="1" data-delay={80 + i * 80} data-dist="30" className={`cdp-cuenta-caja cdp-cuenta-caja--${i + 1}`}>
-          <span className={`cdp-cuenta-num${i === 3 ? " cdp-cuenta-num--acc" : ""}`}>{c.v}</span>
-          <span className="cdp-cuenta-etq">{c.l.toUpperCase()}</span>
+        <div key={c.l} data-xin="1" data-delay={80 + i * 80} data-dist="30" className={`cuh-cuenta-caja cuh-cuenta-caja--${i + 1}`}>
+          <span className={`cuh-cuenta-num${i === 3 ? " cuh-cuenta-num--acc" : ""}`}>{c.v}</span>
+          <span className="cuh-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
     </div>
@@ -1354,12 +1353,12 @@ function FilaCopiable({ etiqueta, valor }: { etiqueta: string; valor: string }) 
     window.setTimeout(() => setCopiado(false), 1600);
   };
   return (
-    <div className="cdp-fila cdp-fila--copiable">
-      <div className="cdp-fila-texto">
-        <span className="cdp-fila-etq">{etiqueta.toUpperCase()}</span>
-        <span className="cdp-fila-dato">{valor}</span>
+    <div className="cuh-fila cuh-fila--copiable">
+      <div className="cuh-fila-texto">
+        <span className="cuh-fila-etq">{etiqueta.toUpperCase()}</span>
+        <span className="cuh-fila-dato">{valor}</span>
       </div>
-      <button type="button" onClick={copiar} className={`cdp-btn-copiar${copiado ? " cdp-btn-copiar--hecho" : ""}`}>
+      <button type="button" onClick={copiar} className={`cuh-btn-copiar${copiado ? " cuh-btn-copiar--hecho" : ""}`}>
         {copiado ? tx("invitacion.regalos.copiado").toUpperCase() : tx("invitacion.regalos.copiar").toUpperCase()}
       </button>
     </div>
@@ -1380,17 +1379,17 @@ function TarjetaBancaria({
       data-xin="1"
       data-delay={retraso}
       data-dist="30"
-      className={`cdp-tarjeta cdp-tarjeta--banco${dobleZ ? " cdp-doblez" : ""}${inclinada ? " cdp-tarjeta--der" : " cdp-tarjeta--izq"}`}
+      className={`cuh-tarjeta cuh-tarjeta--banco${dobleZ ? " cuh-doblez" : ""}${inclinada ? " cuh-tarjeta--der" : " cuh-tarjeta--izq"}`}
     >
-      <span className="cdp-tarjeta-kicker">{titulo.toUpperCase()}</span>
-      {mensaje && <p className="cdp-tarjeta-mensaje">{mensaje}</p>}
-      <div className="cdp-filas">
+      <span className="cuh-tarjeta-kicker">{titulo.toUpperCase()}</span>
+      {mensaje && <p className="cuh-tarjeta-mensaje">{mensaje}</p>}
+      <div className="cuh-filas">
         <FilaCopiable etiqueta="Alias" valor={alias} />
         <FilaCopiable etiqueta="CBU" valor={cbu} />
         {(banco || titular) && (
-          <div className="cdp-fila cdp-fila--ultima">
+          <div className="cuh-fila cuh-fila--ultima">
             <span>{banco || tx("invitacion.regalos.banco")}</span>
-            <span className="cdp-fila-valor">{titular}</span>
+            <span className="cuh-fila-valor">{titular}</span>
           </div>
         )}
       </div>
@@ -1407,7 +1406,7 @@ function TarjetaBancaria({
  * (/api/guests/[token]/confirm o /api/rsvp): adultos, adolescentes, niños y
  * restricciones. Lo propio es el papel, no los datos.
  */
-function CheckinCielo({
+function CheckinCuento({
   invitationId, guestToken, guestName, pase,
   maxAdultos, maxAdolescentes, maxNinos,
   estadoInicial, adultosIniciales, adolescentesIniciales, ninosIniciales, restricciones,
@@ -1497,9 +1496,9 @@ function CheckinCielo({
 
   if (estado === "DECLINED") {
     return (
-      <div data-xin="1" data-delay="140" data-dist="30" className="cdp-tarjeta cdp-tarjeta--izq">
-        <p className="cdp-tarjeta-mensaje">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
-        <button type="button" className="cdp-btn-fantasma" onClick={() => setEstado("PENDING")}>
+      <div data-xin="1" data-delay="140" data-dist="30" className="cuh-tarjeta cuh-tarjeta--izq">
+        <p className="cuh-tarjeta-mensaje">{tx("invitacion.rsvp.graciasPorAvisarAcceso")}</p>
+        <button type="button" className="cuh-btn-fantasma" onClick={() => setEstado("PENDING")}>
           {tx("invitacion.rsvp.cambieDeIdea").toUpperCase()}
         </button>
       </div>
@@ -1510,10 +1509,10 @@ function CheckinCielo({
 
   return (
     <>
-      <div ref={tarjetaRef} data-xin="1" data-delay="140" data-dist="30" className="cdp-tarjeta cdp-tarjeta--talon">
-        <div className="cdp-talon-top">
+      <div ref={tarjetaRef} data-xin="1" data-delay="140" data-dist="30" className="cuh-tarjeta cuh-tarjeta--talon">
+        <div className="cuh-talon-top">
           <span>{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}{guestName ? ` · ${guestName.toUpperCase()}` : ""}</span>
-          <span ref={estadoRef} className="cdp-talon-estado">
+          <span ref={estadoRef} className="cuh-talon-estado">
             {confirmado || confirmadoYa ? tx("invitacion.pase.accesoConfirmado").toUpperCase() : tx("invitacion.pase.pendiente").toUpperCase()}
           </span>
         </div>
@@ -1521,9 +1520,9 @@ function CheckinCielo({
         {!confirmadoYa ? (
           <>
             {lugares > 1 && (
-              <div className="cdp-campo">
-                <label className="cdp-etiqueta">{tx("invitacion.rsvp.adultos").toUpperCase()}</label>
-                <div className="cdp-contador">
+              <div className="cuh-campo">
+                <label className="cuh-etiqueta">{tx("invitacion.rsvp.adultos").toUpperCase()}</label>
+                <div className="cuh-contador">
                   <button type="button" onClick={() => setAdultos((v) => Math.max(1, v - 1))} disabled={adultos <= 1} aria-label="−">−</button>
                   <span>{adultos}</span>
                   <button type="button" onClick={() => setAdultos((v) => Math.min(maxAdultos, v + 1))} disabled={adultos >= maxAdultos} aria-label="+">+</button>
@@ -1531,9 +1530,9 @@ function CheckinCielo({
               </div>
             )}
             {maxAdolescentes > 0 && (
-              <div className="cdp-campo">
-                <label className="cdp-etiqueta">{tx("invitacion.rsvp.adolescentes").toUpperCase()}</label>
-                <div className="cdp-contador">
+              <div className="cuh-campo">
+                <label className="cuh-etiqueta">{tx("invitacion.rsvp.adolescentes").toUpperCase()}</label>
+                <div className="cuh-contador">
                   <button type="button" onClick={() => setAdolescentes((v) => Math.max(0, v - 1))} disabled={adolescentes <= 0} aria-label="−">−</button>
                   <span>{adolescentes}</span>
                   <button type="button" onClick={() => setAdolescentes((v) => Math.min(maxAdolescentes, v + 1))} disabled={adolescentes >= maxAdolescentes} aria-label="+">+</button>
@@ -1541,73 +1540,73 @@ function CheckinCielo({
               </div>
             )}
             {maxNinos > 0 && (
-              <div className="cdp-campo">
-                <label className="cdp-etiqueta">{tx("invitacion.rsvp.ninos").toUpperCase()}</label>
-                <div className="cdp-contador">
+              <div className="cuh-campo">
+                <label className="cuh-etiqueta">{tx("invitacion.rsvp.ninos").toUpperCase()}</label>
+                <div className="cuh-contador">
                   <button type="button" onClick={() => setNinos((v) => Math.max(0, v - 1))} disabled={ninos <= 0} aria-label="−">−</button>
                   <span>{ninos}</span>
                   <button type="button" onClick={() => setNinos((v) => Math.min(maxNinos, v + 1))} disabled={ninos >= maxNinos} aria-label="+">+</button>
                 </div>
               </div>
             )}
-            <div className="cdp-campo">
-              <label className="cdp-etiqueta">{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</label>
+            <div className="cuh-campo">
+              <label className="cuh-etiqueta">{tx("invitacion.rsvp.restriccionAlimentaria").toUpperCase()}</label>
               <input
                 value={dieta}
                 onChange={(e) => setDieta(e.target.value)}
                 placeholder="—"
                 maxLength={120}
-                className="cdp-input"
+                className="cuh-input"
               />
             </div>
           </>
         ) : (
-          <div className="cdp-filas">
-            {lugares > 1 && adultos > 0 && <div className="cdp-fila"><span>{tx("invitacion.rsvp.adultos")}</span><span>{adultos}</span></div>}
-            {adolescentes > 0 && <div className="cdp-fila"><span>{tx("invitacion.rsvp.adolescentes")}</span><span>{adolescentes}</span></div>}
-            {ninos > 0 && <div className="cdp-fila"><span>{tx("invitacion.rsvp.ninos")}</span><span>{ninos}</span></div>}
-            <div className="cdp-fila cdp-fila--ultima">
+          <div className="cuh-filas">
+            {lugares > 1 && adultos > 0 && <div className="cuh-fila"><span>{tx("invitacion.rsvp.adultos")}</span><span>{adultos}</span></div>}
+            {adolescentes > 0 && <div className="cuh-fila"><span>{tx("invitacion.rsvp.adolescentes")}</span><span>{adolescentes}</span></div>}
+            {ninos > 0 && <div className="cuh-fila"><span>{tx("invitacion.rsvp.ninos")}</span><span>{ninos}</span></div>}
+            <div className="cuh-fila cuh-fila--ultima">
               <span>{tx("invitacion.rsvp.restriccionAlimentaria")}</span>
-              <span className="cdp-fila-valor">{restricciones || dieta || "—"}</span>
+              <span className="cuh-fila-valor">{restricciones || dieta || "—"}</span>
             </div>
           </div>
         )}
 
         {hayPago && monto != null && !exento && (
-          <div className="cdp-precio">
+          <div className="cuh-precio">
             <span>{estadoDePago === "PAID" ? tx("invitacion.pago.abonado") : tx("invitacion.pago.valor")}</span>
-            <div className="cdp-precio-valor">
-              <span className="cdp-precio-total">{formatearMoneda(totalAPagar)}</span>
+            <div className="cuh-precio-valor">
+              <span className="cuh-precio-total">{formatearMoneda(totalAPagar)}</span>
               {usarTotalDelServidor && vistaDePago
-                ? vistaDePago.lines.map((l, i) => <span key={i} className="cdp-precio-detalle">{l}</span>)
+                ? vistaDePago.lines.map((l, i) => <span key={i} className="cuh-precio-detalle">{l}</span>)
                 : (
                   <>
-                    {adultos > 0 && <span className="cdp-precio-detalle">{adultos} × {formatearMoneda(precioAdulto)}</span>}
-                    {adolescentes > 0 && <span className="cdp-precio-detalle">{adolescentes} × {formatearMoneda(precioAdo)}</span>}
-                    {ninos > 0 && <span className="cdp-precio-detalle">{ninos} × {formatearMoneda(precioNin)}</span>}
+                    {adultos > 0 && <span className="cuh-precio-detalle">{adultos} × {formatearMoneda(precioAdulto)}</span>}
+                    {adolescentes > 0 && <span className="cuh-precio-detalle">{adolescentes} × {formatearMoneda(precioAdo)}</span>}
+                    {ninos > 0 && <span className="cuh-precio-detalle">{ninos} × {formatearMoneda(precioNin)}</span>}
                   </>
                 )}
             </div>
           </div>
         )}
 
-        <div ref={selloRef} className="cdp-sello" aria-hidden="true">{tx("invitacion.pase.confirmado").toUpperCase()}</div>
-        <div ref={petalosRef} className="cdp-petalos" aria-hidden="true" />
+        <div ref={selloRef} className="cuh-sello" aria-hidden="true">{tx("invitacion.pase.confirmado").toUpperCase()}</div>
+        <div ref={petalosRef} className="cuh-petalos" aria-hidden="true" />
       </div>
 
-      {error && <p className="cdp-error">{error}</p>}
+      {error && <p className="cuh-error">{error}</p>}
 
       {!confirmadoYa ? (
         <>
-          <button type="button" data-xin="1" data-delay="220" className="cdp-btn-solido" disabled={enviando} onClick={() => enviar("CONFIRMA")}>
+          <button type="button" data-xin="1" data-delay="220" className="cuh-btn-solido" disabled={enviando} onClick={() => enviar("CONFIRMA")}>
             {enviando ? tx("invitacion.rsvp.guardando").toUpperCase() : tx("invitacion.rsvp.confirmarAsistencia").toUpperCase()}
           </button>
-          <button type="button" data-xin="1" data-delay="280" className="cdp-btn-fantasma" disabled={enviando} onClick={() => enviar("NO_ASISTE")}>
+          <button type="button" data-xin="1" data-delay="280" className="cuh-btn-fantasma" disabled={enviando} onClick={() => enviar("NO_ASISTE")}>
             {tx("invitacion.rsvp.noVoyAPoderAsistir").toUpperCase()}
           </button>
         </>
       ) : (
-        <button type="button" className="cdp-btn-fantasma" onClick={() => setEstado("PENDING")}>
+        <button type="button" className="cuh-btn-fantasma" onClick={() => setEstado("PENDING")}>
           {tx("invitacion.rsvp.modificarAsistencia").toUpperCase()}
         </button>
       )}
@@ -1618,7 +1617,7 @@ function CheckinCielo({
 interface CancionItem { id: string; title: string; artist: string; guestName: string }
 
 /** Sugerir una canción, en una tarjeta de papel con la lista debajo. */
-function CancionesCielo({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
+function CancionesCuento({ invitationId, guestToken, guestName }: { invitationId: string; guestToken?: string; guestName: string }) {
   const tx = useTextos();
   const [canciones, setCanciones] = useState<CancionItem[]>([]);
   const [tema, setTema] = useState("");
@@ -1668,28 +1667,28 @@ function CancionesCielo({ invitationId, guestToken, guestName }: { invitationId:
 
   return (
     <>
-      <form onSubmit={enviar} data-xin="1" data-delay="140" data-dist="30" className="cdp-tarjeta cdp-tarjeta--der">
-        <div className="cdp-campo">
-          <label className="cdp-etiqueta">{tx("invitacion.musica.tema").toUpperCase()}</label>
-          <input value={tema} onChange={(e) => setTema(e.target.value)} placeholder={tx("invitacion.musica.nombreDeLaCancion")} maxLength={100} className="cdp-input cdp-input--serif" />
+      <form onSubmit={enviar} data-xin="1" data-delay="140" data-dist="30" className="cuh-tarjeta cuh-tarjeta--der">
+        <div className="cuh-campo">
+          <label className="cuh-etiqueta">{tx("invitacion.musica.tema").toUpperCase()}</label>
+          <input value={tema} onChange={(e) => setTema(e.target.value)} placeholder={tx("invitacion.musica.nombreDeLaCancion")} maxLength={100} className="cuh-input cuh-input--serif" />
         </div>
-        <div className="cdp-campo">
-          <label className="cdp-etiqueta">{tx("invitacion.musica.artista").toUpperCase()}</label>
-          <input value={artista} onChange={(e) => setArtista(e.target.value)} placeholder={tx("invitacion.musica.artista")} maxLength={80} className="cdp-input cdp-input--serif" />
+        <div className="cuh-campo">
+          <label className="cuh-etiqueta">{tx("invitacion.musica.artista").toUpperCase()}</label>
+          <input value={artista} onChange={(e) => setArtista(e.target.value)} placeholder={tx("invitacion.musica.artista")} maxLength={80} className="cuh-input cuh-input--serif" />
         </div>
-        {error && <p className="cdp-error">{error}</p>}
-        <button type="submit" disabled={enviando} className="cdp-btn-solido cdp-btn-solido--tinta">
+        {error && <p className="cuh-error">{error}</p>}
+        <button type="submit" disabled={enviando} className="cuh-btn-solido cuh-btn-solido--tinta">
           {enviando ? tx("invitacion.musica.enviando").toUpperCase() : tx("invitacion.musica.sugeriUnaCancion").toUpperCase()}
         </button>
       </form>
 
       {canciones.length > 0 && (
-        <div data-xin="1" data-delay="220" className="cdp-lista">
+        <div data-xin="1" data-delay="220" className="cuh-lista">
           {canciones.slice(0, 8).map((c) => (
-            <div key={c.id} className="cdp-lista-fila">
-              <div className="cdp-lista-texto">
-                <span className="cdp-lista-tema">{c.title}</span>
-                <span className="cdp-lista-quien">{c.artist} · {tx("invitacion.musica.sumadoPor")} {c.guestName || tx("invitacion.evento.invitado")}</span>
+            <div key={c.id} className="cuh-lista-fila">
+              <div className="cuh-lista-texto">
+                <span className="cuh-lista-tema">{c.title}</span>
+                <span className="cuh-lista-quien">{c.artist} · {tx("invitacion.musica.sumadoPor")} {c.guestName || tx("invitacion.evento.invitado")}</span>
               </div>
             </div>
           ))}
@@ -1704,7 +1703,7 @@ function CancionesCielo({ invitationId, guestToken, guestName }: { invitationId:
  * opción, se pinta la correcta y se pasa a la siguiente. Misma API /api/quiz
  * que el resto de las plantillas.
  */
-function TriviaCielo({ preguntas, invitationId, guestToken, guestName }: { preguntas: QuizPregunta[]; invitationId: string; guestToken?: string; guestName: string }) {
+function TriviaCuento({ preguntas, invitationId, guestToken, guestName }: { preguntas: QuizPregunta[]; invitationId: string; guestToken?: string; guestName: string }) {
   const tx = useTextos();
   const [indice, setIndice] = useState(0);
   const [elegidas, setElegidas] = useState<Record<number, number>>({});
@@ -1769,13 +1768,13 @@ function TriviaCielo({ preguntas, invitationId, guestToken, guestName }: { pregu
 
   if (terminado) {
     return (
-      <div data-xin="1" data-delay="140" data-dist="30" className="cdp-tarjeta cdp-tarjeta--izq">
-        <span className="cdp-tarjeta-kicker">{tx("invitacion.quiz.kicker").toUpperCase()}</span>
-        <span className="cdp-tarjeta-titulo">
+      <div data-xin="1" data-delay="140" data-dist="30" className="cuh-tarjeta cuh-tarjeta--izq">
+        <span className="cuh-tarjeta-kicker">{tx("invitacion.quiz.kicker").toUpperCase()}</span>
+        <span className="cuh-tarjeta-titulo">
           {guardando ? tx("invitacion.rsvp.guardando") : tx("invitacion.quiz.respondisteCorrectamente", { aciertos: puntaje, total: preguntas.length })}
         </span>
         {!guardando && stats && stats.count > 0 && (
-          <p className="cdp-tarjeta-mensaje">{tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}</p>
+          <p className="cuh-tarjeta-mensaje">{tx("invitacion.quiz.promedio", { n: stats.count, avg: stats.avg })}</p>
         )}
       </div>
     );
@@ -1797,18 +1796,18 @@ function TriviaCielo({ preguntas, invitationId, guestToken, guestName }: { pregu
   };
 
   return (
-    <div data-xin="1" data-delay="140" data-dist="30" className="cdp-tarjeta cdp-tarjeta--izq">
-      <span className="cdp-tarjeta-kicker">{tx("invitacion.quiz.preguntaDeTotal", { n: indice + 1, total: preguntas.length }).toUpperCase()}</span>
-      <span className="cdp-tarjeta-pregunta">{q.pregunta}</span>
-      <div className="cdp-opciones">
+    <div data-xin="1" data-delay="140" data-dist="30" className="cuh-tarjeta cuh-tarjeta--izq">
+      <span className="cuh-tarjeta-kicker">{tx("invitacion.quiz.preguntaDeTotal", { n: indice + 1, total: preguntas.length }).toUpperCase()}</span>
+      <span className="cuh-tarjeta-pregunta">{q.pregunta}</span>
+      <div className="cuh-opciones">
         {q.opciones.map((op, oi) => {
           let clase = "";
           if (yaEligio && correcta !== undefined) {
-            if (oi === correcta) clase = " cdp-opcion--bien";
-            else if (elegidas[indice] === oi) clase = " cdp-opcion--mal";
+            if (oi === correcta) clase = " cuh-opcion--bien";
+            else if (elegidas[indice] === oi) clase = " cuh-opcion--mal";
           }
           return (
-            <button key={oi} type="button" disabled={yaEligio} onClick={() => elegir(oi)} className={`cdp-opcion${clase}`}>
+            <button key={oi} type="button" disabled={yaEligio} onClick={() => elegir(oi)} className={`cuh-opcion${clase}`}>
               {op}
             </button>
           );
@@ -1825,18 +1824,18 @@ function TriviaCielo({ preguntas, invitationId, guestToken, guestName }: { pregu
 // Los mismos valores del mockup, pasados de estilos en línea a clases: las
 // escenas inyectadas traen los suyos propios (y así se quedan tal cual), pero
 // todo lo que escribe la plantilla se viste desde acá, que es también lo que
-// leen la Bienvenida y el Post-evento compartidos (esperan `cdp-section` y
-// `cdp-kicker`).
-const CSS_CDP = `
-  .cdp-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--cdp-sans), 'Jost', sans-serif; }
-  .cdp-raiz a { color: var(--pp-acc); text-decoration: none; }
-  .cdp-raiz button { font: inherit; }
-  .cdp-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+// leen la Bienvenida y el Post-evento compartidos (esperan `cuh-section` y
+// `cuh-kicker`).
+const CSS_CUH = `
+  .cuh-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--cuh-sans), 'Jost', sans-serif; }
+  .cuh-raiz a { color: var(--pp-acc); text-decoration: none; }
+  .cuh-raiz button { font: inherit; }
+  .cuh-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
-  .cdp-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0;
+  .cuh-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0;
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
-  .cdp-scroller::-webkit-scrollbar { width: 0; height: 0; }
+  .cuh-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
   @keyframes ppFloat { 0%,100% { transform: translate(0,0) rotate(0deg); } 50% { transform: translate(6px,-14px) rotate(8deg); } }
   @keyframes ppDrift { 0% { transform: translateX(-14px); } 100% { transform: translateX(14px); } }
@@ -1859,314 +1858,314 @@ const CSS_CDP = `
   @keyframes ppSide { 0%,100% { transform: translateX(0); } 50% { transform: translateX(7px); } }
   @keyframes ppTwinkle { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
 
-  /* Lo que entra al scrollear se mueve en --cdp-y y gira en --cdp-giro: son
+  /* Lo que entra al scrollear se mueve en --cuh-y y gira en --cuh-giro: son
      dos cosas distintas (el gesto de entrada y la inclinación del papel
      apoyado) y tienen que poder convivir en un mismo transform. */
-  .cdp-scroller [data-xin] { transform: translate3d(0, var(--cdp-y, 0px), 0) rotate(var(--cdp-giro, 0deg)); }
+  .cuh-scroller [data-xin] { transform: translate3d(0, var(--cuh-y, 0px), 0) rotate(var(--cuh-giro, 0deg)); }
 
   /* Las escenas del mockup: quedan detrás y no atajan ningún toque. */
-  .cdp-escena { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+  .cuh-escena { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
 
   /* ── Secciones ─────────────────────────────────────────────────────── */
-  .cdp-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; display: flex;
+  .cuh-section { min-height: calc(var(--vh, 1vh) * 100); position: relative; overflow: hidden; display: flex;
     flex-direction: column; justify-content: center; gap: 22px;
     padding: 90px max(24px, calc((100% - 560px) / 2)) 110px; }
-  .cdp-kicker { position: relative; z-index: 1; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
-  .cdp-kicker--tinta { color: var(--pp-ink); }
-  .cdp-h2 { position: relative; z-index: 1; margin: 0; font-family: var(--cdp-serif), 'Playfair Display', serif;
+  .cuh-kicker { position: relative; z-index: 1; font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
+  .cuh-kicker--tinta { color: var(--pp-ink); }
+  .cuh-h2 { position: relative; z-index: 1; margin: 0; font-family: var(--cuh-serif), 'Playfair Display', serif;
     font-weight: 400; font-size: clamp(40px, 11vw, 64px); line-height: .96; color: inherit; }
-  .cdp-h2 em, .cdp-acento { font-style: italic; color: var(--pp-acc); }
-  .cdp-h2--claro { color: var(--pp-night-ink); }
-  .cdp-h2--album { font-size: clamp(38px, 10vw, 56px); }
-  .cdp-acento-plano { color: var(--pp-acc); }
-  .cdp-parrafo { position: relative; z-index: 1; margin: 0; font-size: 15px; line-height: 1.55; color: var(--pp-ink2); max-width: 420px; }
-  .cdp-parrafo--tinta { color: var(--pp-ink); }
-  .cdp-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
+  .cuh-h2 em, .cuh-acento { font-style: italic; color: var(--pp-acc); }
+  .cuh-h2--claro { color: var(--pp-night-ink); }
+  .cuh-h2--album { font-size: clamp(38px, 10vw, 56px); }
+  .cuh-acento-plano { color: var(--pp-acc); }
+  .cuh-parrafo { position: relative; z-index: 1; margin: 0; font-size: 15px; line-height: 1.55; color: var(--pp-ink2); max-width: 420px; }
+  .cuh-parrafo--tinta { color: var(--pp-ink); }
+  .cuh-meta { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px;
     font-size: 14px; letter-spacing: .12em; color: var(--pp-ink2); }
-  .cdp-meta-punto { width: 4px; height: 4px; border-radius: 50%; background: var(--pp-acc); display: inline-block; }
+  .cuh-meta-punto { width: 4px; height: 4px; border-radius: 50%; background: var(--pp-acc); display: inline-block; }
 
   /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .cdp-std { justify-content: flex-end; gap: 22px; padding: 46vh max(24px, calc((100% - 560px) / 2)) 90px;
+  .cuh-std { justify-content: flex-end; gap: 22px; padding: 46vh max(24px, calc((100% - 560px) / 2)) 90px;
     background: linear-gradient(180deg, var(--pp-sky1) 0%, var(--pp-sky2) 48%, var(--pp-bg) 62%); }
-  .cdp-std-fecha { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; }
-  .cdp-std-dia { font-family: var(--cdp-serif), 'Playfair Display', serif; font-weight: 500;
+  .cuh-std-fecha { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 6px; }
+  .cuh-std-dia { font-family: var(--cuh-serif), 'Playfair Display', serif; font-weight: 500;
     font-size: clamp(120px, 34vw, 200px); line-height: .8; letter-spacing: -.04em; color: var(--pp-ink);
     text-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .cdp-std-fila { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-  .cdp-cinta { display: inline-block; padding: 8px 26px; background: var(--pp-acc); color: ${CARTA};
-    font-family: var(--cdp-serif), 'Playfair Display', serif; font-style: italic; font-size: clamp(30px, 8vw, 44px);
+  .cuh-std-fila { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .cuh-cinta { display: inline-block; padding: 8px 26px; background: var(--pp-acc); color: ${CARTA};
+    font-family: var(--cuh-serif), 'Playfair Display', serif; font-style: italic; font-size: clamp(30px, 8vw, 44px);
     line-height: 1; clip-path: polygon(0 0, 100% 0, 94% 50%, 100% 100%, 0 100%, 6% 50%);
     box-shadow: 0 2px 0 rgba(0,0,0,.12); animation: ppRibbon 4s ease-in-out infinite; text-transform: capitalize; }
-  .cdp-std-anio { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: clamp(30px, 8vw, 44px); line-height: 1; color: var(--pp-ink); }
+  .cuh-std-anio { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: clamp(30px, 8vw, 44px); line-height: 1; color: var(--pp-ink); }
 
   /* ── Nuestra foto: la ventana troquelada ───────────────────────────── */
-  .cdp-foto-seccion { position: relative; overflow: hidden; padding: 20px max(24px, calc((100% - 900px) / 2)) 70px; background: var(--pp-bg); }
-  .cdp-foto-marco { position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 4 / 5; max-height: 78vh; }
-  .cdp-ventana { position: absolute; inset: 0; overflow: hidden;
+  .cuh-foto-seccion { position: relative; overflow: hidden; padding: 20px max(24px, calc((100% - 900px) / 2)) 70px; background: var(--pp-bg); }
+  .cuh-foto-marco { position: relative; width: 100%; max-width: 900px; margin: 0 auto; aspect-ratio: 4 / 5; max-height: 78vh; }
+  .cuh-ventana { position: absolute; inset: 0; overflow: hidden;
     clip-path: inset(44% 38% 44% 38% round 999px 999px 14px 14px);
     background: repeating-linear-gradient(135deg, #DCD7CB 0 8px, #E9E5DC 8px 16px);
     box-shadow: inset 0 0 0 4px rgba(200,107,90,.55), inset 0 0 60px rgba(200,107,90,.28);
     transition: clip-path 120ms linear; }
-  .cdp-foto-capa { position: absolute; inset: 0; }
-  .cdp-foto-firma { position: absolute; left: 6%; bottom: -26px; padding: 12px 18px; background: ${CARTA}; color: ${CARTA_TINTA};
-    font-family: var(--cdp-serif), 'Playfair Display', serif; font-style: italic; font-size: 20px;
+  .cuh-foto-capa { position: absolute; inset: 0; }
+  .cuh-foto-firma { position: absolute; left: 6%; bottom: -26px; padding: 12px 18px; background: ${CARTA}; color: ${CARTA_TINTA};
+    font-family: var(--cuh-serif), 'Playfair Display', serif; font-style: italic; font-size: 20px;
     box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(-2deg); }
 
   /* ── 02 Falta poco ─────────────────────────────────────────────────── */
-  .cdp-countdown { background: linear-gradient(180deg, var(--pp-bg), var(--pp-bg2)); }
-  .cdp-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; max-width: 460px; }
-  .cdp-cuenta-caja { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 20px 16px 16px;
+  .cuh-countdown { background: linear-gradient(180deg, var(--pp-bg), var(--pp-bg2)); }
+  .cuh-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px 14px; max-width: 460px; }
+  .cuh-cuenta-caja { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 20px 16px 16px;
     display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
   /* La esquina doblada: el mismo triángulo de papel del mockup. */
-  .cdp-cuenta-caja::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0;
+  .cuh-cuenta-caja::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 20px 20px 0;
     border-color: var(--pp-bg) var(--pp-bg) ${CARTA_LINEA} ${CARTA_LINEA}; }
-  .cdp-cuenta-caja--1 { --cdp-giro: -1.6deg; transform: rotate(var(--cdp-giro)); }
-  .cdp-cuenta-caja--2 { --cdp-giro: 1.2deg; transform: rotate(var(--cdp-giro)); margin-top: 10px; }
-  .cdp-cuenta-caja--3 { --cdp-giro: 1.8deg; transform: rotate(var(--cdp-giro)); }
-  .cdp-cuenta-caja--4 { --cdp-giro: -1.1deg; transform: rotate(var(--cdp-giro)); margin-top: 10px; }
-  .cdp-cuenta-num { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85; font-variant-numeric: tabular-nums; }
-  .cdp-cuenta-num--acc { color: var(--pp-acc); }
-  .cdp-cuenta-etq { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
+  .cuh-cuenta-caja--1 { --cuh-giro: -1.6deg; transform: rotate(var(--cuh-giro)); }
+  .cuh-cuenta-caja--2 { --cuh-giro: 1.2deg; transform: rotate(var(--cuh-giro)); margin-top: 10px; }
+  .cuh-cuenta-caja--3 { --cuh-giro: 1.8deg; transform: rotate(var(--cuh-giro)); }
+  .cuh-cuenta-caja--4 { --cuh-giro: -1.1deg; transform: rotate(var(--cuh-giro)); margin-top: 10px; }
+  .cuh-cuenta-num { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: clamp(56px, 15vw, 84px); line-height: .85; font-variant-numeric: tabular-nums; }
+  .cuh-cuenta-num--acc { color: var(--pp-acc); }
+  .cuh-cuenta-etq { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
 
   /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .cdp-frase-seccion { gap: 36px; padding: 100px max(24px, calc((100% - 620px) / 2)); background: var(--pp-bg2); }
-  .cdp-frase { position: relative; z-index: 1; margin: 0; font-family: var(--cdp-serif), 'Playfair Display', serif;
+  .cuh-frase-seccion { gap: 36px; padding: 100px max(24px, calc((100% - 620px) / 2)); background: var(--pp-bg2); }
+  .cuh-frase { position: relative; z-index: 1; margin: 0; font-family: var(--cuh-serif), 'Playfair Display', serif;
     font-weight: 400; font-size: clamp(40px, 11.5vw, 76px); line-height: 1; letter-spacing: -.01em; text-wrap: pretty; }
-  .cdp-firma { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: .14em; color: var(--pp-ink2); }
-  .cdp-firma-linea { width: 44px; height: 1.5px; background: var(--pp-acc); display: inline-block; }
+  .cuh-firma { position: relative; z-index: 1; display: flex; align-items: center; gap: 14px; font-size: 14px; letter-spacing: .14em; color: var(--pp-ink2); }
+  .cuh-firma-linea { width: 44px; height: 1.5px; background: var(--pp-acc); display: inline-block; }
 
   /* ── Paneles del recorrido ─────────────────────────────────────────── */
-  .cdp-pan { height: calc(100vh + var(--st-pasos, 2) * 90vh); position: relative; }
-  .cdp-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
-  .cdp-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
-  .cdp-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
+  .cuh-pan { height: calc(100vh + var(--st-pasos, 2) * 90vh); position: relative; }
+  .cuh-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
+  .cuh-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
+  .cuh-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
     display: flex; flex-direction: column; gap: 18px; padding: 80px max(24px, calc((100vw - 560px) / 2)) 96px; }
-  .cdp-panel--abajo { justify-content: flex-end; }
-  .cdp-panel--centro { justify-content: center; }
-  .cdp-panel--album { gap: 14px; padding: clamp(52px, 8vh, 80px) max(24px, calc((100vw - 900px) / 2)) clamp(60px, 10vh, 96px); color: ${CARTA_TINTA}; }
+  .cuh-panel--abajo { justify-content: flex-end; }
+  .cuh-panel--centro { justify-content: center; }
+  .cuh-panel--album { gap: 14px; padding: clamp(52px, 8vh, 80px) max(24px, calc((100vw - 900px) / 2)) clamp(60px, 10vh, 96px); color: ${CARTA_TINTA}; }
   /* Apilado: los mismos paneles, uno abajo del otro, recorridos bajando. */
-  .cdp-pan[data-scroll="vertical"] { height: auto; }
-  .cdp-pan[data-scroll="vertical"] .cdp-pan-fijo { position: static; height: auto; overflow: visible; }
-  .cdp-pan[data-scroll="vertical"] .cdp-tira { position: static; display: block; width: 100%; transform: none !important; }
-  .cdp-pan[data-scroll="vertical"] .cdp-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-  .cdp-panel-top { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
+  .cuh-pan[data-scroll="vertical"] { height: auto; }
+  .cuh-pan[data-scroll="vertical"] .cuh-pan-fijo { position: static; height: auto; overflow: visible; }
+  .cuh-pan[data-scroll="vertical"] .cuh-tira { position: static; display: block; width: 100%; transform: none !important; }
+  .cuh-pan[data-scroll="vertical"] .cuh-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
+  .cuh-panel-top { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
     font-size: 11px; letter-spacing: .3em; color: var(--pp-acc); }
-  .cdp-panel-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
+  .cuh-panel-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 12px;
     font-size: 12px; letter-spacing: .22em; color: var(--pp-ink2); margin-top: auto; }
-  .cdp-seguir { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; font-size: 12px;
+  .cuh-seguir { position: relative; z-index: 1; display: flex; align-items: center; gap: 10px; font-size: 12px;
     letter-spacing: .24em; color: var(--pp-ink2); }
-  .cdp-flecha { display: inline-block; animation: ppSide 2.2s ease-in-out infinite; }
-  .cdp-puntos { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
-  .cdp-punto { width: 22px; height: 3px; transition: background 400ms ease; display: inline-block; }
+  .cuh-flecha { display: inline-block; animation: ppSide 2.2s ease-in-out infinite; }
+  .cuh-puntos { position: absolute; left: 0; right: 34px; bottom: 26px; display: flex; gap: 6px; justify-content: center; z-index: 2; }
+  .cuh-punto { width: 22px; height: 3px; transition: background 400ms ease; display: inline-block; }
 
   /* ── Tarjetas de papel ─────────────────────────────────────────────── */
-  .cdp-tarjeta { position: relative; z-index: 1; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 22px 20px;
+  .cuh-tarjeta { position: relative; z-index: 1; background: ${CARTA}; color: ${CARTA_TINTA}; padding: 22px 20px;
     display: flex; flex-direction: column; gap: 12px; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .cdp-tarjeta--izq { --cdp-giro: -1deg; transform: rotate(var(--cdp-giro)); }
-  .cdp-tarjeta--der { --cdp-giro: 1.1deg; transform: rotate(var(--cdp-giro)); }
-  .cdp-tarjeta--talon { --cdp-giro: -.8deg; transform: rotate(var(--cdp-giro)); overflow: visible; }
-  .cdp-tarjeta--hoy { --cdp-giro: -1deg; transform: rotate(var(--cdp-giro)); align-items: flex-start; }
-  .cdp-tarjeta--banco { margin-top: 4px; }
-  .cdp-doblez::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 22px 22px 0;
+  .cuh-tarjeta--izq { --cuh-giro: -1deg; transform: rotate(var(--cuh-giro)); }
+  .cuh-tarjeta--der { --cuh-giro: 1.1deg; transform: rotate(var(--cuh-giro)); }
+  .cuh-tarjeta--talon { --cuh-giro: -.8deg; transform: rotate(var(--cuh-giro)); overflow: visible; }
+  .cuh-tarjeta--hoy { --cuh-giro: -1deg; transform: rotate(var(--cuh-giro)); align-items: flex-start; }
+  .cuh-tarjeta--banco { margin-top: 4px; }
+  .cuh-doblez::before { content: ""; position: absolute; right: 0; top: 0; border-style: solid; border-width: 0 22px 22px 0;
     border-color: var(--pp-bg2) var(--pp-bg2) ${CARTA_LINEA} ${CARTA_LINEA}; }
-  .cdp-tarjeta-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
-  .cdp-tarjeta-titulo { margin: 0; font-family: var(--cdp-serif), 'Playfair Display', serif; font-weight: 500;
+  .cuh-tarjeta-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
+  .cuh-tarjeta-titulo { margin: 0; font-family: var(--cuh-serif), 'Playfair Display', serif; font-weight: 500;
     font-size: clamp(30px, 8vw, 48px); line-height: .98; }
-  .cdp-tarjeta-pregunta { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: 26px; line-height: 1.15; }
-  .cdp-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
+  .cuh-tarjeta-pregunta { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: 26px; line-height: 1.15; }
+  .cuh-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
 
-  .cdp-filas { display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.4; }
-  .cdp-fila { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid ${CARTA_LINEA}; padding-bottom: 8px; }
-  .cdp-fila > span:first-child { color: var(--pp-ink2); }
-  .cdp-fila--ultima { border-bottom: none; padding-bottom: 0; }
-  .cdp-fila-valor { text-align: right; }
-  .cdp-fila--copiable { align-items: center; }
-  .cdp-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .cdp-fila-etq { font-size: 12px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .cdp-fila-dato { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
-  .cdp-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 1.5px solid ${CARTA_TINTA}; background: transparent;
+  .cuh-filas { display: flex; flex-direction: column; gap: 10px; font-size: 14px; line-height: 1.4; }
+  .cuh-fila { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid ${CARTA_LINEA}; padding-bottom: 8px; }
+  .cuh-fila > span:first-child { color: var(--pp-ink2); }
+  .cuh-fila--ultima { border-bottom: none; padding-bottom: 0; }
+  .cuh-fila-valor { text-align: right; }
+  .cuh-fila--copiable { align-items: center; }
+  .cuh-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .cuh-fila-etq { font-size: 12px; letter-spacing: .18em; color: var(--pp-ink2); }
+  .cuh-fila-dato { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+  .cuh-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 1.5px solid ${CARTA_TINTA}; background: transparent;
     color: ${CARTA_TINTA}; font-size: 13px; letter-spacing: .12em; cursor: pointer; }
-  .cdp-btn-copiar--hecho { background: ${CARTA_TINTA}; color: ${CARTA}; }
+  .cuh-btn-copiar--hecho { background: ${CARTA_TINTA}; color: ${CARTA}; }
 
   /* ── Check-in ──────────────────────────────────────────────────────── */
-  .cdp-checkin { background: var(--pp-bg); }
-  .cdp-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .24em; color: var(--pp-ink2); }
-  .cdp-talon-estado { transition: color 400ms ease; flex-shrink: 0; }
-  .cdp-campo { display: flex; flex-direction: column; gap: 6px; }
-  .cdp-etiqueta { font-size: 12px; letter-spacing: .2em; color: var(--pp-ink2); }
-  .cdp-contador { display: flex; align-items: center; gap: 12px; }
-  .cdp-contador button { width: 48px; height: 48px; border: 1.5px solid ${CARTA_TINTA}; background: transparent; color: ${CARTA_TINTA}; font-size: 22px; line-height: 1; cursor: pointer; }
-  .cdp-contador button:disabled { opacity: .35; cursor: default; }
-  .cdp-contador > span { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: 40px; min-width: 40px; text-align: center; line-height: 1; }
-  .cdp-input { min-height: 44px; border: none; border-bottom: 1.5px solid #CFC4AE; background: transparent; color: ${CARTA_TINTA};
-    font-family: var(--cdp-sans), 'Jost', sans-serif; font-size: 16px; padding: 6px 2px; }
-  .cdp-input--serif { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: 20px; }
-  .cdp-input:focus { outline: none; border-bottom-color: var(--pp-acc); }
-  .cdp-input::placeholder { color: #9A9388; }
-  .cdp-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 1px dashed #CFC4AE; padding-top: 12px; font-size: 14px; color: var(--pp-ink2); }
-  .cdp-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .cdp-precio-total { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: 26px; line-height: 1; color: ${CARTA_TINTA}; }
-  .cdp-precio-detalle { font-size: 12px; color: var(--pp-ink2); }
-  .cdp-sello { position: absolute; right: 14px; top: 44px; width: 92px; height: 92px; border-radius: 50%;
+  .cuh-checkin { background: var(--pp-bg); }
+  .cuh-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12px; letter-spacing: .24em; color: var(--pp-ink2); }
+  .cuh-talon-estado { transition: color 400ms ease; flex-shrink: 0; }
+  .cuh-campo { display: flex; flex-direction: column; gap: 6px; }
+  .cuh-etiqueta { font-size: 12px; letter-spacing: .2em; color: var(--pp-ink2); }
+  .cuh-contador { display: flex; align-items: center; gap: 12px; }
+  .cuh-contador button { width: 48px; height: 48px; border: 1.5px solid ${CARTA_TINTA}; background: transparent; color: ${CARTA_TINTA}; font-size: 22px; line-height: 1; cursor: pointer; }
+  .cuh-contador button:disabled { opacity: .35; cursor: default; }
+  .cuh-contador > span { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: 40px; min-width: 40px; text-align: center; line-height: 1; }
+  .cuh-input { min-height: 44px; border: none; border-bottom: 1.5px solid #CFC4AE; background: transparent; color: ${CARTA_TINTA};
+    font-family: var(--cuh-sans), 'Jost', sans-serif; font-size: 16px; padding: 6px 2px; }
+  .cuh-input--serif { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: 20px; }
+  .cuh-input:focus { outline: none; border-bottom-color: var(--pp-acc); }
+  .cuh-input::placeholder { color: #9A9388; }
+  .cuh-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 1px dashed #CFC4AE; padding-top: 12px; font-size: 14px; color: var(--pp-ink2); }
+  .cuh-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .cuh-precio-total { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: 26px; line-height: 1; color: ${CARTA_TINTA}; }
+  .cuh-precio-detalle { font-size: 12px; color: var(--pp-ink2); }
+  .cuh-sello { position: absolute; right: 14px; top: 44px; width: 92px; height: 92px; border-radius: 50%;
     background: var(--pp-acc); color: ${CARTA}; display: flex; align-items: center; justify-content: center; text-align: center;
     font-size: 11px; letter-spacing: .2em; line-height: 1.3; opacity: 0; transform: scale(1.6) rotate(-20deg);
     box-shadow: 0 2px 0 rgba(0,0,0,.15); pointer-events: none;
     clip-path: polygon(50% 0%, 61% 5%, 71% 2%, 79% 10%, 90% 11%, 93% 22%, 100% 30%, 97% 42%, 100% 52%, 95% 63%, 96% 75%, 88% 82%, 84% 93%, 72% 94%, 63% 100%, 50% 96%, 37% 100%, 28% 94%, 16% 93%, 12% 82%, 4% 75%, 5% 63%, 0% 52%, 3% 42%, 0% 30%, 7% 22%, 10% 11%, 21% 10%, 29% 2%, 39% 5%); }
-  .cdp-petalos { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
-  .cdp-error { position: relative; z-index: 1; margin: 0; font-size: 13px; color: var(--pp-acc); }
+  .cuh-petalos { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+  .cuh-error { position: relative; z-index: 1; margin: 0; font-size: 13px; color: var(--pp-acc); }
 
   /* ── Botones ───────────────────────────────────────────────────────── */
-  .cdp-btn-solido { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  .cuh-btn-solido { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     min-height: 52px; padding: 0 22px; border: none; background: var(--pp-acc); color: ${CARTA};
-    font-family: var(--cdp-sans), 'Jost', sans-serif; font-size: 14px; letter-spacing: .2em; cursor: pointer;
+    font-family: var(--cuh-sans), 'Jost', sans-serif; font-size: 14px; letter-spacing: .2em; cursor: pointer;
     box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
-  .cdp-btn-solido--tinta { background: var(--pp-ink); color: var(--pp-btn-fg); }
-  .cdp-btn-solido:disabled { opacity: .6; cursor: default; }
-  .cdp-btn-fantasma { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center;
+  .cuh-btn-solido--tinta { background: var(--pp-ink); color: var(--pp-btn-fg); }
+  .cuh-btn-solido:disabled { opacity: .6; cursor: default; }
+  .cuh-btn-fantasma { position: relative; z-index: 1; display: inline-flex; align-items: center; justify-content: center;
     min-height: 48px; padding: 0 22px; background: transparent; color: var(--pp-ink); border: 1.5px solid var(--pp-ink);
     font-size: 13px; letter-spacing: .18em; cursor: pointer; }
-  .cdp-btn-papel { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 10px; min-height: 48px;
+  .cuh-btn-papel { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 10px; min-height: 48px;
     padding: 0 22px; align-self: flex-start; border: 1.5px solid var(--pp-ink); color: var(--pp-ink); font-size: 14px;
     letter-spacing: .14em; background: ${CARTA}; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);
-    --cdp-giro: -1deg; transform: rotate(var(--cdp-giro)); text-decoration: none; }
+    --cuh-giro: -1deg; transform: rotate(var(--cuh-giro)); text-decoration: none; }
 
   /* ── Mapa ──────────────────────────────────────────────────────────── */
-  .cdp-mapa { position: relative; z-index: 1; height: 180px; border: 1.5px solid ${CARTA_LINEA}; background: ${CARTA}; overflow: hidden;
+  .cuh-mapa { position: relative; z-index: 1; height: 180px; border: 1.5px solid ${CARTA_LINEA}; background: ${CARTA}; overflow: hidden;
     box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); }
 
   /* ── Cronograma ────────────────────────────────────────────────────── */
-  .cdp-crono { position: relative; z-index: 1; display: flex; flex-direction: column; border-left: 2px solid var(--pp-acc); margin-left: 6px; }
-  .cdp-crono-fila { display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline; }
-  .cdp-crono-hora { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1; }
-  .cdp-crono-titulo { font-size: 15px; }
+  .cuh-crono { position: relative; z-index: 1; display: flex; flex-direction: column; border-left: 2px solid var(--pp-acc); margin-left: 6px; }
+  .cuh-crono-fila { display: flex; gap: 18px; padding: 10px 0 10px 18px; align-items: baseline; }
+  .cuh-crono-hora { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: 26px; min-width: 64px; line-height: 1; }
+  .cuh-crono-titulo { font-size: 15px; }
 
   /* ── Álbum ─────────────────────────────────────────────────────────── */
-  .cdp-polaroids { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr);
+  .cuh-polaroids { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr);
     gap: 14px; max-width: 900px; width: 100%; margin: 0 auto; align-content: start; }
-  .cdp-polaroid { position: relative; background: #FDFBF6; padding: 8px 8px 30px; min-height: 0; display: flex;
+  .cuh-polaroid { position: relative; background: #FDFBF6; padding: 8px 8px 30px; min-height: 0; display: flex;
     box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); cursor: pointer; grid-column: span 2; }
-  .cdp-polaroids[data-cantidad="1"] .cdp-polaroid { grid-column: span 6; }
-  .cdp-polaroids[data-cantidad="2"] .cdp-polaroid { grid-column: span 3; }
-  .cdp-polaroids[data-cantidad="4"] .cdp-polaroid { grid-column: span 3; }
-  .cdp-polaroids[data-cantidad="5"] .cdp-polaroid:nth-child(-n+2) { grid-column: span 3; }
-  .cdp-polaroid:nth-child(odd) { transform: rotate(-2deg); }
-  .cdp-polaroid:nth-child(even) { transform: rotate(1.5deg); margin-top: 14px; }
-  .cdp-polaroid-img { width: 100%; height: 100%; min-height: 120px; object-fit: cover; display: block;
+  .cuh-polaroids[data-cantidad="1"] .cuh-polaroid { grid-column: span 6; }
+  .cuh-polaroids[data-cantidad="2"] .cuh-polaroid { grid-column: span 3; }
+  .cuh-polaroids[data-cantidad="4"] .cuh-polaroid { grid-column: span 3; }
+  .cuh-polaroids[data-cantidad="5"] .cuh-polaroid:nth-child(-n+2) { grid-column: span 3; }
+  .cuh-polaroid:nth-child(odd) { transform: rotate(-2deg); }
+  .cuh-polaroid:nth-child(even) { transform: rotate(1.5deg); margin-top: 14px; }
+  .cuh-polaroid-img { width: 100%; height: 100%; min-height: 120px; object-fit: cover; display: block;
     background: repeating-linear-gradient(135deg, #DCD7CB 0 8px, #E9E5DC 8px 16px); }
-  .cdp-chinche { position: absolute; left: 50%; top: -10px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
+  .cuh-chinche { position: absolute; left: 50%; top: -10px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%;
     background: radial-gradient(circle at 34% 30%, #fff 0 14%, var(--pp-acc) 16% 68%, rgba(0,0,0,.45) 70%);
     box-shadow: 0 3px 4px rgba(0,0,0,.32); }
 
   /* ── Música ────────────────────────────────────────────────────────── */
-  .cdp-musica { background: linear-gradient(180deg, var(--pp-bg2), var(--pp-sky2)); }
-  .cdp-lista { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
-  .cdp-lista-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(43,42,51,.14); }
-  .cdp-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .cdp-lista-tema { font-size: 15px; }
-  .cdp-lista-quien { font-size: 13px; color: var(--pp-ink2); }
+  .cuh-musica { background: linear-gradient(180deg, var(--pp-bg2), var(--pp-sky2)); }
+  .cuh-lista { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto; }
+  .cuh-lista-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid rgba(43,42,51,.14); }
+  .cuh-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .cuh-lista-tema { font-size: 15px; }
+  .cuh-lista-quien { font-size: 13px; color: var(--pp-ink2); }
 
   /* ── Regalos ───────────────────────────────────────────────────────── */
-  .cdp-regalos { background: linear-gradient(180deg, var(--pp-sky2), var(--pp-hill1) 60%, var(--pp-night)); }
+  .cuh-regalos { background: linear-gradient(180deg, var(--pp-sky2), var(--pp-hill1) 60%, var(--pp-night)); }
 
   /* ── Trivia ────────────────────────────────────────────────────────── */
-  .cdp-quiz { background: linear-gradient(180deg, var(--pp-hill1), var(--pp-night) 70%); color: var(--pp-night-ink); }
-  .cdp-opciones { display: flex; flex-direction: column; gap: 8px; }
-  .cdp-opcion { min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #CFC4AE; background: transparent;
-    color: ${CARTA_TINTA}; font-family: var(--cdp-sans), 'Jost', sans-serif; font-size: 15px; cursor: pointer;
+  .cuh-quiz { background: linear-gradient(180deg, var(--pp-hill1), var(--pp-night) 70%); color: var(--pp-night-ink); }
+  .cuh-opciones { display: flex; flex-direction: column; gap: 8px; }
+  .cuh-opcion { min-height: 48px; text-align: left; padding: 0 16px; border: 1.5px solid #CFC4AE; background: transparent;
+    color: ${CARTA_TINTA}; font-family: var(--cuh-sans), 'Jost', sans-serif; font-size: 15px; cursor: pointer;
     transition: background 300ms, border-color 300ms, color 300ms; }
-  .cdp-opcion:disabled { cursor: default; }
-  .cdp-opcion--bien { background: var(--pp-acc2); border-color: var(--pp-acc2); color: ${CARTA}; }
-  .cdp-opcion--mal { border-color: var(--pp-acc); color: var(--pp-acc); }
+  .cuh-opcion:disabled { cursor: default; }
+  .cuh-opcion--bien { background: var(--pp-acc2); border-color: var(--pp-acc2); color: ${CARTA}; }
+  .cuh-opcion--mal { border-color: var(--pp-acc); color: var(--pp-acc); }
 
   /* ── Tu pase ───────────────────────────────────────────────────────── */
-  .cdp-pase { justify-content: flex-end; gap: 20px; background: var(--pp-night); color: var(--pp-night-ink);
+  .cuh-pase { justify-content: flex-end; gap: 20px; background: var(--pp-night); color: var(--pp-night-ink);
     padding: 44vh max(24px, calc((100% - 560px) / 2)) calc(40px + env(safe-area-inset-bottom)); }
-  .cdp-ticket { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr auto; background: ${CARTA};
-    color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.14); --cdp-giro: -.6deg; transform: rotate(var(--cdp-giro));
+  .cuh-ticket { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr auto; background: ${CARTA};
+    color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.2), 0 8px 14px rgba(0,0,0,.14); --cuh-giro: -.6deg; transform: rotate(var(--cuh-giro));
     border-radius: 12px; overflow: hidden; }
-  .cdp-ticket-izq { padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; border-right: 2px dashed #CFC4AE; position: relative; }
-  .cdp-ticket-der { padding: 16px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .cdp-ticket-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
-  .cdp-ticket-nombre { font-family: var(--cdp-serif), 'Playfair Display', serif; font-size: clamp(30px, 8vw, 40px); line-height: .95; }
-  .cdp-ticket-dato { font-size: 14px; color: var(--pp-ink2); }
-  .cdp-ticket-fecha { font-size: 14px; letter-spacing: .14em; color: var(--pp-acc); }
-  .cdp-ticket-muesca { position: absolute; right: -12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pp-night); }
-  .cdp-ticket-muesca--arriba { top: -12px; }
-  .cdp-ticket-muesca--abajo { bottom: -12px; }
+  .cuh-ticket-izq { padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; border-right: 2px dashed #CFC4AE; position: relative; }
+  .cuh-ticket-der { padding: 16px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .cuh-ticket-kicker { font-size: 12px; letter-spacing: .26em; color: var(--pp-ink2); }
+  .cuh-ticket-nombre { font-family: var(--cuh-serif), 'Playfair Display', serif; font-size: clamp(30px, 8vw, 40px); line-height: .95; }
+  .cuh-ticket-dato { font-size: 14px; color: var(--pp-ink2); }
+  .cuh-ticket-fecha { font-size: 14px; letter-spacing: .14em; color: var(--pp-acc); }
+  .cuh-ticket-muesca { position: absolute; right: -12px; width: 24px; height: 24px; border-radius: 50%; background: var(--pp-night); }
+  .cuh-ticket-muesca--arriba { top: -12px; }
+  .cuh-ticket-muesca--abajo { bottom: -12px; }
   /* El QR compartido viene con su propio marco claro: acá va sobre el talón. */
-  .cdp-ticket-der .qr-ingreso, .cdp-ticket-der section { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; }
-  .cdp-info-extra { position: relative; z-index: 1; }
-  .cdp-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .cdp-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-night-ink) !important;
+  .cuh-ticket-der .qr-ingreso, .cuh-ticket-der section { background: transparent !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+  .cuh-info-extra { position: relative; z-index: 1; }
+  .cuh-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .cuh-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-night-ink) !important;
     border: 1px solid rgba(243,235,221,.35) !important; border-radius: 0 !important; letter-spacing: .18em !important; }
   /* Los íconos de los componentes compartidos no entran acá: el dibujo de la
      colección es el papel recortado, y un ícono de trazo al lado desentona. */
-  .cdp-raiz .ia-icon-box { display: none !important; }
-  .cdp-pase-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-top: 10px; }
-  .cdp-pase-firma { font-family: var(--cdp-serif), 'Playfair Display', serif; font-style: italic; font-size: 24px; color: var(--pp-night-ink); }
-  .cdp-pase-creditos { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-  .cdp-replay { cursor: pointer; font-size: 12px; letter-spacing: .18em; color: var(--pp-acc); }
+  .cuh-raiz .ia-icon-box { display: none !important; }
+  .cuh-pase-pie { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-top: 10px; }
+  .cuh-pase-firma { font-family: var(--cuh-serif), 'Playfair Display', serif; font-style: italic; font-size: 24px; color: var(--pp-night-ink); }
+  .cuh-pase-creditos { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .cuh-replay { cursor: pointer; font-size: 12px; letter-spacing: .18em; color: var(--pp-acc); }
 
   /* ── Riel ──────────────────────────────────────────────────────────── */
-  .cdp-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
+  .cuh-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
     align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
     opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid rgba(43,42,51,.12); }
-  .cdp-riel-top { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-ink2); transition: color 500ms ease; }
-  .cdp-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: rgba(43,42,51,.14); position: relative; }
-  .cdp-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .cdp-riel-etiqueta { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-acc); transition: color 500ms ease; }
+  .cuh-riel-top { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-ink2); transition: color 500ms ease; }
+  .cuh-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: rgba(43,42,51,.14); position: relative; }
+  .cuh-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
+  .cuh-riel-etiqueta { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .3em; color: var(--pp-acc); transition: color 500ms ease; }
 
   /* ── Portada ───────────────────────────────────────────────────────── */
-  .cdp-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden;
+  .cuh-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden;
     background: linear-gradient(180deg, var(--pp-sky1), var(--pp-sky2)); }
-  .cdp-portada-escena { position: absolute; inset: 0; pointer-events: none; }
-  .cdp-portada-contenido { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
+  .cuh-portada-escena { position: absolute; inset: 0; pointer-events: none; }
+  .cuh-portada-contenido { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
     align-items: center; text-align: center; pointer-events: none;
     padding: calc(64px + env(safe-area-inset-top)) max(24px, calc((100% - 480px) / 2)) calc(26px + env(safe-area-inset-bottom)); }
-  .cdp-portada-arriba { display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.6vh, 14px); width: 100%; }
-  .cdp-cartel { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: clamp(16px, 3vh, 26px) clamp(18px, 5vw, 30px);
+  .cuh-portada-arriba { display: flex; flex-direction: column; align-items: center; gap: clamp(8px, 1.6vh, 14px); width: 100%; }
+  .cuh-cartel { position: relative; background: ${CARTA}; color: ${CARTA_TINTA}; padding: clamp(16px, 3vh, 26px) clamp(18px, 5vw, 30px);
     max-width: 100%; box-sizing: border-box; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08);
     transform: rotate(-1.2deg); transform-origin: 50% 0%; }
-  .cdp-cartel-nombres { margin: 0; font-family: var(--cdp-serif), 'Playfair Display', serif; font-weight: 500;
+  .cuh-cartel-nombres { margin: 0; font-family: var(--cuh-serif), 'Playfair Display', serif; font-weight: 500;
     font-size: min(clamp(34px, 10vw, 60px), 6.4vh); line-height: .96; letter-spacing: -.01em;
     display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 0 .28em; }
-  .cdp-cartel-amp { font-style: italic; font-weight: 400; font-size: .6em; color: var(--pp-acc); }
-  .cdp-cartel-chinche { position: absolute; left: 50%; top: -10px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%;
+  .cuh-cartel-amp { font-style: italic; font-weight: 400; font-size: .6em; color: var(--pp-acc); }
+  .cuh-cartel-chinche { position: absolute; left: 50%; top: -10px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%;
     background: radial-gradient(circle at 34% 30%, #fff 0 14%, var(--pp-acc) 16% 68%, rgba(0,0,0,.45) 70%);
     box-shadow: 0 3px 5px rgba(0,0,0,.34); }
-  .cdp-portada-abajo { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2vh, 16px); width: 100%; pointer-events: auto; }
-  .cdp-portada-datos { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 20px; background: ${CARTA};
+  .cuh-portada-abajo { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2vh, 16px); width: 100%; pointer-events: auto; }
+  .cuh-portada-datos { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 14px 20px; background: ${CARTA};
     color: ${CARTA_TINTA}; box-shadow: 0 2px 0 rgba(0,0,0,.12), 0 8px 14px rgba(0,0,0,.08); transform: rotate(.8deg);
     max-width: 100%; box-sizing: border-box; }
-  .cdp-portada-saludo { font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); }
-  .cdp-portada-fila { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; font-size: 14px; letter-spacing: .14em; }
-  .cdp-portada-pase { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .cdp-portada-btn { width: 100%; max-width: 360px; min-height: 52px; border: none; background: var(--pp-btn-bg); color: var(--pp-btn-fg);
-    font-family: var(--cdp-sans), 'Jost', sans-serif; font-size: 14px; letter-spacing: .22em; cursor: pointer;
+  .cuh-portada-saludo { font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); }
+  .cuh-portada-fila { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 14px; font-size: 14px; letter-spacing: .14em; }
+  .cuh-portada-pase { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
+  .cuh-portada-btn { width: 100%; max-width: 360px; min-height: 52px; border: none; background: var(--pp-btn-bg); color: var(--pp-btn-fg);
+    font-family: var(--cuh-sans), 'Jost', sans-serif; font-size: 14px; letter-spacing: .22em; cursor: pointer;
     box-shadow: 0 2px 0 rgba(0,0,0,.14), 0 8px 14px rgba(0,0,0,.1); transition: background 300ms ease; }
-  @media (hover: hover) { .cdp-portada-btn:hover { background: var(--pp-acc); color: ${CARTA}; } }
+  @media (hover: hover) { .cuh-portada-btn:hover { background: var(--pp-acc); color: ${CARTA}; } }
 
-  .cdp-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+  .cuh-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
     font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2); opacity: 0; transition: opacity 600ms ease; pointer-events: none;
     animation: ppHint 2.4s ease-in-out infinite; }
 
   /* ── Lupa ──────────────────────────────────────────────────────────── */
-  .cdp-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(43,42,51,.94); display: flex; align-items: center;
+  .cuh-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(43,42,51,.94); display: flex; align-items: center;
     justify-content: center; padding: 24px; cursor: zoom-out; }
-  .cdp-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid ${CARTA};
+  .cuh-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid ${CARTA};
     background: transparent; color: ${CARTA}; font-size: 18px; line-height: 1; cursor: pointer; }
-  .cdp-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; background: ${CARTA}; padding: 10px 10px 30px; }
+  .cuh-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; background: ${CARTA}; padding: 10px 10px 30px; }
 
   /* En escritorio la invitación sigue siendo una hoja angosta centrada: las
      escenas están dibujadas para una pantalla de teléfono y estiradas a 1440
      px pierden la escala del recorte. */
   @media (min-width: 1024px) {
-    .cdp-section, .cdp-panel { padding-left: max(24px, calc((100% - 620px) / 2)); padding-right: max(24px, calc((100% - 620px) / 2)); }
-    .cdp-panel--album { padding-left: max(24px, calc((100vw - 900px) / 2)); padding-right: max(24px, calc((100vw - 900px) / 2)); }
+    .cuh-section, .cuh-panel { padding-left: max(24px, calc((100% - 620px) / 2)); padding-right: max(24px, calc((100% - 620px) / 2)); }
+    .cuh-panel--album { padding-left: max(24px, calc((100vw - 900px) / 2)); padding-right: max(24px, calc((100vw - 900px) / 2)); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cdp-raiz * { animation: none !important; }
-    .cdp-scroller [data-xin] { opacity: 1 !important; --cdp-y: 0px; }
+    .cuh-raiz * { animation: none !important; }
+    .cuh-scroller [data-xin] { opacity: 1 !important; --cuh-y: 0px; }
   }
 `;

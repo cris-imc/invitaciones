@@ -244,8 +244,8 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 |---|---|---|
 | Jardín de papel | JARDINDEPAPEL | `verificada` — base `JardinDePapelTemplate.tsx` (2.150 líneas): escenas del mockup byte por byte en `escenas/JdpEscenas.ts`, motor propio (reveals, frase palabra por palabra, paneles pineados, parallax con mouse/giroscopio, ventana de la foto, riel), portada con las 7 capas que entran y se levantan al abrir, cuenta regresiva propia, check-in con sello y pétalos, álbum de polaroids, canciones, trivia y ticket con QR. 4 variantes por `scripts/gen-capas-de-papel-variants.js` (Noche estrellada, Bosque, Rosa empolvado, Viñedo; el tono claro/oscuro sale solo de la paleta). Los 10 puntos de wiring, `PlantillaDinamica` (374), tsc y eslint limpios. Verificada en el navegador (DOM): 8 secciones, 21 SVG de escena, 4 filtros de papel, las piezas WebP, Cormorant + DM Sans, cuenta viva. |
 | Cielo de papel | CIELODEPAPEL | `verificada` — derivada de Jardín con `scripts/derivar-cielo.js`: el mismo motor (reveals, paneles pineados, parallax, ventana, riel, portada en capas) con Playfair Display + Jost, sus propias escenas (`CdpEscenas.ts`: la quinceañera de papel, la luna, el salón) y cinco paletas de cielo (Cielo rosado, Noche azul, Lila, Dorado, Menta). Es de quince: entra en `soloQuince`, y Jardín pasó a `soloCasamiento` (su dibujo es una pareja). Su mockup no trae panel de ceremonia, así que las escenas de los paneles van por NOMBRE y no por posición -- si el anfitrión activa la ceremonia, ese panel va sin decoración en vez de robarle el dibujo al de al lado. Verificada en DOM: paleta #F7E9EC/#D9738F, 8 secciones, 21 SVG de escena, piezas del quince, Playfair + Jost, 10 capas de portada. |
-| Cuento de papel | CUENTODEPAPEL | — |
-| Ciudad de papel | CIUDADDEPAPEL | — |
+| Cuento de papel | CUENTODEPAPEL | `verificada` — derivada con `scripts/derivar-capas.js` (ficha en `scripts/familias/capas/cuento.json`): quince de cuento de hadas, con el castillo en la portada y la quinceañera de espaldas mirándolo. Playfair Display + Jost, 5 paletas (Cuento de hadas, Bosque encantado, Rosa de cuento, Medianoche, Oro viejo). Sin panel de ceremonia, como Cielo. Verificada en DOM: paleta #F4EFFA/#9B6BD6, castillo y xv-espalda montadas, 8 escenas, 10 capas de portada. |
+| Ciudad de papel | CIUDADDEPAPEL | `verificada` — derivada con `scripts/derivar-capas.js` (ficha en `capas/ciudad.json`): casamiento urbano, los cerros son edificios y la pareja mira la ciudad desde una azotea. Playfair Display + **Work Sans**, 5 paletas (Azotea, Neón nocturno, Concreto, Puerto, Terracota urbana). Trae los cuatro paneles. Verificada en DOM: paleta #EFE9E1/#C2564B, Work Sans en el cuerpo, pieza pareja-ciudad montada. |
 | Trazo de papel | TRAZODEPAPEL | — |
 
 ### Icon · Tipográfica Editorial
@@ -314,7 +314,7 @@ familia: son reglas de las dos colecciones nuevas.
 8. **La colección Icon se llama Iconic** (decisión del 2026-09-15). El código
    del tipo es `ICONIC_TEMPLATE_TIPOS` y `Coleccion = "ICONIC"`.
 
-## 8. Cómo se instala una familia (a partir de Papel Prensado)
+## 8. Cómo se instala una familia
 
 Las cinco familias de Papel Prensado comparten el 92 % del archivo: en el
 mockup, Lumbre y Prensa se diferencian en 87 líneas de 1.037. Copiar y pegar
@@ -338,3 +338,25 @@ Un arreglo en el registro se hace una vez en la base y llega a las cinco
 volviendo a correr las derivaciones:
 
     node scripts/derivar-noche.js && node scripts/derivar-lumbre.js       && node scripts/derivar-herbario.js && node scripts/derivar-trazo.js       && node scripts/gen-papel-prensado-variants.js       && node scripts/generar-plantillas-dinamicas.js
+
+### Capas de papel: una ficha por familia
+
+Lo mismo que en Papel Prensado, pero un paso más allá: en vez de un script de
+derivación por familia hay **uno solo** (`scripts/derivar-capas.js`) y una
+ficha JSON por familia en `scripts/familias/capas/`, con lo único que las
+distingue -- tipografías, paleta base, paletas de las variantes, y qué paneles
+dibuja su mockup. Las escenas salen del mockup con
+`scripts/extraer-escenas-capas.js`.
+
+Instalar una familia nueva de Capas de papel es:
+
+    node scripts/extraer-escenas-capas.js "mockup/Icon/<Familia>.dc.html" <pre> capas-de-papel
+    # escribir scripts/familias/capas/<familia>.json y scripts/familias/<familia>.json
+    node scripts/derivar-capas.js && node scripts/gen-capas-de-papel-variants.js
+    node scripts/cablear-familia.js scripts/familias/<familia>.json
+    node scripts/generar-plantillas-dinamicas.js
+
+Jardín lleva ficha igual (`capas/jardin.json`, con `esBase: true`): no se
+deriva -- está escrita a mano -- pero sus variantes de color se generan con el
+mismo script que las demás, así no hay dos lugares donde mirar qué es una
+familia.

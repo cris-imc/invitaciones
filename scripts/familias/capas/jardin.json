@@ -1,0 +1,113 @@
+{
+  "esBase": true,
+  "archivo": "JardinDePapelTemplate",
+  "prefijo": "jdp",
+  "mote": "Jardin",
+  "titulo": "JARDÍN DE PAPEL",
+  "varianteBase": "Jardín",
+  "nota": "Es la familia base de la sub-colección: está escrita a mano y NO se deriva (por eso esBase). Su ficha vive acá igual, para que sus variantes de color se generen con el mismo script que las demás.",
+  "serif": {
+    "modulo": "Cormorant_Garamond",
+    "css": "'Cormorant Garamond', serif",
+    "pesos": [
+      "400",
+      "500",
+      "600"
+    ]
+  },
+  "sans": {
+    "modulo": "DM_Sans",
+    "css": "'DM Sans', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#F3EBDD",
+    "bg2": "#E9DFCC",
+    "ink": "#2B2A33",
+    "ink2": "#6E6A72",
+    "acc": "#C86B5A",
+    "acc2": "#7C9A7E",
+    "sky1": "#F3EBDD",
+    "sky2": "#EBD3BE",
+    "hill1": "#BCCBB6",
+    "hill2": "#7C9A7E",
+    "hill3": "#4F6B55",
+    "night": "#2E2C3D",
+    "nightInk": "#F3EBDD"
+  },
+  "paneles": {
+    "recepcion": 0,
+    "ceremonia": 1,
+    "llegar": 2,
+    "cronograma": 3
+  },
+  "variantes": {
+    "Noche": {
+      "etiqueta": "Noche estrellada",
+      "bg": "#1E2740",
+      "bg2": "#16203A",
+      "ink": "#F1E9DA",
+      "ink2": "#A9AEC2",
+      "acc": "#D4A857",
+      "acc2": "#6C7BA8",
+      "sky1": "#1E2740",
+      "sky2": "#3A3F63",
+      "hill1": "#3E4A6B",
+      "hill2": "#2C3654",
+      "hill3": "#1B2238",
+      "night": "#0F1526",
+      "nightInk": "#F1E9DA"
+    },
+    "Bosque": {
+      "etiqueta": "Bosque",
+      "bg": "#EAE6D8",
+      "bg2": "#DDD8C6",
+      "ink": "#1F2B25",
+      "ink2": "#5E6B64",
+      "acc": "#B87333",
+      "acc2": "#2F5D4A",
+      "sky1": "#EAE6D8",
+      "sky2": "#D6D9C4",
+      "hill1": "#A9B8A2",
+      "hill2": "#5C7F68",
+      "hill3": "#2F4A3C",
+      "night": "#2E2C3D",
+      "nightInk": "#F3EBDD"
+    },
+    "Rosa": {
+      "etiqueta": "Rosa empolvado",
+      "bg": "#F4E6E2",
+      "bg2": "#EBD6D0",
+      "ink": "#3A2A2E",
+      "ink2": "#7C666B",
+      "acc": "#7A2A3B",
+      "acc2": "#D9A5A0",
+      "sky1": "#F4E6E2",
+      "sky2": "#EBC9C2",
+      "hill1": "#D9B9B4",
+      "hill2": "#B98C8A",
+      "hill3": "#7A5C60",
+      "night": "#2E2C3D",
+      "nightInk": "#F3EBDD"
+    },
+    "Vinedo": {
+      "etiqueta": "Viñedo",
+      "bg": "#F3EBDD",
+      "bg2": "#E7DCC8",
+      "ink": "#2E2530",
+      "ink2": "#6E6470",
+      "acc": "#6B3A5B",
+      "acc2": "#C9A24D",
+      "sky1": "#F3EBDD",
+      "sky2": "#E4CDBE",
+      "hill1": "#C3B5A6",
+      "hill2": "#8A6E7E",
+      "hill3": "#4E3A4C",
+      "night": "#2E2C3D",
+      "nightInk": "#F3EBDD"
+    }
+  }
+}

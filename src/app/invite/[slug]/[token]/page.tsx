@@ -21,6 +21,16 @@ import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso"
 import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
 import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
 import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
+import { CiudadDePapelTemplate } from "@/components/templates/CiudadDePapelTemplate";
+import { CiudadDePapelTemplateNeon } from "@/components/templates/CiudadDePapelTemplateNeon";
+import { CiudadDePapelTemplateConcreto } from "@/components/templates/CiudadDePapelTemplateConcreto";
+import { CiudadDePapelTemplatePuerto } from "@/components/templates/CiudadDePapelTemplatePuerto";
+import { CiudadDePapelTemplateTerracota } from "@/components/templates/CiudadDePapelTemplateTerracota";
+import { CuentoDePapelTemplate } from "@/components/templates/CuentoDePapelTemplate";
+import { CuentoDePapelTemplateBosque } from "@/components/templates/CuentoDePapelTemplateBosque";
+import { CuentoDePapelTemplateRosa } from "@/components/templates/CuentoDePapelTemplateRosa";
+import { CuentoDePapelTemplateMedianoche } from "@/components/templates/CuentoDePapelTemplateMedianoche";
+import { CuentoDePapelTemplateOro } from "@/components/templates/CuentoDePapelTemplateOro";
 import { CieloDePapelTemplate } from "@/components/templates/CieloDePapelTemplate";
 import { CieloDePapelTemplateNoche } from "@/components/templates/CieloDePapelTemplateNoche";
 import { CieloDePapelTemplateLila } from "@/components/templates/CieloDePapelTemplateLila";
@@ -742,6 +752,22 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Dorado': return <CieloDePapelTemplateDorado invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Menta': return <CieloDePapelTemplateMenta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <CieloDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'CUENTODEPAPEL') {
+                switch (color) {
+                    case 'Bosque': return <CuentoDePapelTemplateBosque invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Rosa': return <CuentoDePapelTemplateRosa invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Medianoche': return <CuentoDePapelTemplateMedianoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Oro': return <CuentoDePapelTemplateOro invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <CuentoDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'CIUDADDEPAPEL') {
+                switch (color) {
+                    case 'Neon': return <CiudadDePapelTemplateNeon invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Concreto': return <CiudadDePapelTemplateConcreto invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Puerto': return <CiudadDePapelTemplatePuerto invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Terracota': return <CiudadDePapelTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <CiudadDePapelTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'PRENSA') {
                 switch (color) {

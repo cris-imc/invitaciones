@@ -132,6 +132,8 @@ export function WizardLivePreview() {
         "DESPEDIDASOLTERA", "DESPEDIDASOLTERO", "GRADUACION", "INAUGURACION", "INFANTILESPACIO", "INFANTILJURASICO", "INFANTILSAFARI", "ANIVERSARIO",
         // Colección Paper · Papel Prensado
         "PRENSA",
+        "CIUDADDEPAPEL",
+        "CUENTODEPAPEL",
         "CIELODEPAPEL",
         "HERBARIO",
         "TRAZO",

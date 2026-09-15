@@ -1,0 +1,119 @@
+{
+  "archivo": "CiudadDePapelTemplate",
+  "prefijo": "ciu",
+  "mote": "Ciudad",
+  "titulo": "CIUDAD DE PAPEL",
+  "varianteBase": "Azotea",
+  "resumen": [
+    "El casamiento urbano: el mismo papel recortado, pero los cerros son",
+    "edificios y la pareja mira la ciudad desde una azotea. Playfair Display +",
+    "Work Sans, y cinco paletas de ciudad (azotea, neón nocturno, concreto,",
+    "puerto, terracota urbana).",
+    "",
+    "Trae los cuatro paneles, ceremonia incluida, como Jardín."
+  ],
+  "serif": {
+    "modulo": "Playfair_Display",
+    "css": "'Playfair Display', serif",
+    "pesos": [
+      "400",
+      "500",
+      "600"
+    ]
+  },
+  "sans": {
+    "modulo": "Work_Sans",
+    "css": "'Work Sans', sans-serif",
+    "pesos": [
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#EFE9E1",
+    "bg2": "#E2DAD0",
+    "ink": "#23242B",
+    "ink2": "#65666F",
+    "acc": "#C2564B",
+    "acc2": "#3F6C8E",
+    "sky1": "#EFE9E1",
+    "sky2": "#E8CDBE",
+    "hill1": "#C9C3BA",
+    "hill2": "#8E8C93",
+    "hill3": "#4A4A55",
+    "night": "#2E2C3D",
+    "nightInk": "#EFE9E1"
+  },
+  "paneles": {
+    "recepcion": 0,
+    "ceremonia": 1,
+    "llegar": 2,
+    "cronograma": 3
+  },
+  "variantes": {
+    "Neon": {
+      "etiqueta": "Neón nocturno",
+      "bg": "#161A26",
+      "bg2": "#10131D",
+      "ink": "#EDE7DD",
+      "ink2": "#9EA3B4",
+      "acc": "#E56A8C",
+      "acc2": "#4FB3C4",
+      "sky1": "#161A26",
+      "sky2": "#2B2640",
+      "hill1": "#2E3346",
+      "hill2": "#222736",
+      "hill3": "#151927",
+      "night": "#0F1526",
+      "nightInk": "#EDE7DD"
+    },
+    "Concreto": {
+      "etiqueta": "Concreto",
+      "bg": "#E9E7E2",
+      "bg2": "#DAD7D0",
+      "ink": "#25262A",
+      "ink2": "#666870",
+      "acc": "#D08A2C",
+      "acc2": "#5D7285",
+      "sky1": "#E9E7E2",
+      "sky2": "#D9D2C6",
+      "hill1": "#C4C1B9",
+      "hill2": "#94928C",
+      "hill3": "#55555C",
+      "night": "#2E2C3D",
+      "nightInk": "#E9E7E2"
+    },
+    "Puerto": {
+      "etiqueta": "Puerto",
+      "bg": "#E8EDEF",
+      "bg2": "#D8E1E5",
+      "ink": "#1E2A31",
+      "ink2": "#5D6E77",
+      "acc": "#1F6F8B",
+      "acc2": "#E0A458",
+      "sky1": "#E8EDEF",
+      "sky2": "#CFE0E5",
+      "hill1": "#B7C7CE",
+      "hill2": "#7C939D",
+      "hill3": "#3E5560",
+      "night": "#2E2C3D",
+      "nightInk": "#E8EDEF"
+    },
+    "Terracota": {
+      "etiqueta": "Terracota urbana",
+      "bg": "#F2E7DF",
+      "bg2": "#E6D6C9",
+      "ink": "#33251F",
+      "ink2": "#6F5C52",
+      "acc": "#A8452F",
+      "acc2": "#7B8C6B",
+      "sky1": "#F2E7DF",
+      "sky2": "#EDC9B0",
+      "hill1": "#D4BCA9",
+      "hill2": "#A5836E",
+      "hill3": "#6A4B3C",
+      "night": "#2E2C3D",
+      "nightInk": "#F2E7DF"
+    }
+  }
+}

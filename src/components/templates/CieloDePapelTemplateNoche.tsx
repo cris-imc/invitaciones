@@ -7,22 +7,23 @@
  * CIELO DE PAPEL · Colección Iconic — sub-colección "Capas de papel"
  * Variante: Noche azul
  *
- * GENERADO por scripts/derivar-cielo.js a partir de
+ * GENERADO por scripts/derivar-capas.js a partir de
  * JardinDePapelTemplate.tsx — no editar a mano: el motor se arregla en
- * Jardín y se vuelve a derivar; lo propio de Cielo se cambia en el script.
+ * Jardín y se vuelve a derivar; lo propio de esta familia está en
+ * scripts/familias/capas/cielo.json.
  *
- * El quince de la sub-colección: el mismo papel recortado que Jardín -- las
- * capas se inclinan con el mouse o el giroscopio, se desplazan a distinta
- * velocidad al bajar, la portada se abre levantando las capas -- pero con
+ * El quince de la sub-colección: el mismo papel recortado que Jardín, con
  * su propio dibujo (la quinceañera, la luna, el salón), Playfair Display en
  * vez de Cormorant y cinco paletas de cielo.
- *
+ * 
  * Su mockup no trae panel de ceremonia, porque un quince no suele tenerla.
- * Si el anfitrión igual la activa, el panel se dibuja sin decoración propia
- * en vez de robarle la escena a otro (ver ESCENA_DE_PANEL).
+ * Si el anfitrión igual la activa, ese panel se dibuja sin decoración propia
+ * en vez de robarle la escena a otro.
  *
- * PESO (Railway): comparte las piezas WebP de la sub-colección; las suyas
- * son 5 archivos de ~450 KB en total, con loading lazy salvo la portada.
+ * Las escenas son las del mockup, byte por byte (ver
+ * escenas/CdpEscenas.ts y scripts/extraer-escenas-capas.js): son
+ * decoración pura -- ni un dato del invitado pasa por ahí -- y montarlas
+ * como HTML es lo único que garantiza que el dibujo llegue igual.
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -159,9 +160,7 @@ function numeroDePase(orderNumber: number | undefined): string {
  */
 const ESCENA_DE_PANEL: Record<string, string> = {
   recepcion: CUANDO_CDP[0] ?? "",
-  // Sin ceremonia en el mockup del quince: si el anfitrión la activa, el
-  // panel va sin decoración propia antes que con la de otro.
-  ceremonia: "",
+  ceremonia: "", // su mockup no dibuja este panel
   llegar: CUANDO_CDP[1] ?? "",
   cronograma: CUANDO_CDP[2] ?? "",
 };

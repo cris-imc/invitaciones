@@ -1,0 +1,18 @@
+{
+  "codigo": "CIUDADDEPAPEL",
+  "etiqueta": "Ciudad de papel",
+  "archivo": "CiudadDePapelTemplate",
+  "componente": "CiudadDePapelTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "capasDePapel",
+  "acento": "#C2564B",
+  "eventos": ["soloCasamiento"],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    { "id": "default", "nombre": "Azotea", "color": "#C2564B" },
+    { "id": "Neon", "nombre": "Neón nocturno", "color": "#E56A8C" },
+    { "id": "Concreto", "nombre": "Concreto", "color": "#D08A2C" },
+    { "id": "Puerto", "nombre": "Puerto", "color": "#1F6F8B" },
+    { "id": "Terracota", "nombre": "Terracota urbana", "color": "#A8452F" }
+  ]
+}

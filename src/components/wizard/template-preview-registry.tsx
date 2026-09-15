@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL";
 
 export interface ColorOption {
   id: string;
@@ -1250,4 +1250,36 @@ export const CIELODEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
   Lila: dynamic(() => import("@/components/templates/CieloDePapelTemplateLila").then((m) => m.CieloDePapelTemplateLila), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Dorado: dynamic(() => import("@/components/templates/CieloDePapelTemplateDorado").then((m) => m.CieloDePapelTemplateDorado), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Menta: dynamic(() => import("@/components/templates/CieloDePapelTemplateMenta").then((m) => m.CieloDePapelTemplateMenta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CUENTODEPAPEL_COLORS: ColorOption[] = [
+  { id: "default", name: "Cuento de hadas", color: "#9B6BD6" },
+  { id: "Bosque", name: "Bosque encantado", color: "#3F7D5C" },
+  { id: "Rosa", name: "Rosa de cuento", color: "#D4568E" },
+  { id: "Medianoche", name: "Medianoche", color: "#B79BF0" },
+  { id: "Oro", name: "Oro viejo", color: "#C08A2E" },
+];
+
+export const CUENTODEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CuentoDePapelTemplate").then((m) => m.CuentoDePapelTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Bosque: dynamic(() => import("@/components/templates/CuentoDePapelTemplateBosque").then((m) => m.CuentoDePapelTemplateBosque), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Rosa: dynamic(() => import("@/components/templates/CuentoDePapelTemplateRosa").then((m) => m.CuentoDePapelTemplateRosa), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Medianoche: dynamic(() => import("@/components/templates/CuentoDePapelTemplateMedianoche").then((m) => m.CuentoDePapelTemplateMedianoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Oro: dynamic(() => import("@/components/templates/CuentoDePapelTemplateOro").then((m) => m.CuentoDePapelTemplateOro), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const CIUDADDEPAPEL_COLORS: ColorOption[] = [
+  { id: "default", name: "Azotea", color: "#C2564B" },
+  { id: "Neon", name: "Neón nocturno", color: "#E56A8C" },
+  { id: "Concreto", name: "Concreto", color: "#D08A2C" },
+  { id: "Puerto", name: "Puerto", color: "#1F6F8B" },
+  { id: "Terracota", name: "Terracota urbana", color: "#A8452F" },
+];
+
+export const CIUDADDEPAPEL_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/CiudadDePapelTemplate").then((m) => m.CiudadDePapelTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Neon: dynamic(() => import("@/components/templates/CiudadDePapelTemplateNeon").then((m) => m.CiudadDePapelTemplateNeon), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Concreto: dynamic(() => import("@/components/templates/CiudadDePapelTemplateConcreto").then((m) => m.CiudadDePapelTemplateConcreto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Puerto: dynamic(() => import("@/components/templates/CiudadDePapelTemplatePuerto").then((m) => m.CiudadDePapelTemplatePuerto), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Terracota: dynamic(() => import("@/components/templates/CiudadDePapelTemplateTerracota").then((m) => m.CiudadDePapelTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

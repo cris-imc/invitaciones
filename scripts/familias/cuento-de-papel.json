@@ -1,0 +1,18 @@
+{
+  "codigo": "CUENTODEPAPEL",
+  "etiqueta": "Cuento de papel",
+  "archivo": "CuentoDePapelTemplate",
+  "componente": "CuentoDePapelTemplate",
+  "coleccion": "ICONIC",
+  "subcoleccion": "capasDePapel",
+  "acento": "#9B6BD6",
+  "eventos": ["soloQuince"],
+  "despuesDe": "JARDINDEPAPEL",
+  "variantes": [
+    { "id": "default", "nombre": "Cuento de hadas", "color": "#9B6BD6" },
+    { "id": "Bosque", "nombre": "Bosque encantado", "color": "#3F7D5C" },
+    { "id": "Rosa", "nombre": "Rosa de cuento", "color": "#D4568E" },
+    { "id": "Medianoche", "nombre": "Medianoche", "color": "#B79BF0" },
+    { "id": "Oro", "nombre": "Oro viejo", "color": "#C08A2E" }
+  ]
+}

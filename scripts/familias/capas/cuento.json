@@ -1,0 +1,120 @@
+{
+  "archivo": "CuentoDePapelTemplate",
+  "prefijo": "cuh",
+  "mote": "Cuento",
+  "titulo": "CUENTO DE PAPEL",
+  "varianteBase": "Cuento de hadas",
+  "resumen": [
+    "El quince de cuento de hadas: mismo papel recortado, con un castillo en",
+    "la portada y la quinceañera de espaldas mirándolo. Playfair Display +",
+    "Jost, y cinco paletas que van del lila al oro viejo pasando por una",
+    "medianoche azul.",
+    "",
+    "Como Cielo, su mockup no trae panel de ceremonia."
+  ],
+  "serif": {
+    "modulo": "Playfair_Display",
+    "css": "'Playfair Display', serif",
+    "pesos": [
+      "400",
+      "500",
+      "600"
+    ]
+  },
+  "sans": {
+    "modulo": "Jost",
+    "css": "'Jost', sans-serif",
+    "pesos": [
+      "300",
+      "400",
+      "500"
+    ]
+  },
+  "paleta": {
+    "bg": "#F4EFFA",
+    "bg2": "#E9E0F5",
+    "ink": "#241C3A",
+    "ink2": "#746A8C",
+    "acc": "#9B6BD6",
+    "acc2": "#E0B457",
+    "sky1": "#F4EFFA",
+    "sky2": "#DCC7EE",
+    "hill1": "#E2D6F2",
+    "hill2": "#B79AD8",
+    "hill3": "#6F5796",
+    "night": "#2E2C3D",
+    "nightInk": "#F4EFFA"
+  },
+  "paneles": {
+    "recepcion": 0,
+    "ceremonia": null,
+    "llegar": 1,
+    "cronograma": 2
+  },
+  "variantes": {
+    "Bosque": {
+      "etiqueta": "Bosque encantado",
+      "bg": "#EDF2EA",
+      "bg2": "#DFE8DA",
+      "ink": "#1E2B24",
+      "ink2": "#5F7064",
+      "acc": "#3F7D5C",
+      "acc2": "#E0B457",
+      "sky1": "#EDF2EA",
+      "sky2": "#CFE0CC",
+      "hill1": "#D5E3D2",
+      "hill2": "#93B79A",
+      "hill3": "#43604C",
+      "night": "#2E2C3D",
+      "nightInk": "#EDF2EA"
+    },
+    "Rosa": {
+      "etiqueta": "Rosa de cuento",
+      "bg": "#FBEDF2",
+      "bg2": "#F3DCE6",
+      "ink": "#33203A",
+      "ink2": "#7E667C",
+      "acc": "#D4568E",
+      "acc2": "#E0B457",
+      "sky1": "#FBEDF2",
+      "sky2": "#F0C9DC",
+      "hill1": "#EFD8E6",
+      "hill2": "#D4A6C4",
+      "hill3": "#8A5F80",
+      "night": "#2E2C3D",
+      "nightInk": "#FBEDF2"
+    },
+    "Medianoche": {
+      "etiqueta": "Medianoche",
+      "bg": "#1A1F42",
+      "bg2": "#131736",
+      "ink": "#F1ECFA",
+      "ink2": "#A9AAD2",
+      "acc": "#B79BF0",
+      "acc2": "#E8C87C",
+      "sky1": "#1A1F42",
+      "sky2": "#3A3470",
+      "hill1": "#383C6E",
+      "hill2": "#282C56",
+      "hill3": "#161A3A",
+      "night": "#0F1526",
+      "nightInk": "#F1ECFA"
+    },
+    "Oro": {
+      "etiqueta": "Oro viejo",
+      "bg": "#FAF3E6",
+      "bg2": "#F1E5CE",
+      "ink": "#2C2536",
+      "ink2": "#7A7060",
+      "acc": "#C08A2E",
+      "acc2": "#9B6BD6",
+      "sky1": "#FAF3E6",
+      "sky2": "#F0DCB4",
+      "hill1": "#EBDCC0",
+      "hill2": "#D2B98A",
+      "hill3": "#8A7250",
+      "night": "#2E2C3D",
+      "nightInk": "#FAF3E6"
+    }
+  }
+}
