@@ -5,12 +5,15 @@
   "titulo": "POSTAL",
   "varianteBase": "Aeropostal",
   "resumen": [
-    "La postal de viaje: Alfa Slab One como el sello de un destino, Work Sans",
-    "para el texto y JetBrains Mono para los datos, como el matasellos."
+    "Correo aéreo: Alfa Slab One como sello postal, Work Sans para el texto y",
+    "JetBrains Mono para folios y sellos. Borde de franjas, mapa con curvas de",
+    "nivel, un avioncito que recorre la ruta, matasellos con la tinta gastada,",
+    "sello de visa, panel split-flap, etiquetas de valija, boarding pass y",
+    "postales que giran y muestran el dorso."
   ],
   "serif": {
     "modulo": "Alfa_Slab_One",
-    "css": "'Alfa Slab One', serif",
+    "css": "'Alfa Slab One', cursive",
     "pesos": [
       "400"
     ]
@@ -20,14 +23,17 @@
     "css": "'Work Sans', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "600",
+      "700"
     ]
   },
   "mono": {
     "modulo": "JetBrains_Mono",
     "css": "'JetBrains Mono', monospace",
     "pesos": [
-      "400"
+      "400",
+      "500"
     ]
   },
   "paleta": {
@@ -36,14 +42,9 @@
     "ink": "#1E3A5F",
     "ink2": "#1E3A5F",
     "acc": "#D9643A",
-    "acc2": "#2E8B8B"
+    "acc2": "#2E8B8B",
+    "acc3": "#E8A33D"
   },
-  "cssExtra": [
-    "/* Postal: bordes de sello y tarjetas con línea de troquel. */",
-    ".pos-tapa-nombres, .pos-h2, .pos-panel-titulo, .pos-fecha-linea { letter-spacing: -.01em; }",
-    ".pos-tarjeta, .pos-cupon { border-style: dashed; }",
-    ".pos-foto { border-style: dashed; }"
-  ],
   "variantes": {
     "Mediterraneo": {
       "etiqueta": "Mediterráneo",
@@ -52,7 +53,8 @@
       "ink": "#123456",
       "ink2": "#123456",
       "acc": "#E76F51",
-      "acc2": "#2A9D8F"
+      "acc2": "#2A9D8F",
+      "acc3": "#E9C46A"
     },
     "Desierto": {
       "etiqueta": "Desierto",
@@ -61,7 +63,8 @@
       "ink": "#3A2E22",
       "ink2": "#3A2E22",
       "acc": "#C1502E",
-      "acc2": "#7A8B6F"
+      "acc2": "#7A8B6F",
+      "acc3": "#D9A441"
     },
     "Artico": {
       "etiqueta": "Ártico",
@@ -70,7 +73,8 @@
       "ink": "#28343D",
       "ink2": "#28343D",
       "acc": "#C0553A",
-      "acc2": "#5B7C8D"
+      "acc2": "#5B7C8D",
+      "acc3": "#D6A857"
     },
     "Tropico": {
       "etiqueta": "Trópico",
@@ -79,7 +83,13 @@
       "ink": "#20463C",
       "ink2": "#20463C",
       "acc": "#E0603E",
-      "acc2": "#2E9E7D"
+      "acc2": "#2E9E7D",
+      "acc3": "#E5B94C"
     }
-  }
+  },
+  "extras": [
+    "acc3"
+  ],
+  "render": "pos.jsx",
+  "css": "pos.css"
 }

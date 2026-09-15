@@ -1,0 +1,409 @@
+const CSS_OBS = `
+  /* ── Observatorio ─────────────────────────────────────────────────────
+     La carta celeste: Cormorant Garamond fina para nombres y cifras, Jost
+     para el texto, IBM Plex Mono para coordenadas y folios. Azul profundo,
+     marfil, oro y azul acero; todo con filetes de 0,5-1 px. Estrellas que
+     titilan, un cometa, la constelación que se traza sola, el astrolabio
+     que gira, la luna de esa noche, el ocular, las órbitas del countdown y
+     las placas en negativo. Todo SVG y CSS. */
+  .obs-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--obs-sans), 'Jost', sans-serif;
+    --obs-acc3: ${PALETA.acc3}; --obs-linea: color-mix(in srgb, var(--pp-ink) 25%, transparent); --obs-linea-suave: color-mix(in srgb, var(--pp-ink) 20%, transparent); }
+  .obs-raiz a { color: inherit; text-decoration: none; }
+  .obs-raiz button { font: inherit; }
+
+  .obs-scroller { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; opacity: 0;
+    transition: opacity 900ms ease 260ms; scrollbar-width: none; }
+  .obs-scroller::-webkit-scrollbar { width: 0; height: 0; }
+
+  /* ── El pliego ─────────────────────────────────────────────────────── */
+  .obs-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-std, .obs-frase-seccion, .obs-musica { background: var(--pp-bg2); }
+  .obs-std { border-top: 1px solid color-mix(in srgb, var(--pp-ink) 12%, transparent); }
+
+  /* El folio: mono con tracking, en oro. */
+  .obs-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-folio--chico { font-size: 10px; letter-spacing: .2em; }
+  .obs-folio--tinta { color: inherit; }
+  .obs-folio--pie { align-items: center; margin-top: auto; }
+  .obs-panel > .obs-folio--pie { color: inherit; opacity: .8; }
+  .obs-folio--colofon { align-items: center; border-top: 1px solid color-mix(in srgb, var(--pp-ink) 30%, transparent); padding-top: 12px; }
+  .obs-etq-mono { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc); display: block; }
+  .obs-barra { width: 40%; height: 1px; background: var(--obs-linea); }
+  .obs-oro { color: var(--pp-acc); }
+  .obs-azul { color: var(--pp-acc2); }
+  .obs-italica { font-style: italic; }
+
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .obs-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .obs-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .obs-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .obs-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .obs-spread > *:first-child { justify-self: end; }
+    .obs-spread > *:last-child { justify-self: start; }
+    .obs-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
+  }
+
+  /* ── Tipos ─────────────────────────────────────────────────────────── */
+  .obs-h2, .obs-panel-titulo, .obs-frase, .obs-tapa-nombres { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; }
+  .obs-h2, .obs-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .98; font-size: clamp(40px, 11vw, 84px); }
+  .obs-h2 em { font-weight: 300; }
+  .obs-h2--album { font-size: clamp(34px, 9vw, 68px); line-height: 1; }
+  .obs-panel-titulo { font-size: clamp(38px, 10vw, 84px); line-height: 1; }
+  .obs-panel-sub { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-parrafo { margin: 0; font-size: 15px; line-height: 1.55; max-width: 40ch; opacity: .85; }
+  .obs-cta-linea { align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 1px solid var(--pp-acc); color: var(--pp-acc);
+    font-weight: 500; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .obs-cta { margin-top: 10px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    color: var(--pp-bg); background: var(--pp-acc); font-weight: 500; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+
+  /* ── 01 Guardá la fecha: las efemérides ────────────────────────────── */
+  .obs-astrolabio { position: relative; width: min(100%, 420px); aspect-ratio: 1; align-self: center; }
+  .obs-astrolabio-svg { position: absolute; inset: 0; overflow: visible; color: var(--pp-acc); }
+  .obs-astrolabio-arco { animation: obsGira 90s linear infinite; transform-origin: 100px 100px; }
+  .obs-astrolabio-arco text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 2.6px; fill: var(--pp-acc); }
+  .obs-astrolabio-orbita { animation: obsGiraContra 60s linear infinite; transform-origin: 100px 100px; fill: var(--pp-ink); }
+  .obs-astrolabio-dia { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: 70px; fill: var(--pp-ink); }
+  .obs-astrolabio-mes { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; letter-spacing: 1px; fill: var(--pp-acc); }
+  .obs-astrolabio-anio { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 4px; fill: var(--pp-ink); }
+  @keyframes obsGira { to { transform: rotate(360deg); } }
+  @keyframes obsGiraContra { to { transform: rotate(-360deg); } }
+  /* La luna esa noche: un disco marfil con la sombra corrida. */
+  .obs-luna { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; border: 1px solid var(--obs-linea-suave); padding: 14px 16px; }
+  .obs-luna-disco { position: relative; width: 48px; height: 48px; border-radius: 50%; background: var(--pp-ink); overflow: hidden; display: block; }
+  .obs-luna-disco > span { position: absolute; inset: 0; border-radius: 50%; background: var(--pp-bg2); }
+  .obs-luna-texto { display: flex; flex-direction: column; gap: 2px; font-size: 13px; line-height: 1.4; }
+  /* El ocular: la foto circular con retícula y viñeta que se abre. */
+  .obs-ocular { position: relative; width: 100%; aspect-ratio: 1; align-self: center; max-width: 520px; margin-bottom: 28px; }
+  .obs-ocular-lente { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+    background: repeating-linear-gradient(135deg, #1A2740 0 8px, #142038 8px 16px);
+    box-shadow: 0 0 0 1px var(--pp-acc), 0 0 0 12px var(--pp-bg2), 0 0 0 13px var(--obs-linea-suave); }
+  .obs-foto-capa { position: absolute; inset: 0; }
+  .obs-vineta { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent 20%, var(--pp-bg) 60%);
+    opacity: calc(.25 + var(--obs-punto, 7.2) * .1042); }
+  .obs-reticula { position: absolute; z-index: 2; background: var(--obs-linea); }
+  .obs-reticula--v { left: 50%; top: 0; bottom: 0; width: 1px; }
+  .obs-reticula--h { top: 50%; left: 0; right: 0; height: 1px; }
+  .obs-reticula-centro { position: absolute; z-index: 2; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); }
+  .obs-ocular-etq { position: absolute; left: 0; right: 0; bottom: 16%; z-index: 2; text-align: center; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; }
+  .obs-ocular-pie { position: absolute; bottom: -28px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-ocular-pie--izq { left: 0; }
+  .obs-ocular-pie--der { right: 0; }
+
+  /* ── 02 Falta poco: las órbitas ────────────────────────────────────── */
+  .obs-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .obs-countdown > .obs-folio, .obs-countdown > .obs-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .obs-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 10px 0; white-space: nowrap; border-top: 1px solid var(--obs-linea-suave); border-bottom: 1px solid var(--obs-linea-suave);
+    font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; letter-spacing: .02em; }
+  .obs-marquesina-tira { display: flex; width: max-content; animation: obsCorre 18s linear infinite; }
+  .obs-marquesina-tira > span { padding-right: 40px; }
+  @keyframes obsCorre { to { transform: translate3d(-50%, 0, 0); } }
+  /* Cuatro órbitas: anillo fino, anillo punteado dorado que gira (más
+     rápido cuanto más chica la unidad) con un punto encima, y la cifra. */
+  .obs-cuenta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; justify-items: center; }
+  .obs-cuenta-caja { position: relative; width: min(100%, 240px); aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .obs-cuenta-caja::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--obs-linea); }
+  .obs-cuenta-caja::after { content: ""; position: absolute; inset: 8%; border-radius: 50%; border: 1px dashed var(--pp-acc); opacity: .6; animation: obsGira 90s linear infinite;
+    background: radial-gradient(circle at 50% 0, var(--pp-acc) 0 4px, transparent 4.5px); }
+  .obs-cuenta-caja:nth-child(2)::after { animation-duration: 60s; }
+  .obs-cuenta-caja:nth-child(3)::after { animation-duration: 40s; }
+  .obs-cuenta-caja:nth-child(4)::after { animation-duration: 30s; }
+  .obs-cuenta-num { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(56px, 16vw, 96px); line-height: 1; font-variant-numeric: tabular-nums; }
+  .obs-cuenta-num > span { display: inline-block; animation: obsCifra 300ms ease; }
+  @keyframes obsCifra { from { opacity: .3; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .obs-cuenta-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-tarjeta--hoy { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; padding: 20px 0; border-top: 1px solid var(--obs-linea-suave); border-bottom: 1px solid var(--obs-linea-suave); }
+  .obs-tarjeta--hoy .obs-tarjeta-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-tarjeta--hoy .obs-tarjeta-titulo { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(36px, 10vw, 72px); line-height: 1; }
+
+  /* ── 03 Unas palabras: la bitácora ─────────────────────────────────── */
+  .obs-frase-seccion { justify-content: space-between; gap: 30px; }
+  .obs-constelacion-fondo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .5; color: var(--pp-ink); }
+  .obs-constelacion-fondo polyline { stroke: var(--pp-acc); }
+  .obs-frase { margin: 0; font-size: clamp(30px, 8vw, 64px); line-height: 1.12; max-width: 18ch; }
+  .obs-nota { align-self: flex-end; display: flex; align-items: center; gap: 14px; border: 1px solid var(--obs-linea); padding: 14px 18px; max-width: 340px;
+    font-size: 13px; line-height: 1.45; animation: obsFlota 5s ease-in-out infinite; }
+  .obs-nota-estrella { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--pp-acc); flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
+  .obs-nota-estrella > span { width: 6px; height: 6px; border-radius: 50%; background: var(--pp-acc); }
+  @keyframes obsFlota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+  /* ── 04 Paneles: las coordenadas ───────────────────────────────────── */
+  .obs-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
+  .obs-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .obs-pan-fijo--bg2 { background: var(--pp-bg2); }
+  .obs-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
+  .obs-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-panel--bg2 { background: var(--pp-bg2); }
+  .obs-panel--azul { background: var(--pp-acc2); color: var(--pp-bg); --obs-linea: color-mix(in srgb, var(--pp-bg) 35%, transparent); }
+  .obs-panel--azul .obs-folio, .obs-panel--azul .obs-panel-sub { color: var(--pp-bg); }
+  .obs-panel--azul .obs-cta { background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-panel--azul .obs-ficha-coord { background: var(--pp-acc2); color: var(--pp-bg); }
+  .obs-pan[data-scroll="vertical"] { height: auto; }
+  .obs-pan[data-scroll="vertical"] .obs-pan-fijo { position: static; height: auto; overflow: visible; }
+  .obs-pan[data-scroll="vertical"] .obs-tira { position: static; display: block; width: 100%; transform: none !important; }
+  .obs-pan[data-scroll="vertical"] .obs-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
+  .obs-ficha { position: relative; border: 1px solid var(--obs-linea); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .obs-ficha--claro .obs-cta { background: var(--pp-ink); color: var(--pp-bg); }
+  .obs-ficha-coord { position: absolute; right: 14px; top: -7px; padding: 0 8px; background: var(--pp-bg); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-panel--bg2 .obs-ficha-coord { background: var(--pp-bg2); }
+  .obs-linea { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--obs-linea); font-size: 15px; line-height: 1.3; }
+  .obs-linea > span:first-child { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; opacity: .75; flex: 0 0 auto; padding-top: 3px; }
+  .obs-linea > span:last-child { text-align: right; font-weight: 500; }
+  .obs-mapa { height: 190px; overflow: hidden; border: 1px solid var(--obs-linea); }
+  .obs-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
+  .obs-punto { width: 6px; height: 6px; border-radius: 50%; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block; }
+  .obs-punto[data-activo="1"] { opacity: 1; }
+
+  /* ── 05 Check-in: el registro del observador ───────────────────────── */
+  .obs-checkin { background: var(--pp-acc2) !important; color: var(--pp-bg); }
+  .obs-cupon { position: relative; background: var(--pp-bg); color: var(--pp-ink); padding: 22px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+  .obs-cupon .obs-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .obs-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    padding-bottom: 12px; border-bottom: 1px solid var(--obs-linea-suave); }
+  .obs-talon-estado { transition: color 400ms ease; }
+  .obs-campo { display: flex; flex-direction: column; gap: 6px; }
+  .obs-etiqueta { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; opacity: .8; }
+  .obs-input { min-height: 48px; border: 0; border-bottom: 1px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--obs-sans), 'Jost', sans-serif; font-size: 15px; padding: 0; outline: none; }
+  .obs-contador { display: flex; align-items: center; border-bottom: 1px solid var(--pp-ink); min-height: 48px; }
+  .obs-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer; font-size: 22px; line-height: 1; }
+  .obs-contador button:disabled { opacity: .35; cursor: default; }
+  .obs-contador > span { flex: 1; text-align: center; font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 30px; line-height: 1; color: var(--pp-acc); }
+  .obs-filas { display: flex; flex-direction: column; }
+  .obs-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--obs-linea-suave); font-size: 14px; }
+  .obs-fila--ultima { border-bottom: 0; }
+  .obs-fila-valor { text-align: right; font-weight: 500; }
+  .obs-precio { display: flex; justify-content: space-between; gap: 12px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+  .obs-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; opacity: 1; }
+  .obs-precio-total { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 24px; line-height: 1; letter-spacing: 0; color: var(--pp-acc); }
+  .obs-precio-detalle { font-size: 10px; letter-spacing: .1em; }
+  .obs-btn-solido { min-height: 54px; border: 0; background: var(--pp-acc); color: var(--pp-bg); cursor: pointer;
+    font-weight: 500; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; padding: 0 18px; transition: background 200ms ease; }
+  @media (hover: hover) { .obs-btn-solido:hover { background: var(--pp-ink); } }
+  .obs-btn-solido:disabled { opacity: .6; cursor: default; }
+  .obs-btn-fantasma { min-height: 48px; border: 1px solid var(--pp-acc); background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-weight: 500; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; padding: 0 18px; }
+  .obs-error { margin: 0; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; color: var(--pp-acc); }
+  /* El sello REGISTRADO: dos anillos finos, arriba a la derecha. */
+  .obs-cupon .obs-sello { position: absolute; right: 14px; top: 46px; width: 120px; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+    opacity: 0; transform: scale(1.8); border: 1px solid var(--pp-acc); box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 22px;
+    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: .16em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-cupon .obs-sello::before { content: ""; position: absolute; inset: 26%; border-radius: 50%; border: 1px dashed var(--pp-acc); }
+  .obs-cupon .obs-sello::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: var(--pp-acc); }
+  .obs-petalos { display: none; }
+
+  /* ── 06 Álbum: las placas ──────────────────────────────────────────── */
+  .obs-panel--album { background: var(--pp-bg2); justify-content: flex-start; gap: 14px; }
+  .obs-panel--album-b { background: var(--pp-bg); }
+  .obs-placas { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .obs-placa { position: relative; min-height: 0; overflow: hidden; cursor: pointer; border: 1px solid color-mix(in srgb, var(--pp-ink) 30%, transparent);
+    background: repeating-linear-gradient(135deg, #1A2740 0 8px, #142038 8px 16px); }
+  .obs-placa-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .obs-bano { position: absolute; inset: 0; mix-blend-mode: screen; opacity: 0; transition: opacity 200ms linear; }
+  .obs-bano--1 { background: color-mix(in srgb, var(--pp-acc) 35%, transparent); }
+  .obs-bano--2 { background: color-mix(in srgb, var(--pp-acc2) 40%, transparent); }
+  .obs-bano--3 { background: color-mix(in srgb, var(--obs-acc3) 35%, transparent); }
+  /* El negativo: una capa marfil en "difference" que el motor apaga cuando
+     la placa llega al centro. */
+  .obs-negativo { position: absolute; inset: 0; background: var(--pp-ink); mix-blend-mode: difference; opacity: .18; transition: opacity 300ms linear; }
+  .obs-placa-n { position: absolute; left: 8px; top: 6px; z-index: 1; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .18em; color: var(--pp-acc); }
+  .obs-placa-nota { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .14em; opacity: .85; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .obs-placas[data-cantidad="3"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .obs-placas[data-cantidad="3"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .obs-placas[data-cantidad="3"] .obs-placa:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .obs-placas[data-cantidad="2"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .obs-placas[data-cantidad="2"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .obs-placas[data-cantidad="1"] .obs-placa:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: las frecuencias ────────────────────────────────────── */
+  .obs-eq { display: flex; align-items: flex-end; gap: 5px; height: 36px; }
+  .obs-eq span { width: 2px; height: 100%; background: var(--pp-ink); transform-origin: bottom; animation: obsEq 1.2s ease-in-out infinite; }
+  .obs-eq span:nth-child(1), .obs-eq span:nth-child(5) { background: var(--pp-acc); }
+  .obs-eq span:nth-child(3), .obs-eq span:nth-child(6) { background: var(--pp-acc2); }
+  @keyframes obsEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .obs-musica form.obs-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .obs-musica .obs-etiqueta { display: none; }
+  .obs-musica .obs-input { min-height: 48px; border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); background: transparent; color: var(--pp-ink); padding: 0 14px; min-width: 0; }
+  .obs-musica .obs-error { grid-column: 1 / -1; }
+  .obs-musica .obs-btn-solido { grid-column: 1 / -1; min-height: 50px; border: 1px solid var(--pp-acc); font-size: 12px; }
+  @media (hover: hover) { .obs-musica .obs-btn-solido:hover { background: transparent; color: var(--pp-acc); } }
+  .obs-lista { display: flex; flex-direction: column; margin-top: 12px; counter-reset: tema; }
+  .obs-lista-fila { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--obs-linea-suave); counter-increment: tema; }
+  .obs-lista-fila::before { content: "8" counter(tema) ".7"; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; color: var(--pp-acc); letter-spacing: .1em; flex: 0 0 auto; }
+  .obs-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .obs-lista-tema { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 22px; line-height: 1.05; }
+  .obs-lista-quien { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+
+  /* ── 08 Regalos ────────────────────────────────────────────────────── */
+  .obs-tarjeta--banco { --obs-neon: var(--pp-acc); position: relative; z-index: 1; border: 1px solid var(--obs-linea); background: var(--pp-bg2); padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .obs-tarjeta--der { --obs-neon: var(--pp-acc2); }
+  .obs-tarjeta--banco + .obs-tarjeta--banco { margin-top: 14px; }
+  .obs-tarjeta-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--obs-neon); }
+  .obs-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.55; opacity: .85; }
+  .obs-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .obs-fila-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .obs-fila-dato { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 13px; overflow-wrap: anywhere; }
+  .obs-fila--copiable:first-child { border-bottom: 1px solid var(--obs-linea-suave); }
+  .obs-fila--copiable:first-child .obs-fila-dato { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 24px; line-height: 1.05; color: var(--obs-neon); }
+  .obs-tarjeta--banco .obs-fila--ultima { border-bottom: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+  .obs-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-weight: 500; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+  .obs-btn-copiar--hecho { background: var(--pp-ink); color: var(--pp-bg); }
+
+  /* ── 09 Trivia: la trivia astral ───────────────────────────────────── */
+  .obs-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .obs-quiz .obs-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .obs-quiz .obs-tarjeta-kicker { align-self: flex-start; border: 1px solid var(--pp-bg); color: var(--pp-bg); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; padding: 8px 14px; }
+  .obs-quiz .obs-tarjeta-pregunta, .obs-quiz .obs-tarjeta-titulo { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 8vw, 64px); line-height: 1.05; max-width: 15ch; }
+  .obs-quiz .obs-tarjeta-mensaje { margin: 0; font-size: 15px; }
+  .obs-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .obs-opcion { min-height: 54px; border: 1px solid var(--pp-bg); background: transparent; color: var(--pp-bg); cursor: pointer; counter-increment: opcion;
+    font-family: var(--obs-sans), 'Jost', sans-serif; font-weight: 500; font-size: 15px; text-align: left; padding: 0 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .obs-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .obs-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-opcion--bien::after { content: "Correcta"; }
+  .obs-opcion--mal { background: var(--obs-acc3); color: var(--pp-ink); }
+  .obs-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .obs-quiz .obs-spread > .obs-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .obs-quiz .obs-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .obs-quiz .obs-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .obs-quiz .obs-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: el pase del observatorio ──────────────────────────── */
+  .obs-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .obs-pagina--ticket { align-items: flex-start; }
+  .obs-ticket { position: relative; width: 100%; max-width: 420px; background: var(--pp-ink); color: var(--pp-bg); padding: 18px 18px 18px 46px; box-sizing: border-box;
+    display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; margin-bottom: 20px; }
+  .obs-ticket-troquel { position: absolute; left: 32px; top: 0; bottom: 0; border-left: 1px dashed var(--pp-bg); opacity: .5; }
+  .obs-ticket-talon { position: absolute; left: 0; top: 0; bottom: 0; width: 32px; display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; }
+  .obs-ticket-datos { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .obs-ticket-etqs { display: flex; justify-content: space-between; gap: 8px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
+  .obs-ticket-fila { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .obs-ticket-nombre { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: clamp(20px, 5.4vw, 26px); line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .obs-ticket-cupula { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: clamp(26px, 7vw, 34px); line-height: 1; color: var(--obs-acc3); }
+  .obs-barras { width: 100%; height: 36px; display: block; color: var(--pp-bg); }
+  .obs-ticket-codigo { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .3em; }
+  .obs-ticket-qr { position: relative; width: clamp(96px, 26vw, 130px); aspect-ratio: 1; background: #FFFFFF; padding: 8px; box-sizing: border-box; border: 1px solid var(--pp-bg); }
+  .obs-ticket-qr .qr-ingreso, .obs-ticket-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .obs-ticket-qr img, .obs-ticket-qr svg, .obs-ticket-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .obs-ticket-qr p, .obs-ticket-qr h3, .obs-ticket-qr h4 { display: none; }
+  .obs-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .obs-pase-numero, .obs-pase-mesa { display: flex; flex-direction: column; }
+  .obs-pase-mesa { align-items: flex-end; text-align: right; }
+  .obs-pase-numero > span:last-child { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(64px, 19vw, 140px); line-height: .9; }
+  .obs-pase-mesa > span:last-child { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(40px, 12vw, 88px); line-height: .9; color: var(--obs-acc3); }
+  .obs-lineas-pase { display: flex; flex-direction: column; border-top: 1px solid color-mix(in srgb, var(--pp-ink) 30%, transparent); }
+  .obs-lineas-pase .obs-linea { border-bottom: 1px solid var(--obs-linea-suave); font-size: 14px; padding: 10px 0; }
+  .obs-lineas-pase .obs-linea:last-child { border-bottom: 0; }
+  .obs-lineas-pase .obs-linea > span:first-child { color: var(--pp-acc); opacity: 1; letter-spacing: .16em; }
+  .obs-lineas-pase .obs-linea > span:last-child { font-weight: 400; line-height: 1.4; }
+  .obs-info-extra { margin-top: 4px; }
+  .obs-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .obs-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-acc) !important; border: 1px solid var(--pp-acc) !important;
+    border-radius: 0 !important; font-weight: 500 !important; letter-spacing: .2em !important; text-transform: uppercase; }
+  .obs-raiz .ia-icon-box, .obs-raiz svg.lucide { display: none !important; }
+  .obs-pase-pie { display: flex; flex-direction: column; gap: 14px; }
+  .obs-despedida { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(26px, 7vw, 44px); line-height: 1.1; }
+  .obs-replay { cursor: pointer; color: var(--pp-ink); }
+  .obs-credito { display: inline-flex; opacity: .8; }
+
+  /* ── La tapa: la carta celeste ─────────────────────────────────────── */
+  .obs-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(18px + env(safe-area-inset-top)) max(20px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); }
+  .obs-cielo { position: absolute; inset: 0; pointer-events: none; overflow: hidden; color: var(--pp-ink); }
+  .obs-estrellas { position: absolute; inset: -4%; width: 108%; height: 108%; }
+  .obs-estrella--titila { animation: obsTitila 3s ease-in-out infinite; }
+  @keyframes obsTitila { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+  /* El cometa: una línea que cruza en 3 s y espera el resto del ciclo. */
+  .obs-cometa { position: absolute; left: 0; top: 40%; width: 120px; height: 1px; background: linear-gradient(90deg, transparent, var(--pp-ink)); transform-origin: right;
+    rotate: -28deg; opacity: 0; animation: obsCometa 11s ease-out 3s infinite; }
+  @keyframes obsCometa { 0% { transform: translate3d(-10vw, 10vh, 0); opacity: 0; } 8% { opacity: 1; } 30% { transform: translate3d(60vw, -30vh, 0); opacity: 0; } 100% { transform: translate3d(60vw, -30vh, 0); opacity: 0; } }
+  .obs-carta { position: absolute; left: 50%; top: 50%; width: min(140vw, 120vh, 900px); height: min(140vw, 120vh, 900px); margin-left: calc(min(140vw, 120vh, 900px) / -2); margin-top: calc(min(140vw, 120vh, 900px) / -2); opacity: .35; }
+  .obs-carta-puntos text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1.5px; fill: currentColor; }
+  .obs-folio--tapa { z-index: 1; }
+  .obs-tapa-centro { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; text-align: center; }
+  /* La constelación: se traza sola cuando entra la tapa (la línea de 1000
+     de largo se descubre en 1,8 s) y las estrellas aparecen de a una. */
+  .obs-constelacion { position: relative; width: min(100%, 520px); aspect-ratio: 5 / 2; margin-bottom: -2vh; color: var(--pp-acc); }
+  .obs-constelacion svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .obs-constelacion-linea { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: obsTraza 1800ms cubic-bezier(.2,.7,.2,1) 300ms forwards; }
+  @keyframes obsTraza { to { stroke-dashoffset: 0; } }
+  .obs-constelacion-estrellas { fill: var(--pp-ink); }
+  .obs-constelacion-estrellas circle, .obs-constelacion-halos circle, .obs-constelacion-etqs text { opacity: 0; animation: obsAparece 500ms ease forwards; }
+  .obs-constelacion-estrellas circle:nth-child(1) { animation-delay: .6s; } .obs-constelacion-estrellas circle:nth-child(2) { animation-delay: .72s; } .obs-constelacion-estrellas circle:nth-child(3) { animation-delay: .84s; }
+  .obs-constelacion-estrellas circle:nth-child(4) { animation-delay: .96s; } .obs-constelacion-estrellas circle:nth-child(5) { animation-delay: 1.08s; } .obs-constelacion-estrellas circle:nth-child(6) { animation-delay: 1.2s; } .obs-constelacion-estrellas circle:nth-child(7) { animation-delay: 1.32s; }
+  .obs-constelacion-halos { stroke: var(--pp-acc); }
+  .obs-constelacion-halos circle:nth-child(1) { animation-delay: 1.44s; } .obs-constelacion-halos circle:nth-child(2) { animation-delay: 1.56s; } .obs-constelacion-halos circle:nth-child(3) { animation-delay: 1.68s; }
+  .obs-constelacion-etqs text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px; fill: var(--pp-acc); }
+  .obs-constelacion-etqs text:nth-child(1) { animation-delay: 1.8s; } .obs-constelacion-etqs text:nth-child(2) { animation-delay: 1.92s; } .obs-constelacion-etqs text:nth-child(3) { animation-delay: 2.04s; } .obs-constelacion-etqs text:nth-child(4) { animation-delay: 2.16s; }
+  @keyframes obsAparece { to { opacity: 1; } }
+  .obs-tapa-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc); }
+  /* El nombre: Cormorant 300 centrado; el renglón más largo manda el cuerpo. */
+  .obs-tapa-nombres { margin: 0; line-height: .95; letter-spacing: -.01em; display: flex; flex-direction: column; align-items: center;
+    font-size: min(clamp(48px, 16vw, 140px), 13vh, calc((100vw - 60px) / (var(--largo, 9) * 0.48))); }
+  @media (min-width: 1024px) { .obs-tapa-nombres { font-size: min(11vw, 150px, 13vh, calc((min(100vw, 1100px) - 60px) / (var(--largo, 9) * 0.48))); } }
+  .obs-tapa-linea { overflow: hidden; display: block; white-space: nowrap; }
+  .obs-tapa-linea > span { display: block; }
+  .obs-tapa-linea--y { font-size: .34em; line-height: 1.6; }
+  .obs-tapa-y { display: inline-flex !important; align-items: center; gap: .6em; font-style: italic; color: var(--pp-acc); }
+  .obs-tapa-y > i { width: 2em; height: 1px; background: var(--pp-acc); }
+  .obs-tapa-y > em { font-weight: 300; }
+  .obs-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; box-sizing: border-box;
+    font-size: 13px; line-height: 1.4; text-align: left; font-weight: 500; border-top: 1px solid var(--obs-linea); padding-top: 10px; margin-top: 6px; }
+  .obs-tapa-datos-der { text-align: right; }
+  .obs-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; }
+  .obs-tapa-mensaje { margin: 0; font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; font-size: clamp(18px, 4.6vw, 24px); line-height: 1.35; max-width: 34ch; }
+  .obs-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 1px solid var(--pp-acc); background: transparent; color: var(--pp-acc); cursor: pointer;
+    font-weight: 500; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; padding: 0 22px; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .obs-tapa-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .obs-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--pp-ink); border-left: 1px solid var(--obs-linea) !important; }
+  .obs-riel-top { writing-mode: vertical-rl; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; color: var(--pp-ink) !important; }
+  .obs-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-ink); }
+  .obs-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .obs-riel-barra { position: absolute; left: -1px; top: 0; width: 2px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .obs-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .28em; color: var(--pp-acc);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: obsPista 2.4s ease-in-out infinite; }
+  @keyframes obsPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .obs-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-bg) 94%, transparent);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .obs-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--pp-acc); border-radius: 50%;
+    background: transparent; color: var(--pp-acc); font-size: 18px; line-height: 1; cursor: pointer; }
+  .obs-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 1px solid var(--pp-acc); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .obs-raiz * { animation: none !important; }
+    .obs-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
+    .obs-ocular { --obs-punto: 0; }
+    .obs-constelacion-linea { stroke-dashoffset: 0; }
+    .obs-constelacion-estrellas circle, .obs-constelacion-halos circle, .obs-constelacion-etqs text { opacity: 1; }
+    .obs-cometa { display: none; }
+  }
+`;

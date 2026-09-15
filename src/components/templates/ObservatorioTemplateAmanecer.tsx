@@ -8,15 +8,18 @@
  * Variante: Amanecer.
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/obs.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/obs.jsx, los
+ * estilos en scripts/css/tipografica/obs.css y las caras y la paleta en
+ * scripts/familias/tipografica/obs.json.
  *
- * La carta celeste: Cormorant Garamond sobre un cielo nocturno, con IBM
- * Plex Mono para las coordenadas y Jost para el texto. El acento es el
- * dorado de una constelación dibujada.
+ * La carta celeste: Cormorant Garamond fina para nombres y cifras, Jost
+ * para el texto, IBM Plex Mono para coordenadas y folios. Azul profundo,
+ * marfil, oro y azul acero con filetes de 0,5 a 1 px. Estrellas que
+ * titilan, un cometa, la constelación que se traza sola con la fecha,
+ * astrolabio que gira, la luna de esa noche, ocular, órbitas y placas.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -37,21 +40,21 @@ import { esVistaMiniatura } from "@/lib/miniatura";
 
 const obsSerif = Cormorant_Garamond({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["300", "400", "500"],
   style: ["normal", "italic"],
   display: "swap",
   variable: "--obs-serif",
 });
 const obsSans = Jost({
   subsets: ["latin"],
-  weight: ["300", "400"],
+  weight: ["400", "500", "600"],
   display: "swap",
   variable: "--obs-sans",
 });
 // El mono es la ficha técnica de la revista: folios, kickers y datos.
 const obsMono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "500"],
   display: "swap",
   variable: "--obs-mono",
 });
@@ -76,6 +79,7 @@ const PALETA = {
   hill3: "#1C2740",
   night: "#1C2740",
   nightInk: "#F1EBE0",
+  acc3: "#B8654A",
 };
 
 /**
@@ -312,7 +316,7 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -545,6 +549,31 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            const cerca = Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3));
+            bano.style.opacity = String(cerca);
+            // Las placas (Observatorio) están en negativo y se revelan al
+            // pasar por el centro.
+            const negativo = hoja.querySelector<HTMLElement>("[data-neg]");
+            if (negativo) negativo.style.opacity = (0.18 * (1 - cerca)).toFixed(3);
+            // Las postales (Postal) giran y muestran el dorso cuando pasan
+            // por el centro; vuelven al salir.
+            const carta = hoja.querySelector<HTMLElement>("[data-card]");
+            if (carta && !menosMovimiento) {
+              const gira = dx < 0.18 && p > 0.02 && p < 0.98;
+              if (carta.dataset.girada !== String(gira)) {
+                carta.dataset.girada = String(gira);
+                carta.style.transform = gira ? "rotateY(180deg)" : "rotateY(0)";
+              }
+            }
           });
         });
 
@@ -713,6 +742,7 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-acc3": PALETA.acc3,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -742,6 +772,36 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre en Cormorant fina, centrado, con la "y" entre dos líneas
+  // doradas. El renglón más largo manda el cuerpo.
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(5, ...renglones.map((n) => n.length));
+
+  // La bitácora: el medio en itálica dorada y el cierre en itálica azul.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.7)) return "obs-italica obs-azul";
+    if (i >= Math.floor(n * 0.25) && i < desdeAcento) return "obs-italica obs-oro";
+    return undefined;
+  };
+
+  const kickerDelEvento = tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const mesCorto = mesLargo.slice(0, 3).toUpperCase();
+  const anioRomano = aRomano(fechaEvento.getFullYear());
+  const luna = faseLunar(fechaHora);
+  const nombreDeLuna = tx(luna.clave);
+  const inicialesY = `${(nombre1.trim()[0] || "").toUpperCase()}${nombre2 ? ` ${tx("invitacion.rsvp.y")} ${(nombre2.trim()[0] || "").toUpperCase()}` : ""}`;
+  const codigoDelPase = `ALT ${pase} · ${(ciudad || lugarNombre || "").slice(0, 3).toUpperCase()} · ${anio}`;
+  // Las estrellas del cielo de la tapa: posición, radio y, en ocho de ellas,
+  // el ritmo del titilar.
+  const ESTRELLAS: [number, number, number, number][] = [
+    [22, 60, 1, 0], [88, 24, 0.8, 0], [140, 90, 1.3, 3.2], [210, 40, 0.7, 0], [300, 70, 1.1, 4.1], [370, 30, 0.9, 0],
+    [40, 180, 0.9, 0], [120, 220, 0.6, 0], [250, 160, 1.2, 2.8], [340, 200, 0.8, 0], [390, 140, 0.6, 0],
+    [60, 330, 0.7, 0], [180, 300, 0.9, 3.6], [290, 330, 0.6, 0], [360, 290, 1.1, 0],
+    [30, 470, 1, 4.4], [110, 520, 0.7, 0], [200, 480, 0.8, 0], [310, 500, 1.2, 3], [380, 440, 0.7, 0],
+    [70, 620, 0.8, 0], [160, 660, 1, 0], [260, 600, 0.6, 0], [350, 650, 0.9, 3.8],
+  ];
+
   return (
     <div
       ref={raizRef}
@@ -753,94 +813,101 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
 
       <div ref={scrollerRef} className="obs-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
+            Las efemérides: el astrolabio con la fecha adentro y el texto
+            girando, la luna de esa noche y la foto vista por el ocular. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="obs-section obs-std">
-          <div className="obs-trama obs-trama--media" aria-hidden="true" />
+          <div className="obs-folio">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.efemerides").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="obs-spread">
             <div className="obs-pagina">
-              <div className="obs-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+              <div data-xin="1" data-dist="0" className="obs-astrolabio">
+                <Astrolabio arco={`${diaSemana} · ${diaNum} ${tx("invitacion.evento.de").toUpperCase()} ${mesLargo.toUpperCase()} · ${anio} · ${[ciudad || lugarNombre].filter(Boolean).join(" · ").toUpperCase()} · ${hora} H · `} dia={diaNum} mes={`${tx("invitacion.evento.de")} ${mesLargo}`} anio={anioRomano} />
               </div>
-              <div className="obs-fecha">
-                <span data-xin="1" data-dist="-160" className="obs-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="obs-fecha-linea obs-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="obs-fecha-linea">{anio}</span>
+              <div data-xin="1" data-delay="300" className="obs-luna">
+                <span className="obs-luna-disco" aria-hidden="true"><span style={{ transform: `translateX(${luna.desplazamiento}%)` }} /></span>
+                <div className="obs-luna-texto">
+                  <span className="obs-etq-mono">{tx("invitacion.saveTheDate.lunaEsaNoche")}</span>
+                  <span>{nombreDeLuna} · {luna.porcentaje} % {tx("invitacion.saveTheDate.iluminada")}</span>
+                </div>
               </div>
-              <div data-xin="1" data-delay="360" className="obs-fecha-pie">
-                <span>{diaSemana} · {hora} H</span>
-                <AddToCalendarLink
-                  eventName={titulo}
-                  targetDate={fechaHora}
-                  location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="obs-link"
-                  showIcon={false}
-                >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
-                </AddToCalendarLink>
-              </div>
+              <AddToCalendarLink
+                eventName={titulo}
+                targetDate={fechaHora}
+                location={[lugarNombre, direccion].filter(Boolean).join(", ")}
+                className="obs-cta-linea"
+                showIcon={false}
+              >
+                {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()}
+              </AddToCalendarLink>
             </div>
 
             {hayFoto && (
-              <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="obs-foto">
-                {fotoMobile && (
-                  <div className="acp-mobile-only obs-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
-                  </div>
-                )}
-                {fotoDesktop && (
-                  <div className="acp-desktop-only obs-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
-                  </div>
-                )}
-                {/* La trama que tapa la foto y se disuelve al subir: el radio
-                    del punto lo mueve el motor en --obs-punto. */}
-                <span className="obs-foto-revelado" aria-hidden="true" />
-                <span className="obs-foto-anio">{anio}</span>
-                <span className="obs-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+              <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="obs-ocular">
+                <div className="obs-ocular-lente">
+                  {fotoMobile && (
+                    <div className="acp-mobile-only obs-foto-capa">
+                      <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="11,20,38" />
+                    </div>
+                  )}
+                  {fotoDesktop && (
+                    <div className="acp-desktop-only obs-foto-capa">
+                      <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="11,20,38" />
+                    </div>
+                  )}
+                  {/* La viñeta que tapa la foto y se abre al subir: el motor
+                      mueve --obs-punto de 7,2 a 0 y la opacidad la sigue. */}
+                  <span className="obs-vineta" aria-hidden="true" />
+                  <span className="obs-reticula obs-reticula--v" aria-hidden="true" /><span className="obs-reticula obs-reticula--h" aria-hidden="true" /><span className="obs-reticula-centro" aria-hidden="true" />
+                  <span className="obs-ocular-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                </div>
+                <span className="obs-ocular-pie obs-ocular-pie--izq">{tx("invitacion.saveTheDate.ocular").toUpperCase()}</span>
+                <span className="obs-ocular-pie obs-ocular-pie--der">{tx("invitacion.saveTheDate.placa").toUpperCase()} 01</span>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="obs-section obs-countdown">
+            El tránsito: cuatro órbitas con su anillo punteado girando y la
+            cifra en el centro. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="obs-section obs-countdown">
           <div className="obs-folio">
-            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.saveTheDate.transito").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
           <div className="obs-marquesina" aria-hidden="true">
             <div className="obs-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.cuentaRegresiva.faltan")} {tx("invitacion.cuentaRegresiva.dias").toLowerCase()}, {tx("invitacion.cuentaRegresiva.horas").toLowerCase()}, {tx("invitacion.cuentaRegresiva.minutos").toLowerCase()} {tx("invitacion.rsvp.y")} {tx("invitacion.cuentaRegresiva.segundos").toLowerCase()} — {diaNum} {tx("invitacion.evento.de")} {mesLargo} — {tx("invitacion.saveTheDate.laCuentaSigue")} —&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaObservatorio targetDate={fechaHora} />
-          <div className="obs-marquesina obs-marquesina--contraria" aria-hidden="true">
-            <div className="obs-marquesina-tira">
-              {[0, 1].map((i) => (
-                <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
-                </span>
-              ))}
+          <div className="obs-spread">
+            <div className="obs-pagina obs-pagina--entera">
+              <CuentaObservatorio targetDate={fechaHora} />
             </div>
+          </div>
+          <div className="obs-folio obs-folio--chico">
+            <span>{tx("invitacion.saveTheDate.horaLocal").toUpperCase()} · UTC−3</span>
+            <span>{[lugarNombre, dressCode].filter(Boolean).join(" · ").toUpperCase()}</span>
           </div>
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            La bitácora: una constelación de fondo, la frase en Cormorant y
+            la nota que flota con su estrella. */}
         {hayFrase && (
           <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="obs-section obs-frase-seccion">
+            <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="obs-constelacion-fondo" aria-hidden="true">
+              <polyline points="30,240 90,180 150,210 220,120 300,150 370,60" fill="none" stroke="currentColor" strokeWidth=".5" opacity=".6" className="obs-oro" />
+              <g fill="currentColor"><circle cx="30" cy="240" r="1.5" /><circle cx="90" cy="180" r="2" /><circle cx="150" cy="210" r="1.2" /><circle cx="220" cy="120" r="2.4" /><circle cx="300" cy="150" r="1.4" /><circle cx="370" cy="60" r="2" /></g>
+            </svg>
             <div className="obs-folio">
-              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.saveTheDate.bitacora").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
             <div className="obs-spread">
@@ -849,24 +916,25 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
                   // El espacio va fuera del span: el motor pone cada palabra
                   // en inline-block y un espacio adentro se colapsa a cero.
                   <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "obs-acento" : undefined}>{p}</span>{" "}
+                    <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
                   </span>
                 ))}
               </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="obs-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div data-xin="1" data-delay="900" data-dist="60" className="obs-nota">
+                <span className="obs-nota-estrella" aria-hidden="true"><span /></span>
+                <span>{tx("invitacion.frase.conAmor")} · {titulo} · {tx("invitacion.saveTheDate.registro").toLowerCase()} {String(fechaEvento.getDate()).padStart(2, "0")}.{String(fechaEvento.getMonth() + 1).padStart(2, "0")}.{anio}</span>
               </div>
             </div>
-            <div className="obs-folio obs-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+            <div className="obs-folio obs-folio--chico obs-folio--pie">
+              <span>{tx("invitacion.saveTheDate.observacion").toUpperCase()} Nº {pase}</span>
+              <span className="obs-barra" aria-hidden="true" />
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Las coordenadas: una observación por lugar, con la ficha de
+            filete fino y la etiqueta en la esquina. */}
         <div
           id="details"
           data-pan="1"
@@ -877,64 +945,68 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
         >
           <div className="obs-pan-fijo">
             <div data-strip="1" className="obs-tira">
-              <div data-tone={TONO} className="obs-panel">
+              <div data-tone="dark" className="obs-panel">
                 <div className="obs-folio">
                   <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="obs-spread">
-                  <h2 className="obs-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="obs-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="obs-lineas">
+                  <div className="obs-pagina">
+                    <span className="obs-panel-sub">{tx("invitacion.saveTheDate.observacion")} {deLugar("recepcion").split(" ")[0]}</span>
+                    <h2 className="obs-panel-titulo">{lugarNombre || ciudad}</h2>
+                  </div>
+                  <div className="obs-ficha">
+                    <span className="obs-ficha-coord">{(ciudad || `${hora} H`).toUpperCase()}</span>
                     <div className="obs-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {direccion && <div className="obs-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="obs-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="obs-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="obs-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}<span>→</span>
                       </a>
                     )}
                   </div>
                 </div>
-                <div className="obs-folio obs-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                <div className="obs-folio obs-folio--chico obs-folio--pie">
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="obs-panel">
+                <div id="ceremonia" data-tone="dark" className="obs-panel obs-panel--bg2">
                   <div className="obs-folio">
                     <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="obs-spread">
-                    <h2 className="obs-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="obs-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="obs-lineas">
+                    <div className="obs-pagina">
+                      <span className="obs-panel-sub">{tx("invitacion.saveTheDate.observacion")} {deLugar("ceremonia").split(" ")[0]}</span>
+                      <h2 className="obs-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="obs-ficha obs-ficha--claro">
+                      <span className="obs-ficha-coord">{(ceremoniaHora ? `${ceremoniaHora} H` : ceremoniaTitulo).toUpperCase()}</span>
                       {ceremoniaHora && <div className="obs-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="obs-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
-                  <div className="obs-folio obs-folio--pie">
+                  <div className="obs-folio obs-folio--chico obs-folio--pie">
                     <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="obs-panel">
+                <div id="location" data-tone="dark" className="obs-panel">
                   <div className="obs-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="obs-spread">
-                    <h2 className="obs-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="obs-lineas">
+                    <div className="obs-pagina">
+                      <span className="obs-panel-sub">{tx("invitacion.saveTheDate.observacion")} {deLugar("llegar").split(" ")[0]}</span>
+                      <h2 className="obs-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="obs-ficha">
+                      <span className="obs-ficha-coord">{(ciudad || lugarNombre).toUpperCase()}</span>
                       {embedMapUrl && (
                         <div className="obs-mapa">
                           <iframe
@@ -949,34 +1021,35 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="obs-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="obs-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()}<span>→</span>
                       </a>
                     </div>
                   </div>
-                  <div className="obs-folio obs-folio--pie">
+                  <div className="obs-folio obs-folio--chico obs-folio--pie">
                     <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="obs-panel obs-panel--acento">
+                <div id="schedule" data-tone="light" className="obs-panel obs-panel--azul">
                   <div className="obs-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="obs-spread">
-                    <h2 className="obs-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="obs-acento obs-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="obs-lineas">
+                    <div className="obs-pagina">
+                      <span className="obs-panel-sub">{tx("invitacion.saveTheDate.observacion")} {deLugar("cronograma").split(" ")[0]}</span>
+                      <h2 className="obs-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="obs-ficha">
+                      <span className="obs-ficha-coord">{hora} H</span>
                       {cronograma.map((item, i) => (
                         <div key={i} className="obs-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
                     </div>
                   </div>
-                  <div className="obs-folio obs-folio--pie">
+                  <div className="obs-folio obs-folio--chico obs-folio--pie">
                     <span>{fechaPuntos}</span>
                   </div>
                 </div>
@@ -987,22 +1060,21 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            El registro del observador: pliego azul, la ficha oscura con el
+            libro de observadores y el sello REGISTRADO. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="obs-section obs-checkin">
-            <div className="obs-folio">
-              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+          <section id="rsvp" data-tone="dark" data-screen-label={tx("invitacion.rsvp.confirmar")} className="obs-section obs-checkin">
+            <div className="obs-folio obs-folio--tinta">
+              <span data-xin="1" data-dist="-40">{nCheckin} — {tx("invitacion.saveTheDate.registro").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="obs-spread">
               <div className="obs-pagina">
                 <h2 data-xin="1" data-dist="-80" className="obs-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="obs-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><em>{tx("invitacion.rsvp.confirmaLinea2")}</em>
                 </h2>
               </div>
-              <div className="obs-cupon">
-                <span className="obs-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="obs-cupon">
                 <CheckinObservatorio
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1036,8 +1108,8 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            Las placas fotográficas: en negativo hasta que pasan por el
+            centro, donde se revelan con su baño de color. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1047,24 +1119,21 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
             className="obs-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="obs-pan-fijo">
+            <div className="obs-pan-fijo obs-pan-fijo--bg2">
               <div data-strip="1" className="obs-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="obs-panel obs-panel--album">
+                  <div key={iHoja} data-tone="dark" className={`obs-panel obs-panel--album${iHoja % 2 === 1 ? " obs-panel--album-b" : ""}`}>
                     <div className="obs-folio">
-                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                      <span>{nAlbum} — {tx("invitacion.saveTheDate.placas").toUpperCase()}</span>
+                      <span>{tx("invitacion.saveTheDate.serie").toUpperCase()} {String(iHoja + 1).padStart(2, "0")} / {String(hojasDeFotos.length).padStart(2, "0")} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="obs-h2 obs-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="obs-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="obs-contactos" data-cantidad={hoja.length}>
+                    <h2 className="obs-h2 obs-h2--album">{tx("invitacion.saveTheDate.placas")} <em>{tx("invitacion.saveTheDate.reveladas")}</em></h2>
+                    <div className="obs-placas" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="obs-contacto"
+                          data-sheet="1"
+                          className="obs-placa"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1072,15 +1141,17 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="obs-contacto-img" />
-                          <span className="obs-contacto-tinta" aria-hidden="true" />
-                          <span className="obs-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="obs-placa-img" />
+                          <span data-colorwash="1" className={`obs-bano obs-bano--${(i % 3) + 1}`} aria-hidden="true" />
+                          <span data-neg="1" className="obs-negativo" aria-hidden="true" />
+                          <span className="obs-placa-n">PL. {String(i + 1).padStart(2, "0")}</span>
+                          <span className="obs-placa-nota">{[ciudad, anio].filter(Boolean).join(" · ").toUpperCase()}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="obs-folio obs-folio--pie">
+                    <div className="obs-folio obs-folio--chico obs-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1091,20 +1162,21 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            Las frecuencias: cada tema con su dial en mono y el
+            ecualizador de seis líneas finas. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="obs-section obs-musica">
             <div className="obs-folio">
-              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.saveTheDate.frecuencias").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="obs-spread">
               <div className="obs-pagina">
                 <h2 data-xin="1" data-dist="-80" className="obs-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "obs-acento")}
+                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "obs-italica obs-oro")}
                 </h2>
                 <div data-xin="1" data-delay="120" className="obs-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4, 5].map((i) => <span key={i} style={{ animationDelay: `${i * 0.15}s` }} />)}
                 </div>
               </div>
               <div className="obs-pagina">
@@ -1119,9 +1191,9 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Fichas de filete fino sobre el azul profundo. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="obs-section obs-regalos">
+          <section id="banco" data-tone="dark" data-screen-label={tx("invitacion.regalos.titulo")} className="obs-section obs-regalos">
             <div className="obs-folio">
               <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
@@ -1129,7 +1201,7 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
             <div className="obs-spread">
               <div className="obs-pagina">
                 <h2 data-xin="1" data-dist="-80" className="obs-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="obs-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><em className="obs-oro">{tx("invitacion.regalos.siQueresLinea2")}</em>
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="obs-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1143,7 +1215,7 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1154,7 +1226,8 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1163,138 +1236,173 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            La trivia astral: el único pliego dorado, con tinta oscura. */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="obs-section obs-quiz">
-            <div className="obs-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
-              <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
+          <section id="quiz" data-tone="light" data-screen-label="Quiz" className="obs-section obs-quiz">
+            <div className="obs-folio obs-folio--tinta">
+              <span data-xin="1" data-dist="-40">{nQuiz} — {triviaTitulo.toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{tx("invitacion.saveTheDate.triviaAstral").toUpperCase()} · {folio(nQuiz)}</span>
             </div>
             <div className="obs-spread">
-              <div className="obs-pagina">
-                <h2 data-xin="1" data-dist="-80" className="obs-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="obs-pagina">
-                <TriviaObservatorio
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaObservatorio
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            El pase del observatorio: talón con texto vertical, el nombre,
+            la cúpula (la mesa) en terracota, código de barras y el QR. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="obs-section obs-pase">
           <div className="obs-folio">
             <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="obs-spread">
-            <div data-xin="1" data-dist="-60" className="obs-pagina obs-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+            <div data-xin="1" data-dist="-60" className="obs-pagina obs-pagina--ticket">
+              <div className="obs-ticket">
+                <span className="obs-ticket-troquel" aria-hidden="true" />
+                <span className="obs-ticket-talon">Observatorio · {inicialesY} · {diaNum} {mesCorto}</span>
+                <div className="obs-ticket-datos">
+                  <div className="obs-ticket-etqs"><span>{tx("invitacion.saveTheDate.observador")}</span><span>{tx("invitacion.saveTheDate.cupula")}</span></div>
+                  <div className="obs-ticket-fila"><span className="obs-ticket-nombre">{nombreInvitado || titulo}</span><span className="obs-ticket-cupula">{guest?.mesas?.[0] ?? pase}</span></div>
+                  <CodigoDeBarras />
+                  <span className="obs-ticket-codigo">{codigoDelPase}</span>
+                </div>
+                <div className="obs-ticket-qr">
+                  <QrDeIngreso guest={guest as never} />
+                </div>
+              </div>
             </div>
             <div className="obs-pagina">
               <div data-xin="1" data-delay="100" className="obs-pase-cabeza">
                 <div className="obs-pase-numero">
-                  <span className="obs-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
+                  <span className="obs-etq-mono">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="obs-pase-mesa">
+                    <span className="obs-etq-mono">{tx("invitacion.pase.tuMesa").toUpperCase()}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="obs-lineas">
-                <div className="obs-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="obs-lineas-pase">
+                <div className="obs-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="obs-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="obs-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="obs-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="obs-linea"><span>Sector</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="obs-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="obs-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} H</span></div>
               </div>
               <div className="obs-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="obs-folio obs-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="obs-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="obs-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="obs-pase-pie">
+            <span className="obs-despedida">{tx("invitacion.saveTheDate.nosVemosBajoLasEstrellas")} — {inicialesY}</span>
+            <div className="obs-folio obs-folio--chico obs-folio--colofon">
+              <span className="obs-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.ink} /></span>
+              <span className="obs-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.saveTheDate.volverALaCarta").toUpperCase()} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="obs-riel">
-        <span ref={rielTopRef} className="obs-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="obs-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="obs-riel-linea">
           <span ref={rielBarraRef} className="obs-riel-barra" />
         </div>
         <span ref={rielEtiquetaRef} className="obs-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          La carta celeste de la fecha: el cielo con estrellas que titilan,
+          un cometa que cruza cada tanto, la carta con sus ejes detrás y la
+          constelación que se traza sola con la fecha en sus estrellas. Es
+          la bienvenida: dice de quién es la fiesta, cuándo, dónde y para
+          cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="obs-portada">
         <div ref={escenaPortadaRef} className="obs-portada-hoja">
-          <div className="obs-trama obs-trama--tapa" aria-hidden="true" />
+          <div className="obs-cielo" aria-hidden="true">
+            <svg data-depth="0.4" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice" className="obs-estrellas">
+              <g fill="currentColor">
+                {ESTRELLAS.map(([x, y, r, dur], i) => (
+                  <circle key={i} cx={x} cy={y} r={r} className={dur ? "obs-estrella--titila" : undefined} style={dur ? { animationDuration: `${dur}s`, animationDelay: `${(i % 5) * 0.4}s` } : undefined} />
+                ))}
+              </g>
+            </svg>
+            <span className="obs-cometa" />
+            <svg data-depth="-0.6" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" className="obs-carta">
+              <g fill="none" stroke="currentColor" strokeWidth=".5">
+                <circle cx="200" cy="200" r="190" strokeDasharray="2 5" /><circle cx="200" cy="200" r="150" /><circle cx="200" cy="200" r="100" strokeDasharray="1 4" />
+                <line x1="200" y1="10" x2="200" y2="390" /><line x1="10" y1="200" x2="390" y2="200" /><line x1="66" y1="66" x2="334" y2="334" /><line x1="334" y1="66" x2="66" y2="334" />
+              </g>
+              <g className="obs-carta-puntos"><text x="204" y="20">N</text><text x="204" y="388">S</text><text x="14" y="196">O</text><text x="378" y="196">E</text></g>
+            </svg>
+          </div>
 
-          <div data-cl="1" className="obs-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
-            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
+          <div data-cl="1" className="obs-folio obs-folio--tapa">
+            <span>{tx("invitacion.saveTheDate.cartaCeleste")} Nº {pase}</span>
+            <span>{(ciudad || lugarNombre || kickerDelEvento).toUpperCase()}</span>
           </div>
 
           <div data-cl="2" className="obs-tapa-centro">
-            <div className="obs-tapa-fila">
-              <span className="obs-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
+            <div className="obs-constelacion" aria-hidden="true">
+              <svg viewBox="0 0 500 200">
+                <polyline points="40,140 110,70 190,110 250,40 330,90 400,50 460,130" fill="none" stroke="currentColor" strokeWidth="1" strokeLinejoin="round" opacity=".9" pathLength="1000" className="obs-constelacion-linea" />
+                <g className="obs-constelacion-estrellas">
+                  <circle cx="40" cy="140" r="3" /><circle cx="110" cy="70" r="4.5" /><circle cx="190" cy="110" r="2.5" /><circle cx="250" cy="40" r="5" /><circle cx="330" cy="90" r="3" /><circle cx="400" cy="50" r="4" /><circle cx="460" cy="130" r="3" />
+                </g>
+                <g className="obs-constelacion-halos" fill="none" strokeWidth=".8" opacity=".6"><circle cx="110" cy="70" r="9" /><circle cx="250" cy="40" r="11" /><circle cx="400" cy="50" r="8" /></g>
+                <g className="obs-constelacion-etqs"><text x="96" y="100">{diaNum}</text><text x="238" y="72">{String(fechaEvento.getMonth() + 1).padStart(2, "0")}</text><text x="378" y="82">{anio}</text><text x="430" y="152">{hora}</text></g>
+              </svg>
             </div>
-            <h1 ref={cartelRef} className="obs-tapa-nombres">
+            <span className="obs-tapa-kicker">{tx("invitacion.saveTheDate.bajoElMismoCielo")}</span>
+            <h1 ref={cartelRef} className="obs-tapa-nombres" style={{ "--largo": renglonMasLargo } as React.CSSProperties}>
               {saludaAlInvitado ? (
-                <span className="obs-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="obs-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
               ) : (
                 <>
-                  <span className="obs-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="obs-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
                   {nombre2 && (
-                    <span className="obs-tapa-linea obs-tapa-linea--sangra">
-                      <span><span className="obs-acento">&amp;</span>{nombre2}</span>
-                    </span>
+                    <>
+                      <span className="obs-tapa-linea obs-tapa-linea--y"><span data-pieza="1" className="obs-tapa-y"><i /><em>{tx("invitacion.rsvp.y")}</em><i /></span></span>
+                      <span className="obs-tapa-linea"><span data-pieza="1">{nombre2}</span></span>
+                    </>
                   )}
                 </>
               )}
             </h1>
-            <div className="obs-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="obs-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <div className="obs-tapa-datos">
+              <span>{lugarNombre || "—"}<br /><span className="obs-oro">{[direccion, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="obs-tapa-datos-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br /><span className="obs-oro">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{diaSemana} {diaNum} · {mesCorto} · {anio}<br /><span className="obs-oro">{hora} h</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="obs-tapa-pie">
-            <span className="obs-regla" aria-hidden="true" />
             <p className="obs-tapa-mensaje">
               {saludaAlInvitado
-                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
+                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}, ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
                 : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
             </p>
             <button type="button" onClick={abrir} className="obs-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              {tx("invitacion.saveTheDate.abrirLaCarta").toUpperCase()}
             </button>
           </div>
         </div>
@@ -1329,30 +1437,66 @@ export function ObservatorioTemplateAmanecer({ invitation, guest, isPersonalized
   );
 }
 
+/** El año en números romanos, como en las placas de los observatorios. */
+function aRomano(n: number): string {
+  const tabla: [number, string][] = [[1000, "M"], [900, "CM"], [500, "D"], [400, "CD"], [100, "C"], [90, "XC"], [50, "L"], [40, "XL"], [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]];
+  let resto = n;
+  let salida = "";
+  for (const [valor, letra] of tabla) {
+    while (resto >= valor) { salida += letra; resto -= valor; }
+  }
+  return salida;
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * La fase de la luna esa noche, a partir de la luna nueva del 6 de enero de
+ * 2000 y el mes sinódico (29,53 días). Devuelve la clave del nombre, el
+ * porcentaje iluminado y cuánto correr la sombra del disco (negativo cuando
+ * crece, positivo cuando mengua, como en el mockup).
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
+const FASES_DE_LUNA = [
+  "invitacion.saveTheDate.lunaNueva", "invitacion.saveTheDate.lunaCreciente", "invitacion.saveTheDate.cuartoCreciente", "invitacion.saveTheDate.crecienteGibosa",
+  "invitacion.saveTheDate.lunaLlena", "invitacion.saveTheDate.menguanteGibosa", "invitacion.saveTheDate.cuartoMenguante", "invitacion.saveTheDate.lunaMenguante",
+] as const;
+function faseLunar(fecha: Date): { clave: (typeof FASES_DE_LUNA)[number]; porcentaje: number; desplazamiento: number } {
+  const SINODICO = 29.530588853;
+  const referencia = Date.UTC(2000, 0, 6, 18, 14);
+  const dias = (fecha.getTime() - referencia) / 86400000;
+  const edad = ((dias % SINODICO) + SINODICO) % SINODICO;
+  const iluminacion = (1 - Math.cos((2 * Math.PI * edad) / SINODICO)) / 2;
+  const crece = edad < SINODICO / 2;
+  const indice = edad < 1.85 ? 0 : edad < 7.4 ? 1 : edad < 9.2 ? 2 : edad < 14.8 ? 3 : edad < 16.6 ? 4 : edad < 22.1 ? 5 : edad < 23.9 ? 6 : edad < 27.7 ? 7 : 0;
+  const corrimiento = Math.round((2 * iluminacion - 1) * 100);
+  return { clave: FASES_DE_LUNA[indice], porcentaje: Math.round(iluminacion * 100), desplazamiento: crece ? -corrimiento : corrimiento };
+}
+
+/**
+ * El astrolabio del Save the Date: tres anillos, el texto de la fecha
+ * girando una vuelta cada 90 s, cuatro puntos orbitando en contra y la
+ * fecha adentro con el año en romanos.
+ */
+function Astrolabio({ arco, dia, mes, anio }: { arco: string; dia: string; mes: string; anio: string }) {
   const id = useId().replace(/:/g, "");
   return (
-    <div className="obs-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="obs-sello-amp">&amp;</span>}
-    </div>
+    <svg viewBox="0 0 200 200" className="obs-astrolabio-svg" aria-hidden="true">
+      <defs><path id={`arc-${id}`} d="M100 100 m -80 0 a 80 80 0 1 1 160 0 a 80 80 0 1 1 -160 0" fill="none" /></defs>
+      <g fill="none" stroke="currentColor"><circle cx="100" cy="100" r="96" strokeWidth=".6" /><circle cx="100" cy="100" r="88" strokeWidth=".6" strokeDasharray="1 3" /><circle cx="100" cy="100" r="62" strokeWidth=".8" /></g>
+      <g className="obs-astrolabio-arco"><text><textPath href={`#arc-${id}`}>{arco.repeat(3).slice(0, 70)}</textPath></text></g>
+      <g className="obs-astrolabio-orbita"><circle cx="100" cy="12" r="2" /><circle cx="188" cy="100" r="1.4" /><circle cx="100" cy="188" r="1.8" /><circle cx="12" cy="100" r="1.2" /></g>
+      <text x="100" y="98" textAnchor="middle" className="obs-astrolabio-dia">{dia}</text>
+      <text x="100" y="122" textAnchor="middle" className="obs-astrolabio-mes">{mes}</text>
+      <text x="100" y="142" textAnchor="middle" className="obs-astrolabio-anio">{anio}</text>
+    </svg>
+  );
+}
+
+/** El código de barras del pase: cuarenta barras. */
+function CodigoDeBarras() {
+  const barras = [[0, 3], [5, 1], [9, 2], [14, 4], [20, 1], [24, 3], [30, 2], [34, 1], [38, 4], [45, 2], [49, 1], [53, 3], [59, 1], [62, 4], [69, 2], [73, 1], [77, 3], [83, 2], [87, 4], [94, 1], [97, 3], [103, 1], [107, 2], [112, 4], [118, 1], [122, 3], [128, 2], [132, 1], [136, 4], [143, 2], [147, 1], [151, 3], [157, 1], [160, 4], [167, 2], [171, 1], [175, 3], [181, 2], [185, 4], [192, 1], [196, 3]];
+  return (
+    <svg viewBox="0 0 200 40" preserveAspectRatio="none" className="obs-barras" aria-hidden="true">
+      <g fill="currentColor">{barras.map(([x, w]) => <rect key={x} x={x} width={w} height="40" />)}</g>
+    </svg>
   );
 }
 
@@ -1407,7 +1551,7 @@ function CuentaObservatorio({ targetDate }: { targetDate: Date }) {
     <div className="obs-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`obs-cuenta-caja obs-cuenta-caja--${i + 1}`}>
-          <span className="obs-cuenta-num">{c.v}</span>
+          <span className="obs-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="obs-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1900,13 +2044,16 @@ function TriviaObservatorio({ preguntas, invitationId, guestToken, guestName }: 
 // leen la Bienvenida y el Post-evento compartidos (esperan `obs-section` y
 // `obs-kicker`).
 const CSS_OBS = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Observatorio ─────────────────────────────────────────────────────
+     La carta celeste: Cormorant Garamond fina para nombres y cifras, Jost
+     para el texto, IBM Plex Mono para coordenadas y folios. Azul profundo,
+     marfil, oro y azul acero; todo con filetes de 0,5-1 px. Estrellas que
+     titilan, un cometa, la constelación que se traza sola, el astrolabio
+     que gira, la luna de esa noche, el ocular, las órbitas del countdown y
+     las placas en negativo. Todo SVG y CSS. */
   .obs-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--obs-sans), 'Jost', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--obs-sans), 'Jost', sans-serif;
+    --obs-acc3: ${PALETA.acc3}; --obs-linea: color-mix(in srgb, var(--pp-ink) 25%, transparent); --obs-linea-suave: color-mix(in srgb, var(--pp-ink) 20%, transparent); }
   .obs-raiz a { color: inherit; text-decoration: none; }
   .obs-raiz button { font: inherit; }
 
@@ -1914,297 +2061,394 @@ const CSS_OBS = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .obs-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .obs-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .obs-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .obs-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
-
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .obs-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .obs-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .obs-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-std, .obs-frase-seccion, .obs-musica { background: var(--pp-bg2); }
+  .obs-std { border-top: 1px solid color-mix(in srgb, var(--pp-ink) 12%, transparent); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: mono con tracking, en oro. */
   .obs-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
+    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-folio--chico { font-size: 10px; letter-spacing: .2em; }
+  .obs-folio--tinta { color: inherit; }
   .obs-folio--pie { align-items: center; margin-top: auto; }
-  .obs-folio-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+  .obs-panel > .obs-folio--pie { color: inherit; opacity: .8; }
+  .obs-folio--colofon { align-items: center; border-top: 1px solid color-mix(in srgb, var(--pp-ink) 30%, transparent); padding-top: 12px; }
+  .obs-etq-mono { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc); display: block; }
+  .obs-barra { width: 40%; height: 1px; background: var(--obs-linea); }
+  .obs-oro { color: var(--pp-acc); }
+  .obs-azul { color: var(--pp-acc2); }
+  .obs-italica { font-style: italic; }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .obs-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .obs-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
   .obs-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .obs-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .obs-spread > * { flex: 1 1 0; min-width: 0; }
+  @media (min-width: 1024px) {
+    .obs-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .obs-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .obs-spread > *:first-child { justify-self: end; }
+    .obs-spread > *:last-child { justify-self: start; }
+    .obs-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .obs-h2, .obs-panel-titulo, .obs-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--obs-serif), 'Cormorant Garamond', serif;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .obs-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .obs-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .obs-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .obs-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .obs-acento { font-style: italic; color: var(--pp-acc); }
-  .obs-acento--tinta { color: var(--pp-ink); }
-  .obs-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .obs-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .obs-regla { display: block; height: 2px; background: currentColor; }
+  .obs-h2, .obs-panel-titulo, .obs-frase, .obs-tapa-nombres { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; }
+  .obs-h2, .obs-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .98; font-size: clamp(40px, 11vw, 84px); }
+  .obs-h2 em { font-weight: 300; }
+  .obs-h2--album { font-size: clamp(34px, 9vw, 68px); line-height: 1; }
+  .obs-panel-titulo { font-size: clamp(38px, 10vw, 84px); line-height: 1; }
+  .obs-panel-sub { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-parrafo { margin: 0; font-size: 15px; line-height: 1.55; max-width: 40ch; opacity: .85; }
+  .obs-cta-linea { align-self: flex-start; display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; border: 1px solid var(--pp-acc); color: var(--pp-acc);
+    font-weight: 500; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
+  .obs-cta { margin-top: 10px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    color: var(--pp-bg); background: var(--pp-acc); font-weight: 500; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .obs-std { justify-content: center; }
-  .obs-fecha { display: flex; flex-direction: column; font-family: var(--obs-serif), 'Cormorant Garamond', serif;
-    line-height: .82; letter-spacing: -.04em; }
-  .obs-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .obs-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .obs-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .obs-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
+  /* ── 01 Guardá la fecha: las efemérides ────────────────────────────── */
+  .obs-astrolabio { position: relative; width: min(100%, 420px); aspect-ratio: 1; align-self: center; }
+  .obs-astrolabio-svg { position: absolute; inset: 0; overflow: visible; color: var(--pp-acc); }
+  .obs-astrolabio-arco { animation: obsGira 90s linear infinite; transform-origin: 100px 100px; }
+  .obs-astrolabio-arco text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 8.5px; letter-spacing: 2.6px; fill: var(--pp-acc); }
+  .obs-astrolabio-orbita { animation: obsGiraContra 60s linear infinite; transform-origin: 100px 100px; fill: var(--pp-ink); }
+  .obs-astrolabio-dia { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: 70px; fill: var(--pp-ink); }
+  .obs-astrolabio-mes { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-size: 20px; letter-spacing: 1px; fill: var(--pp-acc); }
+  .obs-astrolabio-anio { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 4px; fill: var(--pp-ink); }
+  @keyframes obsGira { to { transform: rotate(360deg); } }
+  @keyframes obsGiraContra { to { transform: rotate(-360deg); } }
+  /* La luna esa noche: un disco marfil con la sombra corrida. */
+  .obs-luna { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: center; border: 1px solid var(--obs-linea-suave); padding: 14px 16px; }
+  .obs-luna-disco { position: relative; width: 48px; height: 48px; border-radius: 50%; background: var(--pp-ink); overflow: hidden; display: block; }
+  .obs-luna-disco > span { position: absolute; inset: 0; border-radius: 50%; background: var(--pp-bg2); }
+  .obs-luna-texto { display: flex; flex-direction: column; gap: 2px; font-size: 13px; line-height: 1.4; }
+  /* El ocular: la foto circular con retícula y viñeta que se abre. */
+  .obs-ocular { position: relative; width: 100%; aspect-ratio: 1; align-self: center; max-width: 520px; margin-bottom: 28px; }
+  .obs-ocular-lente { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+    background: repeating-linear-gradient(135deg, #1A2740 0 8px, #142038 8px 16px);
+    box-shadow: 0 0 0 1px var(--pp-acc), 0 0 0 12px var(--pp-bg2), 0 0 0 13px var(--obs-linea-suave); }
   .obs-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
-  .obs-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background-image: radial-gradient(var(--pp-ink) calc(var(--obs-punto, 7.2) * 1px), transparent calc(var(--obs-punto, 7.2) * 1px + .6px));
-    background-size: 10px 10px; }
-  .obs-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--obs-serif), 'Cormorant Garamond', serif;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .obs-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--obs-mono), 'IBM Plex Mono', monospace;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .obs-vineta { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(circle at 50% 50%, transparent 20%, var(--pp-bg) 60%);
+    opacity: calc(.25 + var(--obs-punto, 7.2) * .1042); }
+  .obs-reticula { position: absolute; z-index: 2; background: var(--obs-linea); }
+  .obs-reticula--v { left: 50%; top: 0; bottom: 0; width: 1px; }
+  .obs-reticula--h { top: 50%; left: 0; right: 0; height: 1px; }
+  .obs-reticula-centro { position: absolute; z-index: 2; left: 50%; top: 50%; width: 36px; height: 36px; margin: -18px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); }
+  .obs-ocular-etq { position: absolute; left: 0; right: 0; bottom: 16%; z-index: 2; text-align: center; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; }
+  .obs-ocular-pie { position: absolute; bottom: -28px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-ocular-pie--izq { left: 0; }
+  .obs-ocular-pie--der { right: 0; }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .obs-countdown { justify-content: space-between; }
-  .obs-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .obs-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
-  .obs-marquesina--contraria .obs-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  /* ── 02 Falta poco: las órbitas ────────────────────────────────────── */
+  .obs-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .obs-countdown > .obs-folio, .obs-countdown > .obs-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .obs-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 10px 0; white-space: nowrap; border-top: 1px solid var(--obs-linea-suave); border-bottom: 1px solid var(--obs-linea-suave);
+    font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; letter-spacing: .02em; }
+  .obs-marquesina-tira { display: flex; width: max-content; animation: obsCorre 18s linear infinite; }
+  .obs-marquesina-tira > span { padding-right: 40px; }
+  @keyframes obsCorre { to { transform: translate3d(-50%, 0, 0); } }
+  /* Cuatro órbitas: anillo fino, anillo punteado dorado que gira (más
+     rápido cuanto más chica la unidad) con un punto encima, y la cifra. */
+  .obs-cuenta { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; justify-items: center; }
+  .obs-cuenta-caja { position: relative; width: min(100%, 240px); aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+  .obs-cuenta-caja::before { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 1px solid var(--obs-linea); }
+  .obs-cuenta-caja::after { content: ""; position: absolute; inset: 8%; border-radius: 50%; border: 1px dashed var(--pp-acc); opacity: .6; animation: obsGira 90s linear infinite;
+    background: radial-gradient(circle at 50% 0, var(--pp-acc) 0 4px, transparent 4.5px); }
+  .obs-cuenta-caja:nth-child(2)::after { animation-duration: 60s; }
+  .obs-cuenta-caja:nth-child(3)::after { animation-duration: 40s; }
+  .obs-cuenta-caja:nth-child(4)::after { animation-duration: 30s; }
+  .obs-cuenta-num { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(56px, 16vw, 96px); line-height: 1; font-variant-numeric: tabular-nums; }
+  .obs-cuenta-num > span { display: inline-block; animation: obsCifra 300ms ease; }
+  @keyframes obsCifra { from { opacity: .3; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .obs-cuenta-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-tarjeta--hoy { display: flex; flex-direction: column; gap: 8px; align-items: center; text-align: center; padding: 20px 0; border-top: 1px solid var(--obs-linea-suave); border-bottom: 1px solid var(--obs-linea-suave); }
+  .obs-tarjeta--hoy .obs-tarjeta-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-tarjeta--hoy .obs-tarjeta-titulo { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-style: italic; font-size: clamp(36px, 10vw, 72px); line-height: 1; }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .obs-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .obs-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .obs-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .obs-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .obs-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .obs-cuenta-num, .obs-cuenta-dias, .obs-cifra { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .obs-cuenta-caja:nth-child(4) .obs-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .obs-cuenta-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .obs-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: la bitácora ─────────────────────────────────── */
+  .obs-frase-seccion { justify-content: space-between; gap: 30px; }
+  .obs-constelacion-fondo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: .5; color: var(--pp-ink); }
+  .obs-constelacion-fondo polyline { stroke: var(--pp-acc); }
+  .obs-frase { margin: 0; font-size: clamp(30px, 8vw, 64px); line-height: 1.12; max-width: 18ch; }
+  .obs-nota { align-self: flex-end; display: flex; align-items: center; gap: 14px; border: 1px solid var(--obs-linea); padding: 14px 18px; max-width: 340px;
+    font-size: 13px; line-height: 1.45; animation: obsFlota 5s ease-in-out infinite; }
+  .obs-nota-estrella { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--pp-acc); flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
+  .obs-nota-estrella > span { width: 6px; height: 6px; border-radius: 50%; background: var(--pp-acc); }
+  @keyframes obsFlota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .obs-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .obs-frase-seccion .obs-acento { color: var(--pp-bg); font-style: italic; }
-  .obs-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Paneles: las coordenadas ───────────────────────────────────── */
   .obs-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
   .obs-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .obs-pan-fijo--bg2 { background: var(--pp-bg2); }
   .obs-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .obs-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .obs-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .obs-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .obs-panel--acento .obs-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-panel--bg2 { background: var(--pp-bg2); }
+  .obs-panel--azul { background: var(--pp-acc2); color: var(--pp-bg); --obs-linea: color-mix(in srgb, var(--pp-bg) 35%, transparent); }
+  .obs-panel--azul .obs-folio, .obs-panel--azul .obs-panel-sub { color: var(--pp-bg); }
+  .obs-panel--azul .obs-cta { background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-panel--azul .obs-ficha-coord { background: var(--pp-acc2); color: var(--pp-bg); }
   .obs-pan[data-scroll="vertical"] { height: auto; }
   .obs-pan[data-scroll="vertical"] .obs-pan-fijo { position: static; height: auto; overflow: visible; }
   .obs-pan[data-scroll="vertical"] .obs-tira { position: static; display: block; width: 100%; transform: none !important; }
   .obs-pan[data-scroll="vertical"] .obs-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-
-  .obs-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .obs-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .obs-linea > span:first-child { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .obs-linea > span:last-child { text-align: right; font-size: 15px; }
-  .obs-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .obs-cta-flecha { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; }
-  .obs-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .obs-ficha { position: relative; border: 1px solid var(--obs-linea); padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+  .obs-ficha--claro .obs-cta { background: var(--pp-ink); color: var(--pp-bg); }
+  .obs-ficha-coord { position: absolute; right: 14px; top: -7px; padding: 0 8px; background: var(--pp-bg); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-panel--bg2 .obs-ficha-coord { background: var(--pp-bg2); }
+  .obs-linea { display: flex; justify-content: space-between; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--obs-linea); font-size: 15px; line-height: 1.3; }
+  .obs-linea > span:first-child { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; opacity: .75; flex: 0 0 auto; padding-top: 3px; }
+  .obs-linea > span:last-child { text-align: right; font-weight: 500; }
+  .obs-mapa { height: 190px; overflow: hidden; border: 1px solid var(--obs-linea); }
   .obs-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .obs-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+  .obs-punto { width: 6px; height: 6px; border-radius: 50%; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block; }
+  .obs-punto[data-activo="1"] { opacity: 1; }
 
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .obs-checkin { background: var(--pp-bg2); }
-  .obs-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .obs-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .obs-cupon .obs-talon-top { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .2em; }
-  .obs-cupon input, .obs-cupon .obs-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .obs-cupon .obs-contador button { border: 2px solid var(--pp-ink); }
-  .obs-sello, .obs-cupon .obs-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .obs-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .obs-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .obs-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .obs-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .obs-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .obs-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .obs-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .obs-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .obs-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .obs-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .obs-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .obs-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .obs-lista-tema { font-size: 15px; }
-  .obs-lista-quien { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .obs-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .obs-tarjeta + .obs-tarjeta { margin-top: 12px; }
-  .obs-tarjeta-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .obs-tarjeta-titulo { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 28px; line-height: 1; }
-  .obs-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .obs-tarjeta .obs-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .obs-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .obs-fila--ultima { border-bottom: none; }
-  .obs-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .obs-fila-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .obs-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .obs-fila-valor { text-align: right; }
-  .obs-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .obs-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .obs-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .obs-quiz .obs-acento { color: var(--pp-ink); }
-  .obs-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .obs-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--obs-sans), 'Jost', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .obs-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .obs-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .obs-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .obs-pagina--qr { align-items: flex-start; }
-  .obs-pagina--qr .qr-ingreso, .obs-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .obs-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .obs-pase-numero { display: flex; flex-direction: column; }
-  .obs-pase-numero > span:last-child { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .obs-info-extra { margin-top: 12px; }
-  .obs-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .obs-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--obs-mono), 'IBM Plex Mono', monospace !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .obs-raiz .ia-icon-box, .obs-raiz svg.lucide { display: none !important; }
-  .obs-replay { cursor: pointer; }
-  .obs-credito { display: flex; justify-content: center; opacity: .6; }
-  .obs-error { margin: 0; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .obs-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .obs-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .obs-sello-circular text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .obs-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .obs-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .obs-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .obs-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .obs-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .obs-tapa-fecha { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .obs-tapa-nombres { margin: 0; font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .obs-tapa-linea { overflow: hidden; display: block; }
-  .obs-tapa-linea > span { display: block; }
-  .obs-tapa-linea--sangra { padding-left: 14%; }
-  .obs-tapa-pase { text-align: right; }
-  .obs-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .obs-tapa-mensaje { margin: 0; font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .obs-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--obs-sans), 'Jost', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .obs-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .obs-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .obs-riel-top, .obs-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--obs-mono), 'IBM Plex Mono', monospace;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .obs-riel-top { color: var(--pp-ink2); }
-  .obs-riel-etiqueta { color: var(--pp-acc); }
-  .obs-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .obs-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .obs-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .obs-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .obs-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .obs-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
-  .obs-campo { display: flex; flex-direction: column; gap: 6px; }
-  .obs-etiqueta { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .obs-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--obs-sans), 'Jost', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .obs-input:focus { outline: none; border-color: var(--pp-acc); }
-  .obs-contador { display: flex; align-items: center; gap: 12px; }
-  .obs-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
-  .obs-contador button:disabled { opacity: .35; cursor: default; }
-  .obs-contador > span { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .obs-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .obs-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .obs-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .obs-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .obs-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .obs-precio-total { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 28px; line-height: 1; }
-  .obs-precio-detalle { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; }
-  .obs-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  /* ── 05 Check-in: el registro del observador ───────────────────────── */
+  .obs-checkin { background: var(--pp-acc2) !important; color: var(--pp-bg); }
+  .obs-cupon { position: relative; background: var(--pp-bg); color: var(--pp-ink); padding: 22px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+  .obs-cupon .obs-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .obs-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase;
+    padding-bottom: 12px; border-bottom: 1px solid var(--obs-linea-suave); }
   .obs-talon-estado { transition: color 400ms ease; }
+  .obs-campo { display: flex; flex-direction: column; gap: 6px; }
+  .obs-etiqueta { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; opacity: .8; }
+  .obs-input { min-height: 48px; border: 0; border-bottom: 1px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--obs-sans), 'Jost', sans-serif; font-size: 15px; padding: 0; outline: none; }
+  .obs-contador { display: flex; align-items: center; border-bottom: 1px solid var(--pp-ink); min-height: 48px; }
+  .obs-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer; font-size: 22px; line-height: 1; }
+  .obs-contador button:disabled { opacity: .35; cursor: default; }
+  .obs-contador > span { flex: 1; text-align: center; font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 30px; line-height: 1; color: var(--pp-acc); }
   .obs-filas { display: flex; flex-direction: column; }
+  .obs-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--obs-linea-suave); font-size: 14px; }
+  .obs-fila--ultima { border-bottom: 0; }
+  .obs-fila-valor { text-align: right; font-weight: 500; }
+  .obs-precio { display: flex; justify-content: space-between; gap: 12px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+  .obs-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; opacity: 1; }
+  .obs-precio-total { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 24px; line-height: 1; letter-spacing: 0; color: var(--pp-acc); }
+  .obs-precio-detalle { font-size: 10px; letter-spacing: .1em; }
+  .obs-btn-solido { min-height: 54px; border: 0; background: var(--pp-acc); color: var(--pp-bg); cursor: pointer;
+    font-weight: 500; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; padding: 0 18px; transition: background 200ms ease; }
+  @media (hover: hover) { .obs-btn-solido:hover { background: var(--pp-ink); } }
+  .obs-btn-solido:disabled { opacity: .6; cursor: default; }
+  .obs-btn-fantasma { min-height: 48px; border: 1px solid var(--pp-acc); background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-weight: 500; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; padding: 0 18px; }
+  .obs-error { margin: 0; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; color: var(--pp-acc); }
+  /* El sello REGISTRADO: dos anillos finos, arriba a la derecha. */
+  .obs-cupon .obs-sello { position: absolute; right: 14px; top: 46px; width: 120px; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+    opacity: 0; transform: scale(1.8); border: 1px solid var(--pp-acc); box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center; text-align: center; padding: 22px;
+    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: .16em; text-transform: uppercase; color: var(--pp-acc); }
+  .obs-cupon .obs-sello::before { content: ""; position: absolute; inset: 26%; border-radius: 50%; border: 1px dashed var(--pp-acc); }
+  .obs-cupon .obs-sello::after { content: ""; position: absolute; left: 50%; top: 50%; width: 6px; height: 6px; margin: -3px; border-radius: 50%; background: var(--pp-acc); }
   .obs-petalos { display: none; }
 
-  /* Observatorio: la trama son estrellas en dos tamaños, no puntos de imprenta. */
-  .obs-trama { opacity: .32; background-image: radial-gradient(currentColor .6px, transparent .7px), radial-gradient(currentColor .4px, transparent .5px); background-size: 46px 46px, 23px 23px; background-position: 0 0, 12px 8px; }
-  .obs-sello-circular svg { animation-duration: 60s; }
+  /* ── 06 Álbum: las placas ──────────────────────────────────────────── */
+  .obs-panel--album { background: var(--pp-bg2); justify-content: flex-start; gap: 14px; }
+  .obs-panel--album-b { background: var(--pp-bg); }
+  .obs-placas { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .obs-placa { position: relative; min-height: 0; overflow: hidden; cursor: pointer; border: 1px solid color-mix(in srgb, var(--pp-ink) 30%, transparent);
+    background: repeating-linear-gradient(135deg, #1A2740 0 8px, #142038 8px 16px); }
+  .obs-placa-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .obs-bano { position: absolute; inset: 0; mix-blend-mode: screen; opacity: 0; transition: opacity 200ms linear; }
+  .obs-bano--1 { background: color-mix(in srgb, var(--pp-acc) 35%, transparent); }
+  .obs-bano--2 { background: color-mix(in srgb, var(--pp-acc2) 40%, transparent); }
+  .obs-bano--3 { background: color-mix(in srgb, var(--obs-acc3) 35%, transparent); }
+  /* El negativo: una capa marfil en "difference" que el motor apaga cuando
+     la placa llega al centro. */
+  .obs-negativo { position: absolute; inset: 0; background: var(--pp-ink); mix-blend-mode: difference; opacity: .18; transition: opacity 300ms linear; }
+  .obs-placa-n { position: absolute; left: 8px; top: 6px; z-index: 1; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .18em; color: var(--pp-acc); }
+  .obs-placa-nota { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .14em; opacity: .85; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .obs-placas[data-cantidad="5"] .obs-placa:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .obs-placas[data-cantidad="4"] .obs-placa:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .obs-placas[data-cantidad="3"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .obs-placas[data-cantidad="3"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .obs-placas[data-cantidad="3"] .obs-placa:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .obs-placas[data-cantidad="2"] .obs-placa:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .obs-placas[data-cantidad="2"] .obs-placa:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .obs-placas[data-cantidad="1"] .obs-placa:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: las frecuencias ────────────────────────────────────── */
+  .obs-eq { display: flex; align-items: flex-end; gap: 5px; height: 36px; }
+  .obs-eq span { width: 2px; height: 100%; background: var(--pp-ink); transform-origin: bottom; animation: obsEq 1.2s ease-in-out infinite; }
+  .obs-eq span:nth-child(1), .obs-eq span:nth-child(5) { background: var(--pp-acc); }
+  .obs-eq span:nth-child(3), .obs-eq span:nth-child(6) { background: var(--pp-acc2); }
+  @keyframes obsEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .obs-musica form.obs-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .obs-musica .obs-etiqueta { display: none; }
+  .obs-musica .obs-input { min-height: 48px; border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); background: transparent; color: var(--pp-ink); padding: 0 14px; min-width: 0; }
+  .obs-musica .obs-error { grid-column: 1 / -1; }
+  .obs-musica .obs-btn-solido { grid-column: 1 / -1; min-height: 50px; border: 1px solid var(--pp-acc); font-size: 12px; }
+  @media (hover: hover) { .obs-musica .obs-btn-solido:hover { background: transparent; color: var(--pp-acc); } }
+  .obs-lista { display: flex; flex-direction: column; margin-top: 12px; counter-reset: tema; }
+  .obs-lista-fila { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--obs-linea-suave); counter-increment: tema; }
+  .obs-lista-fila::before { content: "8" counter(tema) ".7"; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; color: var(--pp-acc); letter-spacing: .1em; flex: 0 0 auto; }
+  .obs-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .obs-lista-tema { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 22px; line-height: 1.05; }
+  .obs-lista-quien { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+
+  /* ── 08 Regalos ────────────────────────────────────────────────────── */
+  .obs-tarjeta--banco { --obs-neon: var(--pp-acc); position: relative; z-index: 1; border: 1px solid var(--obs-linea); background: var(--pp-bg2); padding: 18px 20px;
+    display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .obs-tarjeta--der { --obs-neon: var(--pp-acc2); }
+  .obs-tarjeta--banco + .obs-tarjeta--banco { margin-top: 14px; }
+  .obs-tarjeta-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--obs-neon); }
+  .obs-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.55; opacity: .85; }
+  .obs-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .obs-fila-etq { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .obs-fila-dato { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 13px; overflow-wrap: anywhere; }
+  .obs-fila--copiable:first-child { border-bottom: 1px solid var(--obs-linea-suave); }
+  .obs-fila--copiable:first-child .obs-fila-dato { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: 24px; line-height: 1.05; color: var(--obs-neon); }
+  .obs-tarjeta--banco .obs-fila--ultima { border-bottom: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+  .obs-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-weight: 500; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+  .obs-btn-copiar--hecho { background: var(--pp-ink); color: var(--pp-bg); }
+
+  /* ── 09 Trivia: la trivia astral ───────────────────────────────────── */
+  .obs-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .obs-quiz .obs-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .obs-quiz .obs-tarjeta-kicker { align-self: flex-start; border: 1px solid var(--pp-bg); color: var(--pp-bg); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; padding: 8px 14px; }
+  .obs-quiz .obs-tarjeta-pregunta, .obs-quiz .obs-tarjeta-titulo { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(30px, 8vw, 64px); line-height: 1.05; max-width: 15ch; }
+  .obs-quiz .obs-tarjeta-mensaje { margin: 0; font-size: 15px; }
+  .obs-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .obs-opcion { min-height: 54px; border: 1px solid var(--pp-bg); background: transparent; color: var(--pp-bg); cursor: pointer; counter-increment: opcion;
+    font-family: var(--obs-sans), 'Jost', sans-serif; font-weight: 500; font-size: 15px; text-align: left; padding: 0 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .obs-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .obs-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-opcion--bien::after { content: "Correcta"; }
+  .obs-opcion--mal { background: var(--obs-acc3); color: var(--pp-ink); }
+  .obs-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .obs-quiz .obs-spread > .obs-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .obs-quiz .obs-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .obs-quiz .obs-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .obs-quiz .obs-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: el pase del observatorio ──────────────────────────── */
+  .obs-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .obs-pagina--ticket { align-items: flex-start; }
+  .obs-ticket { position: relative; width: 100%; max-width: 420px; background: var(--pp-ink); color: var(--pp-bg); padding: 18px 18px 18px 46px; box-sizing: border-box;
+    display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; margin-bottom: 20px; }
+  .obs-ticket-troquel { position: absolute; left: 32px; top: 0; bottom: 0; border-left: 1px dashed var(--pp-bg); opacity: .5; }
+  .obs-ticket-talon { position: absolute; left: 0; top: 0; bottom: 0; width: 32px; display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .3em; text-transform: uppercase; }
+  .obs-ticket-datos { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .obs-ticket-etqs { display: flex; justify-content: space-between; gap: 8px; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .2em; text-transform: uppercase; }
+  .obs-ticket-fila { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .obs-ticket-nombre { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: clamp(20px, 5.4vw, 26px); line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .obs-ticket-cupula { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-size: clamp(26px, 7vw, 34px); line-height: 1; color: var(--obs-acc3); }
+  .obs-barras { width: 100%; height: 36px; display: block; color: var(--pp-bg); }
+  .obs-ticket-codigo { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .3em; }
+  .obs-ticket-qr { position: relative; width: clamp(96px, 26vw, 130px); aspect-ratio: 1; background: #FFFFFF; padding: 8px; box-sizing: border-box; border: 1px solid var(--pp-bg); }
+  .obs-ticket-qr .qr-ingreso, .obs-ticket-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .obs-ticket-qr img, .obs-ticket-qr svg, .obs-ticket-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .obs-ticket-qr p, .obs-ticket-qr h3, .obs-ticket-qr h4 { display: none; }
+  .obs-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .obs-pase-numero, .obs-pase-mesa { display: flex; flex-direction: column; }
+  .obs-pase-mesa { align-items: flex-end; text-align: right; }
+  .obs-pase-numero > span:last-child { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-weight: 300; font-size: clamp(64px, 19vw, 140px); line-height: .9; }
+  .obs-pase-mesa > span:last-child { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(40px, 12vw, 88px); line-height: .9; color: var(--obs-acc3); }
+  .obs-lineas-pase { display: flex; flex-direction: column; border-top: 1px solid color-mix(in srgb, var(--pp-ink) 30%, transparent); }
+  .obs-lineas-pase .obs-linea { border-bottom: 1px solid var(--obs-linea-suave); font-size: 14px; padding: 10px 0; }
+  .obs-lineas-pase .obs-linea:last-child { border-bottom: 0; }
+  .obs-lineas-pase .obs-linea > span:first-child { color: var(--pp-acc); opacity: 1; letter-spacing: .16em; }
+  .obs-lineas-pase .obs-linea > span:last-child { font-weight: 400; line-height: 1.4; }
+  .obs-info-extra { margin-top: 4px; }
+  .obs-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .obs-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-acc) !important; border: 1px solid var(--pp-acc) !important;
+    border-radius: 0 !important; font-weight: 500 !important; letter-spacing: .2em !important; text-transform: uppercase; }
+  .obs-raiz .ia-icon-box, .obs-raiz svg.lucide { display: none !important; }
+  .obs-pase-pie { display: flex; flex-direction: column; gap: 14px; }
+  .obs-despedida { font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(26px, 7vw, 44px); line-height: 1.1; }
+  .obs-replay { cursor: pointer; color: var(--pp-ink); }
+  .obs-credito { display: inline-flex; opacity: .8; }
+
+  /* ── La tapa: la carta celeste ─────────────────────────────────────── */
+  .obs-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .obs-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(18px + env(safe-area-inset-top)) max(20px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); }
+  .obs-cielo { position: absolute; inset: 0; pointer-events: none; overflow: hidden; color: var(--pp-ink); }
+  .obs-estrellas { position: absolute; inset: -4%; width: 108%; height: 108%; }
+  .obs-estrella--titila { animation: obsTitila 3s ease-in-out infinite; }
+  @keyframes obsTitila { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+  /* El cometa: una línea que cruza en 3 s y espera el resto del ciclo. */
+  .obs-cometa { position: absolute; left: 0; top: 40%; width: 120px; height: 1px; background: linear-gradient(90deg, transparent, var(--pp-ink)); transform-origin: right;
+    rotate: -28deg; opacity: 0; animation: obsCometa 11s ease-out 3s infinite; }
+  @keyframes obsCometa { 0% { transform: translate3d(-10vw, 10vh, 0); opacity: 0; } 8% { opacity: 1; } 30% { transform: translate3d(60vw, -30vh, 0); opacity: 0; } 100% { transform: translate3d(60vw, -30vh, 0); opacity: 0; } }
+  .obs-carta { position: absolute; left: 50%; top: 50%; width: min(140vw, 120vh, 900px); height: min(140vw, 120vh, 900px); margin-left: calc(min(140vw, 120vh, 900px) / -2); margin-top: calc(min(140vw, 120vh, 900px) / -2); opacity: .35; }
+  .obs-carta-puntos text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 7px; letter-spacing: 1.5px; fill: currentColor; }
+  .obs-folio--tapa { z-index: 1; }
+  .obs-tapa-centro { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 6px; min-height: 0; text-align: center; }
+  /* La constelación: se traza sola cuando entra la tapa (la línea de 1000
+     de largo se descubre en 1,8 s) y las estrellas aparecen de a una. */
+  .obs-constelacion { position: relative; width: min(100%, 520px); aspect-ratio: 5 / 2; margin-bottom: -2vh; color: var(--pp-acc); }
+  .obs-constelacion svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .obs-constelacion-linea { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: obsTraza 1800ms cubic-bezier(.2,.7,.2,1) 300ms forwards; }
+  @keyframes obsTraza { to { stroke-dashoffset: 0; } }
+  .obs-constelacion-estrellas { fill: var(--pp-ink); }
+  .obs-constelacion-estrellas circle, .obs-constelacion-halos circle, .obs-constelacion-etqs text { opacity: 0; animation: obsAparece 500ms ease forwards; }
+  .obs-constelacion-estrellas circle:nth-child(1) { animation-delay: .6s; } .obs-constelacion-estrellas circle:nth-child(2) { animation-delay: .72s; } .obs-constelacion-estrellas circle:nth-child(3) { animation-delay: .84s; }
+  .obs-constelacion-estrellas circle:nth-child(4) { animation-delay: .96s; } .obs-constelacion-estrellas circle:nth-child(5) { animation-delay: 1.08s; } .obs-constelacion-estrellas circle:nth-child(6) { animation-delay: 1.2s; } .obs-constelacion-estrellas circle:nth-child(7) { animation-delay: 1.32s; }
+  .obs-constelacion-halos { stroke: var(--pp-acc); }
+  .obs-constelacion-halos circle:nth-child(1) { animation-delay: 1.44s; } .obs-constelacion-halos circle:nth-child(2) { animation-delay: 1.56s; } .obs-constelacion-halos circle:nth-child(3) { animation-delay: 1.68s; }
+  .obs-constelacion-etqs text { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px; fill: var(--pp-acc); }
+  .obs-constelacion-etqs text:nth-child(1) { animation-delay: 1.8s; } .obs-constelacion-etqs text:nth-child(2) { animation-delay: 1.92s; } .obs-constelacion-etqs text:nth-child(3) { animation-delay: 2.04s; } .obs-constelacion-etqs text:nth-child(4) { animation-delay: 2.16s; }
+  @keyframes obsAparece { to { opacity: 1; } }
+  .obs-tapa-kicker { font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc); }
+  /* El nombre: Cormorant 300 centrado; el renglón más largo manda el cuerpo. */
+  .obs-tapa-nombres { margin: 0; line-height: .95; letter-spacing: -.01em; display: flex; flex-direction: column; align-items: center;
+    font-size: min(clamp(48px, 16vw, 140px), 13vh, calc((100vw - 60px) / (var(--largo, 9) * 0.48))); }
+  @media (min-width: 1024px) { .obs-tapa-nombres { font-size: min(11vw, 150px, 13vh, calc((min(100vw, 1100px) - 60px) / (var(--largo, 9) * 0.48))); } }
+  .obs-tapa-linea { overflow: hidden; display: block; white-space: nowrap; }
+  .obs-tapa-linea > span { display: block; }
+  .obs-tapa-linea--y { font-size: .34em; line-height: 1.6; }
+  .obs-tapa-y { display: inline-flex !important; align-items: center; gap: .6em; font-style: italic; color: var(--pp-acc); }
+  .obs-tapa-y > i { width: 2em; height: 1px; background: var(--pp-acc); }
+  .obs-tapa-y > em { font-weight: 300; }
+  .obs-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; box-sizing: border-box;
+    font-size: 13px; line-height: 1.4; text-align: left; font-weight: 500; border-top: 1px solid var(--obs-linea); padding-top: 10px; margin-top: 6px; }
+  .obs-tapa-datos-der { text-align: right; }
+  .obs-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; }
+  .obs-tapa-mensaje { margin: 0; font-family: var(--obs-serif), 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; font-size: clamp(18px, 4.6vw, 24px); line-height: 1.35; max-width: 34ch; }
+  .obs-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 1px solid var(--pp-acc); background: transparent; color: var(--pp-acc); cursor: pointer;
+    font-weight: 500; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; padding: 0 22px; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .obs-tapa-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .obs-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--pp-ink); border-left: 1px solid var(--obs-linea) !important; }
+  .obs-riel-top { writing-mode: vertical-rl; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 11px; color: var(--pp-ink) !important; }
+  .obs-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-ink); }
+  .obs-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .obs-riel-barra { position: absolute; left: -1px; top: 0; width: 2px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .obs-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-family: var(--obs-mono), 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .28em; color: var(--pp-acc);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: obsPista 2.4s ease-in-out infinite; }
+  @keyframes obsPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .obs-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-bg) 94%, transparent);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .obs-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--pp-acc); border-radius: 50%;
+    background: transparent; color: var(--pp-acc); font-size: 18px; line-height: 1; cursor: pointer; }
+  .obs-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 1px solid var(--pp-acc); }
 
   @media (prefers-reduced-motion: reduce) {
     .obs-raiz * { animation: none !important; }
     .obs-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
-    .obs-foto { --obs-punto: 0; }
+    .obs-ocular { --obs-punto: 0; }
+    .obs-constelacion-linea { stroke-dashoffset: 0; }
+    .obs-constelacion-estrellas circle, .obs-constelacion-halos circle, .obs-constelacion-etqs text { opacity: 1; }
+    .obs-cometa { display: none; }
   }
 `;

@@ -8,14 +8,18 @@
  * Variante: Desierto.
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/pos.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/pos.jsx, los
+ * estilos en scripts/css/tipografica/pos.css y las caras y la paleta en
+ * scripts/familias/tipografica/pos.json.
  *
- * La postal de viaje: Alfa Slab One como el sello de un destino, Work Sans
- * para el texto y JetBrains Mono para los datos, como el matasellos.
+ * Correo aéreo: Alfa Slab One como sello postal, Work Sans para el texto y
+ * JetBrains Mono para folios y sellos. Borde de franjas, mapa con curvas de
+ * nivel, un avioncito que recorre la ruta, matasellos con la tinta gastada,
+ * sello de visa, panel split-flap, etiquetas de valija, boarding pass y
+ * postales que giran y muestran el dorso.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -42,14 +46,14 @@ const posSerif = Alfa_Slab_One({
 });
 const posSans = Work_Sans({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--pos-sans",
 });
 // El mono es la ficha técnica de la revista: folios, kickers y datos.
 const posMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400"],
+  weight: ["400", "500"],
   display: "swap",
   variable: "--pos-mono",
 });
@@ -74,6 +78,7 @@ const PALETA = {
   hill3: "#3A2E22",
   night: "#3A2E22",
   nightInk: "#F5EDE0",
+  acc3: "#D9A441",
 };
 
 /**
@@ -310,7 +315,7 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -319,6 +324,12 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         linea.style.transform = "translate3d(0,0,0)";
       }, 260 + i * 130);
     });
+    const matasellos = escena ? escena.querySelector<HTMLElement>("[data-matasellos]") : null;
+    if (matasellos) {
+      matasellos.style.animation = "none";
+      void matasellos.offsetWidth;
+      matasellos.style.animation = "";
+    }
   }, []);
 
   const dibujarRuta = useCallback(() => {
@@ -543,6 +554,31 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            const cerca = Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3));
+            bano.style.opacity = String(cerca);
+            // Las placas (Observatorio) están en negativo y se revelan al
+            // pasar por el centro.
+            const negativo = hoja.querySelector<HTMLElement>("[data-neg]");
+            if (negativo) negativo.style.opacity = (0.18 * (1 - cerca)).toFixed(3);
+            // Las postales (Postal) giran y muestran el dorso cuando pasan
+            // por el centro; vuelven al salir.
+            const carta = hoja.querySelector<HTMLElement>("[data-card]");
+            if (carta && !menosMovimiento) {
+              const gira = dx < 0.18 && p > 0.02 && p < 0.98;
+              if (carta.dataset.girada !== String(gira)) {
+                carta.dataset.girada = String(gira);
+                carta.style.transform = gira ? "rotateY(180deg)" : "rotateY(0)";
+              }
+            }
           });
         });
 
@@ -711,6 +747,7 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-acc3": PALETA.acc3,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -740,6 +777,24 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre en Alfa Slab, centrado, con el "&" como una estampilla. El
+  // renglón más largo manda el cuerpo.
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(5, ...renglones.map((n) => n.length));
+
+  // La frase: el medio en el acento y el cierre en el verde azulado.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.7)) return "pos-teal";
+    if (i >= Math.floor(n * 0.25) && i < desdeAcento) return "pos-acento";
+    return undefined;
+  };
+
+  const kickerDelEvento = tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const mesCorto = mesLargo.slice(0, 3).toUpperCase();
+  const inicialesCortas = iniciales(nombre1, nombre2).replace(" & ", "+");
+  const codigoDelPase = `ALT ${pase} · ${anio} · ${(ciudad || lugarNombre || "").slice(0, 3).toUpperCase()}`;
+
   return (
     <div
       ref={raizRef}
@@ -751,21 +806,17 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
 
       <div ref={scrollerRef} className="pos-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
+            El pasaporte: sobre tinta, el sello de visa con la fecha adentro
+            y la foto con marco de papel y el "VISA 2027" arriba. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="pos-section pos-std">
-          <div className="pos-trama pos-trama--media" aria-hidden="true" />
+          <div className="pos-folio pos-folio--ambar">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="pos-spread">
             <div className="pos-pagina">
-              <div className="pos-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
-              <div className="pos-fecha">
-                <span data-xin="1" data-dist="-160" className="pos-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="pos-fecha-linea pos-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="pos-fecha-linea">{anio}</span>
+              <div data-xin="1" data-dist="0" className="pos-visa">
+                <SelloVisa arco={`${tx("invitacion.saveTheDate.entrada").toUpperCase()} · ${[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()} · `} dia={diaNum} mes={mesLargo.toUpperCase()} anio={anio} admitido={tx("invitacion.saveTheDate.admitido").toUpperCase()} />
               </div>
               <div data-xin="1" data-delay="360" className="pos-fecha-pie">
                 <span>{diaSemana} · {hora} H</span>
@@ -773,10 +824,10 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="pos-link"
+                  className="pos-chip pos-chip--ambar"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ✈
                 </AddToCalendarLink>
               </div>
             </div>
@@ -785,47 +836,51 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="pos-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only pos-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="30,58,95" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only pos-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="30,58,95" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --pos-punto. */}
                 <span className="pos-foto-revelado" aria-hidden="true" />
-                <span className="pos-foto-anio">{anio}</span>
-                <span className="pos-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="pos-foto-visa" aria-hidden="true">VISA<br />{anio}</span>
+                <span className="pos-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="pos-section pos-countdown">
+            El panel de salidas: fichas split-flap en mono, con la línea
+            partida al medio, entre dos marquesinas. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="pos-section pos-countdown">
           <div className="pos-folio">
             <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
-          <div className="pos-marquesina" aria-hidden="true">
+          <div className="pos-marquesina pos-marquesina--acento" aria-hidden="true">
             <div className="pos-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.saveTheDate.embarque").toUpperCase()} · {tx("invitacion.cuentaRegresiva.dias").toUpperCase()} · {tx("invitacion.cuentaRegresiva.horas").toUpperCase()} · {tx("invitacion.cuentaRegresiva.minutos").toUpperCase()} · {tx("invitacion.cuentaRegresiva.segundos").toUpperCase()} · {diaNum} {tx("invitacion.evento.de").toUpperCase()} {mesLargo.toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaPostal targetDate={fechaHora} />
-          <div className="pos-marquesina pos-marquesina--contraria" aria-hidden="true">
+          <div className="pos-spread">
+            <div className="pos-pagina pos-pagina--entera">
+              <CuentaPostal targetDate={fechaHora} />
+            </div>
+          </div>
+          <div className="pos-marquesina pos-marquesina--filete pos-marquesina--contraria" aria-hidden="true">
             <div className="pos-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -833,11 +888,12 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            El dorso de la postal: papel rayado, la frase en Alfa Slab y la
+            nota con el avioncito que flota. */}
         {hayFrase && (
-          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="pos-section pos-frase-seccion">
-            <div className="pos-folio">
+          <section data-tone="light" data-screen-label={tx("invitacion.frase.etiqueta")} className="pos-section pos-frase-seccion">
+            <span className="pos-rayado" aria-hidden="true" />
+            <div className="pos-folio pos-folio--acento">
               <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
@@ -847,24 +903,25 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
                   // El espacio va fuera del span: el motor pone cada palabra
                   // en inline-block y un espacio adentro se colapsa a cero.
                   <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "pos-acento" : undefined}>{p}</span>{" "}
+                    <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
                   </span>
                 ))}
               </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="pos-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div data-xin="1" data-delay="900" data-dist="60" className="pos-nota">
+                <span className="pos-nota-avion" aria-hidden="true">✈</span>
+                <span>{tx("invitacion.frase.conAmor")} · {titulo}</span>
               </div>
             </div>
             <div className="pos-folio pos-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+              <span>{tx("invitacion.saveTheDate.viaAerea").toUpperCase()}</span>
+              <span className="pos-barra" aria-hidden="true" />
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Etiquetas de valija: un destino por lugar, con la tarjeta de
+            esquinas desparejas y el ojal a la izquierda. */}
         <div
           id="details"
           data-pan="1"
@@ -875,64 +932,68 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         >
           <div className="pos-pan-fijo">
             <div data-strip="1" className="pos-tira">
-              <div data-tone={TONO} className="pos-panel">
-                <div className="pos-folio">
+              <div data-tone="light" className="pos-panel pos-panel--crema">
+                <div className="pos-folio pos-folio--acento">
                   <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="pos-spread">
-                  <h2 className="pos-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="pos-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="pos-lineas">
+                  <div className="pos-pagina">
+                    <span className="pos-panel-sub">{tx("invitacion.saveTheDate.destino")} {deLugar("recepcion").split(" ")[0]}</span>
+                    <h2 className="pos-panel-titulo">{lugarNombre || ciudad}</h2>
+                  </div>
+                  <div className="pos-etiqueta-valija">
+                    <span className="pos-ojal" aria-hidden="true" />
                     <div className="pos-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {direccion && <div className="pos-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="pos-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pos-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="pos-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar")}<span>✈</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="pos-folio pos-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="pos-panel">
-                  <div className="pos-folio">
+                <div id="ceremonia" data-tone="dark" className="pos-panel pos-panel--tinta">
+                  <div className="pos-folio pos-folio--ambar">
                     <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="pos-spread">
-                    <h2 className="pos-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="pos-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="pos-lineas">
+                    <div className="pos-pagina">
+                      <span className="pos-panel-sub pos-panel-sub--ambar">{tx("invitacion.saveTheDate.destino")} {deLugar("ceremonia").split(" ")[0]}</span>
+                      <h2 className="pos-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="pos-etiqueta-valija">
+                      <span className="pos-ojal" aria-hidden="true" />
                       {ceremoniaHora && <div className="pos-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="pos-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="pos-folio pos-folio--pie">
                     <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="pos-panel">
-                  <div className="pos-folio">
+                <div id="location" data-tone="light" className="pos-panel pos-panel--crema">
+                  <div className="pos-folio pos-folio--acento">
                     <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="pos-spread">
-                    <h2 className="pos-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="pos-lineas">
+                    <div className="pos-pagina">
+                      <span className="pos-panel-sub">{tx("invitacion.saveTheDate.destino")} {deLugar("llegar").split(" ")[0]}</span>
+                      <h2 className="pos-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="pos-etiqueta-valija">
+                      <span className="pos-ojal" aria-hidden="true" />
                       {embedMapUrl && (
                         <div className="pos-mapa">
                           <iframe
@@ -947,28 +1008,29 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="pos-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="pos-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas")}<span>✈</span>
                       </a>
                     </div>
                   </div>
                   <div className="pos-folio pos-folio--pie">
                     <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="pos-panel pos-panel--acento">
+                <div id="schedule" data-tone="dark" className="pos-panel pos-panel--teal">
                   <div className="pos-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="pos-spread">
-                    <h2 className="pos-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="pos-acento pos-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="pos-lineas">
+                    <div className="pos-pagina">
+                      <span className="pos-panel-sub pos-panel-sub--blanco">{tx("invitacion.saveTheDate.destino")} {deLugar("cronograma").split(" ")[0]}</span>
+                      <h2 className="pos-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="pos-etiqueta-valija">
+                      <span className="pos-ojal" aria-hidden="true" />
                       {cronograma.map((item, i) => (
                         <div key={i} className="pos-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -985,10 +1047,10 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            La tarjeta de embarque: pliego verde azulado, el boarding pass
+            blanco con la línea de troquel y el sello OK al confirmar. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="pos-section pos-checkin">
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="pos-section pos-checkin">
             <div className="pos-folio">
               <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
@@ -996,11 +1058,11 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
             <div className="pos-spread">
               <div className="pos-pagina">
                 <h2 data-xin="1" data-dist="-80" className="pos-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="pos-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="pos-ambar">{tx("invitacion.rsvp.confirmaLinea2")}</span>
                 </h2>
               </div>
-              <div className="pos-cupon">
-                <span className="pos-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="pos-cupon">
+                <span className="pos-troquel" aria-hidden="true"><span /><span /><span /></span>
                 <CheckinPostal
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1034,8 +1096,8 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            Postales del viaje: cada foto es una tarjeta que, al pasar por
+            el centro, gira y muestra el dorso con la estampilla. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1045,40 +1107,45 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
             className="pos-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="pos-pan-fijo">
+            <div className="pos-pan-fijo pos-pan-fijo--album">
               <div data-strip="1" className="pos-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="pos-panel pos-panel--album">
-                    <div className="pos-folio">
+                  <div key={iHoja} data-tone="light" className={`pos-panel pos-panel--album${iHoja % 2 === 1 ? " pos-panel--album-b" : ""}`}>
+                    <div className="pos-folio pos-folio--gris">
                       <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="pos-h2 pos-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="pos-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="pos-contactos" data-cantidad={hoja.length}>
+                    <h2 className="pos-h2 pos-h2--album">{tx("invitacion.saveTheDate.postalesDelViaje")}</h2>
+                    <div className="pos-postales" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="pos-contacto"
+                          data-sheet="1"
+                          className="pos-postal"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
                           onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setFotoAmpliada(url); }}
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="pos-contacto-img" />
-                          <span className="pos-contacto-tinta" aria-hidden="true" />
-                          <span className="pos-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <div data-card="1" className="pos-postal-carta">
+                            <div className="pos-postal-frente">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={url} alt="" loading="lazy" className="pos-postal-img" />
+                              <span data-colorwash="1" className={`pos-bano pos-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                              <span className="pos-postal-n">FOTO {String(i + 1).padStart(2, "0")}</span>
+                            </div>
+                            <div className="pos-postal-dorso" aria-hidden="true">
+                              <div className="pos-postal-dorso-izq"><span>{[ciudad, anio].filter(Boolean).join(" · ").toUpperCase()}</span><span /><span /><span /></div>
+                              <div className="pos-postal-dorso-der"><span className="pos-estampilla-chica" /><span /><span /></div>
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
-                    <div className="pos-folio pos-folio--pie">
+                    <div className="pos-folio pos-folio--gris pos-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1089,20 +1156,21 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            El anuncio de abordo: sobre tinta, con el ecualizador de cinco
+            barras y la lista en fichas. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="pos-section pos-musica">
-            <div className="pos-folio">
+            <div className="pos-folio pos-folio--ambar">
               <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="pos-spread">
               <div className="pos-pagina">
                 <h2 data-xin="1" data-dist="-80" className="pos-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "pos-acento")}
+                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "pos-ambar")}
                 </h2>
                 <div data-xin="1" data-delay="120" className="pos-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4].map((i) => <span key={i} style={{ animationDelay: `${i * 0.18}s` }} />)}
                 </div>
               </div>
               <div className="pos-pagina">
@@ -1117,17 +1185,17 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            El fondo de viaje: tarjetas blancas con borde de tinta. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="pos-section pos-regalos">
-            <div className="pos-folio">
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="pos-section pos-regalos">
+            <div className="pos-folio pos-folio--acento">
               <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
             </div>
             <div className="pos-spread">
               <div className="pos-pagina">
                 <h2 data-xin="1" data-dist="-80" className="pos-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="pos-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="pos-teal">{tx("invitacion.regalos.siQueresLinea2")}</span>
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="pos-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1141,7 +1209,7 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1152,7 +1220,8 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1161,40 +1230,49 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            La declaración de aduana: pliego ámbar y opciones en blanco con
+            borde de tinta. */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="pos-section pos-quiz">
+          <section id="quiz" data-tone="light" data-screen-label="Quiz" className="pos-section pos-quiz">
             <div className="pos-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — {triviaTitulo.toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
             </div>
             <div className="pos-spread">
-              <div className="pos-pagina">
-                <h2 data-xin="1" data-dist="-80" className="pos-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="pos-pagina">
-                <TriviaPostal
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaPostal
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            La tarjeta de embarque final: talón lateral con texto vertical,
+            código de barras, el QR chico y el asiento; al lado, el número
+            de pase y los datos. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="pos-section pos-pase">
-          <div className="pos-folio">
+          <div className="pos-folio pos-folio--ambar">
             <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="pos-spread">
-            <div data-xin="1" data-dist="-60" className="pos-pagina pos-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+            <div data-xin="1" data-dist="-60" className="pos-pagina pos-pagina--boarding">
+              <div className="pos-boarding">
+                <span className="pos-boarding-troquel" aria-hidden="true" />
+                <span className="pos-boarding-talon">Boarding · {inicialesCortas} · {diaNum} {mesCorto}</span>
+                <div className="pos-boarding-datos">
+                  <div className="pos-boarding-etqs"><span>{tx("invitacion.saveTheDate.pasajero")}</span><span>{tx("invitacion.saveTheDate.asiento")}</span></div>
+                  <div className="pos-boarding-fila"><span className="pos-boarding-nombre">{nombreInvitado || titulo}</span><span className="pos-boarding-asiento">{guest?.mesas?.[0] ?? pase}</span></div>
+                  <CodigoDeBarras />
+                  <span className="pos-boarding-codigo">{codigoDelPase}</span>
+                </div>
+                <div className="pos-boarding-qr">
+                  <QrDeIngreso guest={guest as never} />
+                </div>
+              </div>
             </div>
             <div className="pos-pagina">
               <div data-xin="1" data-delay="100" className="pos-pase-cabeza">
@@ -1202,97 +1280,113 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
                   <span className="pos-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="pos-pase-mesa">
+                    <span className="pos-folio-etq">{tx("invitacion.pase.tuMesa").toUpperCase()}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="pos-lineas">
-                <div className="pos-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="pos-caja">
+                <div className="pos-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="pos-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="pos-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="pos-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="pos-linea"><span>Sector</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="pos-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="pos-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} H</span></div>
               </div>
               <div className="pos-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="pos-folio pos-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="pos-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="pos-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="pos-pase-pie">
+            <span className="pos-despedida">{tx("invitacion.saveTheDate.buenViaje")} {tx("invitacion.pase.losEsperamos")} — {iniciales(nombre1, nombre2)}</span>
+            <div className="pos-folio pos-folio--ambar pos-folio--colofon">
+              <span className="pos-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} /></span>
+              <span className="pos-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="pos-riel">
-        <span ref={rielTopRef} className="pos-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="pos-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="pos-riel-linea">
           <span ref={rielBarraRef} className="pos-riel-barra" />
         </div>
         <span ref={rielEtiquetaRef} className="pos-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          La postal de tapa: borde de correo aéreo, el mapa con las curvas
+          de nivel, la ruta punteada con el avioncito recorriéndola, el
+          nombre en Alfa Slab con el "&" como estampilla y el matasellos que
+          cae encima. Es la bienvenida: dice de quién es la fiesta, cuándo,
+          dónde y para cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="pos-portada">
         <div ref={escenaPortadaRef} className="pos-portada-hoja">
-          <div className="pos-trama pos-trama--tapa" aria-hidden="true" />
+          <span className="pos-borde-aereo" aria-hidden="true" />
+          <div className="pos-mapa-fondo" aria-hidden="true">
+            <svg data-depth="0.5" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" className="pos-mapa-curvas">
+              <g fill="none" stroke="currentColor" strokeWidth="1"><path d="M20 220 Q60 180 110 200 T200 190 T300 210 T380 190" /><path d="M40 100 Q90 130 150 110 T260 120 T360 90" /></g>
+              <g fill="currentColor" opacity=".5"><circle cx="70" cy="205" r="2.5" /><circle cx="220" cy="188" r="2.5" /><circle cx="330" cy="205" r="2.5" /><circle cx="150" cy="112" r="2.5" /><circle cx="300" cy="105" r="2.5" /></g>
+            </svg>
+            <svg viewBox="0 0 430 300" preserveAspectRatio="none" className="pos-ruta">
+              <path d="M -40 62 C 20 20, 60 20, 110 50 S 200 70, 260 30 S 380 10, 470 40" fill="none" stroke="currentColor" strokeWidth="1.6" strokeDasharray="5 7" opacity=".7" />
+              <circle cx="110" cy="50" r="3" className="pos-ruta-punto" /><circle cx="260" cy="30" r="3" className="pos-ruta-punto" />
+            </svg>
+            <svg viewBox="0 0 40 40" className="pos-avion">
+              <path d="M38 20 C38 18.4 36.4 18.4 34 18.4 L23 18.4 L15 4 L11 4 L15.5 18.4 L9.5 18.4 L6.5 13 L4.5 13 L5.5 18.8 L3 20 L5.5 21.2 L4.5 27 L6.5 27 L9.5 21.6 L15.5 21.6 L11 36 L15 36 L23 21.6 L34 21.6 C36.4 21.6 38 21.6 38 20 Z" fill="currentColor" />
+            </svg>
+          </div>
 
-          <div data-cl="1" className="pos-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
-            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
+          <div data-cl="1" className="pos-folio pos-folio--tapa">
+            <span className="pos-chip-borde">{tx("invitacion.saveTheDate.vueloConfirmado")}</span>
+            <span className="pos-chip-borde">Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="pos-tapa-centro">
-            <div className="pos-tapa-fila">
-              <span className="pos-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="pos-tapa-nombres">
+            <span className="pos-tapa-kicker">{ciudad ? `${tx("invitacion.saveTheDate.saludosDesde")} ${ciudad}` : kickerDelEvento}</span>
+            <h1 ref={cartelRef} className="pos-tapa-nombres" style={{ "--largo": renglonMasLargo } as React.CSSProperties}>
+              <Matasellos texto={`${tx("invitacion.saveTheDate.correo").toUpperCase()} · ${diaNum} ${mesCorto} ${anio} · ${(ciudad || lugarNombre).toUpperCase()} · `} centro={inicialesCortas} pie={`${hora} H`} />
               {saludaAlInvitado ? (
-                <span className="pos-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="pos-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
               ) : (
                 <>
-                  <span className="pos-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="pos-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
                   {nombre2 && (
-                    <span className="pos-tapa-linea pos-tapa-linea--sangra">
-                      <span><span className="pos-acento">&amp;</span>{nombre2}</span>
-                    </span>
+                    <>
+                      <span className="pos-tapa-linea pos-tapa-linea--amp"><span data-pieza="1" className="pos-estampilla-amp">&amp;</span></span>
+                      <span className="pos-tapa-linea"><span data-pieza="1">{nombre2}</span></span>
+                    </>
                   )}
                 </>
               )}
             </h1>
-            <div className="pos-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="pos-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <div className="pos-tapa-datos">
+              <span>{tx("invitacion.saveTheDate.destino")}: {lugarNombre || "—"}<br /><span className="pos-acento">{[direccion, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="pos-tapa-datos-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br /><span className="pos-acento">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{diaSemana} {diaNum}<br /><span className="pos-acento">{hora} h</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="pos-tapa-pie">
-            <span className="pos-regla" aria-hidden="true" />
             <p className="pos-tapa-mensaje">
               {saludaAlInvitado
                 ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
                 : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
             </p>
             <button type="button" onClick={abrir} className="pos-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              {tx("invitacion.portada.abrirInvitacion")} ✈
             </button>
           </div>
         </div>
@@ -1327,30 +1421,68 @@ export function PostalTemplateDesierto({ invitation, guest, isPersonalized = fal
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El matasellos: dos anillos con el texto en arco, las iniciales en el
+ * centro y la hora debajo, con la tinta gastada (una máscara de puntos).
+ * Cae sobre el nombre 1,6 s después de que entra la tapa.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
+function Matasellos({ texto, centro, pie }: { texto: string; centro: string; pie: string }) {
   const id = useId().replace(/:/g, "");
   return (
-    <div className="pos-sello-circular" aria-hidden="true">
+    <div data-matasellos="1" className="pos-matasellos" aria-hidden="true">
       <svg viewBox="0 0 100 100">
         <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
+          <path id={`arc-${id}`} d="M50 50 m -36 0 a 36 36 0 1 1 72 0 a 36 36 0 1 1 -72 0" fill="none" />
+          <pattern id={`gasto-${id}`} patternUnits="userSpaceOnUse" width="7" height="7"><circle cx="2" cy="3" r="1.4" fill="#000" /><circle cx="5.5" cy="6" r="1" fill="#000" /></pattern>
+          <mask id={`mascara-${id}`}><rect width="100" height="100" fill="#fff" /><rect width="100" height="100" fill={`url(#gasto-${id})`} opacity=".55" /></mask>
         </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
+        <g mask={`url(#mascara-${id})`}>
+          <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" strokeWidth="3" />
+          <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
+          <text className="pos-matasellos-arco"><textPath href={`#arc-${id}`}>{texto.repeat(3).slice(0, 44)}</textPath></text>
+          <text x="50" y="47" textAnchor="middle" className="pos-matasellos-centro">{centro}</text>
+          <text x="50" y="60" textAnchor="middle" className="pos-matasellos-pie">{pie}</text>
+        </g>
       </svg>
-      {amp && <span className="pos-sello-amp">&amp;</span>}
     </div>
+  );
+}
+
+/** El sello de visa del Save the Date: la fecha adentro de tres anillos. */
+function SelloVisa({ arco, dia, mes, anio, admitido }: { arco: string; dia: string; mes: string; anio: string; admitido: string }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <svg viewBox="0 0 200 200" className="pos-visa-sello" aria-hidden="true">
+      <defs>
+        <pattern id={`gasto-${id}`} patternUnits="userSpaceOnUse" width="7" height="7"><circle cx="2" cy="3" r="1.4" fill="#000" /><circle cx="5.5" cy="6" r="1" fill="#000" /></pattern>
+        <path id={`arc-${id}`} d="M100 100 m -78 0 a 78 78 0 1 1 156 0 a 78 78 0 1 1 -156 0" fill="none" />
+        <mask id={`mascara-${id}`}><rect width="200" height="200" fill="#fff" /><rect width="200" height="200" fill={`url(#gasto-${id})`} opacity=".45" /></mask>
+      </defs>
+      <g mask={`url(#mascara-${id})`} fill="none" stroke="currentColor"><circle cx="100" cy="100" r="94" strokeWidth="5" /><circle cx="100" cy="100" r="86" strokeWidth="1.5" /><circle cx="100" cy="100" r="62" strokeWidth="2" /></g>
+      <g mask={`url(#mascara-${id})`}>
+        <text className="pos-visa-arco"><textPath href={`#arc-${id}`}>{arco.repeat(3).slice(0, 56)}</textPath></text>
+        <text x="100" y="92" textAnchor="middle" className="pos-visa-dia">{dia}</text>
+        <text x="100" y="116" textAnchor="middle" className="pos-visa-mes">{mes}</text>
+        <text x="100" y="140" textAnchor="middle" className="pos-visa-anio">{anio}</text>
+        <rect x="66" y="150" width="68" height="12" fill="currentColor" /><text x="100" y="159.5" textAnchor="middle" className="pos-visa-admitido">{admitido}</text>
+      </g>
+    </svg>
+  );
+}
+
+/** El código de barras del boarding pass: cuarenta barras. */
+function CodigoDeBarras() {
+  const barras = [[0, 3], [5, 1], [9, 2], [14, 4], [20, 1], [24, 3], [30, 2], [34, 1], [38, 4], [45, 2], [49, 1], [53, 3], [59, 1], [62, 4], [69, 2], [73, 1], [77, 3], [83, 2], [87, 4], [94, 1], [97, 3], [103, 1], [107, 2], [112, 4], [118, 1], [122, 3], [128, 2], [132, 1], [136, 4], [143, 2], [147, 1], [151, 3], [157, 1], [160, 4], [167, 2], [171, 1], [175, 3], [181, 2], [185, 4], [192, 1], [196, 3]];
+  return (
+    <svg viewBox="0 0 200 40" preserveAspectRatio="none" className="pos-barras" aria-hidden="true">
+      <g fill="currentColor">{barras.map(([x, w]) => <rect key={x} x={x} width={w} height="40" />)}</g>
+    </svg>
   );
 }
 
@@ -1405,7 +1537,7 @@ function CuentaPostal({ targetDate }: { targetDate: Date }) {
     <div className="pos-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`pos-cuenta-caja pos-cuenta-caja--${i + 1}`}>
-          <span className="pos-cuenta-num">{c.v}</span>
+          <span className="pos-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="pos-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1898,13 +2030,15 @@ function TriviaPostal({ preguntas, invitationId, guestToken, guestName }: { preg
 // leen la Bienvenida y el Post-evento compartidos (esperan `pos-section` y
 // `pos-kicker`).
 const CSS_POS = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Postal ───────────────────────────────────────────────────────────
+     Correo aéreo: Alfa Slab One como sello postal, Work Sans para el texto
+     y JetBrains Mono para folios, sellos y el panel de vuelos. Borde de
+     franjas, mapa con curvas de nivel, un avioncito que recorre la ruta,
+     matasellos con la tinta gastada, sello de visa, split-flap, etiquetas
+     de valija, boarding pass y postales que giran. Todo CSS y SVG. */
   .pos-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--pos-sans), 'Work Sans', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--pos-sans), 'Work Sans', sans-serif;
+    --pos-acc3: ${PALETA.acc3}; --pos-panel: #16283F; --pos-flap: #0E1A2C; }
   .pos-raiz a { color: inherit; text-decoration: none; }
   .pos-raiz button { font: inherit; }
 
@@ -1912,298 +2046,400 @@ const CSS_POS = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .pos-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .pos-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .pos-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .pos-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
-
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .pos-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .pos-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
   .pos-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: Work Sans 700 con tracking; ámbar sobre tinta, acento sobre
+     crema. */
   .pos-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .pos-folio--pie { align-items: center; margin-top: auto; }
-  .pos-folio-etq { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+    font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .pos-folio--ambar { color: var(--pos-acc3); }
+  .pos-folio--acento { color: var(--pp-acc); }
+  .pos-folio--gris { color: #6E6A78; }
+  .pos-folio--pie { align-items: center; margin-top: auto; letter-spacing: .22em; }
+  .pos-panel > .pos-folio--pie { color: inherit; opacity: .8; }
+  .pos-folio--colofon { align-items: center; border-top: 1px solid color-mix(in srgb, var(--pp-bg) 30%, transparent); padding-top: 12px; }
+  .pos-folio-etq { font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--pos-acc3); display: block; }
+  .pos-barra { width: 40%; height: 1px; background: currentColor; }
+  .pos-acento { color: var(--pp-acc); }
+  .pos-teal { color: var(--pp-acc2); }
+  .pos-ambar { color: var(--pos-acc3); }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .pos-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .pos-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .pos-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .pos-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .pos-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .pos-pagina { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .pos-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .pos-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .pos-spread > *:first-child { justify-self: end; }
+    .pos-spread > *:last-child { justify-self: start; }
+    .pos-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .pos-h2, .pos-panel-titulo, .pos-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--pos-serif), 'Alfa Slab One', serif;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .pos-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .pos-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .pos-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .pos-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .pos-acento { font-style: italic; color: var(--pp-acc); }
-  .pos-acento--tinta { color: var(--pp-ink); }
-  .pos-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .pos-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .pos-regla { display: block; height: 2px; background: currentColor; }
+  .pos-h2, .pos-panel-titulo, .pos-frase, .pos-tapa-nombres { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-weight: 400; }
+  .pos-h2, .pos-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: 1.02; font-size: clamp(34px, 9.5vw, 72px); }
+  .pos-h2--album { font-size: clamp(30px, 8vw, 60px); }
+  .pos-panel-titulo { font-size: clamp(32px, 9vw, 74px); }
+  .pos-panel-sub { font-weight: 700; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-acc); }
+  .pos-panel-sub--ambar { color: var(--pos-acc3); }
+  .pos-panel-sub--blanco { color: #FFFFFF; }
+  .pos-parrafo { margin: 0; font-weight: 600; font-size: 15px; line-height: 1.5; max-width: 40ch; }
+  .pos-chip { display: inline-block; padding: 12px 18px; font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  .pos-chip--ambar { background: var(--pos-acc3); color: var(--pp-ink); }
+  .pos-cta { margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    color: #FFFFFF; background: var(--pp-ink); font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 14px; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .pos-std { justify-content: center; }
-  .pos-fecha { display: flex; flex-direction: column; font-family: var(--pos-serif), 'Alfa Slab One', serif;
-    line-height: .82; letter-spacing: -.04em; }
-  .pos-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .pos-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .pos-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .pos-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
+  /* ── 01 Guardá la fecha: el pasaporte ──────────────────────────────── */
+  .pos-visa { position: relative; width: min(100%, 420px); aspect-ratio: 1; align-self: center; }
+  .pos-visa-sello { position: absolute; inset: 0; transform: rotate(-9deg); color: var(--pp-acc); }
+  .pos-visa-arco { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-weight: 500; font-size: 12px; letter-spacing: 3px; fill: currentColor; }
+  .pos-visa-dia { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 58px; fill: currentColor; }
+  .pos-visa-mes { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 20px; letter-spacing: 2px; fill: currentColor; }
+  .pos-visa-anio { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 15px; letter-spacing: 4px; fill: currentColor; }
+  .pos-visa-admitido { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: 2px; fill: var(--pp-ink); }
+  .pos-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  /* La foto: marco de papel de 10 px y el circulito "VISA" arriba. */
+  .pos-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; box-sizing: border-box; overflow: hidden; border: 10px solid var(--pp-bg);
+    background: repeating-linear-gradient(135deg, #3A4E68 0 8px, #2B3E58 8px 16px); }
   .pos-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
   .pos-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background-image: radial-gradient(var(--pp-ink) calc(var(--pos-punto, 7.2) * 1px), transparent calc(var(--pos-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .pos-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--pos-serif), 'Alfa Slab One', serif;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .pos-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--pos-mono), 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .pos-foto-visa { position: absolute; left: 14px; top: 14px; z-index: 2; width: 60px; height: 60px; border: 2px solid var(--pp-acc); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; transform: rotate(-12deg); text-align: center; line-height: 1.1;
+    font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 11px; color: var(--pp-acc); }
+  .pos-foto-etq { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-bg); }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .pos-countdown { justify-content: space-between; }
-  .pos-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .pos-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  /* ── 02 Falta poco: el panel de salidas ────────────────────────────── */
+  .pos-countdown { background: var(--pos-panel) !important; color: var(--pos-acc3) !important; justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .pos-countdown > .pos-folio, .pos-countdown > .pos-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .pos-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap; font-weight: 700; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+  .pos-marquesina--acento { background: var(--pp-acc); color: var(--pp-bg); font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-weight: 400; font-size: 20px; letter-spacing: .04em; }
+  .pos-marquesina--filete { border-top: 1px solid var(--pos-acc3); border-bottom: 1px solid var(--pos-acc3); }
+  .pos-marquesina-tira { display: flex; width: max-content; animation: posCorre 16s linear infinite; }
+  .pos-marquesina-tira > span { padding-right: 32px; }
   .pos-marquesina--contraria .pos-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  @keyframes posCorre { to { transform: translate3d(-50%, 0, 0); } }
+  /* Las fichas split-flap: caja oscura con la línea partida al medio; al
+     cambiar, la cifra nueva baja girando desde arriba. */
+  .pos-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; background: var(--pp-ink); padding: 3px; }
+  .pos-cuenta-caja { position: relative; background: var(--pos-panel); padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+  .pos-cuenta-num { position: relative; display: block; background: var(--pos-flap); border-radius: 6px; perspective: 400px; text-align: center;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pos-acc3) 25%, transparent);
+    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(52px, 17vw, 120px); line-height: 1.1; color: var(--pos-acc3); }
+  .pos-cuenta-num::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 2px; margin-top: -1px; background: var(--pos-panel); }
+  .pos-cuenta-num > span { display: block; transform-origin: 50% 50%; animation: posFlap 240ms ease-out; }
+  @keyframes posFlap { from { transform: rotateX(-90deg); } to { transform: rotateX(0); } }
+  .pos-cuenta-etq { font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-bg); }
+  .pos-tarjeta--hoy { background: var(--pos-flap); border-radius: 6px; padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .pos-tarjeta--hoy .pos-tarjeta-kicker { font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-bg); }
+  .pos-tarjeta--hoy .pos-tarjeta-titulo { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(30px, 8vw, 60px); line-height: 1.05; color: var(--pos-acc3); }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .pos-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .pos-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .pos-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .pos-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .pos-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .pos-cuenta-num, .pos-cuenta-dias, .pos-cifra { font-family: var(--pos-serif), 'Alfa Slab One', serif; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .pos-cuenta-caja:nth-child(4) .pos-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .pos-cuenta-etq { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .pos-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: el dorso de la postal ───────────────────────── */
+  .pos-frase-seccion { justify-content: space-between; gap: 30px; }
+  .pos-rayado { position: absolute; inset: 0; pointer-events: none; opacity: .6; background: repeating-linear-gradient(180deg, transparent 0 39px, color-mix(in srgb, var(--pp-ink) 14%, transparent) 39px 40px); }
+  .pos-frase { margin: 0; font-size: clamp(26px, 7vw, 56px); line-height: 1.15; max-width: 16ch; }
+  .pos-nota { align-self: flex-end; display: flex; align-items: center; gap: 12px; background: #FFFFFF; border: 1px solid var(--pp-ink); padding: 12px 16px; max-width: 320px;
+    font-weight: 600; font-size: 14px; line-height: 1.4; animation: posFlota 4s ease-in-out infinite; }
+  .pos-nota-avion { width: 34px; height: 34px; border: 2px solid var(--pp-acc); border-radius: 50%; flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
+    font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 12px; color: var(--pp-acc); }
+  @keyframes posFlota { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .pos-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .pos-frase-seccion .pos-acento { color: var(--pp-bg); font-style: italic; }
-  .pos-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Paneles: etiquetas de valija ───────────────────────────────── */
   .pos-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
   .pos-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .pos-pan-fijo--album { background: #F7F5F0; }
   .pos-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .pos-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .pos-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .pos-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .pos-panel--acento .pos-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .pos-panel--tinta { background: var(--pp-ink); color: var(--pp-bg); }
+  .pos-panel--teal { background: var(--pp-acc2); color: #FFFFFF; }
+  .pos-panel--teal > .pos-folio { color: #FFFFFF; }
   .pos-pan[data-scroll="vertical"] { height: auto; }
   .pos-pan[data-scroll="vertical"] .pos-pan-fijo { position: static; height: auto; overflow: visible; }
   .pos-pan[data-scroll="vertical"] .pos-tira { position: static; display: block; width: 100%; transform: none !important; }
   .pos-pan[data-scroll="vertical"] .pos-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-
-  .pos-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .pos-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .pos-linea > span:first-child { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .pos-linea > span:last-child { text-align: right; font-size: 15px; }
-  .pos-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--pos-mono), 'JetBrains Mono', monospace;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .pos-cta-flecha { font-family: var(--pos-serif), 'Alfa Slab One', serif; font-style: italic; font-size: 22px; }
-  .pos-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  /* La etiqueta de valija: blanca, con las esquinas desparejas y el ojal. */
+  .pos-etiqueta-valija { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 2px solid var(--pp-ink); border-radius: 8px 24px 8px 24px;
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+  .pos-ojal { position: absolute; left: -10px; top: 16px; width: 16px; height: 16px; border-radius: 50%; background: var(--pp-bg); border: 2px solid var(--pp-ink); box-sizing: border-box; }
+  .pos-panel--tinta .pos-ojal { background: var(--pp-ink); }
+  .pos-panel--teal .pos-ojal { background: var(--pp-acc2); }
+  .pos-linea { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px dashed currentColor; font-size: 15px; line-height: 1.3; }
+  .pos-linea > span:first-child { font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 2px; }
+  .pos-linea > span:last-child { text-align: right; font-weight: 700; }
+  .pos-mapa { height: 190px; overflow: hidden; border: 1px solid var(--pp-ink); border-radius: 6px; }
   .pos-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .pos-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+  .pos-punto { width: 24px; height: 3px; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block; }
+  .pos-punto[data-activo="1"] { opacity: 1; }
 
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .pos-checkin { background: var(--pp-bg2); }
-  .pos-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .pos-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .pos-cupon .pos-talon-top { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; }
-  .pos-cupon input, .pos-cupon .pos-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .pos-cupon .pos-contador button { border: 2px solid var(--pp-ink); }
-  .pos-sello, .pos-cupon .pos-sello { color: inherit; }
+  /* ── 05 Check-in: la tarjeta de embarque ───────────────────────────── */
+  .pos-checkin { background: var(--pp-acc2) !important; color: #FFFFFF !important; }
+  .pos-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+  /* La línea de troquel con los dos círculos en las puntas, a la altura
+     del renglón de estado. */
+  .pos-troquel { position: absolute; left: -10px; right: -10px; top: 62px; display: flex; align-items: center; gap: 6px; pointer-events: none; }
+  .pos-troquel > span:first-child, .pos-troquel > span:last-child { width: 20px; height: 20px; border-radius: 50%; background: var(--pp-acc2); }
+  .pos-troquel > span:nth-child(2) { flex: 1; border-top: 2px dashed var(--pp-ink); }
+  .pos-cupon .pos-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .pos-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding-bottom: 18px; }
+  .pos-talon-estado { transition: color 400ms ease; }
+  .pos-campo { display: flex; flex-direction: column; gap: 6px; }
+  .pos-etiqueta { font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8; }
+  .pos-input { min-height: 48px; border: 0; border-bottom: 2px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--pos-sans), 'Work Sans', sans-serif; font-weight: 600; font-size: 15px; padding: 0; outline: none; }
+  .pos-contador { display: flex; align-items: center; border-bottom: 2px solid var(--pp-ink); min-height: 48px; }
+  .pos-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer; font-size: 22px; line-height: 1; }
+  .pos-contador button:disabled { opacity: .35; cursor: default; }
+  .pos-contador > span { flex: 1; text-align: center; font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 24px; line-height: 1; color: var(--pp-acc); }
+  .pos-filas { display: flex; flex-direction: column; }
+  .pos-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--pp-ink); font-size: 15px; }
+  .pos-fila--ultima { border-bottom: 0; }
+  .pos-fila-valor { text-align: right; font-weight: 700; }
+  .pos-precio { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .8; }
+  .pos-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .pos-precio-total { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 20px; line-height: 1; letter-spacing: 0; }
+  .pos-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .pos-btn-solido { min-height: 54px; border: 0; background: var(--pp-acc); color: #FFFFFF; cursor: pointer;
+    font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 16px; padding: 0 18px; transition: background 200ms ease; }
+  @media (hover: hover) { .pos-btn-solido:hover { background: var(--pp-ink); } }
+  .pos-btn-solido:disabled { opacity: .6; cursor: default; }
+  .pos-btn-fantasma { min-height: 48px; border: 2px solid var(--pp-ink); background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-weight: 700; font-size: 13px; letter-spacing: .1em; padding: 0 18px; }
+  .pos-error { margin: 0; font-weight: 700; font-size: 12px; color: var(--pp-acc); }
+  /* El sello OK: anillo grueso en el acento sobre papel crema. */
+  .pos-cupon .pos-sello { position: absolute; right: 12px; bottom: 78px; width: 128px; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    background: var(--pp-bg); border: 6px solid var(--pp-acc); box-sizing: border-box;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 14px;
+    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: .14em; color: var(--pp-acc); }
+  .pos-cupon .pos-sello::before { content: "OK"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 24px; letter-spacing: 0; color: var(--pp-ink); }
+  .pos-petalos { display: none; }
 
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .pos-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .pos-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .pos-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .pos-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .pos-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .pos-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .pos-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--pos-mono), 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
+  /* ── 06 Álbum: postales del viaje ──────────────────────────────────── */
+  .pos-panel--album { background: #F7F5F0; color: #1E3A5F; justify-content: flex-start; gap: 14px; }
+  .pos-panel--album-b { background: #EFEBE3; }
+  .pos-postales { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .pos-postal { position: relative; min-height: 0; perspective: 900px; cursor: pointer; }
+  .pos-postal:nth-child(1) { transform: rotate(-1.5deg); }
+  .pos-postal:nth-child(2) { transform: rotate(1.5deg); }
+  .pos-postal:nth-child(3) { transform: rotate(-1deg); }
+  .pos-postal:nth-child(4) { transform: rotate(2deg); }
+  .pos-postal:nth-child(5) { transform: rotate(.5deg); }
+  /* La tarjeta gira (rotateY 180°) cuando pasa por el centro: lo decide el
+     motor con data-card. */
+  .pos-postal-carta { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform 600ms cubic-bezier(.16,1,.3,1); }
+  .pos-postal-frente { position: absolute; inset: 0; border: 8px solid #FFFFFF; box-shadow: 0 0 0 1px #1E3A5F; backface-visibility: hidden; overflow: hidden;
+    background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .pos-postal-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .pos-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .pos-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .pos-bano--2 { background: color-mix(in srgb, var(--pp-acc2) 50%, transparent); }
+  .pos-bano--3 { background: color-mix(in srgb, var(--pos-acc3) 55%, transparent); }
+  .pos-bano--4 { background: color-mix(in srgb, var(--pp-ink) 40%, transparent); }
+  .pos-bano--5 { background: color-mix(in srgb, var(--pp-acc) 35%, transparent); }
+  .pos-postal-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-weight: 700; font-size: 11px; letter-spacing: .14em; color: #1E3A5F; }
+  .pos-postal-dorso { position: absolute; inset: 0; background: #FFFDF6; box-shadow: 0 0 0 1px #1E3A5F; backface-visibility: hidden; transform: rotateY(180deg);
+    padding: 8px 10px; box-sizing: border-box; display: grid; grid-template-columns: 1.1fr 1fr; gap: 8px; overflow: hidden; }
+  .pos-postal-dorso-izq { display: flex; flex-direction: column; gap: 6px; padding-top: 6px; }
+  .pos-postal-dorso-izq > span:first-child { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .14em; color: #1E3A5F; }
+  .pos-postal-dorso-izq > span:not(:first-child), .pos-postal-dorso-der > span:not(:first-child) { height: 1px; width: 100%; background: rgba(30,58,95,.35); }
+  .pos-postal-dorso-der { border-left: 1px solid rgba(30,58,95,.35); padding-left: 8px; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .pos-estampilla-chica { width: 26px; height: 32px; background: var(--pp-acc); border: 2px dashed #FFFDF6; outline: 2px solid var(--pp-acc); box-sizing: border-box; }
+  .pos-postales[data-cantidad="5"] .pos-postal:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .pos-postales[data-cantidad="5"] .pos-postal:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .pos-postales[data-cantidad="5"] .pos-postal:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .pos-postales[data-cantidad="5"] .pos-postal:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .pos-postales[data-cantidad="5"] .pos-postal:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .pos-postales[data-cantidad="4"] .pos-postal:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .pos-postales[data-cantidad="4"] .pos-postal:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .pos-postales[data-cantidad="4"] .pos-postal:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .pos-postales[data-cantidad="4"] .pos-postal:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .pos-postales[data-cantidad="3"] .pos-postal:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .pos-postales[data-cantidad="3"] .pos-postal:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .pos-postales[data-cantidad="3"] .pos-postal:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .pos-postales[data-cantidad="2"] .pos-postal:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .pos-postales[data-cantidad="2"] .pos-postal:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .pos-postales[data-cantidad="1"] .pos-postal:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
 
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
+  /* ── 07 Música: el anuncio de abordo ───────────────────────────────── */
+  .pos-musica { color: #FFFFFF !important; }
   .pos-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .pos-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .pos-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .pos-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
+  .pos-eq span { width: 8px; height: 100%; transform-origin: bottom; animation: posEq 1.1s ease-in-out infinite; background: var(--pp-acc); }
+  .pos-eq span:nth-child(2) { background: var(--pos-acc3); }
+  .pos-eq span:nth-child(3) { background: var(--pp-acc2); }
+  .pos-eq span:nth-child(4) { background: #FFFFFF; }
+  @keyframes posEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .pos-musica form.pos-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .pos-musica .pos-etiqueta { display: none; }
+  .pos-musica .pos-input { min-height: 48px; border: 2px solid #FFFFFF; background: transparent; color: #FFFFFF; padding: 0 14px; min-width: 0; }
+  .pos-musica .pos-input::placeholder { color: rgba(255,255,255,.6); }
+  .pos-musica .pos-error { grid-column: 1 / -1; color: var(--pos-acc3); }
+  .pos-musica .pos-btn-solido { grid-column: 1 / -1; min-height: 50px; border: 2px solid var(--pp-acc); font-size: 15px; }
+  @media (hover: hover) { .pos-musica .pos-btn-solido:hover { background: var(--pos-acc3); border-color: var(--pos-acc3); color: var(--pp-ink); } }
+  .pos-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .pos-lista-fila { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--pos-panel); }
   .pos-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .pos-lista-tema { font-size: 15px; }
-  .pos-lista-quien { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
+  .pos-lista-tema { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 16px; line-height: 1.1; }
+  .pos-lista-quien { font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--pos-acc3); }
 
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .pos-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .pos-tarjeta + .pos-tarjeta { margin-top: 12px; }
-  .pos-tarjeta-kicker { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .pos-tarjeta-titulo { font-family: var(--pos-serif), 'Alfa Slab One', serif; font-size: 28px; line-height: 1; }
-  .pos-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .pos-tarjeta .pos-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .pos-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .pos-fila--ultima { border-bottom: none; }
+  /* ── 08 Regalos: el fondo de viaje ─────────────────────────────────── */
+  .pos-tarjeta--banco { --pos-neon: var(--pp-acc); position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 2px solid var(--pp-ink);
+    padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .pos-tarjeta--der { --pos-neon: var(--pp-acc2); }
+  .pos-tarjeta--banco + .pos-tarjeta--banco { margin-top: 14px; }
+  .pos-tarjeta-kicker { font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--pos-neon); }
+  .pos-tarjeta-mensaje { margin: 0; font-weight: 600; font-size: 14px; line-height: 1.5; opacity: .85; }
   .pos-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .pos-fila-etq { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .pos-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .pos-fila-valor { text-align: right; }
-  .pos-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
+  .pos-fila-etq { font-weight: 700; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .pos-fila-dato { font-weight: 600; font-size: 14px; overflow-wrap: anywhere; }
+  .pos-fila--copiable:first-child { border-bottom: 1px dashed var(--pp-ink); }
+  .pos-fila--copiable:first-child .pos-fila-dato { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 18px; line-height: 1.1; color: var(--pos-neon); }
+  .pos-tarjeta--banco .pos-fila--ultima { border-bottom: 0; font-weight: 600; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+  .pos-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-weight: 700; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
   .pos-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
 
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .pos-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .pos-quiz .pos-acento { color: var(--pp-ink); }
-  .pos-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .pos-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--pos-sans), 'Work Sans', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .pos-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .pos-opcion--mal { opacity: .55; }
+  /* ── 09 Trivia: la declaración de aduana ───────────────────────────── */
+  .pos-quiz { background: var(--pos-acc3) !important; color: var(--pp-ink) !important; }
+  .pos-quiz .pos-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .pos-quiz .pos-tarjeta-kicker { align-self: flex-start; background: var(--pp-ink); color: #FFFFFF; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 8px 16px; }
+  .pos-quiz .pos-tarjeta-pregunta, .pos-quiz .pos-tarjeta-titulo { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(26px, 7vw, 56px); line-height: 1.08; max-width: 15ch; }
+  .pos-quiz .pos-tarjeta-mensaje { margin: 0; font-weight: 600; font-size: 15px; }
+  .pos-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .pos-opcion { min-height: 54px; border: 2px solid var(--pp-ink); background: #FFFFFF; color: var(--pp-ink); cursor: pointer; counter-increment: opcion;
+    font-family: var(--pos-sans), 'Work Sans', sans-serif; font-weight: 600; font-size: 16px; text-align: left; padding: 0 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .pos-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 15px; }
+  .pos-opcion--bien { background: var(--pp-acc2); color: #FFFFFF; }
+  .pos-opcion--bien::after { content: "Correcta"; }
+  .pos-opcion--mal { background: var(--pp-acc); color: #FFFFFF; }
+  .pos-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .pos-quiz .pos-spread > .pos-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .pos-quiz .pos-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .pos-quiz .pos-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .pos-quiz .pos-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
 
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .pos-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .pos-pagina--qr { align-items: flex-start; }
-  .pos-pagina--qr .qr-ingreso, .pos-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  /* ── 10 Tu pase: el boarding pass ──────────────────────────────────── */
+  .pos-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .pos-pagina--boarding { align-items: flex-start; }
+  .pos-boarding { position: relative; width: 100%; max-width: 420px; background: var(--pp-bg); color: var(--pp-ink); border-radius: 8px; padding: 16px 16px 16px 44px; box-sizing: border-box;
+    display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; margin-bottom: 20px; }
+  .pos-boarding-troquel { position: absolute; left: 30px; top: -8px; bottom: -8px; border-left: 2px dashed var(--pp-ink); opacity: .5; }
+  .pos-boarding-talon { position: absolute; left: 0; top: 0; bottom: 0; width: 30px; display: flex; align-items: center; justify-content: center;
+    writing-mode: vertical-rl; transform: rotate(180deg); font-size: 9px; letter-spacing: .3em; text-transform: uppercase; font-weight: 700; }
+  .pos-boarding-datos { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .pos-boarding-etqs { display: flex; justify-content: space-between; gap: 8px; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; font-weight: 700; }
+  .pos-boarding-fila { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+  .pos-boarding-nombre { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(16px, 4.6vw, 22px); line-height: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pos-boarding-asiento { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(22px, 6vw, 30px); line-height: 1; color: var(--pp-acc); }
+  .pos-barras { width: 100%; height: 40px; display: block; color: var(--pp-ink); }
+  .pos-boarding-codigo { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .3em; }
+  .pos-boarding-qr { position: relative; width: clamp(96px, 26vw, 130px); aspect-ratio: 1; background: #FFFFFF; padding: 8px; box-sizing: border-box; border: 1px solid var(--pp-ink); }
+  .pos-boarding-qr .qr-ingreso, .pos-boarding-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .pos-boarding-qr img, .pos-boarding-qr svg, .pos-boarding-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .pos-boarding-qr p, .pos-boarding-qr h3, .pos-boarding-qr h4 { display: none; }
   .pos-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .pos-pase-numero { display: flex; flex-direction: column; }
-  .pos-pase-numero > span:last-child { font-family: var(--pos-serif), 'Alfa Slab One', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .pos-info-extra { margin-top: 12px; }
+  .pos-pase-numero, .pos-pase-mesa { display: flex; flex-direction: column; }
+  .pos-pase-mesa { align-items: flex-end; text-align: right; }
+  .pos-pase-numero > span:last-child { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(56px, 17vw, 130px); line-height: .95; color: var(--pp-acc); }
+  .pos-pase-mesa > span:last-child { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(36px, 11vw, 80px); line-height: .95; color: var(--pp-acc2); }
+  .pos-caja { display: flex; flex-direction: column; background: var(--pos-panel); padding: 6px 16px; }
+  .pos-caja .pos-linea { border-bottom: 1px dashed color-mix(in srgb, var(--pp-bg) 30%, transparent); font-size: 14px; padding: 10px 0; }
+  .pos-caja .pos-linea:last-child { border-bottom: 0; }
+  .pos-caja .pos-linea > span:first-child { color: var(--pos-acc3); opacity: 1; letter-spacing: .16em; }
+  .pos-caja .pos-linea > span:last-child { font-weight: 500; line-height: 1.35; }
+  .pos-info-extra { margin-top: 4px; }
   .pos-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .pos-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--pos-mono), 'JetBrains Mono', monospace !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
+  .pos-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pos-acc3) !important; border: 2px solid var(--pos-acc3) !important;
+    border-radius: 0 !important; font-weight: 700 !important; letter-spacing: .2em !important; text-transform: uppercase; }
   .pos-raiz .ia-icon-box, .pos-raiz svg.lucide { display: none !important; }
-  .pos-replay { cursor: pointer; }
-  .pos-credito { display: flex; justify-content: center; opacity: .6; }
-  .pos-error { margin: 0; font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 12px; }
+  .pos-pase-pie { display: flex; flex-direction: column; gap: 14px; }
+  .pos-despedida { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: clamp(22px, 6vw, 38px); line-height: 1.1; color: var(--pp-acc); }
+  .pos-replay { cursor: pointer; color: var(--pp-bg); }
+  .pos-credito { display: inline-flex; opacity: .8; }
 
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .pos-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .pos-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .pos-sello-circular text { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .pos-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--pos-serif), 'Alfa Slab One', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
+  /* ── La tapa: la postal ────────────────────────────────────────────── */
   .pos-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .pos-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .pos-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .pos-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .pos-tapa-fecha { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .pos-tapa-nombres { margin: 0; font-family: var(--pos-serif), 'Alfa Slab One', serif; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .pos-tapa-linea { overflow: hidden; display: block; }
+  .pos-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(16px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom)); }
+  /* El borde de correo aéreo: franjas a 45° en dos colores. */
+  .pos-borde-aereo { position: absolute; inset: 0; pointer-events: none; z-index: 3; border: 12px solid transparent;
+    border-image: repeating-linear-gradient(45deg, var(--pp-acc) 0 14px, var(--pp-bg) 14px 28px, var(--pp-acc2) 28px 42px, var(--pp-bg) 42px 56px) 12; }
+  /* El mapa: curvas de nivel, la ruta punteada y el avión que la recorre. */
+  .pos-mapa-fondo { position: absolute; inset: 0; pointer-events: none; overflow: hidden; opacity: .75; color: var(--pp-ink); }
+  .pos-mapa-curvas { width: 100%; height: 100%; display: block; }
+  .pos-ruta { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pos-ruta-punto { fill: var(--pp-acc); }
+  .pos-avion { position: absolute; left: 0; top: 0; width: clamp(34px, 9vw, 52px); height: auto; transform-origin: 50% 50%;
+    offset-path: path('M -40 62 C 20 20, 60 20, 110 50 S 200 70, 260 30 S 380 10, 470 40'); offset-rotate: auto; animation: posVuela 14s linear infinite; }
+  @keyframes posVuela { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+  .pos-folio--tapa { z-index: 3; }
+  .pos-chip-borde { border: 1px solid var(--pp-ink); padding: 6px 12px; }
+  .pos-tapa-centro { position: relative; z-index: 3; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 10px; min-height: 0; text-align: center; }
+  .pos-tapa-kicker { font-weight: 700; font-size: 12px; letter-spacing: .26em; text-transform: uppercase; }
+  /* El nombre: Alfa Slab centrado; el renglón más largo manda el cuerpo. El
+     "&" es una estampilla dentada (borde punteado crema y outline acento). */
+  .pos-tapa-nombres { position: relative; margin: 0; line-height: .98; letter-spacing: 0; display: flex; flex-direction: column; align-items: center;
+    font-size: min(clamp(44px, 15vw, 130px), 13vh, calc((100vw - 70px) / (var(--largo, 9) * 0.66))); }
+  @media (min-width: 1024px) { .pos-tapa-nombres { font-size: min(11vw, 150px, 13vh, calc((min(100vw, 1100px) - 70px) / (var(--largo, 9) * 0.66))); } }
+  .pos-tapa-linea { overflow: hidden; display: block; white-space: nowrap; }
   .pos-tapa-linea > span { display: block; }
-  .pos-tapa-linea--sangra { padding-left: 14%; }
-  .pos-tapa-pase { text-align: right; }
-  .pos-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .pos-tapa-mensaje { margin: 0; font-family: var(--pos-serif), 'Alfa Slab One', serif; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .pos-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--pos-sans), 'Work Sans', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .pos-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
+  .pos-tapa-linea--amp { font-size: .32em; line-height: 1.5; padding: .2em 0; }
+  .pos-estampilla-amp { display: inline-flex !important; align-items: center; justify-content: center; width: 2.4em; height: 2em; background: var(--pp-acc); color: var(--pp-bg);
+    border: .12em dashed var(--pp-bg); outline: .12em solid var(--pp-acc); font-family: var(--pos-serif), 'Alfa Slab One', cursive; }
+  /* El matasellos cae sobre el nombre 1,6 s después de que entra la tapa
+     (scale 2,2 → 1, rotate 24 → −12°) con la tinta gastada. */
+  .pos-matasellos { position: absolute; right: -6%; top: -12%; width: clamp(84px, 22vw, 130px); aspect-ratio: 1; z-index: 3; pointer-events: none; color: var(--pp-acc);
+    opacity: 0; transform: rotate(24deg) scale(2.2); animation: posMatasellos 600ms cubic-bezier(.34,1.56,.64,1) 1.6s forwards; }
+  .pos-matasellos svg { position: absolute; inset: 0; mix-blend-mode: multiply; }
+  .pos-matasellos-arco { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-weight: 500; font-size: 8.6px; letter-spacing: 1.4px; fill: currentColor; }
+  .pos-matasellos-centro { font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 13px; fill: currentColor; }
+  .pos-matasellos-pie { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 7px; letter-spacing: 1px; fill: currentColor; }
+  @keyframes posMatasellos { from { opacity: 0; transform: rotate(24deg) scale(2.2); } 30% { opacity: 1; } to { opacity: 1; transform: rotate(-12deg) scale(1); } }
+  .pos-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; box-sizing: border-box;
+    font-weight: 700; font-size: 13px; line-height: 1.35; text-align: left; border-top: 1px dashed var(--pp-ink); padding-top: 10px; }
+  .pos-tapa-datos-der { text-align: right; }
+  .pos-tapa-pie { position: relative; z-index: 3; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; }
+  .pos-tapa-mensaje { margin: 0; font-weight: 600; font-size: clamp(14px, 3.8vw, 18px); line-height: 1.4; max-width: 34ch; }
+  .pos-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg); cursor: pointer;
+    font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 16px; letter-spacing: .04em; padding: 2px 22px 0;
+    display: flex; align-items: center; justify-content: center; gap: 12px; transition: background 200ms ease, border-color 200ms ease; }
+  @media (hover: hover) { .pos-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); } }
 
   /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .pos-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .pos-riel-top, .pos-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--pos-mono), 'JetBrains Mono', monospace;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .pos-riel-top { color: var(--pp-ink2); }
-  .pos-riel-etiqueta { color: var(--pp-acc); }
-  .pos-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .pos-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .pos-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+  .pos-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 50%, transparent) !important; }
+  .pos-riel-top { writing-mode: vertical-rl; font-family: var(--pos-serif), 'Alfa Slab One', cursive; font-size: 12px; color: var(--pp-ink) !important; }
+  .pos-riel-etiqueta { writing-mode: vertical-rl; font-weight: 700; font-size: 10px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-ink); }
+  .pos-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .pos-riel-barra { position: absolute; left: -2px; top: 0; width: 4px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .pos-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-weight: 700; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: posPista 2.4s ease-in-out infinite; }
+  @keyframes posPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
   .pos-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
     display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .pos-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
+  .pos-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg); border-radius: 50%;
     background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .pos-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
-  .pos-campo { display: flex; flex-direction: column; gap: 6px; }
-  .pos-etiqueta { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .pos-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--pos-sans), 'Work Sans', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .pos-input:focus { outline: none; border-color: var(--pp-acc); }
-  .pos-contador { display: flex; align-items: center; gap: 12px; }
-  .pos-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
-  .pos-contador button:disabled { opacity: .35; cursor: default; }
-  .pos-contador > span { font-family: var(--pos-serif), 'Alfa Slab One', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .pos-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .pos-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .pos-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .pos-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .pos-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .pos-precio-total { font-family: var(--pos-serif), 'Alfa Slab One', serif; font-size: 28px; line-height: 1; }
-  .pos-precio-detalle { font-family: var(--pos-mono), 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .1em; }
-  .pos-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--pos-mono), 'JetBrains Mono', monospace;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .pos-talon-estado { transition: color 400ms ease; }
-  .pos-filas { display: flex; flex-direction: column; }
-  .pos-petalos { display: none; }
-
-  /* Postal: bordes de sello y tarjetas con línea de troquel. */
-  .pos-tapa-nombres, .pos-h2, .pos-panel-titulo, .pos-fecha-linea { letter-spacing: -.01em; }
-  .pos-tarjeta, .pos-cupon { border-style: dashed; }
-  .pos-foto { border-style: dashed; }
+  .pos-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 8px solid #FFFFFF; box-shadow: 0 0 0 1px var(--pp-ink); }
 
   @media (prefers-reduced-motion: reduce) {
     .pos-raiz * { animation: none !important; }
     .pos-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .pos-foto { --pos-punto: 0; }
+    .pos-matasellos { opacity: 1; transform: rotate(-12deg) scale(1); }
+    .pos-avion { offset-distance: 40%; }
   }
 `;

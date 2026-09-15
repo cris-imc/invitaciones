@@ -8,18 +8,21 @@
  * Variante: Esmeralda.
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/noi.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/noi.jsx, los
+ * estilos en scripts/css/tipografica/noi.css y las caras y la paleta en
+ * scripts/familias/tipografica/noi.json.
  *
- * El cine negro: Playfair Display 700 sobre negro, Courier Prime para todo
- * lo demás (como un guion mecanografiado) y el dorado apareciendo en una
- * sola palabra por pantalla.
+ * Cine negro: Playfair Display 900 como cartel y su itálica 400 como
+ * contrapunto, Courier Prime para todo lo demás (el expediente). Negro,
+ * marfil, oro y rojo sangre. Foco que sigue al puntero, persiana, humo,
+ * grano, tira de película, claqueta, expediente, fotogramas, carretes y
+ * créditos finales.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Playfair_Display, Courier_Prime } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -37,7 +40,7 @@ import { esVistaMiniatura } from "@/lib/miniatura";
 
 const noiSerif = Playfair_Display({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "700", "900"],
   style: ["normal", "italic"],
   display: "swap",
   variable: "--noi-serif",
@@ -58,14 +61,14 @@ const noiSans = Courier_Prime({
 // sol y figuras de una sola vez.
 const PALETA = {
   bg: "#0A1210",
-  bg2: "#0A1210",
+  bg2: "#17171A",
   ink: "#EDF1EA",
   ink2: "#EDF1EA",
   acc: "#C9A24A",
   acc2: "#1F5C46",
   sky1: "#0A1210",
-  sky2: "#0A1210",
-  hill1: "#0A1210",
+  sky2: "#17171A",
+  hill1: "#17171A",
   hill2: "#EDF1EA",
   hill3: "#EDF1EA",
   night: "#EDF1EA",
@@ -306,7 +309,7 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -539,6 +542,31 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            const cerca = Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3));
+            bano.style.opacity = String(cerca);
+            // Las placas (Observatorio) están en negativo y se revelan al
+            // pasar por el centro.
+            const negativo = hoja.querySelector<HTMLElement>("[data-neg]");
+            if (negativo) negativo.style.opacity = (0.18 * (1 - cerca)).toFixed(3);
+            // Las postales (Postal) giran y muestran el dorso cuando pasan
+            // por el centro; vuelven al salir.
+            const carta = hoja.querySelector<HTMLElement>("[data-card]");
+            if (carta && !menosMovimiento) {
+              const gira = dx < 0.18 && p > 0.02 && p < 0.98;
+              if (carta.dataset.girada !== String(gira)) {
+                carta.dataset.girada = String(gira);
+                carta.style.transform = gira ? "rotateY(180deg)" : "rotateY(0)";
+              }
+            }
           });
         });
 
@@ -736,6 +764,25 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre como cartel de cine: Playfair 900 centrado, con la "y" en
+  // itálica dorada. El renglón más largo manda el cuerpo.
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(5, ...renglones.map((n) => n.length));
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // El intertítulo: el medio en dorado y el cierre en redonda negrita.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.7)) return "noi-negrita";
+    if (i >= Math.floor(n * 0.25) && i < desdeAcento) return "noi-oro";
+    return undefined;
+  };
+
+  const kickerDelEvento = tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const tituloDePelicula = String(invitation.nombreEvento || kickerDelEvento);
+  // Cuatro volutas de humo, cada una con su ritmo.
+  const HUMO: [number, number, number][] = [[22, 6, 0], [30, 7.5, 1.8], [26, 5.2, 3.2], [34, 8, 4.6]];
+
   return (
     <div
       ref={raizRef}
@@ -747,81 +794,82 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
 
       <div ref={scrollerRef} className="noi-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
-        <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="noi-section noi-std">
-          <div className="noi-trama noi-trama--media" aria-hidden="true" />
+            El cartel de cine: marfil, "estreno mundial", la fecha en tres
+            renglones y la foto en blanco y negro con perforaciones de
+            película a los costados. */}
+        <section data-tone="light" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="noi-section noi-std">
+          <div className="noi-folio">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="noi-spread">
             <div className="noi-pagina">
-              <div className="noi-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
+              <span data-xin="1" className="noi-estreno">{tx("invitacion.saveTheDate.estrenoMundial")}</span>
               <div className="noi-fecha">
-                <span data-xin="1" data-dist="-160" className="noi-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="noi-fecha-linea noi-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="noi-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="noi-fecha-linea noi-fecha-linea--dia">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="noi-fecha-linea noi-fecha-linea--mes">{tx("invitacion.evento.de")} {mesLargo}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="noi-fecha-linea noi-fecha-linea--anio">{anio}</span>
               </div>
               <div data-xin="1" data-delay="360" className="noi-fecha-pie">
-                <span>{diaSemana} · {hora} H</span>
+                <span>{diaSemana} · {tx("invitacion.saveTheDate.funcionUnica")} · {hora} H</span>
                 <AddToCalendarLink
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="noi-link"
+                  className="noi-chip"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.reservarEnCalendario")}
                 </AddToCalendarLink>
               </div>
             </div>
 
             {hayFoto && (
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="noi-foto">
+                <span className="noi-perforaciones noi-perforaciones--izq" aria-hidden="true" />
+                <span className="noi-perforaciones noi-perforaciones--der" aria-hidden="true" />
                 {fotoMobile && (
                   <div className="acp-mobile-only noi-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="11,11,13" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only noi-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="11,11,13" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --noi-punto. */}
                 <span className="noi-foto-revelado" aria-hidden="true" />
-                <span className="noi-foto-anio">{anio}</span>
-                <span className="noi-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="noi-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()} · B/N</span>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="noi-section noi-countdown">
-          <div className="noi-folio">
-            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            La claqueta: la franja a rayas, la caja con producción y
+            dirección, los cuatro números y la toma. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="noi-section noi-countdown">
+          <div className="noi-folio noi-folio--oro">
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.kicker").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
+          </div>
+          <span className="noi-claqueta" aria-hidden="true" />
+          <div className="noi-spread">
+            <div className="noi-pagina noi-pagina--entera">
+              <div className="noi-claqueta-caja">
+                <div className="noi-claqueta-fila"><span>{tx("invitacion.saveTheDate.prod").toUpperCase()} {titulo.toUpperCase()}</span><span>{tx("invitacion.saveTheDate.dirElDestino").toUpperCase()}</span></div>
+                <CuentaNoir targetDate={fechaHora} />
+                <div className="noi-claqueta-fila noi-claqueta-fila--pie"><span>{tx("invitacion.saveTheDate.escena").toUpperCase()} {nCountdown}</span><span>{tx("invitacion.saveTheDate.toma").toUpperCase()} {String(fechaEvento.getDate() % 9 + 1)}</span></div>
+              </div>
+            </div>
           </div>
           <div className="noi-marquesina" aria-hidden="true">
             <div className="noi-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
-                </span>
-              ))}
-            </div>
-          </div>
-          <CuentaNoir targetDate={fechaHora} />
-          <div className="noi-marquesina noi-marquesina--contraria" aria-hidden="true">
-            <div className="noi-marquesina-tira">
-              {[0, 1].map((i) => (
-                <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -829,38 +877,39 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            El intertítulo de cine mudo: viñeta oscura, marco doble y la
+            frase en itálica que se funde palabra por palabra. */}
         {hayFrase && (
           <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="noi-section noi-frase-seccion">
-            <div className="noi-folio">
-              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+            <span className="noi-vineta" aria-hidden="true" />
+            <div className="noi-folio noi-folio--oro">
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.saveTheDate.intertitulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
-            <div className="noi-spread">
-              <h2 ref={fraseRef} className="noi-frase">
-                {palabras.map((p, i) => (
-                  // El espacio va fuera del span: el motor pone cada palabra
-                  // en inline-block y un espacio adentro se colapsa a cero.
-                  <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "noi-acento" : undefined}>{p}</span>{" "}
-                  </span>
-                ))}
-              </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="noi-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+            <div className="noi-spread noi-spread--centro">
+              <div className="noi-intertitulo">
+                <h2 ref={fraseRef} className="noi-frase">
+                  {palabras.map((p, i) => (
+                    // El espacio va fuera del span: el motor pone cada palabra
+                    // en inline-block y un espacio adentro se colapsa a cero.
+                    <span key={i}>
+                      <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
+                    </span>
+                  ))}
+                </h2>
               </div>
+              <span data-xin="1" data-delay="900" data-dist="60" className="noi-frase-firma">{tx("invitacion.frase.conAmor").toUpperCase()} · {titulo.toUpperCase()}</span>
             </div>
-            <div className="noi-folio noi-folio--pie">
+            <div className="noi-folio noi-folio--suave noi-folio--pie">
               <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+              <span>{tx("invitacion.saveTheDate.rollo").toUpperCase()} {nFrase}</span>
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Las escenas: exterior noche sobre negro, interior sobre marfil y
+            el guion de la noche sobre rojo sangre. */}
         <div
           id="details"
           data-pan="1"
@@ -871,64 +920,65 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         >
           <div className="noi-pan-fijo">
             <div data-strip="1" className="noi-tira">
-              <div data-tone={TONO} className="noi-panel">
-                <div className="noi-folio">
-                  <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
+              <div data-tone="dark" className="noi-panel noi-panel--negro">
+                <div className="noi-folio noi-folio--acento">
+                  <span>{nCuando} — {tx("invitacion.saveTheDate.escena").toUpperCase()} {deLugar("recepcion").split(" ")[0]}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="noi-spread">
-                  <h2 className="noi-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="noi-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="noi-lineas">
+                  <div className="noi-pagina">
+                    <span className="noi-panel-sub">{tx("invitacion.ubicacion.fiestaSalon")}</span>
+                    <h2 className="noi-panel-titulo">{lugarNombre || ciudad}</h2>
+                  </div>
+                  <div className="noi-ficha">
                     <div className="noi-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {direccion && <div className="noi-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="noi-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="noi-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="noi-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}<span>→</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="noi-folio noi-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="noi-panel">
-                  <div className="noi-folio">
-                    <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
+                <div id="ceremonia" data-tone="light" className="noi-panel noi-panel--marfil">
+                  <div className="noi-folio noi-folio--acento">
+                    <span>{nCuando} — {tx("invitacion.saveTheDate.escena").toUpperCase()} {deLugar("ceremonia").split(" ")[0]}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="noi-spread">
-                    <h2 className="noi-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="noi-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="noi-lineas">
+                    <div className="noi-pagina">
+                      <span className="noi-panel-sub">{ceremoniaTitulo}</span>
+                      <h2 className="noi-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="noi-ficha">
                       {ceremoniaHora && <div className="noi-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="noi-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="noi-folio noi-folio--pie">
                     <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="noi-panel">
-                  <div className="noi-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
+                <div id="location" data-tone="dark" className="noi-panel noi-panel--negro">
+                  <div className="noi-folio noi-folio--acento">
+                    <span>{nCuando} — {tx("invitacion.saveTheDate.escena").toUpperCase()} {deLugar("llegar").split(" ")[0]}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="noi-spread">
-                    <h2 className="noi-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="noi-lineas">
+                    <div className="noi-pagina">
+                      <span className="noi-panel-sub">{ciudad || lugarNombre}</span>
+                      <h2 className="noi-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="noi-ficha">
                       {embedMapUrl && (
                         <div className="noi-mapa">
                           <iframe
@@ -943,28 +993,28 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="noi-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="noi-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()}<span>→</span>
                       </a>
                     </div>
                   </div>
                   <div className="noi-folio noi-folio--pie">
                     <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="noi-panel noi-panel--acento">
+                <div id="schedule" data-tone="dark" className="noi-panel noi-panel--rojo">
                   <div className="noi-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
+                    <span>{nCuando} — {tx("invitacion.saveTheDate.escena").toUpperCase()} {deLugar("cronograma").split(" ")[0]}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="noi-spread">
-                    <h2 className="noi-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="noi-acento noi-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="noi-lineas">
+                    <div className="noi-pagina">
+                      <span className="noi-panel-sub">{tx("invitacion.saveTheDate.guionDeLaNoche")}</span>
+                      <h2 className="noi-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="noi-ficha">
                       {cronograma.map((item, i) => (
                         <div key={i} className="noi-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -981,22 +1031,21 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            El expediente: sobre marfil, la carpeta con "Caso Nº", máquina
+            de escribir y el sello rectangular CONFIRMADO. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="noi-section noi-checkin">
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="noi-section noi-checkin">
             <div className="noi-folio">
-              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+              <span data-xin="1" data-dist="-40">{nCheckin} — {tx("invitacion.saveTheDate.expediente").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="noi-spread">
               <div className="noi-pagina">
                 <h2 data-xin="1" data-dist="-80" className="noi-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="noi-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="noi-italica noi-rojo">{tx("invitacion.rsvp.confirmaLinea2")}</span>
                 </h2>
               </div>
-              <div className="noi-cupon">
-                <span className="noi-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="noi-cupon">
                 <CheckinNoir
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1030,8 +1079,8 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            La tira de fotogramas: negro con perforaciones arriba y abajo,
+            y las fotos con su baño de color. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1041,24 +1090,21 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             className="noi-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="noi-pan-fijo">
+            <div className="noi-pan-fijo noi-pan-fijo--album">
               <div data-strip="1" className="noi-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="noi-panel noi-panel--album">
-                    <div className="noi-folio">
-                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                  <div key={iHoja} data-tone="light" className={`noi-panel noi-panel--album${iHoja % 2 === 1 ? " noi-panel--album-b" : ""}`}>
+                    <div className="noi-folio noi-folio--gris">
+                      <span>{nAlbum} — {tx("invitacion.saveTheDate.fotogramas").toUpperCase()}</span>
+                      <span>{tx("invitacion.saveTheDate.rollo").toUpperCase()} {String(iHoja + 1).padStart(2, "0")} / {String(hojasDeFotos.length).padStart(2, "0")} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="noi-h2 noi-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="noi-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="noi-contactos" data-cantidad={hoja.length}>
+                    <h2 className="noi-h2 noi-h2--album">{tx("invitacion.saveTheDate.detrasDe")} <span className="noi-italica">{tx("invitacion.saveTheDate.escena").toLowerCase()}</span></h2>
+                    <div className="noi-fotogramas" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="noi-contacto"
+                          data-sheet="1"
+                          className="noi-fotograma"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1066,15 +1112,15 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="noi-contacto-img" />
-                          <span className="noi-contacto-tinta" aria-hidden="true" />
-                          <span className="noi-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="noi-fotograma-img" />
+                          <span data-colorwash="1" className={`noi-bano noi-bano--${(i % 2) + 1}`} aria-hidden="true" />
+                          <span className="noi-fotograma-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="noi-folio noi-folio--pie">
+                    <div className="noi-folio noi-folio--gris noi-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1085,20 +1131,21 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            La banda sonora: dos carretes girando y la lista con filetes
+            punteados. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="noi-section noi-musica">
-            <div className="noi-folio">
-              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+            <div className="noi-folio noi-folio--oro">
+              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.saveTheDate.bandaSonora").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="noi-spread">
               <div className="noi-pagina">
                 <h2 data-xin="1" data-dist="-80" className="noi-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "noi-acento")}
+                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "noi-italica noi-oro")}
                 </h2>
-                <div data-xin="1" data-delay="120" className="noi-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                <div data-xin="1" data-delay="120" className="noi-carretes" aria-hidden="true">
+                  <span className="noi-carrete"><i /><i /><i /><i /></span><span className="noi-carrete-cinta" /><span className="noi-carrete noi-carrete--oro"><i /><i /><i /><i /></span>
                 </div>
               </div>
               <div className="noi-pagina">
@@ -1113,9 +1160,9 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Sobre marfil, fichas de papel con filete. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="noi-section noi-regalos">
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="noi-section noi-regalos">
             <div className="noi-folio">
               <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
@@ -1123,7 +1170,7 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
             <div className="noi-spread">
               <div className="noi-pagina">
                 <h2 data-xin="1" data-dist="-80" className="noi-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="noi-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="noi-italica noi-rojo">{tx("invitacion.regalos.siQueresLinea2")}</span>
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="noi-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1137,7 +1184,7 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1148,7 +1195,8 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1157,40 +1205,39 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            El interrogatorio: rojo sangre, la pregunta en itálica y las
+            opciones que dicen culpable o coartada. */}
         {quizHabilitado && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="noi-section noi-quiz">
             <div className="noi-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
-              <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — {triviaTitulo.toUpperCase()}</span>
+              <span data-xin="1" data-dist="40">{tx("invitacion.saveTheDate.interrogatorio").toUpperCase()} · {folio(nQuiz)}</span>
             </div>
             <div className="noi-spread">
-              <div className="noi-pagina">
-                <h2 data-xin="1" data-dist="-80" className="noi-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="noi-pagina">
-                <TriviaNoir
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaNoir
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            Los créditos finales: el QR sobre marfil con doble filete
+            dorado, el pase enorme, la butaca en itálica y FIN. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="noi-section noi-pase">
-          <div className="noi-folio">
-            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+          <div className="noi-folio noi-folio--oro">
+            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.saveTheDate.creditosFinales").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="noi-spread">
             <div data-xin="1" data-dist="-60" className="noi-pagina noi-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="noi-qr">
+                <QrDeIngreso guest={guest as never} />
+                <span className="noi-qr-etq">{tx("invitacion.pase.tuPase").toUpperCase()}</span>
+              </div>
             </div>
             <div className="noi-pagina">
               <div data-xin="1" data-delay="100" className="noi-pase-cabeza">
@@ -1198,97 +1245,107 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
                   <span className="noi-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="noi-pase-mesa">
+                    <span className="noi-folio-etq">{tx("invitacion.saveTheDate.butaca").toUpperCase()}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="noi-lineas">
-                <div className="noi-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="noi-lineas-pase">
+                <div className="noi-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="noi-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="noi-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="noi-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="noi-linea"><span>Sector · {tx("invitacion.pase.tuMesa")}</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="noi-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="noi-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} H</span></div>
               </div>
               <div className="noi-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="noi-folio noi-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="noi-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="noi-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="noi-pase-pie">
+            <span className="noi-fin">FIN</span>
+            <span className="noi-fin-sub">{tx("invitacion.saveTheDate.oElPrincipio")} — {iniciales(nombre1, nombre2)}</span>
+            <div className="noi-folio noi-folio--oro noi-folio--colofon">
+              <span className="noi-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.ink} /></span>
+              <span className="noi-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.saveTheDate.rebobinar").toUpperCase()} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="noi-riel">
-        <span ref={rielTopRef} className="noi-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="noi-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="noi-riel-linea">
           <span ref={rielBarraRef} className="noi-riel-barra" />
         </div>
         <span ref={rielEtiquetaRef} className="noi-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          El foco, la persiana y el humo: un cartel de cine negro con el
+          nombre en Playfair 900, la "y" en itálica dorada y el título de
+          la película. Es la bienvenida: dice de quién es la fiesta,
+          cuándo, dónde y para cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="noi-portada">
         <div ref={escenaPortadaRef} className="noi-portada-hoja">
-          <div className="noi-trama noi-trama--tapa" aria-hidden="true" />
+          <div className="noi-escenario" aria-hidden="true">
+            <span data-depth="6" className="noi-foco" />
+            <span data-depth="1.5" className="noi-persiana" />
+            {HUMO.map(([x, d, dl], i) => (
+              <span key={i} className="noi-humo" style={{ left: `${x}%`, animationDuration: `${d}s`, animationDelay: `${dl}s` }} />
+            ))}
+            <span className="noi-grano" />
+          </div>
 
-          <div data-cl="1" className="noi-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
+          <div data-cl="1" className="noi-folio noi-folio--oro noi-folio--tapa">
+            <span>{tx("invitacion.saveTheDate.escena")} 00 · {tx("invitacion.saveTheDate.toma")} 1</span>
             <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="noi-tapa-centro">
-            <div className="noi-tapa-fila">
-              <span className="noi-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="noi-tapa-nombres">
+            <span className="noi-tapa-kicker">— {tx("invitacion.saveTheDate.unaProduccionDe")} —</span>
+            <h1 ref={cartelRef} className="noi-tapa-nombres" style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
               {saludaAlInvitado ? (
-                <span className="noi-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="noi-tapa-linea"><span data-pieza="1"><Letras texto={nombreInvitado} desde={0} /></span></span>
               ) : (
                 <>
-                  <span className="noi-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="noi-tapa-linea"><span data-pieza="1"><Letras texto={nombre1} desde={0} /></span></span>
                   {nombre2 && (
-                    <span className="noi-tapa-linea noi-tapa-linea--sangra">
-                      <span><span className="noi-acento">&amp;</span>{nombre2}</span>
-                    </span>
+                    <>
+                      <span className="noi-tapa-linea noi-tapa-linea--y"><span data-pieza="1">{tx("invitacion.rsvp.y")}</span></span>
+                      <span className="noi-tapa-linea"><span data-pieza="1"><Letras texto={nombre2} desde={nombre1.replace(/\s/g, "").length} /></span></span>
+                    </>
                   )}
                 </>
               )}
             </h1>
-            <div className="noi-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="noi-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <span className="noi-tapa-pelicula">{tx("invitacion.saveTheDate.en")} «{tituloDePelicula}»</span>
+            <div className="noi-tapa-datos">
+              <span>{diaSemana} {diaNum} · {String(fechaEvento.getMonth() + 1).padStart(2, "0")} · {anio} · {hora}<br /><span className="noi-oro">{[lugarNombre, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="noi-tapa-datos-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase").toUpperCase()} Nº {pase}<br /><span className="noi-oro">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{kickerDelEvento.toUpperCase()}<br /><span className="noi-oro">{dressCode || fechaPuntos}</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="noi-tapa-pie">
-            <span className="noi-regla" aria-hidden="true" />
             <p className="noi-tapa-mensaje">
               {saludaAlInvitado
-                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
+                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}: ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
                 : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
             </p>
             <button type="button" onClick={abrir} className="noi-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}<span className="noi-cursor">_</span>
             </button>
           </div>
         </div>
@@ -1323,30 +1380,24 @@ export function NoirTemplateEsmeralda({ invitation, guest, isPersonalized = fals
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El nombre letra por letra: cada tanto una salta como una tecla de máquina
+ * de escribir (sube 4 px y baja en seco). El CSS escalona el turno.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
-  const id = useId().replace(/:/g, "");
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
   return (
-    <div className="noi-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="noi-sello-amp">&amp;</span>}
-    </div>
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="noi-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
   );
 }
 
@@ -1401,7 +1452,7 @@ function CuentaNoir({ targetDate }: { targetDate: Date }) {
     <div className="noi-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`noi-cuenta-caja noi-cuenta-caja--${i + 1}`}>
-          <span className="noi-cuenta-num">{c.v}</span>
+          <span className="noi-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="noi-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1894,13 +1945,14 @@ function TriviaNoir({ preguntas, invitationId, guestToken, guestName }: { pregun
 // leen la Bienvenida y el Post-evento compartidos (esperan `noi-section` y
 // `noi-kicker`).
 const CSS_NOI = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Noir ─────────────────────────────────────────────────────────────
+     Cine negro: Playfair Display 900 como cartel y su itálica 400 como
+     contrapunto, Courier Prime para todo lo demás (el expediente). Negro,
+     marfil, oro y rojo sangre. Foco que sigue al puntero, persiana, humo,
+     grano, tira de película, claqueta y créditos finales. Todo CSS. */
   .noi-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--noi-sans), 'Courier Prime', monospace; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--noi-sans), 'Courier Prime', monospace;
+    --noi-panel: #17171A; --noi-papel: #FFFDF8; --noi-linea: color-mix(in srgb, var(--pp-ink) 30%, transparent); }
   .noi-raiz a { color: inherit; text-decoration: none; }
   .noi-raiz button { font: inherit; }
 
@@ -1908,297 +1960,352 @@ const CSS_NOI = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .noi-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .noi-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .noi-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .noi-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
-
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .noi-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .noi-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .noi-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .noi-section[data-tone="light"] { background: var(--pp-ink); color: var(--pp-bg); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: Courier con tracking; oro sobre negro. */
   .noi-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+  .noi-folio--oro { color: var(--pp-acc); }
+  .noi-folio--acento { color: var(--noi-acento, var(--pp-acc)); }
+  .noi-folio--suave { color: color-mix(in srgb, currentColor 60%, transparent); }
+  .noi-folio--gris { color: #6E6A78; }
   .noi-folio--pie { align-items: center; margin-top: auto; }
-  .noi-folio-etq { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+  .noi-panel > .noi-folio--pie { color: inherit; opacity: .7; }
+  .noi-folio--colofon { width: 100%; align-items: center; border-top: 1px solid var(--noi-linea); padding-top: 12px; font-size: 10px; }
+  .noi-folio-etq { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc); display: block; }
+  .noi-oro { color: var(--pp-acc); }
+  .noi-rojo { color: var(--pp-acc2); }
+  .noi-italica { font-style: italic; font-weight: 400; }
+  .noi-negrita { font-weight: 700; font-style: normal; }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .noi-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .noi-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .noi-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .noi-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .noi-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .noi-spread--centro { align-items: center; }
+  .noi-pagina { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .noi-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .noi-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .noi-spread > *:first-child { justify-self: end; }
+    .noi-spread > *:last-child { justify-self: start; }
+    .noi-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .noi-h2, .noi-panel-titulo, .noi-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--noi-serif), 'Playfair Display', serif;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .noi-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .noi-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .noi-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .noi-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .noi-acento { font-style: italic; color: var(--pp-acc); }
-  .noi-acento--tinta { color: var(--pp-ink); }
-  .noi-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .noi-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .noi-regla { display: block; height: 2px; background: currentColor; }
+  .noi-h2, .noi-panel-titulo, .noi-fecha-linea, .noi-tapa-nombres, .noi-fin { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 900; }
+  .noi-h2, .noi-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .92; letter-spacing: -.02em; font-size: clamp(44px, 13vw, 110px); }
+  .noi-h2--album { font-size: clamp(40px, 11vw, 90px); }
+  .noi-panel-sub { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--noi-acento, var(--pp-acc)); }
+  .noi-parrafo { margin: 0; font-size: 14px; line-height: 1.6; max-width: 42ch; }
+  .noi-chip { display: inline-block; padding: 12px 18px; color: var(--pp-ink); background: var(--pp-bg); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  .noi-cta { margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    color: var(--noi-fondo, var(--pp-bg)); background: currentColor; font-weight: 700; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; }
+  .noi-cta > * { color: var(--noi-fondo, var(--pp-bg)); }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .noi-std { justify-content: center; }
-  .noi-fecha { display: flex; flex-direction: column; font-family: var(--noi-serif), 'Playfair Display', serif;
-    line-height: .82; letter-spacing: -.04em; }
-  .noi-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .noi-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .noi-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .noi-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
-  .noi-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
+  /* ── 01 Guardá la fecha: el cartel de cine ─────────────────────────── */
+  .noi-estreno { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; text-align: center; }
+  .noi-fecha { display: flex; flex-direction: column; line-height: .9; text-align: center; }
+  .noi-fecha-linea { font-size: clamp(40px, 12vw, 90px); }
+  .noi-fecha-linea--dia { font-size: clamp(110px, 36vw, 260px); letter-spacing: -.04em; }
+  .noi-fecha-linea--mes { font-style: italic; font-weight: 400; }
+  .noi-fecha-linea--anio { color: var(--pp-acc2); }
+  .noi-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor; padding: 10px 0; }
+  .noi-std .noi-chip { color: var(--pp-ink); background: var(--pp-bg); }
+  /* La foto: en blanco y negro, con la tira de película a los costados. */
+  .noi-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; box-sizing: border-box; overflow: visible; border: 14px solid var(--pp-bg); border-left-width: 26px; border-right-width: 26px;
+    background: repeating-linear-gradient(135deg, #3A3A3E 0 8px, #2A2A2E 8px 16px); }
+  .noi-foto-capa { position: absolute; inset: 0; overflow: hidden; filter: grayscale(1) contrast(1.05); }
+  .noi-perforaciones { position: absolute; top: 0; bottom: 0; width: 26px; z-index: 2; opacity: .9;
+    background: repeating-linear-gradient(180deg, transparent 0 10px, var(--pp-ink) 10px 22px, transparent 22px 32px); background-position: 6px 0; background-size: 14px 32px; background-repeat: repeat-y; }
+  .noi-perforaciones--izq { left: -26px; }
+  .noi-perforaciones--der { right: -26px; }
   .noi-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background-image: radial-gradient(var(--pp-ink) calc(var(--noi-punto, 7.2) * 1px), transparent calc(var(--noi-punto, 7.2) * 1px + .6px));
+    background-image: radial-gradient(var(--pp-bg) calc(var(--noi-punto, 7.2) * 1px), transparent calc(var(--noi-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .noi-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--noi-serif), 'Playfair Display', serif;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .noi-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--noi-sans), 'Courier Prime', monospace;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .noi-foto-etq { position: absolute; left: 12px; bottom: 10px; z-index: 2; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-ink); }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .noi-countdown { justify-content: space-between; }
-  .noi-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .noi-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
-  .noi-marquesina--contraria .noi-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  /* ── 02 Falta poco: la claqueta ────────────────────────────────────── */
+  .noi-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .noi-countdown > .noi-folio, .noi-countdown > .noi-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .noi-claqueta { display: block; height: 26px; background: repeating-linear-gradient(-45deg, var(--pp-ink) 0 22px, var(--pp-bg) 22px 44px); }
+  .noi-claqueta-caja { background: var(--noi-panel); border: 2px solid var(--pp-ink); padding: 16px 14px; display: flex; flex-direction: column; gap: 12px; }
+  .noi-claqueta-fila { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; border-bottom: 1px solid var(--noi-linea); padding-bottom: 8px; }
+  .noi-claqueta-fila--pie { border-bottom: 0; border-top: 1px solid var(--noi-linea); padding: 8px 0 0; }
+  .noi-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .noi-cuenta-caja { border: 1px solid var(--noi-linea); padding: 14px 12px 12px; display: flex; flex-direction: column-reverse; gap: 6px; }
+  .noi-cuenta-etq { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc); }
+  .noi-cuenta-num { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 900; font-size: clamp(52px, 17vw, 130px); line-height: .9; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .noi-tarjeta--hoy { display: flex; flex-direction: column; gap: 8px; text-align: center; padding: 12px 0; }
+  .noi-tarjeta--hoy .noi-tarjeta-kicker { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc); }
+  .noi-tarjeta--hoy .noi-tarjeta-titulo { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 900; font-size: clamp(36px, 10vw, 84px); line-height: .92; }
+  .noi-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap; color: var(--pp-acc);
+    font-size: 12px; letter-spacing: .22em; text-transform: uppercase; border-top: 1px solid var(--noi-linea); border-bottom: 1px solid var(--noi-linea); }
+  .noi-marquesina-tira { display: flex; width: max-content; animation: noiCorre 16s linear infinite reverse; }
+  .noi-marquesina-tira > span { padding-right: 36px; }
+  @keyframes noiCorre { to { transform: translate3d(-50%, 0, 0); } }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .noi-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .noi-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .noi-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .noi-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .noi-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .noi-cuenta-num, .noi-cuenta-dias, .noi-cifra { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .noi-cuenta-caja:nth-child(4) .noi-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .noi-cuenta-etq { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .noi-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: el intertítulo ──────────────────────────────── */
+  .noi-frase-seccion { justify-content: space-between; gap: 30px; }
+  .noi-vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,.8) 100%); }
+  .noi-intertitulo { border: 1px solid color-mix(in srgb, var(--pp-ink) 40%, transparent); padding: 30px 22px; width: 100%; max-width: 560px; box-sizing: border-box; text-align: center;
+    box-shadow: inset 0 0 0 6px var(--pp-bg), inset 0 0 0 7px color-mix(in srgb, var(--pp-ink) 25%, transparent); }
+  .noi-frase { margin: 0; font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(26px, 7vw, 56px); line-height: 1.2; }
+  .noi-frase-firma { font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-acc); }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .noi-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .noi-frase-seccion .noi-acento { color: var(--pp-bg); font-style: italic; }
-  .noi-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Paneles: las escenas ───────────────────────────────────────── */
   .noi-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
   .noi-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .noi-pan-fijo--album { background: #F7F5F0; }
   .noi-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .noi-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .noi-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .noi-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .noi-panel--acento .noi-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .noi-panel--negro { --noi-acento: var(--pp-acc); --noi-fondo: var(--pp-bg); }
+  .noi-panel--marfil { --noi-acento: var(--pp-acc2); --noi-fondo: var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg); }
+  .noi-panel--rojo { --noi-acento: var(--pp-ink); --noi-fondo: var(--pp-acc2); background: var(--pp-acc2); color: var(--pp-ink); }
   .noi-pan[data-scroll="vertical"] { height: auto; }
   .noi-pan[data-scroll="vertical"] .noi-pan-fijo { position: static; height: auto; overflow: visible; }
   .noi-pan[data-scroll="vertical"] .noi-tira { position: static; display: block; width: 100%; transform: none !important; }
   .noi-pan[data-scroll="vertical"] .noi-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-
-  .noi-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .noi-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .noi-linea > span:first-child { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .noi-linea > span:last-child { text-align: right; font-size: 15px; }
-  .noi-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--noi-sans), 'Courier Prime', monospace;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .noi-cta-flecha { font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-size: 22px; }
-  .noi-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .noi-ficha { border: 1px solid currentColor; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .noi-linea { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px dotted currentColor; font-size: 14px; line-height: 1.4; }
+  .noi-linea > span:first-child { font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 3px; }
+  .noi-linea > span:last-child { text-align: right; font-weight: 700; }
+  .noi-mapa { height: 190px; overflow: hidden; border: 1px solid currentColor; }
   .noi-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .noi-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+  .noi-punto { width: 24px; height: 2px; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block; }
+  .noi-punto[data-activo="1"] { opacity: 1; }
 
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .noi-checkin { background: var(--pp-bg2); }
-  .noi-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .noi-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .noi-cupon .noi-talon-top { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .2em; }
-  .noi-cupon input, .noi-cupon .noi-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .noi-cupon .noi-contador button { border: 2px solid var(--pp-ink); }
-  .noi-sello, .noi-cupon .noi-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .noi-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .noi-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .noi-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .noi-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .noi-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .noi-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .noi-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--noi-sans), 'Courier Prime', monospace;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .noi-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .noi-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .noi-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .noi-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .noi-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .noi-lista-tema { font-size: 15px; }
-  .noi-lista-quien { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .noi-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .noi-tarjeta + .noi-tarjeta { margin-top: 12px; }
-  .noi-tarjeta-kicker { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .noi-tarjeta-titulo { font-family: var(--noi-serif), 'Playfair Display', serif; font-size: 28px; line-height: 1; }
-  .noi-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .noi-tarjeta .noi-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .noi-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .noi-fila--ultima { border-bottom: none; }
-  .noi-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .noi-fila-etq { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .noi-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .noi-fila-valor { text-align: right; }
-  .noi-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .noi-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .noi-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .noi-quiz .noi-acento { color: var(--pp-ink); }
-  .noi-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .noi-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .noi-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .noi-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .noi-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .noi-pagina--qr { align-items: flex-start; }
-  .noi-pagina--qr .qr-ingreso, .noi-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .noi-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .noi-pase-numero { display: flex; flex-direction: column; }
-  .noi-pase-numero > span:last-child { font-family: var(--noi-serif), 'Playfair Display', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .noi-info-extra { margin-top: 12px; }
-  .noi-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .noi-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--noi-sans), 'Courier Prime', monospace !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .noi-raiz .ia-icon-box, .noi-raiz svg.lucide { display: none !important; }
-  .noi-replay { cursor: pointer; }
-  .noi-credito { display: flex; justify-content: center; opacity: .6; }
-  .noi-error { margin: 0; font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .noi-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .noi-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .noi-sello-circular text { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .noi-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .noi-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .noi-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .noi-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .noi-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .noi-tapa-fecha { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .noi-tapa-nombres { margin: 0; font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .noi-tapa-linea { overflow: hidden; display: block; }
-  .noi-tapa-linea > span { display: block; }
-  .noi-tapa-linea--sangra { padding-left: 14%; }
-  .noi-tapa-pase { text-align: right; }
-  .noi-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .noi-tapa-mensaje { margin: 0; font-family: var(--noi-serif), 'Playfair Display', serif; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .noi-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .noi-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .noi-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .noi-riel-top, .noi-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--noi-sans), 'Courier Prime', monospace;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .noi-riel-top { color: var(--pp-ink2); }
-  .noi-riel-etiqueta { color: var(--pp-acc); }
-  .noi-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .noi-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .noi-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .noi-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .noi-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .noi-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
+  /* ── 05 Check-in: el expediente ────────────────────────────────────── */
+  .noi-cupon { position: relative; background: var(--noi-papel); color: var(--pp-bg); border: 1px solid var(--pp-bg); padding: 22px 20px;
+    display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
+  .noi-cupon .noi-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .noi-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    border-bottom: 2px solid var(--pp-bg); padding-bottom: 12px; }
+  .noi-talon-estado { border: 1px solid currentColor; padding: 3px 8px; transition: color 400ms ease; }
   .noi-campo { display: flex; flex-direction: column; gap: 6px; }
-  .noi-etiqueta { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .noi-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .noi-input:focus { outline: none; border-color: var(--pp-acc); }
-  .noi-contador { display: flex; align-items: center; gap: 12px; }
-  .noi-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
+  .noi-etiqueta { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; }
+  .noi-input { min-height: 48px; border: 0; border-bottom: 1px solid var(--pp-bg); border-radius: 0; background: transparent; color: var(--pp-bg);
+    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 15px; padding: 0; outline: none; }
+  .noi-contador { display: flex; align-items: center; border-bottom: 1px solid var(--pp-bg); min-height: 48px; }
+  .noi-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-bg); cursor: pointer; font-size: 22px; line-height: 1; }
   .noi-contador button:disabled { opacity: .35; cursor: default; }
-  .noi-contador > span { font-family: var(--noi-serif), 'Playfair Display', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .noi-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .noi-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .noi-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .noi-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .noi-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .noi-precio-total { font-family: var(--noi-serif), 'Playfair Display', serif; font-size: 28px; line-height: 1; }
-  .noi-precio-detalle { font-family: var(--noi-sans), 'Courier Prime', monospace; font-size: 11px; letter-spacing: .1em; }
-  .noi-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--noi-sans), 'Courier Prime', monospace;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .noi-talon-estado { transition: color 400ms ease; }
+  .noi-contador > span { flex: 1; text-align: center; font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 900; font-size: 26px; line-height: 1; }
   .noi-filas { display: flex; flex-direction: column; }
+  .noi-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px dotted var(--pp-bg); font-size: 14px; }
+  .noi-fila--ultima { border-bottom: 0; }
+  .noi-fila-valor { text-align: right; font-weight: 700; }
+  .noi-precio { display: flex; justify-content: space-between; gap: 12px; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+  .noi-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .noi-precio-total { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 900; font-size: 22px; line-height: 1; letter-spacing: 0; }
+  .noi-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .noi-btn-solido { min-height: 54px; border: 0; background: var(--pp-acc2); color: var(--pp-ink); cursor: pointer;
+    font-weight: 700; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; padding: 0 18px; transition: background 200ms ease; }
+  @media (hover: hover) { .noi-btn-solido:hover { background: var(--pp-bg); } }
+  .noi-btn-solido:disabled { opacity: .6; cursor: default; }
+  .noi-btn-fantasma { min-height: 48px; border: 1px solid var(--pp-bg); background: transparent; color: var(--pp-bg); cursor: pointer;
+    font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; padding: 0 18px; }
+  .noi-error { margin: 0; font-size: 12px; letter-spacing: .06em; color: var(--pp-acc2); }
+  /* El sello CONFIRMADO: rectángulo con doble filete rojo. */
+  .noi-cupon .noi-sello { position: absolute; right: 12px; bottom: 78px; width: 150px; height: 70px; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    border: 3px solid var(--pp-acc2); color: var(--pp-acc2); box-shadow: inset 0 0 0 3px var(--noi-papel), inset 0 0 0 4px var(--pp-acc2);
+    display: flex; align-items: center; justify-content: center; box-sizing: border-box;
+    font-weight: 700; font-size: 14px; letter-spacing: .2em; text-transform: uppercase; }
   .noi-petalos { display: none; }
 
-  /* Noir: la luz entra de costado, como por una persiana. */
-  .noi-trama { opacity: .09; background-image: repeating-linear-gradient(105deg, currentColor 0 2px, transparent 2px 24px); background-size: auto; }
-  .noi-tapa-nombres, .noi-h2, .noi-panel-titulo { letter-spacing: -.02em; }
+  /* ── 06 Álbum: la tira de fotogramas ───────────────────────────────── */
+  .noi-panel--album { background: #F7F5F0; color: #0B0B0D; justify-content: flex-start; gap: 14px; }
+  .noi-panel--album-b { background: #EFEBE3; }
+  .noi-fotogramas { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 8px; max-width: 900px;
+    background: #0B0B0D; padding: 8px; border-top: 12px dotted #F7F5F0; border-bottom: 12px dotted #F7F5F0; box-sizing: border-box; }
+  .noi-panel--album-b .noi-fotogramas { border-color: #EFEBE3; }
+  .noi-fotograma { position: relative; overflow: hidden; min-height: 0; cursor: pointer; background: repeating-linear-gradient(135deg, #8A8680 0 8px, #9E9A93 8px 16px); }
+  .noi-fotograma-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1); }
+  .noi-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .noi-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .noi-bano--2 { background: color-mix(in srgb, var(--pp-acc2) 50%, transparent); }
+  .noi-fotograma-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-size: 10px; letter-spacing: .14em; color: #F2EEE6; }
+  .noi-fotogramas[data-cantidad="5"] .noi-fotograma:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .noi-fotogramas[data-cantidad="5"] .noi-fotograma:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .noi-fotogramas[data-cantidad="5"] .noi-fotograma:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .noi-fotogramas[data-cantidad="5"] .noi-fotograma:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .noi-fotogramas[data-cantidad="5"] .noi-fotograma:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .noi-fotogramas[data-cantidad="4"] .noi-fotograma:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .noi-fotogramas[data-cantidad="4"] .noi-fotograma:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .noi-fotogramas[data-cantidad="4"] .noi-fotograma:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .noi-fotogramas[data-cantidad="4"] .noi-fotograma:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .noi-fotogramas[data-cantidad="3"] .noi-fotograma:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .noi-fotogramas[data-cantidad="3"] .noi-fotograma:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .noi-fotogramas[data-cantidad="3"] .noi-fotograma:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .noi-fotogramas[data-cantidad="2"] .noi-fotograma:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .noi-fotogramas[data-cantidad="2"] .noi-fotograma:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .noi-fotogramas[data-cantidad="1"] .noi-fotograma:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: la banda sonora ────────────────────────────────────── */
+  .noi-carretes { display: flex; align-items: center; gap: 16px; }
+  .noi-carrete { position: relative; width: 48px; height: 48px; border-radius: 50%; border: 2px solid currentColor; box-sizing: border-box; animation: noiGira 4s linear infinite; }
+  .noi-carrete--oro { color: var(--pp-acc); }
+  .noi-carrete i { position: absolute; background: currentColor; }
+  .noi-carrete i:nth-child(1) { left: 50%; top: 4px; width: 2px; height: 16px; margin-left: -1px; }
+  .noi-carrete i:nth-child(2) { left: 50%; bottom: 4px; width: 2px; height: 16px; margin-left: -1px; }
+  .noi-carrete i:nth-child(3) { top: 50%; left: 4px; height: 2px; width: 16px; margin-top: -1px; }
+  .noi-carrete i:nth-child(4) { top: 50%; right: 4px; height: 2px; width: 16px; margin-top: -1px; }
+  .noi-carrete-cinta { flex: 1; height: 1px; background: color-mix(in srgb, var(--pp-ink) 40%, transparent); }
+  @keyframes noiGira { to { transform: rotate(360deg); } }
+  .noi-musica form.noi-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .noi-musica .noi-etiqueta { display: none; }
+  .noi-musica .noi-input { min-height: 48px; border: 1px solid var(--pp-ink); background: transparent; color: var(--pp-ink); padding: 0 14px; min-width: 0; }
+  .noi-musica .noi-error { grid-column: 1 / -1; }
+  .noi-musica .noi-btn-solido { grid-column: 1 / -1; min-height: 50px; border: 1px solid var(--pp-acc); background: var(--pp-acc); color: var(--pp-bg); font-size: 12px; }
+  @media (hover: hover) { .noi-musica .noi-btn-solido:hover { background: var(--pp-ink); border-color: var(--pp-ink); } }
+  .noi-lista { display: flex; flex-direction: column; margin-top: 12px; counter-reset: tema; }
+  .noi-lista-fila { display: flex; align-items: baseline; gap: 12px; padding: 12px 0; border-bottom: 1px dotted color-mix(in srgb, var(--pp-ink) 40%, transparent); counter-increment: tema; }
+  .noi-lista-fila::before { content: counter(tema, decimal-leading-zero); font-size: 11px; color: var(--pp-acc); flex: 0 0 auto; }
+  .noi-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .noi-lista-tema { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 700; font-size: 19px; line-height: 1.1; }
+  .noi-lista-quien { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .7; }
+
+  /* ── 08 Regalos ────────────────────────────────────────────────────── */
+  .noi-tarjeta--banco { position: relative; z-index: 1; background: var(--noi-papel); color: var(--pp-bg); border: 1px solid var(--pp-bg); padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .noi-tarjeta--banco + .noi-tarjeta--banco { margin-top: 14px; }
+  .noi-tarjeta-kicker { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; }
+  .noi-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.6; opacity: .85; }
+  .noi-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .noi-fila-etq { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; opacity: .7; }
+  .noi-fila-dato { font-size: 14px; overflow-wrap: anywhere; }
+  .noi-fila--copiable:first-child { border-bottom: 1px dotted var(--pp-bg); }
+  .noi-fila--copiable:first-child .noi-fila-dato { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 700; font-size: 20px; line-height: 1.1; }
+  .noi-tarjeta--banco .noi-fila--ultima { border-bottom: 0; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .7; }
+  .noi-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 1px solid var(--pp-bg); background: transparent; color: var(--pp-bg); cursor: pointer;
+    font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .noi-btn-copiar:hover { background: var(--pp-bg); color: var(--pp-ink); } }
+  .noi-btn-copiar--hecho { background: var(--pp-bg); color: var(--pp-ink); }
+
+  /* ── 09 Trivia: el interrogatorio ──────────────────────────────────── */
+  .noi-quiz { background: var(--pp-acc2) !important; color: var(--pp-ink); }
+  .noi-quiz .noi-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .noi-quiz .noi-tarjeta-kicker { align-self: flex-start; border: 1px solid var(--pp-ink); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; padding: 8px 14px; }
+  .noi-quiz .noi-tarjeta-pregunta, .noi-quiz .noi-tarjeta-titulo { font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(34px, 9.5vw, 80px); line-height: 1; max-width: 16ch; }
+  .noi-quiz .noi-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.6; }
+  .noi-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .noi-opcion { min-height: 54px; border: 1px solid var(--pp-ink); background: transparent; color: var(--pp-ink); cursor: pointer; counter-increment: opcion;
+    font-family: var(--noi-sans), 'Courier Prime', monospace; font-weight: 700; font-size: 15px; text-align: left; padding: 0 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .noi-opcion::after { content: counter(opcion, upper-alpha); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .noi-opcion--bien { background: var(--pp-ink); color: var(--pp-acc2); }
+  .noi-opcion--bien::after { content: "Culpable"; }
+  .noi-opcion--mal { background: var(--pp-bg); color: var(--pp-ink); }
+  .noi-opcion--mal::after { content: "Coartada"; }
+  @media (min-width: 1024px) {
+    .noi-quiz .noi-spread > .noi-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .noi-quiz .noi-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .noi-quiz .noi-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .noi-quiz .noi-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: los créditos finales ──────────────────────────────── */
+  .noi-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .noi-pagina--qr { align-items: flex-start; }
+  .noi-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: var(--pp-ink); padding: 16px; box-sizing: border-box;
+    border: 1px solid var(--pp-acc); box-shadow: 0 0 0 8px var(--pp-bg), 0 0 0 9px var(--pp-acc); margin-bottom: 30px; }
+  .noi-qr .qr-ingreso, .noi-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .noi-qr img, .noi-qr svg, .noi-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .noi-qr-etq { position: absolute; left: 0; right: 0; bottom: -28px; text-align: center; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-acc); }
+  .noi-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .noi-pase-numero, .noi-pase-mesa { display: flex; flex-direction: column; }
+  .noi-pase-mesa { align-items: flex-end; text-align: right; }
+  .noi-pase-numero > span:last-child { font-family: var(--noi-serif), 'Playfair Display', serif; font-weight: 900; font-size: clamp(64px, 20vw, 150px); line-height: .9; letter-spacing: -.03em; }
+  .noi-pase-mesa > span:last-child { font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(40px, 12vw, 90px); line-height: .9; color: var(--pp-acc); }
+  .noi-lineas-pase { display: flex; flex-direction: column; border-top: 1px solid var(--pp-acc); }
+  .noi-lineas-pase .noi-linea { border-bottom: 1px dotted color-mix(in srgb, var(--pp-ink) 40%, transparent); font-size: 13px; padding: 10px 0; }
+  .noi-lineas-pase .noi-linea:last-child { border-bottom: 0; }
+  .noi-lineas-pase .noi-linea > span:first-child { color: var(--pp-acc); opacity: 1; }
+  .noi-lineas-pase .noi-linea > span:last-child { font-weight: 400; line-height: 1.45; }
+  .noi-info-extra { margin-top: 4px; }
+  .noi-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .noi-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-acc) !important; border: 1px solid var(--pp-acc) !important;
+    border-radius: 0 !important; font-family: var(--noi-sans), 'Courier Prime', monospace !important; letter-spacing: .22em !important; text-transform: uppercase; }
+  .noi-raiz .ia-icon-box, .noi-raiz svg.lucide { display: none !important; }
+  .noi-pase-pie { display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; }
+  .noi-fin { font-size: clamp(56px, 16vw, 120px); line-height: .9; letter-spacing: .1em; }
+  .noi-fin-sub { font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-size: clamp(16px, 4.4vw, 22px); }
+  .noi-replay { cursor: pointer; color: var(--pp-ink); }
+  .noi-credito { display: inline-flex; opacity: .8; }
+
+  /* ── La tapa: foco, persiana y humo ────────────────────────────────── */
+  .noi-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .noi-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(18px + env(safe-area-inset-top)) max(20px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); }
+  .noi-escenario { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  /* El foco: un gradiente radial enorme que el motor corre con el puntero. */
+  .noi-foco { position: absolute; left: 50%; top: 40%; width: 140vmax; height: 140vmax; margin: -70vmax 0 0 -70vmax;
+    background: radial-gradient(circle at center, color-mix(in srgb, var(--pp-ink) 16%, transparent) 0, color-mix(in srgb, var(--pp-ink) 6%, transparent) 18%, transparent 34%); }
+  .noi-persiana { position: absolute; left: -10%; right: -10%; top: 0; bottom: 0;
+    background: repeating-linear-gradient(174deg, transparent 0 46px, color-mix(in srgb, var(--pp-ink) 5%, transparent) 46px 58px);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 40%, #000 60%, transparent); mask-image: linear-gradient(90deg, transparent, #000 40%, #000 60%, transparent); }
+  .noi-humo { position: absolute; bottom: 22%; width: 60px; height: 60px; border-radius: 50%; opacity: 0;
+    background: radial-gradient(circle, color-mix(in srgb, var(--pp-ink) 50%, transparent), transparent 70%); animation: noiHumo 6s ease-out infinite; }
+  @keyframes noiHumo { 0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; } 20% { opacity: .35; } 100% { transform: translate3d(30px, -180px, 0) scale(2.2); opacity: 0; } }
+  .noi-grano { position: absolute; inset: -4%; opacity: .12; animation: noiGrano .4s steps(1) infinite;
+    background-image: radial-gradient(var(--pp-ink) .6px, transparent .7px), radial-gradient(var(--pp-ink) .5px, transparent .6px); background-size: 6px 6px, 6px 6px; background-position: 1px 2px, 4px 5px; }
+  @keyframes noiGrano { 0% { transform: translate(0, 0); } 25% { transform: translate(-2%, 1%); } 50% { transform: translate(1%, -2%); } 75% { transform: translate(-1%, -1%); } 100% { transform: translate(2%, 1%); } }
+  .noi-folio--tapa { z-index: 1; }
+  .noi-tapa-centro { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 0; text-align: center;
+    animation: noiParpadeo 9s linear infinite; }
+  @keyframes noiParpadeo { 0%, 100% { opacity: 1; } 92% { opacity: 1; } 93% { opacity: .82; } 94% { opacity: 1; } 97% { opacity: .9; } 98% { opacity: 1; } }
+  .noi-tapa-kicker { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--pp-acc); }
+  /* El nombre: Playfair 900 centrado; el renglón más largo manda el cuerpo. */
+  .noi-tapa-nombres { margin: 0; line-height: .92; letter-spacing: -.02em; display: flex; flex-direction: column; align-items: center;
+    font-size: min(clamp(56px, 18vw, 170px), 13vh, calc((100vw - 60px) / (var(--largo, 9) * 0.62))); }
+  @media (min-width: 1024px) { .noi-tapa-nombres { font-size: min(11vw, 180px, 13vh, calc((min(100vw, 1100px) - 60px) / (var(--largo, 9) * 0.62))); } }
+  .noi-tapa-linea { overflow: hidden; display: block; white-space: nowrap; }
+  .noi-tapa-linea > span { display: block; }
+  .noi-tapa-linea--y { font-size: .3em; line-height: 1.2; }
+  .noi-tapa-linea--y > span { font-weight: 400; font-style: italic; color: var(--pp-acc); }
+  .noi-letra { display: inline-block; animation: noiTecla calc(var(--n, 12) * 4s) steps(1) infinite; animation-delay: calc(var(--i, 0) * -4s); }
+  @keyframes noiTecla { 0%, 99.4% { transform: none; opacity: 1; } 99.5%, 99.9% { transform: translateY(-4px); opacity: .6; } 100% { transform: none; opacity: 1; } }
+  .noi-tapa-pelicula { font-family: var(--noi-serif), 'Playfair Display', serif; font-style: italic; font-weight: 400; font-size: clamp(18px, 5vw, 28px); }
+  .noi-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; box-sizing: border-box;
+    font-size: 12px; line-height: 1.5; text-align: left; border-top: 1px solid var(--noi-linea); padding-top: 10px; letter-spacing: .04em; text-transform: uppercase; }
+  .noi-tapa-datos-der { text-align: right; }
+  .noi-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; }
+  .noi-tapa-mensaje { margin: 0; font-size: clamp(13px, 3.6vw, 16px); line-height: 1.5; max-width: 40ch; }
+  .noi-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 1px solid var(--pp-acc); background: transparent; color: var(--pp-acc); cursor: pointer;
+    font-weight: 700; font-size: 13px; letter-spacing: .3em; text-transform: uppercase; padding: 0 22px;
+    display: flex; align-items: center; justify-content: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .noi-tapa-btn:hover { background: var(--pp-acc); color: var(--pp-bg); } }
+  .noi-cursor { animation: noiCursor 1s steps(1) infinite; }
+  @keyframes noiCursor { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .noi-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--pp-acc); border-left: 1px solid var(--pp-acc) !important; }
+  .noi-riel-top { writing-mode: vertical-rl; font-size: 11px; letter-spacing: .2em; color: var(--pp-acc) !important; }
+  .noi-riel-etiqueta { writing-mode: vertical-rl; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--pp-acc); }
+  .noi-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .noi-riel-barra { position: absolute; left: -1px; top: 0; width: 2px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .noi-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-size: 11px; letter-spacing: .28em; color: var(--pp-acc);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: noiPista 2.4s ease-in-out infinite; }
+  @keyframes noiPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .noi-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(11,11,13,.94);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .noi-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 1px solid var(--pp-acc);
+    background: transparent; color: var(--pp-acc); font-size: 18px; line-height: 1; cursor: pointer; }
+  .noi-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 14px solid var(--pp-bg); box-shadow: 0 0 0 1px var(--pp-acc); }
 
   @media (prefers-reduced-motion: reduce) {
     .noi-raiz * { animation: none !important; }
     .noi-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .noi-foto { --noi-punto: 0; }
+    .noi-humo, .noi-grano { display: none; }
   }
 `;

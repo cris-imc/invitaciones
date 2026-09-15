@@ -551,7 +551,22 @@ export function CoutureTemplateNoche({ invitation, guest, isPersonalized = false
             if (!bano) return;
             const rh = hoja.getBoundingClientRect();
             const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
-            bano.style.opacity = String(Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3)));
+            const cerca = Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3));
+            bano.style.opacity = String(cerca);
+            // Las placas (Observatorio) están en negativo y se revelan al
+            // pasar por el centro.
+            const negativo = hoja.querySelector<HTMLElement>("[data-neg]");
+            if (negativo) negativo.style.opacity = (0.18 * (1 - cerca)).toFixed(3);
+            // Las postales (Postal) giran y muestran el dorso cuando pasan
+            // por el centro; vuelven al salir.
+            const carta = hoja.querySelector<HTMLElement>("[data-card]");
+            if (carta && !menosMovimiento) {
+              const gira = dx < 0.18 && p > 0.02 && p < 0.98;
+              if (carta.dataset.girada !== String(gira)) {
+                carta.dataset.girada = String(gira);
+                carta.style.transform = gira ? "rotateY(180deg)" : "rotateY(0)";
+              }
+            }
           });
         });
 

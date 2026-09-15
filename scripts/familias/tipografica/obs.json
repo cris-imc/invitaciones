@@ -5,16 +5,19 @@
   "titulo": "OBSERVATORIO",
   "varianteBase": "Medianoche",
   "resumen": [
-    "La carta celeste: Cormorant Garamond sobre un cielo nocturno, con IBM",
-    "Plex Mono para las coordenadas y Jost para el texto. El acento es el",
-    "dorado de una constelación dibujada."
+    "La carta celeste: Cormorant Garamond fina para nombres y cifras, Jost",
+    "para el texto, IBM Plex Mono para coordenadas y folios. Azul profundo,",
+    "marfil, oro y azul acero con filetes de 0,5 a 1 px. Estrellas que",
+    "titilan, un cometa, la constelación que se traza sola con la fecha,",
+    "astrolabio que gira, la luna de esa noche, ocular, órbitas y placas."
   ],
   "serif": {
     "modulo": "Cormorant_Garamond",
     "css": "'Cormorant Garamond', serif",
     "pesos": [
       "300",
-      "400"
+      "400",
+      "500"
     ],
     "italica": true
   },
@@ -22,15 +25,17 @@
     "modulo": "Jost",
     "css": "'Jost', sans-serif",
     "pesos": [
-      "300",
-      "400"
+      "400",
+      "500",
+      "600"
     ]
   },
   "mono": {
     "modulo": "IBM_Plex_Mono",
     "css": "'IBM Plex Mono', monospace",
     "pesos": [
-      "400"
+      "400",
+      "500"
     ]
   },
   "paleta": {
@@ -39,13 +44,9 @@
     "ink": "#EFE6D2",
     "ink2": "#EFE6D2",
     "acc": "#D4A957",
-    "acc2": "#7FA3C4"
+    "acc2": "#7FA3C4",
+    "acc3": "#C97B63"
   },
-  "cssExtra": [
-    "/* Observatorio: la trama son estrellas en dos tamaños, no puntos de imprenta. */",
-    ".obs-trama { opacity: .32; background-image: radial-gradient(currentColor .6px, transparent .7px), radial-gradient(currentColor .4px, transparent .5px); background-size: 46px 46px, 23px 23px; background-position: 0 0, 12px 8px; }",
-    ".obs-sello-circular svg { animation-duration: 60s; }"
-  ],
   "variantes": {
     "Nebulosa": {
       "etiqueta": "Nebulosa",
@@ -54,7 +55,8 @@
       "ink": "#F1E9E0",
       "ink2": "#F1E9E0",
       "acc": "#E0B98A",
-      "acc2": "#9B8BC4"
+      "acc2": "#9B8BC4",
+      "acc3": "#D97A8A"
     },
     "Boreal": {
       "etiqueta": "Boreal",
@@ -63,7 +65,8 @@
       "ink": "#E8F0EA",
       "ink2": "#E8F0EA",
       "acc": "#C9B86A",
-      "acc2": "#4FA39A"
+      "acc2": "#4FA39A",
+      "acc3": "#C97B63"
     },
     "Eclipse": {
       "etiqueta": "Eclipse",
@@ -72,7 +75,8 @@
       "ink": "#EDE8DF",
       "ink2": "#EDE8DF",
       "acc": "#E2C275",
-      "acc2": "#8A8F99"
+      "acc2": "#8A8F99",
+      "acc3": "#C46A4B"
     },
     "Amanecer": {
       "etiqueta": "Amanecer",
@@ -81,7 +85,13 @@
       "ink": "#1C2740",
       "ink2": "#1C2740",
       "acc": "#B08637",
-      "acc2": "#4E6A8A"
+      "acc2": "#4E6A8A",
+      "acc3": "#B8654A"
     }
-  }
+  },
+  "extras": [
+    "acc3"
+  ],
+  "render": "obs.jsx",
+  "css": "obs.css"
 }

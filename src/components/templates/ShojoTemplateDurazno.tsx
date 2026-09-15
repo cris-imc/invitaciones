@@ -8,14 +8,17 @@
  * Variante: Durazno.
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/sho.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir y se vuelve a derivar; lo propio de esta familia
+ * está en scripts/familias/tipografica/sho.json.
+ *
+ * PROVISORIO: todavía usa el render de Editorial. Falta portar el suyo
+ * desde el mockup.
  *
  * El manga romántico: Cherry Bomb One redondeada sobre pasteles, con
  * M PLUS Rounded para el texto. Todo tiene brillo y nada tiene esquinas.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -304,7 +307,7 @@ export function ShojoTemplateDurazno({ invitation, guest, isPersonalized = false
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -537,6 +540,31 @@ export function ShojoTemplateDurazno({ invitation, guest, isPersonalized = false
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            const cerca = Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3));
+            bano.style.opacity = String(cerca);
+            // Las placas (Observatorio) están en negativo y se revelan al
+            // pasar por el centro.
+            const negativo = hoja.querySelector<HTMLElement>("[data-neg]");
+            if (negativo) negativo.style.opacity = (0.18 * (1 - cerca)).toFixed(3);
+            // Las postales (Postal) giran y muestran el dorso cuando pasan
+            // por el centro; vuelven al salir.
+            const carta = hoja.querySelector<HTMLElement>("[data-card]");
+            if (carta && !menosMovimiento) {
+              const gira = dx < 0.18 && p > 0.02 && p < 0.98;
+              if (carta.dataset.girada !== String(gira)) {
+                carta.dataset.girada = String(gira);
+                carta.style.transform = gira ? "rotateY(180deg)" : "rotateY(0)";
+              }
+            }
           });
         });
 
@@ -1255,13 +1283,13 @@ export function ShojoTemplateDurazno({ invitation, guest, isPersonalized = false
             </div>
             <h1 ref={cartelRef} className="sho-tapa-nombres">
               {saludaAlInvitado ? (
-                <span className="sho-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="sho-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
               ) : (
                 <>
-                  <span className="sho-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="sho-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
                   {nombre2 && (
                     <span className="sho-tapa-linea sho-tapa-linea--sangra">
-                      <span><span className="sho-acento">&amp;</span>{nombre2}</span>
+                      <span data-pieza="1"><span className="sho-acento">&amp;</span>{nombre2}</span>
                     </span>
                   )}
                 </>
@@ -1399,7 +1427,7 @@ function CuentaShojo({ targetDate }: { targetDate: Date }) {
     <div className="sho-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`sho-cuenta-caja sho-cuenta-caja--${i + 1}`}>
-          <span className="sho-cuenta-num">{c.v}</span>
+          <span className="sho-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="sho-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}

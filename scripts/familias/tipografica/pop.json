@@ -5,9 +5,10 @@
   "titulo": "POP",
   "varianteBase": "Fucsia",
   "resumen": [
-    "El cómic: Bangers en mayúsculas sobre negro, Nunito para el texto y tres",
-    "colores que se pisan entre sí. Los títulos llevan contorno, como un",
-    "globo de diálogo."
+    "El cómic: Bangers en mayúsculas con sombra plana y trazo negro, Nunito",
+    "redonda para el texto. Tramas de puntos, globos con cola, stickers",
+    "torcidos, marquesinas inclinadas, la estrella de doce puntas girando y",
+    "el nombre que salta letra por letra."
   ],
   "serif": {
     "modulo": "Bangers",
@@ -20,18 +21,18 @@
     "modulo": "Nunito",
     "css": "'Nunito', sans-serif",
     "pesos": [
-      "400",
       "500",
-      "700"
+      "700",
+      "800"
     ]
   },
   "mono": {
     "modulo": "Nunito",
     "css": "'Nunito', sans-serif",
     "pesos": [
-      "400",
       "500",
-      "700"
+      "700",
+      "800"
     ]
   },
   "paleta": {
@@ -40,13 +41,9 @@
     "ink": "#FFF4E0",
     "ink2": "#B8AE9C",
     "acc": "#FF2E63",
-    "acc2": "#FFD84D"
+    "acc2": "#FFD84D",
+    "acc3": "#2EC4FF"
   },
-  "cssExtra": [
-    "/* Pop: contorno y sombra dura, como una viñeta de cómic. */",
-    ".pop-tapa-nombres, .pop-h2, .pop-panel-titulo, .pop-fecha-linea { letter-spacing: .02em; -webkit-text-stroke: 2px var(--pp-bg); text-shadow: 5px 5px 0 var(--pp-acc); }",
-    ".pop-trama { opacity: .18; background-size: 8px 8px; }"
-  ],
   "variantes": {
     "Limon": {
       "etiqueta": "Limón",
@@ -55,7 +52,8 @@
       "ink": "#FFF7E6",
       "ink2": "#B9B39F",
       "acc": "#FFD84D",
-      "acc2": "#2EC4FF"
+      "acc2": "#2EC4FF",
+      "acc3": "#FF2E63"
     },
     "Cian": {
       "etiqueta": "Cian",
@@ -64,7 +62,8 @@
       "ink": "#F0FAFF",
       "ink2": "#A9B7BF",
       "acc": "#2EC4FF",
-      "acc2": "#FF2E63"
+      "acc2": "#FF2E63",
+      "acc3": "#FFD84D"
     },
     "Lila": {
       "etiqueta": "Lila",
@@ -73,7 +72,8 @@
       "ink": "#F7F0FF",
       "ink2": "#B5A9C4",
       "acc": "#B455FF",
-      "acc2": "#FFD84D"
+      "acc2": "#FFD84D",
+      "acc3": "#3DF2B0"
     },
     "Naranja": {
       "etiqueta": "Naranja",
@@ -82,7 +82,13 @@
       "ink": "#FFF3E8",
       "ink2": "#BFAE9F",
       "acc": "#FF7A1A",
-      "acc2": "#3DF2B0"
+      "acc2": "#3DF2B0",
+      "acc3": "#2EC4FF"
     }
-  }
+  },
+  "extras": [
+    "acc3"
+  ],
+  "render": "pop.jsx",
+  "css": "pop.css"
 }
