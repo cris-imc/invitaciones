@@ -5,17 +5,19 @@
   "titulo": "BAUHAUS",
   "varianteBase": "Primarios",
   "resumen": [
-    "La escuela: Jost 500 en cajas, Work Sans para el texto y tres colores",
-    "primarios que se usan en bloques enteros, nunca en un adorno. Círculos,",
-    "cuadrados y triángulos como única decoración."
+    "La escuela: Jost geométrica en mayúsculas, Work Sans para el texto, tres",
+    "primarios más el negro y formas hechas sólo con CSS (círculo, semicírculo,",
+    "cuarto, banda). La tapa es una composición de cinco formas con parallax;",
+    "la retícula con junta negra de 3 px arma el countdown, el álbum y los",
+    "formularios. Nunca un degradé."
   ],
   "serif": {
     "modulo": "Jost",
     "css": "'Jost', sans-serif",
     "pesos": [
-      "400",
       "500",
-      "600"
+      "600",
+      "700"
     ]
   },
   "sans": {
@@ -23,7 +25,8 @@
     "css": "'Work Sans', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "600"
     ]
   },
   "mono": {
@@ -31,7 +34,8 @@
     "css": "'Work Sans', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "500",
+      "600"
     ]
   },
   "paleta": {
@@ -40,16 +44,9 @@
     "ink": "#111111",
     "ink2": "#5A5650",
     "acc": "#D4321F",
-    "acc2": "#F2C319"
+    "acc2": "#F2C319",
+    "acc3": "#1E3FBF"
   },
-  "cssExtra": [
-    "/* Bauhaus: sin itálicas y sin curvas. El acento es un bloque detrás de la",
-    "   palabra, no una inclinación. */",
-    ".bau-acento { font-style: normal !important; background: var(--pp-acc); color: var(--pp-bg); padding: 0 .1em; }",
-    ".bau-tapa-nombres, .bau-h2, .bau-panel-titulo, .bau-fecha-linea { text-transform: uppercase; letter-spacing: -.02em; }",
-    ".bau-trama { background-image: none; }",
-    ".bau-sello-circular svg { animation-duration: 40s; }"
-  ],
   "variantes": {
     "Klein": {
       "etiqueta": "Klein",
@@ -58,7 +55,8 @@
       "ink": "#111111",
       "ink2": "#575A66",
       "acc": "#1E3FBF",
-      "acc2": "#F2C319"
+      "acc2": "#F2C319",
+      "acc3": "#D4321F"
     },
     "Bosque": {
       "etiqueta": "Bosque",
@@ -67,7 +65,8 @@
       "ink": "#111111",
       "ink2": "#5A5E55",
       "acc": "#2E6B4A",
-      "acc2": "#E8A33D"
+      "acc2": "#E8A33D",
+      "acc3": "#1E3FBF"
     },
     "Terracota": {
       "etiqueta": "Terracota",
@@ -76,7 +75,8 @@
       "ink": "#111111",
       "ink2": "#66584D",
       "acc": "#C4552B",
-      "acc2": "#F2C319"
+      "acc2": "#F2C319",
+      "acc3": "#3A4A7A"
     },
     "Grafito": {
       "etiqueta": "Grafito",
@@ -85,7 +85,13 @@
       "ink": "#111111",
       "ink2": "#5B5B5B",
       "acc": "#111111",
-      "acc2": "#F2C319"
+      "acc2": "#F2C319",
+      "acc3": "#D4321F"
     }
-  }
+  },
+  "extras": [
+    "acc3"
+  ],
+  "render": "bau.jsx",
+  "css": "bau.css"
 }

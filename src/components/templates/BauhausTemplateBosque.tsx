@@ -8,18 +8,21 @@
  * Variante: Bosque.
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
- * EditorialBlancNoirTemplate.tsx — no editar a mano: la sub-colección se
- * arregla en Editorial Blanc & Noir y se vuelve a derivar; lo propio de
- * esta familia está en scripts/familias/tipografica/bau.json.
+ * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/bau.jsx, los
+ * estilos en scripts/css/tipografica/bau.css y las caras y la paleta en
+ * scripts/familias/tipografica/bau.json.
  *
- * La escuela: Jost 500 en cajas, Work Sans para el texto y tres colores
- * primarios que se usan en bloques enteros, nunca en un adorno. Círculos,
- * cuadrados y triángulos como única decoración.
+ * La escuela: Jost geométrica en mayúsculas, Work Sans para el texto, tres
+ * primarios más el negro y formas hechas sólo con CSS (círculo, semicírculo,
+ * cuarto, banda). La tapa es una composición de cinco formas con parallax;
+ * la retícula con junta negra de 3 px arma el countdown, el álbum y los
+ * formularios. Nunca un degradé.
  *
- * Sin imágenes propias: son tres fuentes y CSS.
+ * Sin imágenes propias: son fuentes y CSS.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Jost, Work_Sans } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -31,19 +34,19 @@ import { BurbujaPase } from "@/components/templates/BurbujaPase";
 import { QrDeIngreso } from "@/components/invitation/QrDeIngreso";
 import { PostEventoStorytelling, useEstadoDelEvento } from "@/components/invitation/PostEventoStorytelling";
 import { useCountdown, pad } from "@/components/invitation/v2/useCountdown";
-import { useTextos, useFormatoDeMoneda, tituloEnDosLineas } from "@/components/i18n/ProveedorIdioma";
+import { useTextos, useFormatoDeMoneda } from "@/components/i18n/ProveedorIdioma";
 import { toEmbedMapUrl } from "@/lib/google-maps";
 import { esVistaMiniatura } from "@/lib/miniatura";
 
 const bauSerif = Jost({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600", "700"],
   display: "swap",
   variable: "--bau-serif",
 });
 const bauSans = Work_Sans({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   display: "swap",
   variable: "--bau-sans",
 });
@@ -69,6 +72,7 @@ const PALETA = {
   hill3: "#111111",
   night: "#111111",
   nightInk: "#F0EEE4",
+  acc3: "#1E3FBF",
 };
 
 /**
@@ -305,7 +309,7 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
     // Cada renglón del nombre sube desde su propia máscara, uno atrás de
     // otro. Es el gesto de una tapa armándose, no el de un cartel que se
     // endereza.
-    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("span > span")) : [];
+    const renglones = cartel ? Array.from(cartel.querySelectorAll<HTMLElement>("[data-pieza]")) : [];
     renglones.forEach((linea, i) => {
       linea.style.transition = "none";
       linea.style.transform = "translate3d(0,110%,0)";
@@ -538,6 +542,16 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
           const activo = Math.min(n - 1, Math.round(suave * (n - 1)));
           pan.querySelectorAll<HTMLElement>("[data-dot]").forEach((punto, i) => {
             punto.style.background = i === activo ? PALETA.acc : "rgba(43,42,51,.18)";
+            punto.dataset.activo = i === activo ? "1" : "";
+          });
+          // El baño de color de las fotos: opaco en el centro de la pantalla,
+          // transparente a más de un 40 % del ancho.
+          tira.querySelectorAll<HTMLElement>("[data-sheet]").forEach((hoja) => {
+            const bano = hoja.querySelector<HTMLElement>("[data-colorwash]");
+            if (!bano) return;
+            const rh = hoja.getBoundingClientRect();
+            const dx = Math.abs((rh.left + rh.width / 2) / vw - 0.5);
+            bano.style.opacity = String(Math.max(0, Math.min(1, 1 - (dx - 0.1) / 0.3)));
           });
         });
 
@@ -706,6 +720,7 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-acc3": PALETA.acc3,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -735,6 +750,24 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre va en bloques sobre fondo crema, uno por renglón; el más largo
+  // manda el cuerpo (Jost es geométrica y no se parte).
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(5, ...renglones.map((n) => n.length));
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // La frase: el medio en negro sobre amarillo (invertido) y el cierre sobre
+  // un bloque crema.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.7)) return "bau-bloque";
+    if (i >= Math.floor(n * 0.25) && i < desdeAcento) return "bau-invertido";
+    return undefined;
+  };
+
+  const kickerDelEvento = tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const mesCorto = mesLargo.slice(0, 3);
+
   return (
     <div
       ref={raizRef}
@@ -746,21 +779,21 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
 
       <div ref={scrollerRef} className="bau-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
+            Inversión en negro: un círculo azul, un semicírculo amarillo, la
+            fecha en tres renglones y la foto con la esquina redonda. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="bau-section bau-std">
-          <div className="bau-trama bau-trama--media" aria-hidden="true" />
+          <span className="bau-forma bau-std-circulo" aria-hidden="true" />
+          <span className="bau-forma bau-std-medio" aria-hidden="true" />
+          <div className="bau-folio">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="bau-spread">
             <div className="bau-pagina">
-              <div className="bau-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
               <div className="bau-fecha">
-                <span data-xin="1" data-dist="-160" className="bau-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="bau-fecha-linea bau-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="bau-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="bau-fecha-linea bau-fecha-linea--dia">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="bau-fecha-linea bau-fecha-linea--mes">{mesCorto}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="bau-fecha-linea bau-fecha-linea--anio">{anio}</span>
               </div>
               <div data-xin="1" data-delay="360" className="bau-fecha-pie">
                 <span>{diaSemana} · {hora} H</span>
@@ -768,10 +801,10 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="bau-link"
+                  className="bau-chip bau-chip--claro"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} →
                 </AddToCalendarLink>
               </div>
             </div>
@@ -780,47 +813,51 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="bau-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only bau-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="17,17,17" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only bau-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="17,17,17" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --bau-punto. */}
                 <span className="bau-foto-revelado" aria-hidden="true" />
-                <span className="bau-foto-anio">{anio}</span>
-                <span className="bau-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="bau-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="bau-foto-cuadrado" aria-hidden="true" />
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="bau-section bau-countdown">
+            La retícula: cuatro módulos de color con una junta negra de 3 px,
+            cada uno con una forma asomando, entre dos marquesinas. */}
+        <section data-tone="light" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="bau-section bau-countdown">
           <div className="bau-folio">
             <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
-          <div className="bau-marquesina" aria-hidden="true">
+          <div className="bau-marquesina bau-marquesina--negra" aria-hidden="true">
             <div className="bau-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.cuentaRegresiva.dias")} ● {tx("invitacion.cuentaRegresiva.horas")} ■ {tx("invitacion.cuentaRegresiva.minutos")} ▲ {tx("invitacion.cuentaRegresiva.segundos")} ● {diaSemana.toLowerCase()} {diaNum} {tx("invitacion.evento.de")} {mesLargo} ■&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaBauhaus targetDate={fechaHora} />
-          <div className="bau-marquesina bau-marquesina--contraria" aria-hidden="true">
+          <div className="bau-spread">
+            <div className="bau-pagina bau-pagina--entera">
+              <CuentaBauhaus targetDate={fechaHora} />
+            </div>
+          </div>
+          <div className="bau-marquesina bau-marquesina--filete bau-marquesina--contraria" aria-hidden="true">
             <div className="bau-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -828,10 +865,12 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            Pliego amarillo: un cuarto rojo arriba a la derecha, el disco azul
+            que pendula abajo y la frase con palabras en bloque. */}
         {hayFrase && (
-          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="bau-section bau-frase-seccion">
+          <section data-tone="light" data-screen-label={tx("invitacion.frase.etiqueta")} className="bau-section bau-frase-seccion">
+            <span className="bau-forma bau-frase-cuarto" aria-hidden="true" />
+            <span className="bau-forma bau-frase-pendulo" aria-hidden="true" />
             <div className="bau-folio">
               <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
@@ -842,24 +881,26 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                   // El espacio va fuera del span: el motor pone cada palabra
                   // en inline-block y un espacio adentro se colapsa a cero.
                   <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "bau-acento" : undefined}>{p}</span>{" "}
+                    <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
                   </span>
                 ))}
               </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="bau-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div data-xin="1" data-delay="900" data-dist="60" className="bau-firma">
+                <span className="bau-forma bau-forma--circulo bau-firma-punto" aria-hidden="true" />
+                <span>{tx("invitacion.frase.conAmor")} · {titulo}{ciudad ? `, ${ciudad}.` : "."}</span>
               </div>
             </div>
             <div className="bau-folio bau-folio--pie">
               <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+              <span className="bau-barra" aria-hidden="true" />
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Un módulo por lugar, cada uno con su color de fondo y una forma
+            grande en la esquina: crema y cuarto amarillo, azul y círculo
+            rojo, amarillo y semicírculo negro. */}
         <div
           id="details"
           data-pan="1"
@@ -870,64 +911,68 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         >
           <div className="bau-pan-fijo">
             <div data-strip="1" className="bau-tira">
-              <div data-tone={TONO} className="bau-panel">
+              <div data-tone="light" className="bau-panel bau-panel--crema">
+                <span className="bau-forma bau-panel-forma" aria-hidden="true" />
                 <div className="bau-folio">
                   <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="bau-spread">
-                  <h2 className="bau-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="bau-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="bau-lineas">
+                  <div className="bau-pagina">
+                    <span className="bau-panel-sub">Módulo {deLugar("recepcion").split(" ")[0]}</span>
+                    <h2 className="bau-panel-titulo">{lugarNombre || ciudad}</h2>
+                  </div>
+                  <div className="bau-tarjeta-lugar">
                     <div className="bau-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
                     {direccion && <div className="bau-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="bau-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bau-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="bau-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}<span>→</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="bau-folio bau-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="bau-panel">
+                <div id="ceremonia" data-tone="dark" className="bau-panel bau-panel--azul">
+                  <span className="bau-forma bau-panel-forma" aria-hidden="true" />
                   <div className="bau-folio">
                     <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="bau-spread">
-                    <h2 className="bau-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="bau-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="bau-lineas">
+                    <div className="bau-pagina">
+                      <span className="bau-panel-sub">Módulo {deLugar("ceremonia").split(" ")[0]}</span>
+                      <h2 className="bau-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="bau-tarjeta-lugar bau-tarjeta-lugar--negra">
                       {ceremoniaHora && <div className="bau-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="bau-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="bau-folio bau-folio--pie">
                     <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="bau-panel">
+                <div id="location" data-tone="light" className="bau-panel bau-panel--crema2">
+                  <span className="bau-forma bau-panel-forma" aria-hidden="true" />
                   <div className="bau-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="bau-spread">
-                    <h2 className="bau-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="bau-lineas">
+                    <div className="bau-pagina">
+                      <span className="bau-panel-sub">Módulo {deLugar("llegar").split(" ")[0]}</span>
+                      <h2 className="bau-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="bau-tarjeta-lugar">
                       {embedMapUrl && (
                         <div className="bau-mapa">
                           <iframe
@@ -942,28 +987,29 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="bau-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="bau-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas").toUpperCase()}<span>→</span>
                       </a>
                     </div>
                   </div>
                   <div className="bau-folio bau-folio--pie">
                     <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="bau-panel bau-panel--acento">
+                <div id="schedule" data-tone="light" className="bau-panel bau-panel--amarillo">
+                  <span className="bau-forma bau-panel-forma" aria-hidden="true" />
                   <div className="bau-folio">
                     <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="bau-spread">
-                    <h2 className="bau-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="bau-acento bau-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="bau-lineas">
+                    <div className="bau-pagina">
+                      <span className="bau-panel-sub">Módulo {deLugar("cronograma").split(" ")[0]}</span>
+                      <h2 className="bau-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="bau-tarjeta-lugar">
                       {cronograma.map((item, i) => (
                         <div key={i} className="bau-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -980,10 +1026,11 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            El formulario en retícula: un anillo azul detrás, la tarjeta
+            blanca con borde de 3 px y el sello "SÍ" al confirmar. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="bau-section bau-checkin">
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="bau-section bau-checkin">
+            <span className="bau-forma bau-checkin-anillo" aria-hidden="true" />
             <div className="bau-folio">
               <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
@@ -991,11 +1038,10 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
             <div className="bau-spread">
               <div className="bau-pagina">
                 <h2 data-xin="1" data-dist="-80" className="bau-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="bau-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="bau-rojo">{tx("invitacion.rsvp.confirmaLinea2")}</span>
                 </h2>
               </div>
-              <div className="bau-cupon">
-                <span className="bau-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="bau-cupon">
                 <CheckinBauhaus
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1029,8 +1075,8 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            La retícula de fotos: junta negra de 3 px y una esquina redonda
+            distinta en cada módulo. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1040,24 +1086,21 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
             className="bau-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="bau-pan-fijo">
+            <div className="bau-pan-fijo bau-pan-fijo--album">
               <div data-strip="1" className="bau-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="bau-panel bau-panel--album">
+                  <div key={iHoja} data-tone="light" className={`bau-panel bau-panel--album${iHoja % 2 === 1 ? " bau-panel--album-b" : ""}`}>
                     <div className="bau-folio">
                       <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="bau-h2 bau-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="bau-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="bau-contactos" data-cantidad={hoja.length}>
+                    <h2 className="bau-h2 bau-h2--album">{tx("invitacion.album.titulo")} <span className="bau-rojo">{tx("invitacion.album.deFotos")}</span></h2>
+                    <div className="bau-reticula" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="bau-contacto"
+                          data-sheet="1"
+                          className="bau-modulo-foto"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1065,15 +1108,15 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="bau-contacto-img" />
-                          <span className="bau-contacto-tinta" aria-hidden="true" />
-                          <span className="bau-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="bau-modulo-foto-img" />
+                          <span data-colorwash="1" className={`bau-bano bau-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                          <span className="bau-modulo-foto-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
                     <div className="bau-folio bau-folio--pie">
                       <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza").toUpperCase()} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1084,20 +1127,20 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            Pliego azul con un círculo amarillo, el ecualizador de barras
+            anchas y la lista en módulos negros con viñeta geométrica. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="bau-section bau-musica">
+            <span className="bau-forma bau-musica-circulo" aria-hidden="true" />
             <div className="bau-folio">
               <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="bau-spread">
               <div className="bau-pagina">
-                <h2 data-xin="1" data-dist="-80" className="bau-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "bau-acento")}
-                </h2>
+                <h2 data-xin="1" data-dist="-80" className="bau-h2">{tx("invitacion.sabor.preguntaCancionFaltar")}</h2>
                 <div data-xin="1" data-delay="120" className="bau-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4].map((i) => <span key={i} style={{ animationDelay: `${i * 0.18}s` }} />)}
                 </div>
               </div>
               <div className="bau-pagina">
@@ -1112,9 +1155,11 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Pliego crema con una media píldora roja, y las cuentas en
+            módulos blancos con borde de 3 px. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="bau-section bau-regalos">
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="bau-section bau-regalos">
+            <span className="bau-forma bau-regalos-pildora" aria-hidden="true" />
             <div className="bau-folio">
               <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
@@ -1122,13 +1167,13 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
             <div className="bau-spread">
               <div className="bau-pagina">
                 <h2 data-xin="1" data-dist="-80" className="bau-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="bau-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="bau-azul">{tx("invitacion.regalos.siQueresLinea2")}</span>
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="bau-parrafo">{String(invitation.regaloMensaje)}</p>
                 )}
               </div>
-              <div className="bau-pagina">
+              <div className="bau-pagina bau-pagina--junta">
                 {regaloHabilitado && (
                   <TarjetaBancaria
                     titulo={String(invitation.regaloTitulo || tx("invitacion.regalos.tituloEvento"))}
@@ -1136,7 +1181,7 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1147,7 +1192,8 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1156,40 +1202,42 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            Pliego rojo con un disco negro abajo; las opciones son módulos
+            crema con su forma de viñeta. */}
         {quizHabilitado && (
           <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="bau-section bau-quiz">
+            <span className="bau-forma bau-quiz-disco" aria-hidden="true" />
             <div className="bau-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — {triviaTitulo.toUpperCase()}</span>
               <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
             </div>
             <div className="bau-spread">
-              <div className="bau-pagina">
-                <h2 data-xin="1" data-dist="-80" className="bau-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="bau-pagina">
-                <TriviaBauhaus
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaBauhaus
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            Pliego negro con un cuarto amarillo; el QR sobre un cuadrado
+            crema con la esquina redonda, el pase en amarillo, la mesa en
+            rojo y las tres formas como firma. */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="bau-section bau-pase">
+          <span className="bau-forma bau-pase-cuarto" aria-hidden="true" />
           <div className="bau-folio">
             <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="bau-spread">
             <div data-xin="1" data-dist="-60" className="bau-pagina bau-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="bau-qr">
+                <QrDeIngreso guest={guest as never} />
+                <span className="bau-qr-etq">{tx("invitacion.pase.tuPase").toUpperCase()}</span>
+              </div>
             </div>
             <div className="bau-pagina">
               <div data-xin="1" data-delay="100" className="bau-pase-cabeza">
@@ -1197,97 +1245,108 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
                   <span className="bau-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="bau-pase-mesa">
+                    <span className="bau-folio-etq">{tx("invitacion.pase.tuMesa").toUpperCase()}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="bau-lineas">
-                <div className="bau-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="bau-lineas-pase">
+                <div className="bau-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="bau-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="bau-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="bau-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="bau-linea"><span>Sector</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="bau-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="bau-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} H</span></div>
               </div>
               <div className="bau-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="bau-folio bau-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="bau-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="bau-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="bau-pase-pie">
+            <div className="bau-despedida">
+              <span className="bau-forma bau-forma--circulo bau-despedida-forma bau-despedida-forma--azul" aria-hidden="true" />
+              <span className="bau-forma bau-forma--cuadrado bau-despedida-forma bau-despedida-forma--rojo" aria-hidden="true" />
+              <span className="bau-triangulo" aria-hidden="true" />
+              <span className="bau-despedida-texto">{tx("invitacion.pase.losEsperamos")} · {iniciales(nombre1, nombre2)}</span>
+            </div>
+            <div className="bau-folio bau-folio--colofon">
+              <span className="bau-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} /></span>
+              <span className="bau-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="bau-riel">
-        <span ref={rielTopRef} className="bau-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="bau-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="bau-riel-linea">
           <span ref={rielBarraRef} className="bau-riel-barra" />
         </div>
         <span ref={rielEtiquetaRef} className="bau-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          La composición: cinco formas de color sobre una grilla de 4×6,
+          cada una a su profundidad, y el nombre en bloques crema encima.
+          Es la bienvenida: dice de quién es la fiesta, cuándo, dónde y para
+          cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="bau-portada">
         <div ref={escenaPortadaRef} className="bau-portada-hoja">
-          <div className="bau-trama bau-trama--tapa" aria-hidden="true" />
+          <div className="bau-composicion" aria-hidden="true">
+            <span data-drift="14" data-depth="0.8" className="bau-forma bau-comp-1" />
+            <span data-drift="-10" data-depth="-0.6" className="bau-forma bau-comp-2" />
+            <span data-drift="20" data-depth="1.1" className="bau-forma bau-comp-3" />
+            <span data-drift="-6" data-depth="-0.3" className="bau-forma bau-comp-4" />
+            <span data-drift="8" data-depth="0.5" className="bau-forma bau-comp-5" />
+          </div>
 
-          <div data-cl="1" className="bau-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
+          <div data-cl="1" className="bau-folio bau-folio--tapa">
+            <span>{kickerDelEvento}</span>
             <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="bau-tapa-centro">
-            <div className="bau-tapa-fila">
-              <span className="bau-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="bau-tapa-nombres">
+            <span className="bau-chip bau-chip--fecha">{diaSemana} {diaNum} · {String(fechaEvento.getMonth() + 1).padStart(2, "0")} · {anio}</span>
+            <h1 ref={cartelRef} className="bau-tapa-nombres" style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
               {saludaAlInvitado ? (
-                <span className="bau-tapa-linea"><span>{nombreInvitado}</span></span>
+                <span className="bau-tapa-linea"><span data-pieza="1" className="bau-tapa-bloque"><Letras texto={nombreInvitado} desde={0} /></span></span>
               ) : (
                 <>
-                  <span className="bau-tapa-linea"><span>{nombre1}</span></span>
+                  <span className="bau-tapa-linea"><span data-pieza="1" className="bau-tapa-bloque"><Letras texto={nombre1} desde={0} /></span></span>
                   {nombre2 && (
-                    <span className="bau-tapa-linea bau-tapa-linea--sangra">
-                      <span><span className="bau-acento">&amp;</span>{nombre2}</span>
+                    <span className="bau-tapa-linea">
+                      <span data-pieza="1" className="bau-tapa-bloque bau-tapa-bloque--punto"><span className="bau-forma bau-forma--circulo bau-tapa-punto" aria-hidden="true" /><Letras texto={nombre2} desde={nombre1.replace(/\s/g, "").length} /></span>
                     </span>
                   )}
                 </>
               )}
             </h1>
-            <div className="bau-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="bau-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <div className="bau-chip bau-chip--datos">
+              <span>{lugarNombre || "—"}<br />{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+              <span className="bau-chip-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br />{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</>
+                  : <>{hora} h<br />{fechaPuntos}</>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="bau-tapa-pie">
-            <span className="bau-regla" aria-hidden="true" />
             <p className="bau-tapa-mensaje">
               {saludaAlInvitado
                 ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
                 : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
             </p>
             <button type="button" onClick={abrir} className="bau-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              <span>{tx("invitacion.portada.abrirInvitacion").toUpperCase()}</span><span className="bau-forma bau-forma--circulo bau-tapa-btn-punto" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -1312,7 +1371,7 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
 
       {musicaHabilitada && audioDeFondo}
       {montado && isPersonalized && guest && portadaAbierta && (
-        <BurbujaPase acento={PALETA.acc} guest={guest} />
+        <BurbujaPase acento={PALETA.acc3} guest={guest} />
       )}
       {montado && musicaHabilitada && portadaAbierta && createPortal(
         <MusicToggleButton isPlaying={musicaSonando} onToggle={alternarMusica} className="fixed top-3 left-3 z-[99998]" />,
@@ -1322,30 +1381,24 @@ export function BauhausTemplateBosque({ invitation, guest, isPersonalized = fals
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El nombre letra por letra: cada tanto una gira 90° sobre su eje vertical
+ * y vuelve, como una placa. El CSS escalona el turno de cada letra.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
-  const id = useId().replace(/:/g, "");
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
   return (
-    <div className="bau-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="bau-sello-amp">&amp;</span>}
-    </div>
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="bau-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
   );
 }
 
@@ -1400,7 +1453,7 @@ function CuentaBauhaus({ targetDate }: { targetDate: Date }) {
     <div className="bau-cuenta">
       {celdas.map((c, i) => (
         <div key={c.l} data-xin="1" data-delay={i * 100} data-dist={i % 2 === 0 ? -80 : 80} className={`bau-cuenta-caja bau-cuenta-caja--${i + 1}`}>
-          <span className="bau-cuenta-num">{c.v}</span>
+          <span className="bau-cuenta-num"><span key={c.v}>{c.v}</span></span>
           <span className="bau-cuenta-etq">{c.l.toUpperCase()}</span>
         </div>
       ))}
@@ -1893,13 +1946,14 @@ function TriviaBauhaus({ preguntas, invitationId, guestToken, guestName }: { pre
 // leen la Bienvenida y el Post-evento compartidos (esperan `bau-section` y
 // `bau-kicker`).
 const CSS_BAU = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Bauhaus ──────────────────────────────────────────────────────────
+     La escuela: Jost geométrica en mayúsculas, Work Sans para el texto,
+     tres primarios más el negro, y formas hechas sólo con CSS -- círculo,
+     semicírculo, cuarto, banda. Nunca un degradé. La junta negra de 3 px
+     entre módulos es la retícula. */
   .bau-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--bau-sans), 'Work Sans', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--bau-sans), 'Work Sans', sans-serif;
+    --bau-acc3: ${PALETA.acc3}; }
   .bau-raiz a { color: inherit; text-decoration: none; }
   .bau-raiz button { font: inherit; }
 
@@ -1907,300 +1961,397 @@ const CSS_BAU = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .bau-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .bau-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .bau-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .bau-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
+  /* Las formas: un span con fondo y radio. */
+  .bau-forma { position: absolute; pointer-events: none; display: block; }
+  .bau-forma--circulo { position: static; border-radius: 50%; }
+  .bau-forma--cuadrado { position: static; border-radius: 0; }
+  .bau-forma--medio { position: static; border-radius: 999px 999px 0 0; }
 
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .bau-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
+  .bau-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 24px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
   .bau-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: Jost 600 en versalitas con tracking. */
   .bau-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .bau-folio--pie { align-items: center; margin-top: auto; }
-  .bau-folio-etq { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+    font-weight: 600; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .bau-folio--pie { align-items: center; margin-top: auto; letter-spacing: .22em; }
+  .bau-folio--colofon { align-items: center; opacity: .8; border-top: 1px solid color-mix(in srgb, currentColor 35%, transparent); padding-top: 12px; }
+  .bau-folio-etq { font-weight: 600; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; opacity: .7; display: block; }
+  .bau-barra { width: 40%; height: 3px; background: currentColor; }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .bau-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .bau-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .bau-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .bau-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .bau-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 20px; }
+  .bau-pagina { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  @media (min-width: 1024px) {
+    .bau-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .bau-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .bau-spread > *:first-child { justify-self: end; }
+    .bau-spread > *:last-child { justify-self: start; }
+    .bau-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .bau-h2, .bau-panel-titulo, .bau-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--bau-serif), 'Jost', sans-serif;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .bau-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .bau-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .bau-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .bau-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .bau-acento { font-style: italic; color: var(--pp-acc); }
-  .bau-acento--tinta { color: var(--pp-ink); }
-  .bau-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .bau-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .bau-regla { display: block; height: 2px; background: currentColor; }
+  .bau-h2, .bau-panel-titulo, .bau-frase, .bau-fecha-linea, .bau-tapa-nombres {
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; text-transform: uppercase; }
+  .bau-h2, .bau-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .88; letter-spacing: -.03em; font-size: clamp(52px, 15vw, 130px); }
+  .bau-h2--album { font-size: clamp(44px, 12vw, 100px); }
+  .bau-panel-sub { font-weight: 600; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+  .bau-rojo { color: var(--pp-acc); }
+  .bau-azul { color: var(--bau-acc3); }
+  .bau-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 40ch; }
+  /* El chip: un bloque de fondo detrás de un texto, ancho al contenido. */
+  .bau-chip { display: inline-block; width: max-content; max-width: 100%; box-sizing: border-box; background: var(--pp-bg); color: var(--pp-ink); padding: 8px 10px; }
+  .bau-chip--claro { font-weight: 600; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; padding: 12px 18px; }
+  .bau-cta { margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px;
+    background: var(--pp-ink); color: #FFFFFF; font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .bau-std { justify-content: center; }
-  .bau-fecha { display: flex; flex-direction: column; font-family: var(--bau-serif), 'Jost', sans-serif;
-    line-height: .82; letter-spacing: -.04em; }
-  .bau-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .bau-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .bau-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .bau-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
+  /* ── 01 Guardá la fecha: inversión en negro ────────────────────────── */
+  .bau-std-circulo { right: -10vw; top: 8vh; width: 60vw; height: 60vw; max-width: 520px; max-height: 520px; border-radius: 50%; background: var(--bau-acc3); }
+  .bau-std-medio { left: 0; bottom: 0; width: 34vw; height: 17vw; max-width: 300px; max-height: 150px; border-radius: 300px 300px 0 0; background: var(--pp-acc2); }
+  .bau-fecha { display: flex; flex-direction: column; line-height: .86; letter-spacing: -.04em; }
+  .bau-fecha-linea { font-size: clamp(64px, 20vw, 170px); }
+  .bau-fecha-linea--dia { font-size: clamp(96px, 32vw, 240px); }
+  .bau-fecha-linea--mes { text-align: right; color: var(--pp-acc2); }
+  .bau-fecha-linea--anio { color: var(--pp-acc); }
+  .bau-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    font-weight: 600; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
+  /* La foto: cuadrada, con la esquina de arriba a la izquierda redonda y
+     un cuadrado rojo abajo a la derecha. */
+  .bau-foto { position: relative; width: 100%; aspect-ratio: 1; box-sizing: border-box; overflow: hidden; border-radius: 50% 0 0 0;
+    background: repeating-linear-gradient(135deg, #3A3733 0 8px, #2C2A27 8px 16px); }
   .bau-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
   .bau-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
     background-image: radial-gradient(var(--pp-ink) calc(var(--bau-punto, 7.2) * 1px), transparent calc(var(--bau-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .bau-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--bau-serif), 'Jost', sans-serif;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .bau-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--bau-sans), 'Work Sans', sans-serif;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .bau-foto-etq { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-weight: 600; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--pp-bg); }
+  .bau-foto-cuadrado { position: absolute; right: 0; bottom: 0; z-index: 2; width: 26%; aspect-ratio: 1; background: var(--pp-acc); }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .bau-countdown { justify-content: space-between; }
-  .bau-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .bau-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  /* ── 02 Falta poco: la retícula ────────────────────────────────────── */
+  .bau-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .bau-countdown > .bau-folio, .bau-countdown > .bau-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .bau-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap;
+    font-weight: 600; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+  .bau-marquesina--negra { background: var(--pp-ink); color: var(--pp-bg); font-family: var(--bau-serif), 'Jost', sans-serif; font-size: 22px; letter-spacing: .12em; }
+  .bau-marquesina--filete { border-top: 3px solid var(--pp-ink); border-bottom: 3px solid var(--pp-ink); }
+  .bau-marquesina-tira { display: flex; width: max-content; animation: bauCorre 16s linear infinite; }
+  .bau-marquesina-tira > span { padding-right: 36px; }
   .bau-marquesina--contraria .bau-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  @keyframes bauCorre { to { transform: translate3d(-50%, 0, 0); } }
+  /* Cuatro módulos con junta negra: crema, amarillo, azul, rojo; en cada
+     uno asoma un círculo de otro color. */
+  .bau-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; background: var(--pp-ink); padding: 3px; }
+  .bau-cuenta-caja { position: relative; overflow: hidden; min-height: 150px; padding: 18px 14px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .bau-cuenta-caja::after { content: ""; position: absolute; right: -10%; bottom: -30%; width: 60%; aspect-ratio: 1; border-radius: 50%; opacity: .9; }
+  .bau-cuenta-caja:nth-child(1) { background: var(--pp-bg); color: var(--pp-ink); }
+  .bau-cuenta-caja:nth-child(1)::after { background: var(--pp-acc); }
+  .bau-cuenta-caja:nth-child(2) { background: var(--pp-acc2); color: var(--pp-ink); }
+  .bau-cuenta-caja:nth-child(2)::after { background: var(--bau-acc3); }
+  .bau-cuenta-caja:nth-child(3) { background: var(--bau-acc3); color: var(--pp-bg); }
+  .bau-cuenta-caja:nth-child(3)::after { background: var(--pp-acc2); }
+  .bau-cuenta-caja:nth-child(4) { background: var(--pp-acc); color: var(--pp-bg); }
+  .bau-cuenta-caja:nth-child(4)::after { background: var(--pp-ink); }
+  .bau-cuenta-num { position: relative; z-index: 1; font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: clamp(64px, 20vw, 150px);
+    line-height: .86; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+  .bau-cuenta-num > span { display: inline-block; animation: bauCifra 300ms cubic-bezier(.16,1,.3,1); }
+  @keyframes bauCifra { from { transform: translateY(18%); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+  .bau-cuenta-etq { position: relative; z-index: 1; font-weight: 600; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .bau-tarjeta--hoy { background: var(--pp-acc2); color: var(--pp-ink); border: 3px solid var(--pp-ink); padding: 18px; display: flex; flex-direction: column; gap: 8px; }
+  .bau-tarjeta--hoy .bau-tarjeta-kicker { font-weight: 600; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .bau-tarjeta--hoy .bau-tarjeta-titulo { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: clamp(36px, 10vw, 84px); line-height: .9; text-transform: uppercase; letter-spacing: -.03em; }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .bau-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .bau-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .bau-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .bau-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .bau-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .bau-cuenta-num, .bau-cuenta-dias, .bau-cifra { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .bau-cuenta-caja:nth-child(4) .bau-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .bau-cuenta-etq { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .bau-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: pliego amarillo ─────────────────────────────── */
+  .bau-frase-seccion { background: var(--pp-acc2) !important; color: var(--pp-ink); justify-content: space-between; gap: 30px; }
+  .bau-frase-cuarto { right: 0; top: 0; width: 40vw; height: 40vw; max-width: 380px; max-height: 380px; background: var(--pp-acc); border-radius: 0 0 0 100%; }
+  /* El disco azul pendula colgado de su borde de arriba. */
+  .bau-frase-pendulo { left: 20px; bottom: 90px; width: 22vw; height: 22vw; max-width: 200px; max-height: 200px; border-radius: 50%; background: var(--bau-acc3);
+    transform-origin: 50% 0; animation: bauPendulo 8s ease-in-out infinite; }
+  @keyframes bauPendulo { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } }
+  .bau-frase { margin: 0; font-weight: 600; font-size: clamp(36px, 10vw, 84px); line-height: 1; letter-spacing: -.02em; max-width: 15ch; text-transform: none; }
+  .bau-invertido { background: var(--pp-ink); color: var(--pp-acc2); padding: 0 .12em; }
+  .bau-bloque { background: var(--pp-bg); padding: 0 .12em; }
+  .bau-firma { align-self: flex-end; display: flex; align-items: center; gap: 12px; background: var(--pp-ink); color: var(--pp-bg); padding: 12px 16px; max-width: 320px;
+    font-weight: 500; font-size: 14px; line-height: 1.4; }
+  .bau-firma-punto { width: 22px; height: 22px; background: var(--pp-acc); flex: 0 0 auto; }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .bau-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .bau-frase-seccion .bau-acento { color: var(--pp-bg); font-style: italic; }
-  .bau-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Paneles: los módulos ───────────────────────────────────────── */
   .bau-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
   .bau-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .bau-pan-fijo--album { background: #F7F5F0; }
   .bau-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .bau-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .bau-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .bau-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .bau-panel--acento .bau-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .bau-panel-forma { right: 0; top: 0; width: 50vw; height: 50vw; max-width: 460px; max-height: 460px; }
+  .bau-panel--crema .bau-panel-forma { background: var(--pp-acc2); border-radius: 0 0 0 100%; }
+  .bau-panel--azul { background: var(--bau-acc3); color: var(--pp-bg); }
+  .bau-panel--azul .bau-panel-forma { background: var(--pp-acc); border-radius: 50%; }
+  .bau-panel--crema2 { background: var(--pp-bg2); }
+  .bau-panel--crema2 .bau-panel-forma { background: var(--bau-acc3); border-radius: 50% 0 0 0; }
+  .bau-panel--amarillo { background: var(--pp-acc2); }
+  .bau-panel--amarillo .bau-panel-forma { background: var(--pp-ink); border-radius: 999px 999px 0 0; }
   .bau-pan[data-scroll="vertical"] { height: auto; }
   .bau-pan[data-scroll="vertical"] .bau-pan-fijo { position: static; height: auto; overflow: visible; }
   .bau-pan[data-scroll="vertical"] .bau-tira { position: static; display: block; width: 100%; transform: none !important; }
   .bau-pan[data-scroll="vertical"] .bau-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
-
-  .bau-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .bau-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .bau-linea > span:first-child { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .bau-linea > span:last-child { text-align: right; font-size: 15px; }
-  .bau-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--bau-sans), 'Work Sans', sans-serif;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .bau-cta-flecha { font-family: var(--bau-serif), 'Jost', sans-serif; font-style: italic; font-size: 22px; }
-  .bau-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
+  .bau-tarjeta-lugar { background: #FFFFFF; color: var(--pp-ink); padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .bau-tarjeta-lugar--negra { background: var(--pp-ink); color: var(--pp-bg); }
+  .bau-tarjeta-lugar--negra .bau-cta { background: var(--pp-bg); color: var(--pp-ink); }
+  .bau-linea { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 2px solid currentColor; font-size: 15px; line-height: 1.3; }
+  .bau-linea > span:first-child { font-weight: 600; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; flex: 0 0 auto; padding-top: 2px; }
+  .bau-linea > span:last-child { text-align: right; font-weight: 500; }
+  .bau-mapa { height: 190px; overflow: hidden; border: 3px solid var(--pp-ink); }
   .bau-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .bau-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
+  .bau-punto { width: 14px; height: 14px; background: currentColor !important; opacity: .25; transition: opacity 300ms ease; display: inline-block; }
+  .bau-punto:nth-child(3n+1) { border-radius: 50%; }
+  .bau-punto:nth-child(3n+3) { border-radius: 50% 50% 0 0; }
+  .bau-punto[data-activo="1"] { opacity: 1; }
 
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .bau-checkin { background: var(--pp-bg2); }
-  .bau-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .bau-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .bau-cupon .bau-talon-top { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .2em; }
-  .bau-cupon input, .bau-cupon .bau-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .bau-cupon .bau-contador button { border: 2px solid var(--pp-ink); }
-  .bau-sello, .bau-cupon .bau-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .bau-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .bau-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .bau-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .bau-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .bau-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .bau-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .bau-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--bau-sans), 'Work Sans', sans-serif;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .bau-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .bau-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .bau-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .bau-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .bau-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .bau-lista-tema { font-size: 15px; }
-  .bau-lista-quien { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .bau-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .bau-tarjeta + .bau-tarjeta { margin-top: 12px; }
-  .bau-tarjeta-kicker { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .bau-tarjeta-titulo { font-family: var(--bau-serif), 'Jost', sans-serif; font-size: 28px; line-height: 1; }
-  .bau-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .bau-tarjeta .bau-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .bau-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .bau-fila--ultima { border-bottom: none; }
-  .bau-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .bau-fila-etq { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .bau-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .bau-fila-valor { text-align: right; }
-  .bau-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .bau-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .bau-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .bau-quiz .bau-acento { color: var(--pp-ink); }
-  .bau-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .bau-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .bau-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .bau-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .bau-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .bau-pagina--qr { align-items: flex-start; }
-  .bau-pagina--qr .qr-ingreso, .bau-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .bau-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .bau-pase-numero { display: flex; flex-direction: column; }
-  .bau-pase-numero > span:last-child { font-family: var(--bau-serif), 'Jost', sans-serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .bau-info-extra { margin-top: 12px; }
-  .bau-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .bau-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--bau-sans), 'Work Sans', sans-serif !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .bau-raiz .ia-icon-box, .bau-raiz svg.lucide { display: none !important; }
-  .bau-replay { cursor: pointer; }
-  .bau-credito { display: flex; justify-content: center; opacity: .6; }
-  .bau-error { margin: 0; font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .bau-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .bau-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .bau-sello-circular text { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .bau-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--bau-serif), 'Jost', sans-serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .bau-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .bau-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .bau-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .bau-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .bau-tapa-fecha { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .bau-tapa-nombres { margin: 0; font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .bau-tapa-linea { overflow: hidden; display: block; }
-  .bau-tapa-linea > span { display: block; }
-  .bau-tapa-linea--sangra { padding-left: 14%; }
-  .bau-tapa-pase { text-align: right; }
-  .bau-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .bau-tapa-mensaje { margin: 0; font-family: var(--bau-serif), 'Jost', sans-serif; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .bau-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .bau-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .bau-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .bau-riel-top, .bau-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--bau-sans), 'Work Sans', sans-serif;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .bau-riel-top { color: var(--pp-ink2); }
-  .bau-riel-etiqueta { color: var(--pp-acc); }
-  .bau-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .bau-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .bau-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .bau-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .bau-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .bau-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
+  /* ── 05 Check-in: el formulario en retícula ────────────────────────── */
+  .bau-checkin-anillo { left: -10vw; top: 20vh; width: 44vw; height: 44vw; max-width: 380px; max-height: 380px; border-radius: 50%;
+    border: 3vw solid var(--bau-acc3); box-sizing: border-box; }
+  .bau-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); padding: 20px;
+    display: flex; flex-direction: column; gap: 14px; overflow: hidden; transition: border-color 400ms ease; }
+  .bau-cupon:has(.bau-filas) { border-color: var(--bau-acc3); }
+  .bau-cupon .bau-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .bau-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 600; font-size: 11px; letter-spacing: .22em;
+    text-transform: uppercase; border-bottom: 3px solid var(--pp-ink); padding-bottom: 12px; }
+  /* El estado lleva un cuadrado amarillo que, al confirmar, se vuelve un
+     círculo azul. */
+  .bau-talon-estado { display: flex; align-items: center; gap: 8px; transition: color 400ms ease; }
+  .bau-talon-estado::before { content: ""; width: 10px; height: 10px; background: var(--pp-acc2); transition: background 300ms ease, border-radius 300ms ease; }
+  .bau-cupon:has(.bau-filas) .bau-talon-estado::before { background: var(--bau-acc3); border-radius: 50%; }
   .bau-campo { display: flex; flex-direction: column; gap: 6px; }
-  .bau-etiqueta { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .bau-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .bau-input:focus { outline: none; border-color: var(--pp-acc); }
-  .bau-contador { display: flex; align-items: center; gap: 12px; }
-  .bau-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
+  .bau-etiqueta { font-weight: 600; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  .bau-input { min-height: 48px; border: 0; border-bottom: 3px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 15px; padding: 0; outline: none; }
+  .bau-contador { display: flex; align-items: center; border-bottom: 3px solid var(--pp-ink); min-height: 48px; }
+  .bau-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-size: 26px; line-height: 1; }
   .bau-contador button:disabled { opacity: .35; cursor: default; }
-  .bau-contador > span { font-family: var(--bau-serif), 'Jost', sans-serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .bau-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .bau-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .bau-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .bau-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .bau-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .bau-precio-total { font-family: var(--bau-serif), 'Jost', sans-serif; font-size: 28px; line-height: 1; }
-  .bau-precio-detalle { font-family: var(--bau-sans), 'Work Sans', sans-serif; font-size: 11px; letter-spacing: .1em; }
-  .bau-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--bau-sans), 'Work Sans', sans-serif;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .bau-talon-estado { transition: color 400ms ease; }
+  .bau-contador > span { flex: 1; text-align: center; font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: 28px; line-height: 1; }
   .bau-filas { display: flex; flex-direction: column; }
+  .bau-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 2px solid var(--pp-ink); font-size: 15px; }
+  .bau-fila--ultima { border-bottom: 0; }
+  .bau-fila-valor { text-align: right; font-weight: 500; }
+  .bau-precio { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .bau-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .bau-precio-total { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: 0; }
+  .bau-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .bau-btn-solido { min-height: 54px; border: 0; background: var(--pp-acc); color: #FFFFFF; cursor: pointer;
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; padding: 0 18px; transition: background 200ms ease; }
+  @media (hover: hover) { .bau-btn-solido:hover { background: var(--pp-ink); } }
+  .bau-btn-solido:disabled { opacity: .6; cursor: default; }
+  .bau-btn-fantasma { min-height: 48px; border: 3px solid var(--pp-ink); background: #FFFFFF; color: var(--pp-ink); cursor: pointer;
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; padding: 0 18px; }
+  .bau-error { margin: 0; font-weight: 600; font-size: 12px; color: var(--pp-acc); }
+  /* El sello "SÍ": disco amarillo con un círculo azul adentro. */
+  .bau-cupon .bau-sello { position: absolute; right: 12px; bottom: 78px; width: 130px; aspect-ratio: 1; border-radius: 50%; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    background: radial-gradient(circle, var(--bau-acc3) 0 26%, var(--pp-acc2) 26.5%);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 12px; box-sizing: border-box;
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 8px; letter-spacing: .18em; text-transform: uppercase; color: var(--pp-ink); }
+  .bau-cupon .bau-sello::before { content: "SÍ"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 20px; letter-spacing: 0; color: #FFFFFF; }
   .bau-petalos { display: none; }
 
-  /* Bauhaus: sin itálicas y sin curvas. El acento es un bloque detrás de la
-     palabra, no una inclinación. */
-  .bau-acento { font-style: normal !important; background: var(--pp-acc); color: var(--pp-bg); padding: 0 .1em; }
-  .bau-tapa-nombres, .bau-h2, .bau-panel-titulo, .bau-fecha-linea { text-transform: uppercase; letter-spacing: -.02em; }
-  .bau-trama { background-image: none; }
-  .bau-sello-circular svg { animation-duration: 40s; }
+  /* ── 06 Álbum: la retícula ─────────────────────────────────────────── */
+  .bau-panel--album { background: #F7F5F0; color: #111111; justify-content: flex-start; gap: 14px; }
+  .bau-panel--album-b { background: #EFEBE3; }
+  .bau-reticula { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 3px;
+    background: #111111; padding: 3px; max-width: 900px; box-sizing: border-box; }
+  .bau-modulo-foto { position: relative; overflow: hidden; min-height: 0; cursor: pointer;
+    background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .bau-modulo-foto-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bau-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .bau-bano--1 { background: color-mix(in srgb, var(--pp-acc) 55%, transparent); }
+  .bau-bano--2 { background: color-mix(in srgb, var(--bau-acc3) 50%, transparent); }
+  .bau-bano--3 { background: color-mix(in srgb, var(--pp-acc2) 60%, transparent); }
+  .bau-bano--4 { background: rgba(17,17,17,.4); }
+  .bau-bano--5 { background: color-mix(in srgb, var(--pp-acc) 40%, transparent); }
+  .bau-modulo-foto-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-weight: 600; font-size: 11px; letter-spacing: .14em; color: #111111; }
+  .bau-modulo-foto:nth-child(1) { border-radius: 0 50% 0 0; }
+  .bau-modulo-foto:nth-child(3) { border-radius: 0 0 0 50%; }
+  .bau-modulo-foto:nth-child(4) { border-radius: 50%; }
+  .bau-reticula[data-cantidad="5"] .bau-modulo-foto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .bau-reticula[data-cantidad="5"] .bau-modulo-foto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .bau-reticula[data-cantidad="5"] .bau-modulo-foto:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .bau-reticula[data-cantidad="5"] .bau-modulo-foto:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .bau-reticula[data-cantidad="5"] .bau-modulo-foto:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .bau-reticula[data-cantidad="4"] .bau-modulo-foto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .bau-reticula[data-cantidad="4"] .bau-modulo-foto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .bau-reticula[data-cantidad="4"] .bau-modulo-foto:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .bau-reticula[data-cantidad="4"] .bau-modulo-foto:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; border-radius: 0; }
+  .bau-reticula[data-cantidad="3"] .bau-modulo-foto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .bau-reticula[data-cantidad="3"] .bau-modulo-foto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .bau-reticula[data-cantidad="3"] .bau-modulo-foto:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .bau-reticula[data-cantidad="2"] .bau-modulo-foto:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .bau-reticula[data-cantidad="2"] .bau-modulo-foto:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .bau-reticula[data-cantidad="1"] .bau-modulo-foto:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: pliego azul ────────────────────────────────────────── */
+  .bau-musica { background: var(--bau-acc3) !important; color: var(--pp-bg); }
+  .bau-musica-circulo { right: -6vw; bottom: -6vw; width: 50vw; height: 50vw; max-width: 440px; max-height: 440px; border-radius: 50%; background: var(--pp-acc2); }
+  .bau-eq { display: flex; align-items: flex-end; gap: 6px; height: 44px; }
+  .bau-eq span { width: 14px; height: 100%; background: var(--pp-bg); transform-origin: bottom; animation: bauEq 1.1s ease-in-out infinite; }
+  .bau-eq span:nth-child(2) { background: var(--pp-acc2); border-radius: 7px 7px 0 0; }
+  .bau-eq span:nth-child(3) { background: var(--pp-acc); }
+  .bau-eq span:nth-child(4) { border-radius: 7px 7px 0 0; }
+  .bau-eq span:nth-child(5) { background: var(--pp-ink); }
+  @keyframes bauEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .bau-musica form.bau-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; background: var(--pp-bg); padding: 3px; transform: none !important; }
+  .bau-musica .bau-etiqueta { display: none; }
+  .bau-musica .bau-input { min-height: 48px; border: 0; background: var(--bau-acc3); color: var(--pp-bg); padding: 0 14px; min-width: 0; }
+  .bau-musica .bau-input::placeholder { color: color-mix(in srgb, var(--pp-bg) 70%, transparent); }
+  .bau-musica .bau-error { grid-column: 1 / -1; background: var(--pp-bg); padding: 4px 8px; }
+  .bau-musica .bau-btn-solido { grid-column: 1 / -1; min-height: 50px; background: var(--pp-bg); color: var(--pp-ink); font-size: 12px; }
+  @media (hover: hover) { .bau-musica .bau-btn-solido:hover { background: var(--pp-acc2); } }
+  .bau-lista { display: flex; flex-direction: column; gap: 3px; margin-top: 12px; }
+  .bau-lista-fila { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--pp-ink); color: var(--pp-bg); }
+  .bau-lista-fila::before { content: ""; width: 14px; height: 14px; flex: 0 0 auto; background: var(--pp-acc); border-radius: 50%; }
+  .bau-lista-fila:nth-child(3n+2)::before { background: var(--pp-acc2); border-radius: 0; }
+  .bau-lista-fila:nth-child(3n+3)::before { background: var(--bau-acc3); border-radius: 50% 50% 0 0; }
+  .bau-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .bau-lista-tema { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 17px; line-height: 1.1; }
+  .bau-lista-quien { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+
+  /* ── 08 Regalos: módulos blancos ───────────────────────────────────── */
+  .bau-regalos-pildora { right: 0; top: 30%; width: 24vw; height: 48vw; max-width: 200px; max-height: 400px; background: var(--pp-acc); border-radius: 200px 0 0 200px; }
+  .bau-pagina--junta { gap: 3px; }
+  .bau-tarjeta--banco { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .bau-tarjeta-kicker { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+  .bau-tarjeta-kicker::before { content: ""; width: 12px; height: 12px; background: var(--bau-acc3); border-radius: 50%; }
+  .bau-tarjeta--der .bau-tarjeta-kicker::before { background: var(--pp-acc); border-radius: 0; }
+  .bau-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; }
+  .bau-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .bau-fila-etq { font-weight: 600; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; }
+  .bau-fila-dato { font-weight: 500; font-size: 14px; letter-spacing: .06em; overflow-wrap: anywhere; }
+  .bau-fila--copiable:first-child { border-bottom: 2px solid var(--pp-ink); }
+  .bau-fila--copiable:first-child .bau-fila-dato { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: 22px; line-height: 1; letter-spacing: 0; }
+  .bau-tarjeta--banco .bau-fila--ultima { border-bottom: 0; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .bau-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 0; background: var(--pp-ink); color: #FFFFFF; cursor: pointer;
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; transition: background 200ms ease; }
+  @media (hover: hover) { .bau-btn-copiar:hover { background: var(--bau-acc3); } }
+  .bau-btn-copiar--hecho { background: var(--bau-acc3); }
+
+  /* ── 09 Trivia: pliego rojo ────────────────────────────────────────── */
+  .bau-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
+  .bau-quiz-disco { left: 50%; bottom: -20vw; width: 60vw; height: 60vw; max-width: 500px; max-height: 500px; margin-left: -30vw; border-radius: 50%; background: var(--pp-ink); }
+  .bau-quiz .bau-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .bau-quiz .bau-tarjeta-kicker { align-self: flex-start; background: var(--pp-bg); color: var(--pp-ink); padding: 8px 14px; }
+  .bau-quiz .bau-tarjeta-kicker::before { display: none; }
+  .bau-quiz .bau-tarjeta-pregunta, .bau-quiz .bau-tarjeta-titulo { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: clamp(40px, 11vw, 96px); line-height: .92; letter-spacing: -.03em; max-width: 14ch; }
+  .bau-quiz .bau-tarjeta-mensaje { margin: 0; font-size: 15px; opacity: .9; }
+  .bau-opciones { display: flex; flex-direction: column; gap: 3px; }
+  .bau-opcion { min-height: 54px; border: 0; background: var(--pp-bg); color: var(--pp-ink); cursor: pointer;
+    font-family: var(--bau-sans), 'Work Sans', sans-serif; font-weight: 500; font-size: 16px; text-align: left; padding: 0 18px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .bau-opcion::after { content: ""; width: 14px; height: 14px; flex: 0 0 auto; background: currentColor; border-radius: 50%; }
+  .bau-opcion:nth-child(3n+2)::after { border-radius: 0; }
+  .bau-opcion:nth-child(3n+3)::after { border-radius: 50% 50% 0 0; }
+  .bau-opcion--bien { background: var(--pp-acc2); }
+  .bau-opcion--mal { background: var(--pp-ink); color: var(--pp-bg); }
+  @media (min-width: 1024px) {
+    .bau-quiz .bau-spread > .bau-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .bau-quiz .bau-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .bau-quiz .bau-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .bau-quiz .bau-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
+  .bau-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .bau-pase-cuarto { right: 0; top: 0; width: 30vw; height: 30vw; max-width: 260px; max-height: 260px; background: var(--pp-acc2); border-radius: 0 0 0 100%; }
+  .bau-pagina--qr { align-items: flex-start; }
+  .bau-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: var(--pp-bg); padding: 18px; box-sizing: border-box; border-radius: 0 50% 0 0; margin-bottom: 28px; }
+  .bau-qr .qr-ingreso, .bau-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .bau-qr img, .bau-qr svg, .bau-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .bau-qr-etq { position: absolute; left: 0; right: 0; bottom: -24px; text-align: center; font-weight: 600; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-bg); opacity: .7; }
+  .bau-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .bau-pase-numero, .bau-pase-mesa { display: flex; flex-direction: column; }
+  .bau-pase-mesa { align-items: flex-end; text-align: right; }
+  .bau-pase-numero > span:last-child { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: clamp(72px, 22vw, 160px); line-height: .84; letter-spacing: -.04em; color: var(--pp-acc2); }
+  .bau-pase-mesa > span:last-child { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 700; font-size: clamp(44px, 13vw, 96px); line-height: .88; letter-spacing: -.03em; color: var(--pp-acc); }
+  .bau-lineas-pase { display: flex; flex-direction: column; border-top: 3px solid var(--pp-bg); }
+  .bau-lineas-pase .bau-linea { border-bottom: 1px solid color-mix(in srgb, var(--pp-bg) 35%, transparent); font-size: 14px; padding: 11px 0; }
+  .bau-lineas-pase .bau-linea > span:first-child { opacity: .7; }
+  .bau-lineas-pase .bau-linea:last-child { border-bottom: 0; }
+  .bau-info-extra { margin-top: 4px; }
+  .bau-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .bau-info-extra #ia-trigger-btn { background: var(--pp-bg) !important; color: var(--pp-ink) !important; border: 0 !important;
+    border-radius: 0 !important; font-weight: 600 !important; letter-spacing: .22em !important; text-transform: uppercase; }
+  .bau-raiz .ia-icon-box, .bau-raiz svg.lucide { display: none !important; }
+  .bau-pase-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
+  .bau-despedida { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .bau-despedida-forma { width: 22px; height: 22px; }
+  .bau-despedida-forma--azul { background: var(--bau-acc3); }
+  .bau-despedida-forma--rojo { background: var(--pp-acc); }
+  .bau-triangulo { width: 0; height: 0; border-left: 11px solid transparent; border-right: 11px solid transparent; border-bottom: 22px solid var(--pp-acc2); }
+  .bau-despedida-texto { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: clamp(22px, 6vw, 36px); line-height: 1; letter-spacing: -.02em; text-transform: uppercase; }
+  .bau-replay { cursor: pointer; color: var(--pp-acc2); }
+  .bau-credito { display: inline-flex; opacity: .8; }
+
+  /* ── La tapa: la composición ───────────────────────────────────────── */
+  .bau-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .bau-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(16px + env(safe-area-inset-top)) max(20px, calc((100% - 1100px) / 2)) calc(18px + env(safe-area-inset-bottom)); }
+  /* Cinco formas en una grilla de 4×6; cada una tiene su data-drift y su
+     data-depth, así el motor las mueve a distinta profundidad. */
+  .bau-composicion { position: absolute; inset: 0; pointer-events: none; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(6, 1fr); }
+  .bau-composicion .bau-forma { position: static; }
+  .bau-comp-1 { grid-column: 3 / 5; grid-row: 1 / 3; background: var(--pp-acc2); border-radius: 0 0 0 100%; }
+  .bau-comp-2 { grid-column: 1 / 3; grid-row: 2 / 4; background: var(--pp-acc); border-radius: 100% 0 0 0; opacity: .95; }
+  .bau-comp-3 { grid-column: 4 / 5; grid-row: 3 / 6; background: var(--bau-acc3); border-radius: 999px 999px 0 0; }
+  .bau-comp-4 { grid-column: 1 / 2; grid-row: 5 / 7; background: var(--pp-ink); border-radius: 0 999px 0 0; }
+  .bau-comp-5 { grid-column: 2 / 4; grid-row: 6 / 7; background: var(--pp-acc2); border-radius: 999px 999px 0 0; align-self: end; height: 60%; }
+  .bau-folio--tapa { align-items: flex-start; }
+  .bau-tapa-centro { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  .bau-chip--fecha { font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; color: var(--pp-acc); padding: 6px 10px; }
+  /* El nombre: un bloque crema por renglón, del ancho del texto. El renglón
+     más largo manda el cuerpo. */
+  .bau-tapa-nombres { margin: 0; line-height: .88; letter-spacing: -.03em; display: flex; flex-direction: column;
+    font-size: min(clamp(44px, 14.5vw, 150px), 16vh, calc((100vw - 44px) / (var(--largo, 9) * 0.66))); }
+  @media (min-width: 1024px) { .bau-tapa-nombres { font-size: min(11vw, 190px, 22vh, calc((min(100vw, 1100px) - 44px) / (var(--largo, 9) * 0.66))); } }
+  .bau-tapa-linea { overflow: hidden; display: block; white-space: nowrap; }
+  .bau-tapa-bloque { display: block; width: max-content; max-width: 100%; background: var(--pp-bg); padding: 0 .06em; }
+  .bau-tapa-bloque--punto { display: flex; align-items: center; gap: .1em; }
+  .bau-tapa-punto { width: .55em; height: .55em; background: var(--bau-acc3); flex: 0 0 auto; }
+  .bau-letra { display: inline-block; backface-visibility: hidden; animation: bauPlaca calc(var(--n, 12) * 3.6s) ease-in-out infinite; animation-delay: calc(var(--i, 0) * -3.6s); }
+  @keyframes bauPlaca { 0%, 98.8% { transform: rotateY(0); } 99.4% { transform: rotateY(90deg); } 100% { transform: rotateY(0); } }
+  .bau-chip--datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; font-weight: 500; font-size: 13px; line-height: 1.35; }
+  .bau-chip-der { text-align: right; }
+  .bau-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; }
+  .bau-tapa-mensaje { margin: 0; font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 500; font-size: clamp(17px, 4.6vw, 22px); line-height: 1.25; max-width: 30ch;
+    background: var(--pp-bg); padding: 8px 10px; width: max-content; box-sizing: border-box; }
+  .bau-tapa-btn { min-height: 54px; min-width: 260px; align-self: flex-start; border: 0; background: var(--pp-ink); color: var(--pp-bg); cursor: pointer;
+    font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .22em; text-transform: uppercase; padding: 0 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px; transition: background 200ms ease; }
+  @media (hover: hover) { .bau-tapa-btn:hover { background: var(--pp-acc); } }
+  .bau-tapa-btn-punto { width: 14px; height: 14px; background: var(--pp-acc2); }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .bau-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; border-left: 3px solid var(--pp-ink) !important; }
+  .bau-riel-top { writing-mode: vertical-rl; font-family: var(--bau-serif), 'Jost', sans-serif; font-weight: 600; font-size: 12px; letter-spacing: .2em; color: var(--pp-ink) !important; }
+  .bau-riel-etiqueta { writing-mode: vertical-rl; font-weight: 600; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--pp-ink); }
+  .bau-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .bau-riel-barra { position: absolute; left: -3px; top: 0; width: 6px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .bau-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-weight: 600; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: bauPista 2.4s ease-in-out infinite; }
+  @keyframes bauPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .bau-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(17,17,17,.94);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .bau-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 0; border-radius: 50%;
+    background: var(--pp-acc2); color: var(--pp-ink); font-size: 18px; line-height: 1; cursor: pointer; }
+  .bau-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
 
   @media (prefers-reduced-motion: reduce) {
     .bau-raiz * { animation: none !important; }
     .bau-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .bau-foto { --bau-punto: 0; }
   }
 `;
