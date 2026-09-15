@@ -21,6 +21,26 @@ import { PrensaTemplateHueso } from "@/components/templates/PrensaTemplateHueso"
 import { PrensaTemplateArena } from "@/components/templates/PrensaTemplateArena";
 import { PrensaTemplatePiedra } from "@/components/templates/PrensaTemplatePiedra";
 import { PrensaTemplateHumo } from "@/components/templates/PrensaTemplateHumo";
+import { MembreteTemplate } from "@/components/templates/MembreteTemplate";
+import { MembreteTemplateVerde } from "@/components/templates/MembreteTemplateVerde";
+import { MembreteTemplateBorgona } from "@/components/templates/MembreteTemplateBorgona";
+import { MembreteTemplateGrafito } from "@/components/templates/MembreteTemplateGrafito";
+import { MembreteTemplateOcre } from "@/components/templates/MembreteTemplateOcre";
+import { TintaViniloTemplate } from "@/components/templates/TintaViniloTemplate";
+import { TintaViniloTemplateKlein } from "@/components/templates/TintaViniloTemplateKlein";
+import { TintaViniloTemplateBotella } from "@/components/templates/TintaViniloTemplateBotella";
+import { TintaViniloTemplateNaranja } from "@/components/templates/TintaViniloTemplateNaranja";
+import { TintaViniloTemplateVioleta } from "@/components/templates/TintaViniloTemplateVioleta";
+import { ManuscritaTemplate } from "@/components/templates/ManuscritaTemplate";
+import { ManuscritaTemplateOliva } from "@/components/templates/ManuscritaTemplateOliva";
+import { ManuscritaTemplateAzul } from "@/components/templates/ManuscritaTemplateAzul";
+import { ManuscritaTemplateCiruela } from "@/components/templates/ManuscritaTemplateCiruela";
+import { ManuscritaTemplateLadrillo } from "@/components/templates/ManuscritaTemplateLadrillo";
+import { AcuarelaCoronaTemplate } from "@/components/templates/AcuarelaCoronaTemplate";
+import { AcuarelaCoronaTemplateLavanda } from "@/components/templates/AcuarelaCoronaTemplateLavanda";
+import { AcuarelaCoronaTemplateDurazno } from "@/components/templates/AcuarelaCoronaTemplateDurazno";
+import { AcuarelaCoronaTemplateSalvia } from "@/components/templates/AcuarelaCoronaTemplateSalvia";
+import { AcuarelaCoronaTemplateNoche } from "@/components/templates/AcuarelaCoronaTemplateNoche";
 import { SobreSelloTemplate } from "@/components/templates/SobreSelloTemplate";
 import { SobreSelloTemplateBosque } from "@/components/templates/SobreSelloTemplateBosque";
 import { SobreSelloTemplateTinta } from "@/components/templates/SobreSelloTemplateTinta";
@@ -794,6 +814,38 @@ export default async function PersonalizedInvitationPage({ params }: { params: P
                     case 'Terracota': return <SobreSelloTemplateTerracota invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     case 'Oliva': return <SobreSelloTemplateOliva invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                     default: return <SobreSelloTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'ACUARELACORONA') {
+                switch (color) {
+                    case 'Lavanda': return <AcuarelaCoronaTemplateLavanda invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Durazno': return <AcuarelaCoronaTemplateDurazno invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Salvia': return <AcuarelaCoronaTemplateSalvia invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Noche': return <AcuarelaCoronaTemplateNoche invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <AcuarelaCoronaTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'MANUSCRITA') {
+                switch (color) {
+                    case 'Oliva': return <ManuscritaTemplateOliva invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Azul': return <ManuscritaTemplateAzul invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ciruela': return <ManuscritaTemplateCiruela invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ladrillo': return <ManuscritaTemplateLadrillo invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <ManuscritaTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'TINTAVINILO') {
+                switch (color) {
+                    case 'Klein': return <TintaViniloTemplateKlein invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Botella': return <TintaViniloTemplateBotella invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Naranja': return <TintaViniloTemplateNaranja invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Violeta': return <TintaViniloTemplateVioleta invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <TintaViniloTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                }
+            } else if (validInvitation.templateTipo === 'MEMBRETE') {
+                switch (color) {
+                    case 'Verde': return <MembreteTemplateVerde invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Borgona': return <MembreteTemplateBorgona invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Grafito': return <MembreteTemplateGrafito invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    case 'Ocre': return <MembreteTemplateOcre invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
+                    default: return <MembreteTemplate invitation={invRecord} guest={guestRecord} isPersonalized={true} />;
                 }
             } else if (validInvitation.templateTipo === 'PRENSA') {
                 switch (color) {

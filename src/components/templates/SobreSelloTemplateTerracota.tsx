@@ -2,7 +2,7 @@
 
 /**
  * SobreSelloTemplateTerracota.tsx — Colección Paper · Papelería Viva · Familia 01
- * "Sobre & Sello". Variante: Terracota (generada, no editar a mano). Las otras cuatro (Verde bosque,
+ * "Sobre & Sello". Variante: Bordó (base). Las otras cuatro (Verde bosque,
  * Azul tinta, Terracota, Oliva) se generan con
  * scripts/gen-papeleria-viva-variants.js.
  *

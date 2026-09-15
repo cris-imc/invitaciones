@@ -1,0 +1,36 @@
+{
+  "archivo": "ManuscritaTemplate",
+  "prefijo": "mn",
+  "mote": "Manuscrita",
+  "css": "manuscrita",
+  "titulo": "Familia 03 \"Manuscrita\"",
+  "varianteBase": "Bordó",
+  "resumen": [
+    "El casamiento informal: la misma papelería, escrita a mano. Los nombres",
+    "van en Caveat (la letra manuscrita de la familia), los titulares en Bodoni",
+    "Moda y el texto en Space Mono, como una nota escrita sobre papel de carta.",
+    "",
+    "El borde del sobre es un pespunte (línea de puntadas), no un filete, y",
+    "sobre el forro pasa una aguada de acuarela cada siete segundos y medio."
+  ],
+  "serif": { "modulo": "Bodoni_Moda", "css": "'Bodoni Moda', serif", "pesos": ["400", "500"] },
+  "sans": { "modulo": "Space_Mono", "css": "'Space Mono', monospace", "pesos": ["400", "700"] },
+  "script": { "modulo": "Caveat", "css": "'Caveat', cursive" },
+  "paleta": { "bg": "#F1EDE4", "alt": "#E7E1D4", "ink": "#2B2724", "ink2": "#6F655A", "acc": "#7A2F3A", "acc2": "#8A7B52" },
+  "doodles": {
+    "carpeta": "manuscrita",
+    "piezas": ["cupido", "olivo", "copas", "candelabro"],
+    "portada": [
+      { "pieza": "cupido", "ancho": "30%", "left": "-4%", "top": "2%", "prioritario": true },
+      { "pieza": "olivo", "ancho": "34%", "right": "-6%", "bottom": "10%", "transform": "scaleX(-1)", "opacity": 0.9, "prioritario": true }
+    ],
+    "frase": { "pieza": "copas", "ancho": 92, "right": 16, "top": 40, "clase": "mn-flota" },
+    "cierre": { "pieza": "candelabro", "ancho": 84, "left": "50%", "top": -26, "transform": "translateX(-50%)" }
+  },
+  "variantes": {
+    "Oliva": { "etiqueta": "Oliva", "bg": "#F2F0E4", "alt": "#E6E5D3", "ink": "#262719", "ink2": "#67695A", "acc": "#6E7A52", "acc2": "#8C7C4F" },
+    "Azul": { "etiqueta": "Azul lavado", "bg": "#EFF1F0", "alt": "#E1E6E6", "ink": "#1F2A2E", "ink2": "#5D6B70", "acc": "#4A6572", "acc2": "#8A7B52" },
+    "Ciruela": { "etiqueta": "Ciruela", "bg": "#F3EDEC", "alt": "#E8DEDE", "ink": "#2C2024", "ink2": "#6E5E62", "acc": "#6E4459", "acc2": "#8C7A57" },
+    "Ladrillo": { "etiqueta": "Ladrillo", "bg": "#F5EDE5", "alt": "#EBDFD2", "ink": "#2E241E", "ink2": "#77655A", "acc": "#A4573B", "acc2": "#84754C" }
+  }
+}

@@ -1,42 +1,25 @@
 "use client";
 
 /**
- * SobreSelloTemplateOliva.tsx — Colección Paper · Papelería Viva · Familia 01
- * "Sobre & Sello". Variante: Bordó (base). Las otras cuatro (Verde bosque,
- * Azul tinta, Terracota, Oliva) se generan con
- * scripts/gen-papeleria-viva-variants.js.
+ * ManuscritaTemplate.tsx — Colección Paper · Papelería Viva · Familia 03 "Manuscrita"
+ * Variante: Bordó (base).
  *
- * GENERADO por scripts/derivar-sobre-sello.js a partir de
- * PrensaTemplate.tsx — no editar a mano.
+ * GENERADO por scripts/derivar-papeleria.js a partir de
+ * SobreSelloTemplate.tsx — no editar a mano: la papelería se arregla en
+ * Sobre & Sello y se vuelve a derivar; lo propio de esta familia está en
+ * scripts/familias/papeleria/manuscrita.json.
  *
- * Portado desde mockup/Paper/Sobre y Sello - Panoramica.dc.html.
- *
- * COMPARTE CON PAPEL PRENSADO la arquitectura: mecanismo Flat, las mismas
- * nueve secciones en el mismo orden, los componentes compartidos de v2/
- * vestidos con el registro, el splash y la pastilla que se repliega.
- *
- * NO COMPARTE NADA DEL VESTUARIO, que es lo que hace a la sub-colección:
- *
- *  - DOS ACENTOS: el lacre (bordó) y el dorado. Papel Prensado es
- *    monocroma; acá el color es la mitad de la identidad.
- *  - DOODLES PINTADOS en diez slots -- ramos de esquina, una pluma que
- *    flota, un lazo, el sello de lacre -- como <img>, porque tienen medios
- *    tonos y como máscara de un color plano se perderían.
- *  - TARJETAS, no hojas troqueladas: papel con un filete fino de
- *    rgba(0,0,0,.08) y la esquina doblada de 16 px.
- *  - LA PORTADA ES UN SOBRE: forro a rayas en diagonal, doble filete
- *    interior, ramos en las esquinas, el borde rasgado del papel asomando
- *    y los nombres abajo, en Cormorant con el & en Pinyon Script.
- *  - LA CUENTA REGRESIVA son los días en un círculo con un anillo que da
- *    una vuelta por minuto, y al costado tres cajitas con horas, minutos y
- *    segundos.
- *  - SIN RELIEVE: la tinta es plana. El registro prensado es de la otra
- *    sub-colección.
+ * El casamiento informal: la misma papelería, escrita a mano. Los nombres
+ * van en Caveat (la letra manuscrita de la familia), los titulares en Bodoni
+ * Moda y el texto en Space Mono, como una nota escrita sobre papel de carta.
+ * 
+ * El borde del sobre es un pespunte (línea de puntadas), no un filete, y
+ * sobre el forro pasa una aguada de acuarela cada siete segundos y medio.
  */
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { Cormorant_Garamond, Jost, Pinyon_Script } from "next/font/google";
+import { Bodoni_Moda, Space_Mono, Caveat } from "next/font/google";
 import { Album } from "@/components/invitation/v2/Album";
 import { AlbumCarousel } from "@/components/invitation/v2/AlbumCarousel";
 import { AnimatedCoverPhoto, COVER_EXIT_STYLE, COVER_RESPONSIVE_STYLE } from "@/components/invitation/v2/AnimatedCoverPhoto";
@@ -61,56 +44,56 @@ import { useTextos } from "@/components/i18n/ProveedorIdioma";
 // Cormorant Garamond 300 para nombres, cifras y numeración; Jost 300/400 para
 // kickers, datos y texto corrido. La script (Final Parade) es del repo y llega
 // por var(--font-final-parade) desde layout.tsx: no se pide a Google.
-const ssCormorant = Cormorant_Garamond({
+const mnSerif = Bodoni_Moda({
   subsets: ["latin"],
   preload: false,
   style: ["normal", "italic"],
-  weight: ["300", "400"],
-  variable: "--ss-cormorant",
+  weight: ["400", "500"],
+  variable: "--mn-serif",
   display: "swap",
 });
-const ssJost = Jost({
+const mnSans = Space_Mono({
   subsets: ["latin"],
   preload: false,
-  weight: ["300", "400", "500"],
-  variable: "--ss-jost",
+  weight: ["400", "700"],
+  variable: "--mn-sans",
   display: "swap",
 });
 // La script de esta sub-colección sí es de Google (Papel Prensado usa la
 // del repo): Pinyon Script, que es la caligrafía de una tarjeta grabada.
-const ssPinyon = Pinyon_Script({
+const mnScript = Caveat({
   subsets: ["latin"],
   preload: false,
   weight: ["400"],
-  variable: "--ss-pinyon",
+  variable: "--mn-script",
   display: "swap",
 });
 
 // ─── Paleta ─────────────────────────────────────────────────────────────────
 // Lo único que cambia por variante es el par de papeles. El generador
 // reemplaza estos dos hex y el nombre del identificador; todo lo demás queda.
-const PAPEL = "#F4F1E6";
-const PAPEL2 = "#E7E5D3";
-const TINTA = "#262619";
-const TINTA_SUAVE = "#636453";
+const PAPEL = "#F1EDE4";
+const PAPEL2 = "#E7E1D4";
+const TINTA = "#2B2724";
+const TINTA_SUAVE = "#6F655A";
 /**
  * Los dos acentos de Papelería Viva: el lacre y el dorado. Son lo que
  * cambia por variante (junto con los papeles) y lo que la separa de Papel
  * Prensado, que es monocroma a propósito.
  */
-const ACENTO = "#6B6B3A";
-const ACENTO2 = "#957F50";
+const ACENTO = "#7A2F3A";
+const ACENTO2 = "#8A7B52";
 /** rgb de la sombra: se usa en todos los rgba() del registro. */
-const SH = "38,38,25";
+const SH = "43,39,36";
 
 // Las tres caras son parte del diseño y no se cambian desde el wizard (a
 // diferencia de las Flat de siempre, que leen --font-title/--font-body-custom):
 // el relieve está calibrado para Cormorant 300 y la firma de la colección es
 // la script. Por eso el paso de Tipografía no aparece para Paper (ver
 // wizard-steps-config.ts).
-const SERIF = "var(--ss-cormorant), 'Cormorant Garamond', serif";
-const SANS = "var(--ss-jost), 'Jost', sans-serif";
-const SCRIPT = "var(--ss-pinyon), 'Pinyon Script', cursive";
+const SERIF = "var(--mn-serif), 'Bodoni Moda', serif";
+const SANS = "var(--mn-sans), 'Space Mono', monospace";
+const SCRIPT = "var(--mn-script), 'Caveat', cursive";
 
 // ─── Piezas ─────────────────────────────────────────────────────────────────
 // Sólo el set compartido de íconos de línea, como máscara CSS con la tinta
@@ -121,7 +104,7 @@ const SCRIPT = "var(--ss-pinyon), 'Pinyon Script', cursive";
  * acuarelas con medios tonos, y pintadas de un color plano se perderían.
  * Las cinco variantes comparten los cuatro archivos.
  */
-const DOODLES = "/templates/sobre-sello/";
+const DOODLES = "/templates/manuscrita/";
 
 const PIEZAS = "/templates/iconos-linea/";
 const ICONOS = {
@@ -198,7 +181,7 @@ function safeJson<T>(val: string | null | undefined, fallback: T): T {
   try { return JSON.parse(val) as T; } catch { return fallback; }
 }
 
-interface SobreSelloTemplateOlivaProps {
+interface ManuscritaTemplateProps {
   invitation: Record<string, unknown>;
   guest?: {
     id: string;
@@ -232,7 +215,7 @@ function temaDe(tipo: string): Theme {
 /** Un bloque que entra con el gesto de la colección. `retraso` en ms. */
 function Entra({ children, retraso = 0, style, className }: { children: React.ReactNode; retraso?: number; style?: React.CSSProperties; className?: string }) {
   return (
-    <div data-ss-reveal="1" data-ss-retraso={retraso} className={`ss-entra ${className ?? ""}`} style={style}>
+    <div data-mn-reveal="1" data-mn-retraso={retraso} className={`mn-entra ${className ?? ""}`} style={style}>
       {children}
     </div>
   );
@@ -243,7 +226,7 @@ function Entra({ children, retraso = 0, style, className }: { children: React.Re
  * loading lazy salvo los de la portada: son decoración y no tiene sentido
  * que retrasen el primer dibujo.
  */
-function Doodle({ pieza, ancho, prioritario = false, className, ...posicion }: { pieza: "ramo-esquina" | "pluma" | "lazo" | "lacre"; ancho: number | string; prioritario?: boolean; className?: string } & React.CSSProperties) {
+function Doodle({ pieza, ancho, prioritario = false, className, ...posicion }: { pieza: "cupido" | "olivo" | "copas" | "candelabro"; ancho: number | string; prioritario?: boolean; className?: string } & React.CSSProperties) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -263,8 +246,8 @@ function Doodle({ pieza, ancho, prioritario = false, className, ...posicion }: {
 /** Una tarjeta de papel: filete fino y la esquina doblada. */
 function Hoja({ children, className, style, portada = false }: { children: React.ReactNode; className?: string; style?: React.CSSProperties; portada?: boolean }) {
   return (
-    <div className={`ss-hoja ${portada ? "ss-hoja--portada" : ""} ${className ?? ""}`} style={style}>
-      <div className="ss-filete" aria-hidden="true" />
+    <div className={`mn-hoja ${portada ? "mn-hoja--portada" : ""} ${className ?? ""}`} style={style}>
+      <div className="mn-filete" aria-hidden="true" />
       {children}
     </div>
   );
@@ -277,10 +260,10 @@ function Hoja({ children, className, style, portada = false }: { children: React
 function Cabecera({ icono, numero, titulo, anchoIcono, topeIcono }: { icono: NombreDeIcono; numero: string; titulo: string; anchoIcono?: string; topeIcono?: number }) {
   return (
     <Entra>
-      <div className="ss-cabecera">
-        <span className="ss-kicker">{titulo}</span>
-        <span className="ss-cabecera-filete" aria-hidden="true" />
-        <span className="ss-cabecera-punto" aria-hidden="true" />
+      <div className="mn-cabecera">
+        <span className="mn-kicker">{titulo}</span>
+        <span className="mn-cabecera-filete" aria-hidden="true" />
+        <span className="mn-cabecera-punto" aria-hidden="true" />
       </div>
     </Entra>
   );
@@ -301,24 +284,24 @@ function Cabecera({ icono, numero, titulo, anchoIcono, topeIcono }: { icono: Nom
  * La lógica del tiempo sí es la compartida (useCountdown): eso no tiene
  * nada de visual y duplicarlo sólo traería dos relojes que se desincronizan.
  */
-function CuentaSobre({ targetDate }: { targetDate: Date }) {
+function CuentaManuscrita({ targetDate }: { targetDate: Date }) {
   const tx = useTextos();
   const { time, isEventDay, isPast, hasEnded } = useCountdown(targetDate);
   const enCero = time.dias === 0 && time.hs === 0 && time.min === 0 && time.seg === 0;
 
   if (isEventDay || (!isPast && enCero)) {
     return (
-      <div id="countdown" className="ss-cuenta-aviso">
-        <p className="ss-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
-        <p className="ss-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
+      <div id="countdown" className="mn-cuenta-aviso">
+        <p className="mn-script">{tx("invitacion.cuentaRegresiva.llegoElDia")}</p>
+        <p className="mn-cuerpo" style={{ marginBottom: 0 }}>{tx("invitacion.cuentaRegresiva.hoyEsElGranDia")}</p>
       </div>
     );
   }
 
   if (hasEnded || isPast) {
     return (
-      <div id="countdown" className="ss-cuenta-aviso">
-        <p className="ss-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
+      <div id="countdown" className="mn-cuenta-aviso">
+        <p className="mn-script">{tx("invitacion.cuentaRegresiva.yaFueUnaNocheIncreible")}</p>
       </div>
     );
   }
@@ -336,19 +319,19 @@ function CuentaSobre({ targetDate }: { targetDate: Date }) {
   // van abajo, en tres cajitas con la esquina doblada.
   const [dias, ...resto] = celdas;
   return (
-    <div id="countdown" className="ss-cuenta">
-      <div className="ss-cuenta-circulo">
-        <span className="ss-cuenta-anillo" aria-hidden="true" />
+    <div id="countdown" className="mn-cuenta">
+      <div className="mn-cuenta-circulo">
+        <span className="mn-cuenta-anillo" aria-hidden="true" />
         <span>
-          <span className="ss-cuenta-dias">{dias.v}</span>
-          <span className="ss-cuenta-etq">{dias.l}</span>
+          <span className="mn-cuenta-dias">{dias.v}</span>
+          <span className="mn-cuenta-etq">{dias.l}</span>
         </span>
       </div>
-      <div className="ss-cuenta-grilla">
+      <div className="mn-cuenta-grilla">
         {resto.map((c) => (
-          <div key={c.l} className="ss-cuenta-caja">
-            <span className="ss-cuenta-num">{c.v}</span>
-            <span className="ss-cuenta-etq">{c.l}</span>
+          <div key={c.l} className="mn-cuenta-caja">
+            <span className="mn-cuenta-num">{c.v}</span>
+            <span className="mn-cuenta-etq">{c.l}</span>
           </div>
         ))}
       </div>
@@ -377,12 +360,12 @@ function CopyField({ label, value }: { label: string; value: string }) {
     });
   };
   return (
-    <div className="ss-banco-fila">
+    <div className="mn-banco-fila">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="ss-banco-clave">{label}</span>
-        <span className="ss-banco-valor">{value}</span>
+        <span className="mn-banco-clave">{label}</span>
+        <span className="mn-banco-valor">{value}</span>
       </div>
-      <button className={`copy-btn ss-btn-fantasma ${copied ? "copied" : ""}`} type="button" onClick={handle} style={{ minHeight: 40, padding: "0 14px" }}>
+      <button className={`copy-btn mn-btn-fantasma ${copied ? "copied" : ""}`} type="button" onClick={handle} style={{ minHeight: 40, padding: "0 14px" }}>
         {copied ? "✓ " + tx("invitacion.regalos.copiado") : tx("invitacion.regalos.copiar")}
       </button>
     </div>
@@ -391,10 +374,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="ss-banco-fila">
+    <div className="mn-banco-fila">
       <div style={{ minWidth: 0, flex: 1 }}>
-        <span className="ss-banco-clave">{label}</span>
-        <span className="ss-banco-valor">{value}</span>
+        <span className="mn-banco-clave">{label}</span>
+        <span className="mn-banco-valor">{value}</span>
       </div>
     </div>
   );
@@ -405,7 +388,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
  * guardado local) y las opciones del registro: botones de ancho completo,
  * filete de 0,5 px, el elegido se rellena de tinta.
  */
-function QuizSobre({ preguntas, invitationId, guestToken, guestName }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string }) {
+function QuizManuscrita({ preguntas, invitationId, guestToken, guestName }: { preguntas: QuizQuestion[]; invitationId?: string; guestToken?: string; guestName?: string }) {
   const tx = useTextos();
   const [currentIdx, setCurrentIdx] = useState(0);
   const [picks, setPicks] = useState<Record<number, number>>({});
@@ -473,13 +456,13 @@ function QuizSobre({ preguntas, invitationId, guestToken, guestName }: { pregunt
     preguntas.forEach((q, i) => { if (picks[i] === q.respuestaCorrecta) score++; });
     return (
       <div style={{ textAlign: "center" }}>
-        <p className="ss-lugar">{tx("invitacion.quiz.juegoCompletado")}</p>
-        <p className="ss-dato">{score} / {preguntas.length}</p>
+        <p className="mn-lugar">{tx("invitacion.quiz.juegoCompletado")}</p>
+        <p className="mn-dato">{score} / {preguntas.length}</p>
         {isSaving ? (
-          <p className="ss-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.quiz.guardandoResultados")}</p>
+          <p className="mn-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.quiz.guardandoResultados")}</p>
         ) : (
           stats && stats.count > 0 && (
-            <p className="ss-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
+            <p className="mn-cuerpo" style={{ display: "inline-flex", alignItems: "center", gap: 8, color: TINTA_SUAVE }}>
               <span>{tx("invitacion.quiz.promedioGlobal", { n: stats.count })} <strong style={{ color: TINTA, fontWeight: 400 }}>{stats.avg}%</strong>.</span>
             </p>
           )
@@ -499,14 +482,14 @@ function QuizSobre({ preguntas, invitationId, guestToken, guestName }: { pregunt
 
   return (
     <div key={currentIdx}>
-      <p className="ss-lugar">{formatQuestion(q.pregunta)}</p>
+      <p className="mn-lugar">{formatQuestion(q.pregunta)}</p>
       {q.opciones.map((opt, oi) => {
         const chosen = picks[currentIdx] === oi;
         return (
           <button
             key={oi}
             type="button"
-            className="ss-quiz-opcion"
+            className="mn-quiz-opcion"
             data-elegida={chosen ? "1" : undefined}
             disabled={picks[currentIdx] !== undefined}
             onClick={() => pick(oi)}
@@ -520,7 +503,7 @@ function QuizSobre({ preguntas, invitationId, guestToken, guestName }: { pregunt
 }
 
 // ─── La plantilla ───────────────────────────────────────────────────────────
-export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = false }: SobreSelloTemplateOlivaProps) {
+export function ManuscritaTemplate({ invitation, guest, isPersonalized = false }: ManuscritaTemplateProps) {
   const tx = useTextos();
   const [isCoverOpen, setIsCoverOpen] = useState(false);
   const [isClosingCover, setIsClosingCover] = useState(false);
@@ -577,7 +560,7 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
     quietoRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const raiz = raizRef.current;
     if (!raiz) return;
-    raiz.style.setProperty("--ss-rel", relieve(0, true));
+    raiz.style.setProperty("--mn-rel", relieve(0, true));
     let raf = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const alScrollear = (y: number) => {
@@ -586,7 +569,7 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
-        raiz.style.setProperty("--ss-rel", relieve(y, quietoRef.current));
+        raiz.style.setProperty("--mn-rel", relieve(y, quietoRef.current));
         setPastillaOculta(y > 40);
       });
     };
@@ -605,15 +588,15 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
   // ── Entrada de sección ─────────────────────────────────────────────────
   // IntersectionObserver al 15 %, una sola vez por bloque, con el retraso
-  // que trae cada bloque (data-ss-retraso: 0 / 120 / 240). Se arma cada vez
+  // que trae cada bloque (data-mn-retraso: 0 / 120 / 240). Se arma cada vez
   // que se abre la portada porque hasta entonces el cuerpo no está montado.
   useEffect(() => {
     if (!isCoverOpen) return;
     const raiz = raizRef.current;
     if (!raiz) return;
-    const bloques = Array.from(raiz.querySelectorAll<HTMLElement>("[data-ss-reveal]"));
+    const bloques = Array.from(raiz.querySelectorAll<HTMLElement>("[data-mn-reveal]"));
     if (quietoRef.current || !("IntersectionObserver" in window)) {
-      bloques.forEach((b) => b.classList.add("ss-entra--visto"));
+      bloques.forEach((b) => b.classList.add("mn-entra--visto"));
       return;
     }
     const io = new IntersectionObserver((entradas) => {
@@ -622,7 +605,7 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
         const el = e.target as HTMLElement;
         const d = Number(el.dataset.prRetraso || 0);
         el.style.transitionDelay = `${d}ms`;
-        el.classList.add("ss-entra--visto");
+        el.classList.add("mn-entra--visto");
         io.unobserve(el);
       });
     }, { threshold: 0.15 });
@@ -729,9 +712,9 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
     .map((item) => item.fileUrl);
 
   const varsDeTema = {
-    "--font-cormorant": "var(--ss-cormorant)",
-    "--font-inter": "var(--ss-jost)",
-    "--font-sans": "var(--ss-jost)",
+    "--font-cormorant": "var(--mn-cormorant)",
+    "--font-inter": "var(--mn-jost)",
+    "--font-sans": "var(--mn-jost)",
     // En esta colección --t-acc y --t-acc2 no son un acento: son la tinta y
     // la tinta suave. Lo que cambia por variante es el papel (--t-bg).
     "--t-acc": ACENTO,
@@ -750,26 +733,26 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
   // ── Post-evento ────────────────────────────────────────────────────────
   if (eventStatus === "POST_EVENT") {
     return (
-      <div className={`${ssCormorant.variable} ${ssJost.variable} ${ssPinyon.variable} ss-raiz`} style={varsDeTema} data-theme={theme} ref={raizRef}>
-        <style>{CSS_SOBRE}</style>
-        <div className="ss-fondo" aria-hidden="true" />
-        <main className="ss-post">
-          <Hoja className="ss-post-hoja">
+      <div className={`${mnSerif.variable} ${mnSans.variable} ${mnScript.variable} mn-raiz`} style={varsDeTema} data-theme={theme} ref={raizRef}>
+        <style>{CSS_MN}</style>
+        <div className="mn-fondo" aria-hidden="true" />
+        <main className="mn-post">
+          <Hoja className="mn-post-hoja">
             <IconoLinea nombre={esXV ? "torta" : "anillos"} ancho="16%" />
-            <p className="ss-kicker">{tx("invitacion.frase.unMomento")}</p>
-            <h1 className="ss-nombres" style={{ fontSize: 38 }}>
-              <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="ss-sinonimo" />
+            <p className="mn-kicker">{tx("invitacion.frase.unMomento")}</p>
+            <h1 className="mn-nombres" style={{ fontSize: 38 }}>
+              <AnimatedSynonyms words={[tx("invitacion.frase.inolvidable"), tx("invitacion.frase.unico"), tx("invitacion.frase.eterno"), tx("invitacion.frase.magico")]} className="mn-sinonimo" />
             </h1>
             <FileteConPunto />
-            <p className="ss-cuerpo">{tx("invitacion.frase.graciasPorAcompanarnosCorto")}</p>
-            <p className="ss-dato">{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</p>
+            <p className="mn-cuerpo">{tx("invitacion.frase.graciasPorAcompanarnosCorto")}</p>
+            <p className="mn-dato">{tx("invitacion.album.disponibleHasta")} {expirationDateStr}</p>
             <div style={{ marginTop: 22 }}>
               {livePhotos.length > 0 ? (
                 <AlbumCarousel photos={livePhotos} hideHeader={true} />
               ) : (
                 <>
-                  <p className="ss-lugar">{tx("invitacion.album.fotografico")}</p>
-                  <p className="ss-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.album.sinCapturas")}</p>
+                  <p className="mn-lugar">{tx("invitacion.album.fotografico")}</p>
+                  <p className="mn-cuerpo" style={{ color: TINTA_SUAVE }}>{tx("invitacion.album.sinCapturas")}</p>
                 </>
               )}
             </div>
@@ -781,12 +764,12 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
   }
 
   return (
-    <div className={`${ssCormorant.variable} ${ssJost.variable} ${ssPinyon.variable} ss-raiz`} style={varsDeTema} ref={raizRef}>
-      <style>{CSS_SOBRE}</style>
+    <div className={`${mnSerif.variable} ${mnSans.variable} ${mnScript.variable} mn-raiz`} style={varsDeTema} ref={raizRef}>
+      <style>{CSS_MN}</style>
 
       {/* ── Splash (celular) ────────────────────────────────────────── */}
       {!isCoverOpen && (
-        <div className={`ss-splash ${isClosingCover ? "ss-splash--sale" : ""}`}>
+        <div className={`mn-splash ${isClosingCover ? "mn-splash--sale" : ""}`}>
           {portadaFondoAnimado && (
             <div className="acp-mobile-only">
               <AnimatedCoverPhoto
@@ -794,22 +777,22 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
                 tintColor1={PAPEL}
                 tintColor2={TINTA_SUAVE}
                 effect="enfoque"
-                scrimColorRgb="244,241,230"
+                scrimColorRgb="241,237,228"
               />
             </div>
           )}
-          <Hoja className="ss-splash-hoja">
-            <p className="ss-kicker">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
-            <p className="ss-splash-nombre">{guestNameDisplay}</p>
-            <div className="ss-filete-corto" aria-hidden="true" />
+          <Hoja className="mn-splash-hoja">
+            <p className="mn-kicker">{saludaAlInvitado ? portadaKicker : kickerDelEvento}</p>
+            <p className="mn-splash-nombre">{guestNameDisplay}</p>
+            <div className="mn-filete-corto" aria-hidden="true" />
             {/* Los nombres de los novios sólo si arriba no están ya: cuando
                 el saludo es para el invitado son el dato que falta ("¿la boda
                 de quién?"); cuando el nombre grande ya es el de ellos,
                 repetirlos era escribir lo mismo dos veces. */}
-            {saludaAlInvitado && <p className="ss-dato">{nombresLinea}</p>}
-            <p className="ss-dato" style={{ color: TINTA_SUAVE }}>{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
-            {Boolean(activeDressCode) && <p className="ss-kicker" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
-            <button type="button" onClick={openInvitation} className="ss-btn-solido" style={{ marginTop: 26 }}>
+            {saludaAlInvitado && <p className="mn-dato">{nombresLinea}</p>}
+            <p className="mn-dato" style={{ color: TINTA_SUAVE }}>{fechaCorta}{ciudad ? ` · ${ciudad}` : ""}</p>
+            {Boolean(activeDressCode) && <p className="mn-kicker" style={{ marginTop: 6 }}>{tx("invitacion.ubicacion.dressCode")} {activeDressCode}</p>}
+            <button type="button" onClick={openInvitation} className="mn-btn-solido" style={{ marginTop: 26 }}>
               {tx("invitacion.portada.abrirInvitacion")}
             </button>
           </Hoja>
@@ -821,26 +804,26 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
       {mounted && isPersonalized && guest && isCoverOpen && createPortal(
         <div
           onClick={() => setIsTicketMaximized(!isTicketMaximized)}
-          className={`ss-pase-burbuja ${isTicketMaximized ? "ss-pase-burbuja--abierta" : ""}`}
+          className={`mn-pase-burbuja ${isTicketMaximized ? "mn-pase-burbuja--abierta" : ""}`}
         >
           {isTicketMaximized ? (
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", gap: 14 }}>
               <div style={{ textAlign: "left" }}>
-                <span className="ss-kicker" style={{ margin: 0, fontSize: 8 }}>{tx("invitacion.pase.pase")}</span>
+                <span className="mn-kicker" style={{ margin: 0, fontSize: 8 }}>{tx("invitacion.pase.pase")}</span>
                 <span style={{ display: "block", fontFamily: SERIF, fontWeight: 300, fontSize: 18, color: TINTA, lineHeight: 1.1 }}>{guest.name}</span>
                 {guest.mesas && guest.mesas.length > 0 && (
-                  <span className="ss-kicker" style={{ margin: "4px 0 0", fontSize: 8 }}>{guest.mesas.join(" · ")}</span>
+                  <span className="mn-kicker" style={{ margin: "4px 0 0", fontSize: 8 }}>{guest.mesas.join(" · ")}</span>
                 )}
               </div>
               <div style={{ textAlign: "right", borderLeft: `0.5px solid rgba(${SH},.34)`, paddingLeft: 12 }}>
                 <span style={{ display: "block", fontFamily: SERIF, fontWeight: 300, fontSize: 22, color: TINTA, lineHeight: 1 }}>{guest.expectedCount}</span>
-                <span className="ss-kicker" style={{ margin: 0, fontSize: 8 }}>{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
+                <span className="mn-kicker" style={{ margin: 0, fontSize: 8 }}>{guest.expectedCount === 1 ? tx("invitacion.pase.lugar") : tx("invitacion.pase.lugares")}</span>
               </div>
             </div>
           ) : (
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <IconoPastilla nombre="tarjeta" />
-              <span className="ss-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
+              <span className="mn-kicker" style={{ margin: 0 }}>{tx("invitacion.pase.pase")}</span>
             </div>
           )}
         </div>,
@@ -851,35 +834,34 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
         document.body
       )}
 
-      <div className="desktop-stage ss-escenario" data-theme={theme}>
-        <div className="ss-fondo" aria-hidden="true" />
+      <div className="desktop-stage mn-escenario" data-theme={theme}>
+        <div className="mn-fondo" aria-hidden="true" />
 
         {/* ── Escritorio: la hoja grande, fija a la izquierda ─────────── */}
-        <aside className="d-left hide-mobile ss-izquierda">
-          <Hoja portada className="ss-hoja-grande">
+        <aside className="d-left hide-mobile mn-izquierda">
+          <Hoja portada className="mn-hoja-grande">
             {/* El sobre: forro a rayas, doble filete, ramos en las esquinas y
                 el borde rasgado del papel asomando abajo. */}
-            <div className="ss-sobre" aria-hidden="true">
-              <div className="ss-sobre-forro" />
-              <div className="ss-sobre-brillo" />
-              <div className="ss-sobre-filete" />
-              <div className="ss-sobre-filete ss-sobre-filete--interno" />
-              <Doodle pieza="ramo-esquina" ancho="35%" left="-4%" top="-2%" prioritario />
-              <Doodle pieza="ramo-esquina" ancho="30%" right="-4%" bottom="14%" transform="scaleX(-1) rotate(8deg)" opacity={0.95} prioritario />
-              <Doodle pieza="lacre" ancho="22%" left="50%" top="38%" transform="translate(-50%,-50%)" prioritario />
+            <div className="mn-sobre" aria-hidden="true">
+              <div className="mn-sobre-forro" />
+              <div className="mn-sobre-brillo" />
+              <div className="mn-sobre-filete" />
+              <div className="mn-sobre-filete mn-sobre-filete--interno" />
+              <Doodle pieza="cupido" ancho="30%" left="-4%" top="2%" prioritario />
+              <Doodle pieza="olivo" ancho="34%" right="-6%" bottom="10%" transform="scaleX(-1)" opacity={0.9} prioritario />
             </div>
-            <p className="ss-kicker">{kickerDelEvento}</p>
-            <h1 className="ss-nombres">
+            <p className="mn-kicker">{kickerDelEvento}</p>
+            <h1 className="mn-nombres">
               <span>{nombre1}</span>
-              {nombre2 && <span className="ss-amp">&amp;</span>}
+              {nombre2 && <span className="mn-amp">&amp;</span>}
               {nombre2 && <span>{nombre2}</span>}
             </h1>
-            <div className="ss-filete-corto" aria-hidden="true" />
-            <p className="ss-dato">{fechaLarga}</p>
-            {ciudad && <p className="ss-dato">{ciudad}</p>}
-            <div className="ss-nav-escritorio">
+            <div className="mn-filete-corto" aria-hidden="true" />
+            <p className="mn-dato">{fechaLarga}</p>
+            {ciudad && <p className="mn-dato">{ciudad}</p>}
+            <div className="mn-nav-escritorio">
               <FileteConPunto ancho={220} />
-              <nav className="ss-nav-lista">
+              <nav className="mn-nav-lista">
                 {seccionesNav.map((s) => (
                   <a key={s.id} href={`#${s.id}`}>{s.n}. {s.label}</a>
                 ))}
@@ -888,36 +870,35 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
           </Hoja>
         </aside>
 
-        <div className="d-right tpl ss-derecha" ref={derechaRef}>
+        <div className="d-right tpl mn-derecha" ref={derechaRef}>
           {/* ── Portada (celular) ───────────────────────────────────── */}
-          <section className="hide-desktop ss-seccion ss-portada" data-sec="00">
-            <Hoja portada className={isCoverOpen ? "ss-portada--sube" : ""}>
+          <section className="hide-desktop mn-seccion mn-portada" data-sec="00">
+            <Hoja portada className={isCoverOpen ? "mn-portada--sube" : ""}>
               {/* El sobre: forro a rayas, doble filete, ramos en las esquinas y
                   el borde rasgado del papel asomando abajo. */}
-              <div className="ss-sobre" aria-hidden="true">
-                <div className="ss-sobre-forro" />
-                <div className="ss-sobre-brillo" />
-                <div className="ss-sobre-filete" />
-                <div className="ss-sobre-filete ss-sobre-filete--interno" />
-                <Doodle pieza="ramo-esquina" ancho="35%" left="-4%" top="-2%" prioritario />
-                <Doodle pieza="ramo-esquina" ancho="30%" right="-4%" bottom="14%" transform="scaleX(-1) rotate(8deg)" opacity={0.95} prioritario />
-                <Doodle pieza="lacre" ancho="22%" left="50%" top="38%" transform="translate(-50%,-50%)" prioritario />
+              <div className="mn-sobre" aria-hidden="true">
+                <div className="mn-sobre-forro" />
+                <div className="mn-sobre-brillo" />
+                <div className="mn-sobre-filete" />
+                <div className="mn-sobre-filete mn-sobre-filete--interno" />
+                <Doodle pieza="cupido" ancho="30%" left="-4%" top="2%" prioritario />
+                <Doodle pieza="olivo" ancho="34%" right="-6%" bottom="10%" transform="scaleX(-1)" opacity={0.9} prioritario />
               </div>
               <Entra>
-                <p className="ss-kicker">{kickerDelEvento}</p>
+                <p className="mn-kicker">{kickerDelEvento}</p>
               </Entra>
               <Entra retraso={120}>
-                <h1 className="ss-nombres">
+                <h1 className="mn-nombres">
                   <span>{nombre1}</span>
-                  {nombre2 && <span className="ss-amp">&amp;</span>}
+                  {nombre2 && <span className="mn-amp">&amp;</span>}
                   {nombre2 && <span>{nombre2}</span>}
                 </h1>
               </Entra>
               <Entra retraso={240}>
-                <div className="ss-filete-corto" aria-hidden="true" />
-                <p className="ss-dato">{fechaLarga}</p>
-                {ciudad && <p className="ss-dato">{ciudad}</p>}
-                <AddToCalendarLink eventName={nombresLinea} targetDate={fechaEvento} location={[lugarNombre, direccion].filter(Boolean).join(", ")} className="ss-link" showIcon={false}>
+                <div className="mn-filete-corto" aria-hidden="true" />
+                <p className="mn-dato">{fechaLarga}</p>
+                {ciudad && <p className="mn-dato">{ciudad}</p>}
+                <AddToCalendarLink eventName={nombresLinea} targetDate={fechaEvento} location={[lugarNombre, direccion].filter(Boolean).join(", ")} className="mn-link" showIcon={false}>
                   {tx("invitacion.saveTheDate.agregarAlCalendario")}
                 </AddToCalendarLink>
               </Entra>
@@ -926,14 +907,14 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 01 La cuenta regresiva ─────────────────────────────── */}
           {(invitation.contadorHabilitado ?? true) ? (
-            <section className="ss-seccion" data-sec="01" id="countdown-hoja">
+            <section className="mn-seccion" data-sec="01" id="countdown-hoja">
               <Hoja>
                 <Cabecera icono="reloj" numero="01" titulo={tx("invitacion.cuentaRegresiva.kicker")} />
                 <Entra retraso={120}>
-                  <p className="ss-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
-                  <CuentaSobre targetDate={fechaEvento} />
+                  <p className="mn-kicker">{tx("invitacion.cuentaRegresiva.faltan")}</p>
+                  <CuentaManuscrita targetDate={fechaEvento} />
                   <FileteConPunto />
-                  <p className="ss-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
+                  <p className="mn-dato">{fechaLarga}{hora ? ` · ${hora} hs` : ""}</p>
                 </Entra>
               </Hoja>
             </section>
@@ -941,47 +922,47 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 02 La frase (sangra, sin hoja) ─────────────────────── */}
           {frase && (
-            <SectionWrapper id="quote" delay={100} className="ss-frase-seccion">
-              <Doodle pieza="pluma" ancho={86} right={14} top={44} className="ss-flota" />
+            <SectionWrapper id="quote" delay={100} className="mn-frase-seccion">
+              <Doodle pieza="copas" ancho={92} className="mn-flota" right={16} top={40} />
               <Entra>
-                <p className="ss-num">02.</p>
-                <p className="ss-frase">{frase}</p>
-                <p className="ss-script">{tx("invitacion.frase.unasPalabras")}</p>
+                <p className="mn-num">02.</p>
+                <p className="mn-frase">{frase}</p>
+                <p className="mn-script">{tx("invitacion.frase.unasPalabras")}</p>
               </Entra>
             </SectionWrapper>
           )}
 
           {/* ── 03 El evento ───────────────────────────────────────── */}
-          <SectionWrapper id="details" delay={150} className="ss-seccion" style={{ padding: 0 }}>
-            <div className="ss-seccion" data-sec="03">
+          <SectionWrapper id="details" delay={150} className="mn-seccion" style={{ padding: 0 }}>
+            <div className="mn-seccion" data-sec="03">
               <Hoja>
                 <Cabecera icono="iglesia" numero="03" titulo={tx("invitacion.ubicacion.cuandoYDonde")} />
                 <Entra retraso={120}>
                   {Boolean(invitation.ceremoniaHabilitada) && (
                     <div>
-                      <p className="ss-kicker">{String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}</p>
-                      {Boolean(invitation.ceremoniaNombre) && <p className="ss-lugar">{String(invitation.ceremoniaNombre)}</p>}
-                      <p className="ss-dato">
+                      <p className="mn-kicker">{String(invitation.ceremoniaTitulo || tx("invitacion.ubicacion.ceremoniaCivil"))}</p>
+                      {Boolean(invitation.ceremoniaNombre) && <p className="mn-lugar">{String(invitation.ceremoniaNombre)}</p>}
+                      <p className="mn-dato">
                         {Boolean(invitation.ceremoniaHora) && `${String(invitation.ceremoniaHora)} hs`}
                         {Boolean(invitation.ceremoniaHora) && Boolean(invitation.ceremoniaDireccion) && " · "}
                         {Boolean(invitation.ceremoniaDireccion) && String(invitation.ceremoniaDireccion)}
                       </p>
                       {Boolean(invitation.ceremoniaMapUrl) && (
-                        <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="ss-link">{tx("invitacion.ubicacion.comoLlegar")}</a>
+                        <a href={String(invitation.ceremoniaMapUrl)} target="_blank" rel="noopener noreferrer" className="mn-link">{tx("invitacion.ubicacion.comoLlegar")}</a>
                       )}
-                      <div className="ss-hairline" aria-hidden="true" />
+                      <div className="mn-hairline" aria-hidden="true" />
                     </div>
                   )}
                   {(lugarNombre || direccion) && (
                     <div>
-                      <p className="ss-kicker">{tx("invitacion.ubicacion.fiestaSalon")}</p>
-                      {lugarNombre && <p className="ss-lugar">{lugarNombre}</p>}
-                      <p className="ss-dato">
+                      <p className="mn-kicker">{tx("invitacion.ubicacion.fiestaSalon")}</p>
+                      {lugarNombre && <p className="mn-lugar">{lugarNombre}</p>}
+                      <p className="mn-dato">
                         {hora && `${hora} hs`}
                         {hora && direccion && " · "}
                         {direccion}
                       </p>
-                      {mapUrl && <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="ss-link">{tx("invitacion.ubicacion.comoLlegar")}</a>}
+                      {mapUrl && <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="mn-link">{tx("invitacion.ubicacion.comoLlegar")}</a>}
                     </div>
                   )}
                 </Entra>
@@ -989,15 +970,15 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
                   <Entra retraso={240}>
                     {cronograma.length > 0 && (
                       <>
-                        <div className="ss-hairline" aria-hidden="true" />
-                        <p className="ss-kicker">Cronograma</p>
-                        <div className="ss-cronograma" id="schedule">
-                          <span className="ss-cronograma-eje" aria-hidden="true" />
+                        <div className="mn-hairline" aria-hidden="true" />
+                        <p className="mn-kicker">Cronograma</p>
+                        <div className="mn-cronograma" id="schedule">
+                          <span className="mn-cronograma-eje" aria-hidden="true" />
                           {cronograma.map((item, i) => (
-                            <Entra key={i} retraso={i * 120} className="ss-hito">
-                              <span className="ss-hito-hora">{item.time ?? ""}</span>
-                              <span className="ss-hito-punto" aria-hidden="true" />
-                              <span className="ss-hito-titulo">{item.title}</span>
+                            <Entra key={i} retraso={i * 120} className="mn-hito">
+                              <span className="mn-hito-hora">{item.time ?? ""}</span>
+                              <span className="mn-hito-punto" aria-hidden="true" />
+                              <span className="mn-hito-titulo">{item.title}</span>
                             </Entra>
                           ))}
                         </div>
@@ -1005,9 +986,9 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
                     )}
                     {Boolean(activeDressCode) && (
                       <>
-                        <div className="ss-hairline" aria-hidden="true" />
-                        <p className="ss-kicker">{tx("invitacion.ubicacion.dressCode")}</p>
-                        <p className="ss-cuerpo">{activeDressCode}</p>
+                        <div className="mn-hairline" aria-hidden="true" />
+                        <p className="mn-kicker">{tx("invitacion.ubicacion.dressCode")}</p>
+                        <p className="mn-cuerpo">{activeDressCode}</p>
                       </>
                     )}
                   </Entra>
@@ -1020,8 +1001,8 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 04 El álbum ────────────────────────────────────────── */}
           {(invitation.galeriaPrincipalHabilitada ?? false) && allPhotos.length > 0 && (
-            <SectionWrapper id="album" delay={200} className="ss-seccion" style={{ padding: 0 }}>
-              <div className="ss-seccion" data-sec="04">
+            <SectionWrapper id="album" delay={200} className="mn-seccion" style={{ padding: 0 }}>
+              <div className="mn-seccion" data-sec="04">
                 <Hoja>
                   <Cabecera icono="polaroids" numero="04" titulo={tx("invitacion.album.titulo")} />
                   <Entra retraso={120}>
@@ -1034,19 +1015,19 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 05 El mapa ─────────────────────────────────────────── */}
           {mapUrl && (
-            <section className="ss-seccion" data-sec="05" id="location">
+            <section className="mn-seccion" data-sec="05" id="location">
               <Hoja>
                 <Cabecera icono="auto" numero="05" titulo={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre }).replace(/^Mapa de\s*/i, "Mapa")} anchoIcono="22%" />
                 <Entra retraso={120}>
-                  <div className="ss-mapa">
+                  <div className="mn-mapa">
                     {embedMapUrl ? (
                       <iframe src={embedMapUrl} width="100%" height="100%" style={{ border: 0, display: "block" }} loading="lazy" title={tx("invitacion.ubicacion.tituloMapa", { lugar: lugarNombre })} referrerPolicy="no-referrer-when-downgrade" />
                     ) : (
-                      <span className="ss-kicker" style={{ margin: 0 }}>{tx("invitacion.ubicacion.mapaNoDisponible")}</span>
+                      <span className="mn-kicker" style={{ margin: 0 }}>{tx("invitacion.ubicacion.mapaNoDisponible")}</span>
                     )}
                   </div>
-                  <p className="ss-dato">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>
-                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="ss-btn-solido">{tx("invitacion.ubicacion.verMapaFiesta")}</a>
+                  <p className="mn-dato">{[direccion, ciudad].filter(Boolean).join(" · ")}</p>
+                  <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="mn-btn-solido">{tx("invitacion.ubicacion.verMapaFiesta")}</a>
                 </Entra>
               </Hoja>
             </section>
@@ -1054,14 +1035,14 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 06 Tu confirmación ─────────────────────────────────── */}
           {rsvpEnabled && (
-            <section className="ss-seccion" data-sec="06" id="rsvp-hoja">
+            <section className="mn-seccion" data-sec="06" id="rsvp-hoja">
               <Hoja>
                 <Cabecera icono="tarjeta" numero="06" titulo={tx("invitacion.rsvp.confirmar")} />
                 {rsvpDias > 0 && (
                   <Entra retraso={120}>
-                    <p className="ss-kicker">{tx("invitacion.rsvp.quedan")}</p>
-                    <p className="ss-cifra">{diasParaConfirmar}</p>
-                    <p className="ss-kicker">{tx("invitacion.rsvp.diasParaConfirmar")}</p>
+                    <p className="mn-kicker">{tx("invitacion.rsvp.quedan")}</p>
+                    <p className="mn-cifra">{diasParaConfirmar}</p>
+                    <p className="mn-kicker">{tx("invitacion.rsvp.diasParaConfirmar")}</p>
                   </Entra>
                 )}
                 <Entra retraso={240}>
@@ -1100,8 +1081,8 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
           <QrDeIngreso guest={guest as never} />
 
           {(invitation.galeriaPrincipalHabilitada ?? false) && invitation.albumStyle === "solapadas" && allPhotos.length >= 5 && (
-            <SectionWrapper id="album-2" delay={150} className="ss-seccion" style={{ padding: 0 }}>
-              <div className="ss-seccion">
+            <SectionWrapper id="album-2" delay={150} className="mn-seccion" style={{ padding: 0 }}>
+              <div className="mn-seccion">
                 <Hoja>
                   <Album photos={allPhotos} hideHeader albumStyle="solapadas" part="second" />
                 </Hoja>
@@ -1111,12 +1092,12 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── Quiz ───────────────────────────────────────────────── */}
           {triviaHabilitada && triviaPreguntas.length > 0 && (
-            <SectionWrapper id="quiz" delay={300} className="ss-seccion" style={{ padding: 0 }}>
-              <div className="ss-seccion">
+            <SectionWrapper id="quiz" delay={300} className="mn-seccion" style={{ padding: 0 }}>
+              <div className="mn-seccion">
                 <Hoja>
                   <Entra>
-                    <p className="ss-kicker">{String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes"))}</p>
-                    <QuizSobre preguntas={triviaPreguntas} invitationId={String(invitation.id ?? "")} guestToken={guest?.uniqueToken} guestName={guest?.name} />
+                    <p className="mn-kicker">{String(invitation.triviaTitulo || tx("invitacion.quiz.cuantoSabes"))}</p>
+                    <QuizManuscrita preguntas={triviaPreguntas} invitationId={String(invitation.id ?? "")} guestToken={guest?.uniqueToken} guestName={guest?.name} />
                   </Entra>
                 </Hoja>
               </div>
@@ -1125,12 +1106,12 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 07 Regalos ─────────────────────────────────────────── */}
           {showGiftSection && (
-            <SectionWrapper id="banco" delay={200} className="ss-seccion" style={{ padding: 0 }}>
-              <div className="ss-seccion" data-sec="07">
+            <SectionWrapper id="banco" delay={200} className="mn-seccion" style={{ padding: 0 }}>
+              <div className="mn-seccion" data-sec="07">
                 <Hoja>
                   <Cabecera icono="sobre" numero="07" titulo={tx("invitacion.regalos.banco")} />
                   <Entra retraso={120}>
-                    {Boolean(invitation.regaloMensaje) && <p className="ss-cuerpo">{String(invitation.regaloMensaje)}</p>}
+                    {Boolean(invitation.regaloMensaje) && <p className="mn-cuerpo">{String(invitation.regaloMensaje)}</p>}
                     <div style={{ display: "grid", gap: 14 }}>
                       {pagoTarjetaHabilitado && (
                         <BankDetailsCard
@@ -1179,7 +1160,7 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
 
           {/* ── 08 Sugerí una canción ──────────────────────────────── */}
           {songsEnabled && (
-            <section className="ss-seccion" data-sec="08" id="songs-hoja">
+            <section className="mn-seccion" data-sec="08" id="songs-hoja">
               <Hoja>
                 <Cabecera icono="nota" numero="08" titulo={tx("invitacion.musica.titulo")} anchoIcono="15%" />
                 <Entra retraso={120}>
@@ -1199,19 +1180,19 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
           )}
 
           {/* ── 09 Cierre ──────────────────────────────────────────── */}
-          <section className="ss-seccion" data-sec="09" id="cierre">
+          <section className="mn-seccion" data-sec="09" id="cierre">
             <Hoja>
-              <Doodle pieza="lazo" ancho={120} left="50%" top={-28} transform="translateX(-50%)" />
+              <Doodle pieza="candelabro" ancho={84} left="50%" top={-26} transform="translateX(-50%)" />
               <Entra>
-                <p className="ss-num">09.</p>
-                <div className="ss-monograma">
+                <p className="mn-num">09.</p>
+                <div className="mn-monograma">
                   <svg viewBox="0 0 88 110" width="78" height="98" aria-hidden="true">
                     <ellipse cx="44" cy="55" rx="40" ry="52" fill="none" stroke="currentColor" strokeWidth=".75" />
                     <ellipse cx="44" cy="55" rx="34" ry="46" fill="none" stroke="currentColor" strokeWidth=".4" />
                   </svg>
                   <span>{monograma}</span>
                 </div>
-                <p className="ss-script">{tx("invitacion.frase.graciasPorEstar")}</p>
+                <p className="mn-script">{tx("invitacion.frase.graciasPorEstar")}</p>
               </Entra>
             </Hoja>
           </section>
@@ -1223,7 +1204,7 @@ export function SobreSelloTemplateOliva({ invitation, guest, isPersonalized = fa
       </div>
 
       {isCoverOpen && (
-        <div className={`ss-pastilla ${pastillaOculta ? "ss-pastilla--oculta" : ""}`}>
+        <div className={`mn-pastilla ${pastillaOculta ? "mn-pastilla--oculta" : ""}`}>
           <BottomNavPill sections={navSections} variant="moderno" accentColor={TINTA} surfaceColor={PAPEL} inactiveColor={TINTA_SUAVE} solid />
         </div>
       )}
@@ -1245,221 +1226,237 @@ function IconoPastilla({ nombre }: { nombre: NombreDeIcono }) {
 // Lo escribe scripts/derivar-sobre-sello.js dentro de la plantilla. Vive
 // aparte porque es la identidad entera de la sub-colección y así se lee de
 // corrido, sin el ruido del script que lo inserta.
-const CSS_SOBRE = `
-  .ss-raiz { position: relative; color: ${TINTA}; font-family: ${SANS}; background: ${PAPEL}; }
-  .ss-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-color: ${PAPEL}; }
-  .ss-escenario { position: relative; z-index: 1; background: transparent !important; }
-  .ss-escenario.desktop-stage { background: transparent; }
-  .ss-derecha { background: transparent; }
-  .desktop-stage.ss-escenario .d-left.ss-izquierda { background: transparent; padding: 26px 22px; align-items: center; justify-content: center; }
-  .ss-hoja-grande { width: 94%; aspect-ratio: 301/432; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; overflow: hidden; }
-  .ss-hoja-grande .ss-nombres { font-size: 44px; }
-  .ss-nav-escritorio { margin-top: 18px; width: 100%; padding-bottom: 22px; }
-  .ss-nav-lista { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 12px; }
-  .ss-nav-lista a { background: none; border: none; padding: 5px 2px; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: ${TINTA_SUAVE}; text-decoration: none; }
-  .ss-nav-lista a:hover { color: ${ACENTO}; }
+const CSS_MN = `
+  .mn-raiz { position: relative; color: ${TINTA}; font-family: ${SANS}; background: ${PAPEL}; }
+  .mn-fondo { position: fixed; inset: 0; z-index: 0; pointer-events: none; background-color: ${PAPEL}; }
+  .mn-escenario { position: relative; z-index: 1; background: transparent !important; }
+  .mn-escenario.desktop-stage { background: transparent; }
+  .mn-derecha { background: transparent; }
+  .desktop-stage.mn-escenario .d-left.mn-izquierda { background: transparent; padding: 26px 22px; align-items: center; justify-content: center; }
+  .mn-hoja-grande { width: 94%; aspect-ratio: 301/432; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; text-align: center; overflow: hidden; }
+  .mn-hoja-grande .mn-nombres { font-size: 44px; }
+  .mn-nav-escritorio { margin-top: 18px; width: 100%; padding-bottom: 22px; }
+  .mn-nav-lista { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 12px; }
+  .mn-nav-lista a { background: none; border: none; padding: 5px 2px; font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: ${TINTA_SUAVE}; text-decoration: none; }
+  .mn-nav-lista a:hover { color: ${ACENTO}; }
 
   /* La tarjeta: papel, un filete fino y la esquina doblada. Sin troquel ni
      relieve -- eso es de la otra sub-colección. */
-  .ss-hoja { position: relative; padding: 26px 22px 24px; text-align: center; background: ${PAPEL};
+  .mn-hoja { position: relative; padding: 26px 22px 24px; text-align: center; background: ${PAPEL};
     border: 1px solid rgba(0,0,0,.08); overflow: hidden; }
-  .desktop-stage .ss-hoja { padding: 34px 40px 30px; }
-  .ss-hoja::after { content: ""; position: absolute; right: 0; top: 0; width: 16px; height: 16px;
+  .desktop-stage .mn-hoja { padding: 34px 40px 30px; }
+  .mn-hoja::after { content: ""; position: absolute; right: 0; top: 0; width: 16px; height: 16px;
     background: linear-gradient(225deg, ${PAPEL2} 50%, rgba(0,0,0,.10) 50%); pointer-events: none; }
-  .ss-filete { display: none; }
+  .mn-filete { display: none; }
   /* La portada del celular no es una hoja con proporción de tarjeta: es un
      sobre que llena la pantalla, con el papel asomando abajo. Con la
      proporción 301:432 de Papel Prensado el sobre quedaba de 72 px y los
      nombres se salían por el borde. */
-  .ss-hoja--portada { aspect-ratio: auto; min-height: min(86vh, 806px); display: flex; flex-direction: column;
+  .mn-hoja--portada { aspect-ratio: auto; min-height: min(86vh, 806px); display: flex; flex-direction: column;
     align-items: center; justify-content: flex-end; padding: 0; border: none; }
-  .ss-hoja--portada::after { display: none; }
-  .ss-seccion { position: relative; padding: 14px 3%; }
-  .ss-seccion:nth-of-type(even) { background: ${PAPEL2}; }
-  .ss-portada { padding: 0; }
-  .ss-portada--sube { animation: ssPortadaSube .9s cubic-bezier(.22,.61,.36,1) both; }
+  .mn-hoja--portada::after { display: none; }
+  .mn-seccion { position: relative; padding: 14px 3%; }
+  .mn-seccion:nth-of-type(even) { background: ${PAPEL2}; }
+  .mn-portada { padding: 0; }
+  .mn-portada--sube { animation: mnPortadaSube .9s cubic-bezier(.22,.61,.36,1) both; }
 
   /* El sobre de la portada. */
   /* El papel que asoma abajo ocupa el 24 % de la portada (196 de 806 px en el
      mockup). Va en porcentaje y no en píxeles porque la misma portada se
      dibuja a 806 px en el celular y a la altura de la tarjeta en escritorio. */
-  .ss-sobre { position: absolute; left: 0; right: 0; top: 0; bottom: 24%; overflow: hidden; pointer-events: none; }
-  .ss-sobre-forro { position: absolute; inset: 0;
+  .mn-sobre { position: absolute; left: 0; right: 0; top: 0; bottom: 24%; overflow: hidden; pointer-events: none; }
+  .mn-sobre-forro { position: absolute; inset: 0;
     background: repeating-linear-gradient(135deg, ${matiz(PAPEL2, -8)} 0 7px, ${matiz(PAPEL2, -14)} 7px 14px); }
-  .ss-sobre-brillo { position: absolute; top: 0; bottom: 0; width: 130px; left: -130px;
-    background: linear-gradient(90deg, transparent, rgba(255,244,228,.6), transparent); animation: ssBrillo 9s ease-in-out infinite; }
-  .ss-sobre-filete { position: absolute; left: 18px; right: 18px; top: 18px; bottom: 18px; border: 1px solid rgba(244,235,226,.8); }
-  .ss-sobre-filete--interno { left: 25px; right: 25px; top: 25px; bottom: 25px; border-color: rgba(244,235,226,.4); }
+  .mn-sobre-brillo { position: absolute; top: 0; bottom: 0; width: 130px; left: -130px;
+    background: linear-gradient(90deg, transparent, rgba(255,244,228,.6), transparent); animation: mnBrillo 9s ease-in-out infinite; }
+  .mn-sobre-filete { position: absolute; left: 18px; right: 18px; top: 18px; bottom: 18px; border: 1px solid rgba(244,235,226,.8); }
+  .mn-sobre-filete--interno { left: 25px; right: 25px; top: 25px; bottom: 25px; border-color: rgba(244,235,226,.4); }
   /* Lo que va sobre el papel que asoma abajo del sobre: el saludo, los
      nombres y la fecha. Son bloques hermanos del sobre, así que cada uno se
      apoya en el papel y se pone por encima del forro. */
-  .ss-hoja--portada > .ss-entra { position: relative; z-index: 1; align-self: stretch; box-sizing: border-box; background: ${PAPEL}; padding: 0 22px; }
-  .ss-hoja--portada > .ss-entra:first-of-type { padding-top: 24px; }
-  .ss-hoja--portada > .ss-entra:last-of-type { padding-bottom: 26px; }
+  .mn-hoja--portada > .mn-entra { position: relative; z-index: 1; align-self: stretch; box-sizing: border-box; background: ${PAPEL}; padding: 0 22px; }
+  .mn-hoja--portada > .mn-entra:first-of-type { padding-top: 24px; }
+  .mn-hoja--portada > .mn-entra:last-of-type { padding-bottom: 26px; }
 
   /* La cabecera de cada sección: el nombre, un filete que llega al borde y
      un punto dorado que lo cierra. */
-  .ss-cabecera { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
-  .ss-cabecera .ss-kicker { margin: 0; flex-shrink: 0; }
-  .ss-cabecera-filete { flex: 1; height: 1px; background: ${ACENTO2}; opacity: .5; }
-  .ss-cabecera-punto { width: 4px; height: 4px; border-radius: 50%; background: ${ACENTO2}; flex-shrink: 0; }
+  .mn-cabecera { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
+  .mn-cabecera .mn-kicker { margin: 0; flex-shrink: 0; }
+  .mn-cabecera-filete { flex: 1; height: 1px; background: ${ACENTO2}; opacity: .5; }
+  .mn-cabecera-punto { width: 4px; height: 4px; border-radius: 50%; background: ${ACENTO2}; flex-shrink: 0; }
 
   /* Tipos */
-  .ss-kicker { font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: ${ACENTO}; margin: 0 0 10px; }
-  .ss-dato { font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin: 0 0 8px; }
-  .ss-cuerpo { font-family: ${SANS}; font-weight: 300; font-size: 14px; line-height: 1.7; color: ${TINTA_SUAVE}; margin: 0 auto 16px; max-width: 46ch; }
-  .ss-num { display: none; }
-  .ss-titulo { font-family: ${SERIF}; font-weight: 300; font-size: 30px; line-height: 1.2; color: ${TINTA}; margin: 0 0 18px; letter-spacing: .04em; }
-  .ss-script { font-family: ${SCRIPT}; font-weight: 400; font-size: 40px; line-height: 1.2; color: ${ACENTO}; margin: 0 0 8px; display: inline-block; }
-  .ss-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 42px; line-height: 1; letter-spacing: .07em; color: ${TINTA}; margin: 0;
+  .mn-kicker { font-family: ${SANS}; font-weight: 400; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: ${ACENTO}; margin: 0 0 10px; }
+  .mn-dato { font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .3em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin: 0 0 8px; }
+  .mn-cuerpo { font-family: ${SANS}; font-weight: 300; font-size: 14px; line-height: 1.7; color: ${TINTA_SUAVE}; margin: 0 auto 16px; max-width: 46ch; }
+  .mn-num { display: none; }
+  .mn-titulo { font-family: ${SERIF}; font-weight: 300; font-size: 30px; line-height: 1.2; color: ${TINTA}; margin: 0 0 18px; letter-spacing: .04em; }
+  .mn-script { font-family: ${SCRIPT}; font-weight: 400; font-size: 40px; line-height: 1.2; color: ${ACENTO}; margin: 0 0 8px; display: inline-block; }
+  .mn-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 42px; line-height: 1; letter-spacing: .07em; color: ${TINTA}; margin: 0;
     display: flex; flex-direction: column; align-items: center; text-transform: uppercase; }
-  .ss-amp { font-family: ${SCRIPT}; font-weight: 400; font-size: 36px; line-height: .62; color: ${ACENTO}; text-transform: none; margin: 2px 0; }
-  .ss-cifra { font-family: ${SERIF}; font-weight: 300; font-size: 62px; line-height: 1; color: ${TINTA}; margin: 4px 0 6px; }
-  .ss-filete-corto { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 14px auto 16px; }
-  .ss-filete-corto::before, .ss-filete-corto::after { content: ""; width: 46px; height: 1px; background: ${ACENTO2}; }
-  .ss-hairline { height: 1px; background: rgba(0,0,0,.08); margin: 22px 0; }
-  .ss-lugar { font-family: ${SERIF}; font-weight: 400; font-size: 26px; line-height: 1.2; color: ${TINTA}; margin: 0 0 8px; }
-  .ss-link { display: inline-flex; align-items: center; min-height: 44px; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: ${ACENTO}; border-bottom: 1px solid ${ACENTO2}; text-decoration: none; }
-  .ss-btn-solido { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: ${ACENTO}; color: ${PAPEL}; border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
-  .ss-btn-fantasma { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; background: transparent; color: ${TINTA}; border: 1px solid ${ACENTO2}; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
-  .ss-frase-seccion { position: relative; padding: 64px 8%; text-align: center; background: ${PAPEL}; }
-  .desktop-stage .ss-frase-seccion { padding: 76px 8%; }
-  .ss-frase { font-family: ${SERIF}; font-weight: 300; font-style: italic; font-size: 27px; line-height: 1.45; color: ${TINTA}; margin: 0 auto 6px; max-width: 26ch; text-wrap: pretty; }
-  .desktop-stage .ss-frase { font-size: 32px; }
-  .ss-flota { animation: ssFlota 7s ease-in-out infinite; }
+  .mn-amp { font-family: ${SCRIPT}; font-weight: 400; font-size: 36px; line-height: .62; color: ${ACENTO}; text-transform: none; margin: 2px 0; }
+  .mn-cifra { font-family: ${SERIF}; font-weight: 300; font-size: 62px; line-height: 1; color: ${TINTA}; margin: 4px 0 6px; }
+  .mn-filete-corto { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 14px auto 16px; }
+  .mn-filete-corto::before, .mn-filete-corto::after { content: ""; width: 46px; height: 1px; background: ${ACENTO2}; }
+  .mn-hairline { height: 1px; background: rgba(0,0,0,.08); margin: 22px 0; }
+  .mn-lugar { font-family: ${SERIF}; font-weight: 400; font-size: 26px; line-height: 1.2; color: ${TINTA}; margin: 0 0 8px; }
+  .mn-link { display: inline-flex; align-items: center; min-height: 44px; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: ${ACENTO}; border-bottom: 1px solid ${ACENTO2}; text-decoration: none; }
+  .mn-btn-solido { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 26px; background: ${ACENTO}; color: ${PAPEL}; border: none; font-family: ${SANS}; font-weight: 400; font-size: 11.5px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; text-decoration: none; }
+  .mn-btn-fantasma { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; background: transparent; color: ${TINTA}; border: 1px solid ${ACENTO2}; font-family: ${SANS}; font-weight: 400; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; cursor: pointer; }
+  .mn-frase-seccion { position: relative; padding: 64px 8%; text-align: center; background: ${PAPEL}; }
+  .desktop-stage .mn-frase-seccion { padding: 76px 8%; }
+  .mn-frase { font-family: ${SERIF}; font-weight: 300; font-style: italic; font-size: 27px; line-height: 1.45; color: ${TINTA}; margin: 0 auto 6px; max-width: 26ch; text-wrap: pretty; }
+  .desktop-stage .mn-frase { font-size: 32px; }
+  .mn-flota { animation: mnFlota 7s ease-in-out infinite; }
 
   /* La cabecera de cada sección: kicker, filete largo y un punto. */
-  .ss-entra { opacity: 0; transform: translateY(14px);
+  .mn-entra { opacity: 0; transform: translateY(14px);
     transition: opacity .9s cubic-bezier(.22,.61,.36,1), transform .9s cubic-bezier(.22,.61,.36,1); }
-  .ss-entra--visto { opacity: 1; transform: none; }
+  .mn-entra--visto { opacity: 1; transform: none; }
 
   /* Cronograma */
-  .ss-cronograma { position: relative; text-align: left; max-width: 380px; margin: 0 auto; }
-  .ss-cronograma-eje { position: absolute; left: 74px; top: 10px; bottom: 10px; width: 1px; background: ${ACENTO2}; opacity: .45; }
-  .ss-hito { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
-  .ss-hito-hora { font-family: ${SANS}; font-weight: 400; font-size: 12px; letter-spacing: .2em; color: ${TINTA_SUAVE}; width: 62px; text-align: right; flex-shrink: 0; }
-  .ss-hito-punto { width: 4px; height: 4px; border-radius: 50%; background: ${ACENTO2}; flex-shrink: 0; }
-  .ss-hito-titulo { font-family: ${SERIF}; font-weight: 400; font-size: 20px; color: ${TINTA}; }
+  .mn-cronograma { position: relative; text-align: left; max-width: 380px; margin: 0 auto; }
+  .mn-cronograma-eje { position: absolute; left: 74px; top: 10px; bottom: 10px; width: 1px; background: ${ACENTO2}; opacity: .45; }
+  .mn-hito { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+  .mn-hito-hora { font-family: ${SANS}; font-weight: 400; font-size: 12px; letter-spacing: .2em; color: ${TINTA_SUAVE}; width: 62px; text-align: right; flex-shrink: 0; }
+  .mn-hito-punto { width: 4px; height: 4px; border-radius: 50%; background: ${ACENTO2}; flex-shrink: 0; }
+  .mn-hito-titulo { font-family: ${SERIF}; font-weight: 400; font-size: 20px; color: ${TINTA}; }
 
   /* Cuenta regresiva: los días en un anillo que gira, el resto en cajitas. */
-  .ss-cuenta { display: flex; flex-direction: column; align-items: center; gap: 22px; }
-  .ss-cuenta-circulo { position: relative; width: 152px; height: 152px; display: flex; align-items: center; justify-content: center; text-align: center; }
-  .ss-cuenta-anillo { position: absolute; inset: 0; border-radius: 50%; border: 1px solid ${ACENTO2};
-    border-top-color: ${ACENTO}; border-right-color: transparent; animation: ssGira 60s linear infinite; }
-  .ss-cuenta-dias { display: block; font-family: ${SERIF}; font-weight: 300; font-size: 62px; line-height: 1; color: ${TINTA}; font-variant-numeric: tabular-nums; }
-  .ss-cuenta-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 340px; }
-  .ss-cuenta-caja { position: relative; background: ${PAPEL}; border: 1px solid rgba(0,0,0,.08); padding: 16px 8px 13px; text-align: center; overflow: hidden; }
-  .ss-cuenta-caja::after { content: ""; position: absolute; right: 0; top: 0; width: 16px; height: 16px;
+  .mn-cuenta { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .mn-cuenta-circulo { position: relative; width: 152px; height: 152px; display: flex; align-items: center; justify-content: center; text-align: center; }
+  .mn-cuenta-anillo { position: absolute; inset: 0; border-radius: 50%; border: 1px solid ${ACENTO2};
+    border-top-color: ${ACENTO}; border-right-color: transparent; animation: mnGira 60s linear infinite; }
+  .mn-cuenta-dias { display: block; font-family: ${SERIF}; font-weight: 300; font-size: 62px; line-height: 1; color: ${TINTA}; font-variant-numeric: tabular-nums; }
+  .mn-cuenta-grilla { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 100%; max-width: 340px; }
+  .mn-cuenta-caja { position: relative; background: ${PAPEL}; border: 1px solid rgba(0,0,0,.08); padding: 16px 8px 13px; text-align: center; overflow: hidden; }
+  .mn-cuenta-caja::after { content: ""; position: absolute; right: 0; top: 0; width: 16px; height: 16px;
     background: linear-gradient(225deg, ${PAPEL2} 50%, rgba(0,0,0,.10) 50%); }
-  .ss-cuenta-num { display: block; font-family: ${SERIF}; font-weight: 300; font-size: 32px; line-height: 1; color: ${TINTA}; font-variant-numeric: tabular-nums; }
-  .ss-cuenta-etq { display: block; font-family: ${SANS}; font-weight: 400; font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin-top: 6px; }
-  .ss-cuenta-aviso { text-align: center; }
+  .mn-cuenta-num { display: block; font-family: ${SERIF}; font-weight: 300; font-size: 32px; line-height: 1; color: ${TINTA}; font-variant-numeric: tabular-nums; }
+  .mn-cuenta-etq { display: block; font-family: ${SANS}; font-weight: 400; font-size: 9px; letter-spacing: .26em; text-transform: uppercase; color: ${TINTA_SUAVE}; margin-top: 6px; }
+  .mn-cuenta-aviso { text-align: center; }
 
   /* Mapa */
-  .ss-mapa { height: 180px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  .mn-mapa { height: 180px; display: flex; align-items: center; justify-content: center; overflow: hidden;
     background: ${PAPEL2}; border: 1px solid rgba(0,0,0,.08); margin-bottom: 18px; }
-  .desktop-stage .ss-mapa { height: 250px; }
+  .desktop-stage .mn-mapa { height: 250px; }
 
   /* Banco */
-  .ss-banco-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,.08); text-align: left; }
-  .ss-banco-clave { display: block; font-family: ${SANS}; font-weight: 400; font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: ${ACENTO}; margin-bottom: 3px; }
-  .ss-banco-valor { display: block; font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; overflow-wrap: anywhere; }
-  .ss-hoja #banco .t-kicker, .ss-hoja h4 { font-family: ${SANS} !important; font-weight: 400 !important; font-size: 9.5px !important; letter-spacing: .28em !important; text-transform: uppercase !important; color: ${ACENTO} !important; }
+  .mn-banco-fila { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,.08); text-align: left; }
+  .mn-banco-clave { display: block; font-family: ${SANS}; font-weight: 400; font-size: 9.5px; letter-spacing: .28em; text-transform: uppercase; color: ${ACENTO}; margin-bottom: 3px; }
+  .mn-banco-valor { display: block; font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; overflow-wrap: anywhere; }
+  .mn-hoja #banco .t-kicker, .mn-hoja h4 { font-family: ${SANS} !important; font-weight: 400 !important; font-size: 9.5px !important; letter-spacing: .28em !important; text-transform: uppercase !important; color: ${ACENTO} !important; }
 
   /* Quiz */
-  .ss-quiz-opcion { display: block; width: 100%; max-width: 420px; margin: 0 auto 8px; min-height: 48px; padding: 12px 16px; cursor: pointer; text-align: left;
+  .mn-quiz-opcion { display: block; width: 100%; max-width: 420px; margin: 0 auto 8px; min-height: 48px; padding: 12px 16px; cursor: pointer; text-align: left;
     font-family: ${SANS}; font-weight: 300; font-size: 15px; color: ${TINTA}; background: ${PAPEL}; border: 1px solid rgba(0,0,0,.08); transition: background .2s ease, color .2s ease, border-color .2s ease; }
-  .ss-quiz-opcion[data-elegida] { background: ${ACENTO}; border-color: ${ACENTO}; color: ${PAPEL}; }
-  .ss-quiz-opcion:disabled { cursor: default; }
+  .mn-quiz-opcion[data-elegida] { background: ${ACENTO}; border-color: ${ACENTO}; color: ${PAPEL}; }
+  .mn-quiz-opcion:disabled { cursor: default; }
 
   /* Monograma */
-  .ss-monograma { position: relative; width: 78px; height: 78px; display: flex; align-items: center; justify-content: center; margin: 6px auto 18px;
+  .mn-monograma { position: relative; width: 78px; height: 78px; display: flex; align-items: center; justify-content: center; margin: 6px auto 18px;
     border: 1px solid ${ACENTO2}; border-radius: 50%; }
-  .ss-monograma svg { display: none; }
-  .ss-monograma span { position: relative; font-family: ${SERIF}; font-weight: 300; font-size: 22px; letter-spacing: .18em; color: ${ACENTO}; }
+  .mn-monograma svg { display: none; }
+  .mn-monograma span { position: relative; font-family: ${SERIF}; font-weight: 300; font-size: 22px; letter-spacing: .18em; color: ${ACENTO}; }
 
   /* Splash */
-  .ss-splash { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 16px 3%; background: ${PAPEL}; }
-  .ss-splash--sale { animation: ssSplashSale .9s ease both; }
-  .ss-splash-hoja { position: relative; width: 100%; max-width: 340px; aspect-ratio: 301/432; padding: 40px 28px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-  .ss-splash-nombre { font-family: ${SCRIPT}; font-weight: 400; font-size: 52px; line-height: 1.1; color: ${ACENTO}; margin: 2px 0 4px; }
-  @keyframes ssSplashSale { from { opacity: 1; } to { opacity: 0; } }
-  @keyframes ssPortadaSube { from { transform: translateY(24px); } to { transform: translateY(0); } }
-  @keyframes ssPrensado { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  @keyframes ssGira { to { transform: rotate(360deg); } }
-  @keyframes ssFlota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
-  @keyframes ssBrillo { 0% { left: -130px; } 60%, 100% { left: 120%; } }
+  .mn-splash { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; padding: 16px 3%; background: ${PAPEL}; }
+  .mn-splash--sale { animation: mnSplashSale .9s ease both; }
+  .mn-splash-hoja { position: relative; width: 100%; max-width: 340px; aspect-ratio: 301/432; padding: 40px 28px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .mn-splash-nombre { font-family: ${SCRIPT}; font-weight: 400; font-size: 52px; line-height: 1.1; color: ${ACENTO}; margin: 2px 0 4px; }
+  @keyframes mnSplashSale { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes mnPortadaSube { from { transform: translateY(24px); } to { transform: translateY(0); } }
+  @keyframes mnPrensado { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes mnGira { to { transform: rotate(360deg); } }
+  @keyframes mnFlota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+  @keyframes mnBrillo { 0% { left: -130px; } 60%, 100% { left: 120%; } }
 
   /* Pase (burbuja arriba) */
-  .ss-pase-burbuja { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 99999; cursor: pointer; padding: 8px 14px;
+  .mn-pase-burbuja { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 99999; cursor: pointer; padding: 8px 14px;
     background: ${PAPEL}; border: 1px solid ${ACENTO2}; box-shadow: 0 2px 10px rgba(${SH},.16); transition: all .5s ease; }
-  .ss-pase-burbuja--abierta { width: calc(100% - 32px); max-width: 360px; padding: 12px 16px; }
+  .mn-pase-burbuja--abierta { width: calc(100% - 32px); max-width: 360px; padding: 12px 16px; }
 
   /* Pastilla inferior */
-  .ss-pastilla { transition: opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1); }
-  .ss-pastilla--oculta { opacity: 0; transform: translateY(26px); transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1); pointer-events: none; }
-  .ss-raiz .bottom-nav, .desktop-stage.ss-escenario .bottom-nav { border-radius: 0 !important; background: ${PAPEL} !important; border: 1px solid ${ACENTO2} !important;
+  .mn-pastilla { transition: opacity .35s ease, transform .35s cubic-bezier(.22,.61,.36,1); }
+  .mn-pastilla--oculta { opacity: 0; transform: translateY(26px); transition: opacity .3s ease, transform .3s cubic-bezier(.22,.61,.36,1); pointer-events: none; }
+  .mn-raiz .bottom-nav, .desktop-stage.mn-escenario .bottom-nav { border-radius: 0 !important; background: ${PAPEL} !important; border: 1px solid ${ACENTO2} !important;
     box-shadow: 0 2px 10px rgba(${SH},.16) !important; backdrop-filter: none !important; padding: 5px !important; gap: 2px !important; }
-  .ss-raiz .bottom-nav a { color: ${TINTA} !important; opacity: .55 !important; min-height: 48px; }
-  .ss-raiz .bottom-nav a[aria-current="true"] { opacity: 1 !important; background: ${PAPEL2}; color: ${ACENTO} !important; }
+  .mn-raiz .bottom-nav a { color: ${TINTA} !important; opacity: .55 !important; min-height: 48px; }
+  .mn-raiz .bottom-nav a[aria-current="true"] { opacity: 1 !important; background: ${PAPEL2}; color: ${ACENTO} !important; }
 
   /* Componentes compartidos, vestidos con el registro */
-  .ss-raiz .tpl h2, .ss-raiz .tpl h3, .ss-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
-  .ss-raiz .ss-script, .ss-raiz .ss-amp, .ss-raiz .ss-splash-nombre, .ss-raiz .ss-sinonimo { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
-  .ss-raiz .tpl .t-kicker, .ss-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${ACENTO} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .28em !important; text-transform: uppercase !important; display: block; }
-  .ss-raiz .tpl .t-kicker::before, .ss-raiz .tpl p.kicker::before { display: none !important; }
-  .ss-raiz .tpl div:not(#countdown div), .ss-raiz .tpl section, .ss-raiz .tpl button, .ss-raiz .tpl input, .ss-raiz .tpl iframe, .ss-raiz .tpl .t-btn, .ss-raiz .tpl .album-btn { border-radius: 0 !important; }
-  .ss-raiz .tpl .album-item { border-radius: 0 !important; border: 8px solid ${PAPEL}; border-bottom-width: 22px; background: ${PAPEL}; box-shadow: 0 2px 10px rgba(${SH},.16); }
-  .ss-raiz .tpl .album-btn { color: ${ACENTO} !important; border: 1px solid ${ACENTO2} !important; background: transparent !important; }
-  .ss-raiz .tpl .cascade-frame { box-shadow: 0 2px 10px rgba(${SH},.16) !important; background: ${PAPEL} !important; }
+  .mn-raiz .tpl h2, .mn-raiz .tpl h3, .mn-raiz .tpl h4 { font-family: ${SERIF}; color: ${TINTA}; }
+  .mn-raiz .mn-script, .mn-raiz .mn-amp, .mn-raiz .mn-splash-nombre, .mn-raiz .mn-sinonimo { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-style: normal !important; }
+  .mn-raiz .tpl .t-kicker, .mn-raiz .tpl p.kicker { font-family: ${SANS} !important; color: ${ACENTO} !important; font-size: 10px !important; font-weight: 400 !important; letter-spacing: .28em !important; text-transform: uppercase !important; display: block; }
+  .mn-raiz .tpl .t-kicker::before, .mn-raiz .tpl p.kicker::before { display: none !important; }
+  .mn-raiz .tpl div:not(#countdown div), .mn-raiz .tpl section, .mn-raiz .tpl button, .mn-raiz .tpl input, .mn-raiz .tpl iframe, .mn-raiz .tpl .t-btn, .mn-raiz .tpl .album-btn { border-radius: 0 !important; }
+  .mn-raiz .tpl .album-item { border-radius: 0 !important; border: 8px solid ${PAPEL}; border-bottom-width: 22px; background: ${PAPEL}; box-shadow: 0 2px 10px rgba(${SH},.16); }
+  .mn-raiz .tpl .album-btn { color: ${ACENTO} !important; border: 1px solid ${ACENTO2} !important; background: transparent !important; }
+  .mn-raiz .tpl .cascade-frame { box-shadow: 0 2px 10px rgba(${SH},.16) !important; background: ${PAPEL} !important; }
 
   /* Los íconos de los componentes compartidos no entran: el dibujo de esta
      sub-colección son los doodles pintados. */
-  .ss-raiz #songs svg.lucide, .ss-raiz #rsvp svg.lucide, .ss-raiz .ia-icon-box svg.lucide { display: none !important; }
-  .ss-raiz .ia-icon-box { display: none !important; }
+  .mn-raiz #songs svg.lucide, .mn-raiz #rsvp svg.lucide, .mn-raiz .ia-icon-box svg.lucide { display: none !important; }
+  .mn-raiz .ia-icon-box { display: none !important; }
 
-  .ss-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
-  .ss-raiz #rsvp.section.dark > p.t-kicker, .ss-raiz #rsvp.section.dark > h2, .ss-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }
-  .ss-raiz #rsvp.section.dark h2 { display: none !important; }
-  .ss-raiz #rsvp.section.dark b, .ss-raiz #rsvp.section.dark strong { color: ${TINTA} !important; }
-  .ss-raiz #rsvp.section.dark label { text-transform: uppercase !important; font-size: 9.5px !important; font-family: ${SANS} !important; letter-spacing: .28em !important; color: ${ACENTO} !important; font-weight: 400 !important; }
-  .ss-raiz #rsvp.section.dark input { background: ${PAPEL} !important; color: ${TINTA} !important; border: 1px solid rgba(0,0,0,.08) !important; border-radius: 0 !important; padding: 12px 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; min-height: 48px; }
-  .ss-raiz #rsvp.section.dark input::placeholder { color: ${TINTA_SUAVE} !important; opacity: .8 !important; }
-  .ss-raiz #rsvp.section.dark .t-btn { border-radius: 0 !important; min-height: 48px; padding: 0 22px !important; flex: 1 !important; min-width: 130px !important; background: transparent !important; color: ${TINTA} !important; border: 1px solid ${ACENTO2} !important; font-family: ${SANS} !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: .24em !important; font-size: 11.5px !important; }
-  .ss-raiz #rsvp.section.dark .t-btn.solid, .ss-raiz #rsvp.section.dark button[data-rsvp="confirmar"] { background: ${ACENTO} !important; color: ${PAPEL} !important; border-color: ${ACENTO} !important; }
-  .ss-raiz #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) { flex-direction: row !important; gap: 12px !important; }
-  .ss-raiz .tpl .d-rsvp-grid { display: flex !important; flex-direction: column !important; gap: 24px !important; align-items: flex-start !important; }
-  .ss-raiz .tpl .d-rsvp-grid > div { width: 100% !important; }
-  .ss-raiz #rsvp.section.dark .t-detail { background: transparent !important; border: none !important; border-top: 1px solid rgba(0,0,0,.08) !important; padding: 16px 0 0 !important; text-align: left !important; box-shadow: none !important; width: 100% !important; }
-  .ss-raiz #rsvp.section.dark .t-detail h4 { color: ${ACENTO} !important; font-family: ${SANS} !important; text-transform: uppercase !important; font-size: 9.5px !important; letter-spacing: .28em !important; font-weight: 400 !important; margin-bottom: 6px !important; }
-  .ss-raiz #rsvp.section.dark .t-detail p { color: ${TINTA_SUAVE} !important; font-size: 14px !important; }
-  .ss-raiz #rsvp.section.dark .t-detail p b { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 26px !important; color: ${TINTA} !important; }
+  .mn-raiz #rsvp.section.dark { background: transparent !important; color: ${TINTA} !important; border: none !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; }
+  .mn-raiz #rsvp.section.dark > p.t-kicker, .mn-raiz #rsvp.section.dark > h2, .mn-raiz #rsvp.section.dark > .d-rsvp-grid { width: 100% !important; max-width: 420px !important; text-align: left !important; }
+  .mn-raiz #rsvp.section.dark h2 { display: none !important; }
+  .mn-raiz #rsvp.section.dark b, .mn-raiz #rsvp.section.dark strong { color: ${TINTA} !important; }
+  .mn-raiz #rsvp.section.dark label { text-transform: uppercase !important; font-size: 9.5px !important; font-family: ${SANS} !important; letter-spacing: .28em !important; color: ${ACENTO} !important; font-weight: 400 !important; }
+  .mn-raiz #rsvp.section.dark input { background: ${PAPEL} !important; color: ${TINTA} !important; border: 1px solid rgba(0,0,0,.08) !important; border-radius: 0 !important; padding: 12px 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; min-height: 48px; }
+  .mn-raiz #rsvp.section.dark input::placeholder { color: ${TINTA_SUAVE} !important; opacity: .8 !important; }
+  .mn-raiz #rsvp.section.dark .t-btn { border-radius: 0 !important; min-height: 48px; padding: 0 22px !important; flex: 1 !important; min-width: 130px !important; background: transparent !important; color: ${TINTA} !important; border: 1px solid ${ACENTO2} !important; font-family: ${SANS} !important; font-weight: 400 !important; text-transform: uppercase !important; letter-spacing: .24em !important; font-size: 11.5px !important; }
+  .mn-raiz #rsvp.section.dark .t-btn.solid, .mn-raiz #rsvp.section.dark button[data-rsvp="confirmar"] { background: ${ACENTO} !important; color: ${PAPEL} !important; border-color: ${ACENTO} !important; }
+  .mn-raiz #rsvp.section.dark div:has(> button[data-rsvp="confirmar"]) { flex-direction: row !important; gap: 12px !important; }
+  .mn-raiz .tpl .d-rsvp-grid { display: flex !important; flex-direction: column !important; gap: 24px !important; align-items: flex-start !important; }
+  .mn-raiz .tpl .d-rsvp-grid > div { width: 100% !important; }
+  .mn-raiz #rsvp.section.dark .t-detail { background: transparent !important; border: none !important; border-top: 1px solid rgba(0,0,0,.08) !important; padding: 16px 0 0 !important; text-align: left !important; box-shadow: none !important; width: 100% !important; }
+  .mn-raiz #rsvp.section.dark .t-detail h4 { color: ${ACENTO} !important; font-family: ${SANS} !important; text-transform: uppercase !important; font-size: 9.5px !important; letter-spacing: .28em !important; font-weight: 400 !important; margin-bottom: 6px !important; }
+  .mn-raiz #rsvp.section.dark .t-detail p { color: ${TINTA_SUAVE} !important; font-size: 14px !important; }
+  .mn-raiz #rsvp.section.dark .t-detail p b { font-family: ${SERIF} !important; font-weight: 300 !important; font-size: 26px !important; color: ${TINTA} !important; }
   /* Confirmado: la caligrafía de la familia, no un relieve. */
-  .ss-raiz #rsvp.section.dark [class*="confirm"] h3, .ss-raiz #rsvp.section.dark h3 { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-size: 46px !important; line-height: 1.1 !important; color: ${ACENTO} !important;
-    animation: ssPrensado .5s cubic-bezier(.22,.61,.36,1) both; }
+  .mn-raiz #rsvp.section.dark [class*="confirm"] h3, .mn-raiz #rsvp.section.dark h3 { font-family: ${SCRIPT} !important; font-weight: 400 !important; font-size: 46px !important; line-height: 1.1 !important; color: ${ACENTO} !important;
+    animation: mnPrensado .5s cubic-bezier(.22,.61,.36,1) both; }
 
-  .ss-raiz #songs.d-sec.dark, .ss-raiz #songs { background: transparent !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; color: ${TINTA}; }
-  .ss-raiz #songs > p.t-kicker, .ss-raiz #songs > form, .ss-raiz #songs > div { width: 100% !important; max-width: 420px !important; text-align: left !important; }
-  .ss-raiz #songs h2, .ss-raiz #songs p:not(.t-kicker) { font-family: ${SANS}; color: ${TINTA}; }
-  .ss-raiz #songs .mod-input-row { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
-  .ss-raiz #songs input { background: ${PAPEL} !important; color: ${TINTA} !important; border: 1px solid rgba(0,0,0,.08) !important; border-radius: 0 !important; min-height: 48px; padding: 0 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; }
-  .ss-raiz #songs button[type="submit"], .ss-raiz #songs .t-btn { background: ${ACENTO} !important; color: ${PAPEL} !important; border: none !important; border-radius: 0 !important; min-height: 48px; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 11.5px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
-  .ss-raiz #songs .mod-item, .ss-raiz #songs li { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; border-radius: 0 !important; }
+  .mn-raiz #songs.d-sec.dark, .mn-raiz #songs { background: transparent !important; padding: 0 !important; display: flex; flex-direction: column; align-items: center; color: ${TINTA}; }
+  .mn-raiz #songs > p.t-kicker, .mn-raiz #songs > form, .mn-raiz #songs > div { width: 100% !important; max-width: 420px !important; text-align: left !important; }
+  .mn-raiz #songs h2, .mn-raiz #songs p:not(.t-kicker) { font-family: ${SANS}; color: ${TINTA}; }
+  .mn-raiz #songs .mod-input-row { display: flex !important; flex-direction: column !important; gap: 0 !important; width: 100% !important; }
+  .mn-raiz #songs input { background: ${PAPEL} !important; color: ${TINTA} !important; border: 1px solid rgba(0,0,0,.08) !important; border-radius: 0 !important; min-height: 48px; padding: 0 14px !important; font-family: ${SANS} !important; font-weight: 300 !important; font-size: 15px !important; }
+  .mn-raiz #songs button[type="submit"], .mn-raiz #songs .t-btn { background: ${ACENTO} !important; color: ${PAPEL} !important; border: none !important; border-radius: 0 !important; min-height: 48px; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 11.5px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
+  .mn-raiz #songs .mod-item, .mn-raiz #songs li { background: transparent !important; border: none !important; border-bottom: 1px solid rgba(0,0,0,.08) !important; border-radius: 0 !important; }
 
-  .ss-raiz #info-adicional { background: transparent !important; }
-  .ss-raiz #ia-trigger-btn { background: transparent !important; color: ${ACENTO} !important; border: 1px solid ${ACENTO2} !important; border-radius: 0 !important; font-family: ${SANS} !important; letter-spacing: .24em !important; text-transform: uppercase !important; font-size: 11px !important; }
+  .mn-raiz #info-adicional { background: transparent !important; }
+  .mn-raiz #ia-trigger-btn { background: transparent !important; color: ${ACENTO} !important; border: 1px solid ${ACENTO2} !important; border-radius: 0 !important; font-family: ${SANS} !important; letter-spacing: .24em !important; text-transform: uppercase !important; font-size: 11px !important; }
 
-  .ss-raiz .copy-btn { background: transparent !important; color: ${ACENTO} !important; border: 1px solid ${ACENTO2} !important; border-radius: 0 !important; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
-  .ss-raiz .copy-btn.copied { background: ${ACENTO} !important; color: ${PAPEL} !important; }
+  .mn-raiz .copy-btn { background: transparent !important; color: ${ACENTO} !important; border: 1px solid ${ACENTO2} !important; border-radius: 0 !important; font-family: ${SANS} !important; font-weight: 400 !important; font-size: 10px !important; letter-spacing: .24em !important; text-transform: uppercase !important; }
+  .mn-raiz .copy-btn.copied { background: ${ACENTO} !important; color: ${PAPEL} !important; }
 
   /* Post-evento */
-  .ss-post { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 3% 24px; min-height: 100dvh; display: flex; align-items: center; }
-  .ss-post-hoja { width: 100%; padding: 44px 30px 38px; }
-  .ss-sinonimo { font-family: ${SCRIPT}; font-weight: 400; font-style: normal; color: ${ACENTO}; }
+  .mn-post { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; padding: 48px 3% 24px; min-height: 100dvh; display: flex; align-items: center; }
+  .mn-post-hoja { width: 100%; padding: 44px 30px 38px; }
+  .mn-sinonimo { font-family: ${SCRIPT}; font-weight: 400; font-style: normal; color: ${ACENTO}; }
+
+  /* Manuscrita: los nombres son letra manuscrita, no mayúsculas grabadas. */
+  .mn-nombres { font-family: ${SCRIPT}; font-weight: 400; font-size: 60px; line-height: 1.15; letter-spacing: 0; text-transform: none; }
+  .desktop-stage .mn-nombres { font-size: 72px; }
+  .mn-amp { font-size: 42px; line-height: .8; }
+  /* El borde del sobre es un pespunte: puntadas en diagonal, como una carta
+     cosida a mano. */
+  .mn-sobre-filete { border: none;
+    background: repeating-linear-gradient(45deg, ${PAPEL} 0 5px, transparent 5px 10px);
+    -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    padding: 6px; }
+  .mn-sobre-filete--interno { border: 1px dashed ${PAPEL}80; background: none; -webkit-mask: none; mask: none; padding: 0; }
+  /* La aguada: una pasada de agua sobre el forro, cada 7,5 s. */
+  .mn-sobre-brillo { background: linear-gradient(90deg, transparent, rgba(255,250,240,.5), transparent);
+    animation: mnBrillo 7.5s cubic-bezier(.45,0,.55,1) 1.6s infinite; }
 
   @media (prefers-reduced-motion: reduce) {
-    .ss-entra { opacity: 1; transform: none; transition: none; }
-    .ss-splash--sale, .ss-portada--sube, .ss-flota, .ss-cuenta-anillo, .ss-sobre-brillo { animation: none; }
-    .ss-pastilla, .ss-pastilla--oculta { transition: none; opacity: 1; transform: none; pointer-events: auto; }
+    .mn-entra { opacity: 1; transform: none; transition: none; }
+    .mn-splash--sale, .mn-portada--sube, .mn-flota, .mn-cuenta-anillo, .mn-sobre-brillo { animation: none; }
+    .mn-pastilla, .mn-pastilla--oculta { transition: none; opacity: 1; transform: none; pointer-events: auto; }
   }
 `;

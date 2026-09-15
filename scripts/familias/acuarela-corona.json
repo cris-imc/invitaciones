@@ -1,0 +1,18 @@
+{
+  "codigo": "ACUARELACORONA",
+  "etiqueta": "Acuarela & Corona",
+  "archivo": "AcuarelaCoronaTemplate",
+  "componente": "AcuarelaCoronaTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papeleriaViva",
+  "acento": "#C27C86",
+  "eventos": ["soloQuince"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Rosa antiguo", "color": "#C27C86" },
+    { "id": "Lavanda", "nombre": "Lavanda", "color": "#8E7CC3" },
+    { "id": "Durazno", "nombre": "Durazno", "color": "#E39A6B" },
+    { "id": "Salvia", "nombre": "Salvia", "color": "#7C9A7E" },
+    { "id": "Noche", "nombre": "Azul noche", "color": "#22304A" }
+  ]
+}

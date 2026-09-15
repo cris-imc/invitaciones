@@ -1,0 +1,28 @@
+{
+  "archivo": "MembreteTemplate",
+  "prefijo": "mb",
+  "mote": "Membrete",
+  "css": "membrete",
+  "titulo": "Familia 05 \"Membrete\"",
+  "varianteBase": "Azul institucional",
+  "resumen": [
+    "La corporativa: papelería institucional, sin una sola imagen. Todo es",
+    "filete, tipografía y aire -- un membrete con su regla superior, el nombre",
+    "del evento en Source Serif y los datos en Archivo.",
+    "",
+    "Es la única familia de la sub-colección SIN doodles: su ornamento es el",
+    "membrete mismo. Tampoco tiene script: la firma es la serif en itálica,",
+    "que es lo que hace una papelería institucional de verdad."
+  ],
+  "sinDoodles": true,
+  "serif": { "modulo": "Source_Serif_4", "css": "'Source Serif 4', serif", "pesos": ["300", "400"] },
+  "sans": { "modulo": "Archivo", "css": "'Archivo', sans-serif", "pesos": ["300", "400", "500"] },
+  "script": { "usaSerif": true, "css": "'Source Serif 4', serif" },
+  "paleta": { "bg": "#F7F6F3", "alt": "#ECEBE7", "ink": "#22252A", "ink2": "#5A6069", "acc": "#1F4E79", "acc2": "#8C9099" },
+  "variantes": {
+    "Verde": { "etiqueta": "Verde institucional", "bg": "#F6F7F4", "alt": "#EAEDE8", "ink": "#1E2521", "ink2": "#566058", "acc": "#1E6B52", "acc2": "#8B948D" },
+    "Borgona": { "etiqueta": "Borgoña", "bg": "#F8F5F4", "alt": "#EEE9E8", "ink": "#26201F", "ink2": "#61585A", "acc": "#7B2B3A", "acc2": "#998E90" },
+    "Grafito": { "etiqueta": "Grafito", "bg": "#F6F6F6", "alt": "#EAEAEA", "ink": "#1C1E20", "ink2": "#5B5F62", "acc": "#3A3F45", "acc2": "#8E9296" },
+    "Ocre": { "etiqueta": "Ocre", "bg": "#F8F6F1", "alt": "#EEEAE0", "ink": "#262219", "ink2": "#615B4E", "acc": "#9A6B1F", "acc2": "#9A9284" }
+  }
+}

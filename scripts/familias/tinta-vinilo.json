@@ -1,0 +1,18 @@
+{
+  "codigo": "TINTAVINILO",
+  "etiqueta": "Tinta & Vinilo",
+  "archivo": "TintaViniloTemplate",
+  "componente": "TintaViniloTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papeleriaViva",
+  "acento": "#B4231F",
+  "eventos": ["soloCumpleanos"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Rojo lacre", "color": "#B4231F" },
+    { "id": "Klein", "nombre": "Azul klein", "color": "#1C31A8" },
+    { "id": "Botella", "nombre": "Verde botella", "color": "#14543E" },
+    { "id": "Naranja", "nombre": "Naranja quemado", "color": "#C2561B" },
+    { "id": "Violeta", "nombre": "Violeta tinta", "color": "#4B2E83" }
+  ]
+}

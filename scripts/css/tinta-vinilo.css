@@ -1,0 +1,10 @@
+  /* Tinta & Vinilo: los titulares son de cartel, no de tarjeta. */
+  .tv-nombres { font-family: ${SERIF}; font-weight: 400; font-size: 40px; line-height: 1.05; letter-spacing: -.01em; }
+  .desktop-stage .tv-nombres { font-size: 52px; }
+  .tv-amp { font-family: ${SANS}; font-size: 22px; letter-spacing: .3em; color: ${ACENTO}; }
+  /* Los datos van en mono, como impresos en un ticket. */
+  .tv-dato, .tv-cuenta-etq, .tv-kicker { font-family: ${SCRIPT}; }
+  /* El vinilo gira despacio; el brazo queda quieto encima. */
+  .tv-gira { animation: tvGira 24s linear infinite; transform-origin: 50% 50%; }
+  /* El forro del sobre es una funda de disco: rayado más marcado y sin brillo. */
+  .tv-sobre-brillo { display: none; }

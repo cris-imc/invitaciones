@@ -1,0 +1,15 @@
+  /* Manuscrita: los nombres son letra manuscrita, no mayúsculas grabadas. */
+  .mn-nombres { font-family: ${SCRIPT}; font-weight: 400; font-size: 60px; line-height: 1.15; letter-spacing: 0; text-transform: none; }
+  .desktop-stage .mn-nombres { font-size: 72px; }
+  .mn-amp { font-size: 42px; line-height: .8; }
+  /* El borde del sobre es un pespunte: puntadas en diagonal, como una carta
+     cosida a mano. */
+  .mn-sobre-filete { border: none;
+    background: repeating-linear-gradient(45deg, ${PAPEL} 0 5px, transparent 5px 10px);
+    -webkit-mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    padding: 6px; }
+  .mn-sobre-filete--interno { border: 1px dashed ${PAPEL}80; background: none; -webkit-mask: none; mask: none; padding: 0; }
+  /* La aguada: una pasada de agua sobre el forro, cada 7,5 s. */
+  .mn-sobre-brillo { background: linear-gradient(90deg, transparent, rgba(255,250,240,.5), transparent);
+    animation: mnBrillo 7.5s cubic-bezier(.45,0,.55,1) 1.6s infinite; }

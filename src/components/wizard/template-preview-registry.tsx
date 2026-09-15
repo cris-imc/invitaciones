@@ -2,7 +2,7 @@ import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import type { ComponentType } from "react";
 
-export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL" | "SOBRESELLO";
+export type TemplateTipo = "ELEGANT" | "MODERNO" | "NEON" | "CHIC" | "EDITORIAL" | "ONIX" | "JARDINSEDA" | "HOLOGRAMA" | "CIRCUITO" | "CRISTAL3D" | "CINE" | "NORDICO" | "RIVIERA" | "GOLDENDUSK" | "SEDA" | "PETALOS" | "LUZLUNA" | "BONVOYAGE" | "CORPORATE" | "GARDENPARTY" | "LOFTINDUSTRIAL" | "INFANTIL" | "GUESTPASSVIP" | "PRINCESA" | "CORONAESCARLATA" | "JEWELRYBOX" | "PASEVIP" | "CINEABSTRACTOXV" | "ACRYLICPOP" | "BOLADEDISCOTECA" | "CRYSTAL3D" | "FASHIONTAG" | "CERAMICAEDITORIAL" | "CINEABSTRACTO" | "PAPELERIADEHOTELDELUJO" | "VINTAGEEDITORIAL" | "FASHIONLOOKBOOK" | "MARMOLYORO" | "ATELIERDEPAPEL" | "BOTANICAEDITORIAL" | "ENCAJECONTEMPORANEO" | "LIQUIDGLASS" | "BLACKANDWHITE" | "BABYSHOWER" | "BAUTISMO" | "CORPORATIVOANIVERSARIO" | "CORPORATIVOENCUENTRO" | "CUMPLEANOSCOCKTAIL" | "CUMPLEANOSJARDIN" | "CUMPLEANOSTERRAZA" | "DESPEDIDASOLTERA" | "DESPEDIDASOLTERO" | "GRADUACION" | "INAUGURACION" | "INFANTILESPACIO" | "INFANTILJURASICO" | "INFANTILSAFARI" | "ANIVERSARIO" | "PRENSA" | "JARDINDEPAPEL" | "LUMBRE" | "NOCHE" | "TRAZO" | "HERBARIO" | "CIELODEPAPEL" | "CUENTODEPAPEL" | "CIUDADDEPAPEL" | "TRAZODEPAPEL" | "SOBRESELLO" | "ACUARELACORONA" | "MANUSCRITA" | "TINTAVINILO" | "MEMBRETE";
 
 export interface ColorOption {
   id: string;
@@ -1314,4 +1314,68 @@ export const SOBRESELLO_COMPONENTS: Record<string, PreviewComponent> = {
   Tinta: dynamic(() => import("@/components/templates/SobreSelloTemplateTinta").then((m) => m.SobreSelloTemplateTinta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Terracota: dynamic(() => import("@/components/templates/SobreSelloTemplateTerracota").then((m) => m.SobreSelloTemplateTerracota), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
   Oliva: dynamic(() => import("@/components/templates/SobreSelloTemplateOliva").then((m) => m.SobreSelloTemplateOliva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const ACUARELACORONA_COLORS: ColorOption[] = [
+  { id: "default", name: "Rosa antiguo", color: "#C27C86" },
+  { id: "Lavanda", name: "Lavanda", color: "#8E7CC3" },
+  { id: "Durazno", name: "Durazno", color: "#E39A6B" },
+  { id: "Salvia", name: "Salvia", color: "#7C9A7E" },
+  { id: "Noche", name: "Azul noche", color: "#22304A" },
+];
+
+export const ACUARELACORONA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/AcuarelaCoronaTemplate").then((m) => m.AcuarelaCoronaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Lavanda: dynamic(() => import("@/components/templates/AcuarelaCoronaTemplateLavanda").then((m) => m.AcuarelaCoronaTemplateLavanda), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Durazno: dynamic(() => import("@/components/templates/AcuarelaCoronaTemplateDurazno").then((m) => m.AcuarelaCoronaTemplateDurazno), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Salvia: dynamic(() => import("@/components/templates/AcuarelaCoronaTemplateSalvia").then((m) => m.AcuarelaCoronaTemplateSalvia), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Noche: dynamic(() => import("@/components/templates/AcuarelaCoronaTemplateNoche").then((m) => m.AcuarelaCoronaTemplateNoche), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const MANUSCRITA_COLORS: ColorOption[] = [
+  { id: "default", name: "Bordó", color: "#7A2F3A" },
+  { id: "Oliva", name: "Oliva", color: "#6E7A52" },
+  { id: "Azul", name: "Azul lavado", color: "#4A6572" },
+  { id: "Ciruela", name: "Ciruela", color: "#6E4459" },
+  { id: "Ladrillo", name: "Ladrillo", color: "#A4573B" },
+];
+
+export const MANUSCRITA_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/ManuscritaTemplate").then((m) => m.ManuscritaTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Oliva: dynamic(() => import("@/components/templates/ManuscritaTemplateOliva").then((m) => m.ManuscritaTemplateOliva), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Azul: dynamic(() => import("@/components/templates/ManuscritaTemplateAzul").then((m) => m.ManuscritaTemplateAzul), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ciruela: dynamic(() => import("@/components/templates/ManuscritaTemplateCiruela").then((m) => m.ManuscritaTemplateCiruela), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ladrillo: dynamic(() => import("@/components/templates/ManuscritaTemplateLadrillo").then((m) => m.ManuscritaTemplateLadrillo), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const TINTAVINILO_COLORS: ColorOption[] = [
+  { id: "default", name: "Rojo lacre", color: "#B4231F" },
+  { id: "Klein", name: "Azul klein", color: "#1C31A8" },
+  { id: "Botella", name: "Verde botella", color: "#14543E" },
+  { id: "Naranja", name: "Naranja quemado", color: "#C2561B" },
+  { id: "Violeta", name: "Violeta tinta", color: "#4B2E83" },
+];
+
+export const TINTAVINILO_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/TintaViniloTemplate").then((m) => m.TintaViniloTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Klein: dynamic(() => import("@/components/templates/TintaViniloTemplateKlein").then((m) => m.TintaViniloTemplateKlein), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Botella: dynamic(() => import("@/components/templates/TintaViniloTemplateBotella").then((m) => m.TintaViniloTemplateBotella), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Naranja: dynamic(() => import("@/components/templates/TintaViniloTemplateNaranja").then((m) => m.TintaViniloTemplateNaranja), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Violeta: dynamic(() => import("@/components/templates/TintaViniloTemplateVioleta").then((m) => m.TintaViniloTemplateVioleta), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+};
+
+export const MEMBRETE_COLORS: ColorOption[] = [
+  { id: "default", name: "Azul institucional", color: "#1F4E79" },
+  { id: "Verde", name: "Verde institucional", color: "#1E6B52" },
+  { id: "Borgona", name: "Borgoña", color: "#7B2B3A" },
+  { id: "Grafito", name: "Grafito", color: "#3A3F45" },
+  { id: "Ocre", name: "Ocre", color: "#9A6B1F" },
+];
+
+export const MEMBRETE_COMPONENTS: Record<string, PreviewComponent> = {
+  default: dynamic(() => import("@/components/templates/MembreteTemplate").then((m) => m.MembreteTemplate), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Verde: dynamic(() => import("@/components/templates/MembreteTemplateVerde").then((m) => m.MembreteTemplateVerde), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Borgona: dynamic(() => import("@/components/templates/MembreteTemplateBorgona").then((m) => m.MembreteTemplateBorgona), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Grafito: dynamic(() => import("@/components/templates/MembreteTemplateGrafito").then((m) => m.MembreteTemplateGrafito), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
+  Ocre: dynamic(() => import("@/components/templates/MembreteTemplateOcre").then((m) => m.MembreteTemplateOcre), { ssr: false, loading: PreviewLoading }) as PreviewComponent,
 };

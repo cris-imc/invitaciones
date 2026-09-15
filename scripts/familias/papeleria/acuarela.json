@@ -1,0 +1,37 @@
+{
+  "archivo": "AcuarelaCoronaTemplate",
+  "prefijo": "ac",
+  "mote": "Acuarela",
+  "css": "acuarela-corona",
+  "titulo": "Familia 02 \"Acuarela & Corona\"",
+  "varianteBase": "Rosa antiguo",
+  "resumen": [
+    "El quince de Papelería Viva: la misma papelería, pintada en acuarela. El",
+    "nombre va en Parisienne en una sola línea (no apilado como una pareja),",
+    "hay mariposas que flotan sobre el sobre y una corona en el cierre.",
+    "",
+    "Playfair Display para los titulares y DM Sans para el texto."
+  ],
+  "serif": { "modulo": "Playfair_Display", "css": "'Playfair Display', serif", "pesos": ["400", "500"] },
+  "sans": { "modulo": "DM_Sans", "css": "'DM Sans', sans-serif", "pesos": ["300", "400", "500"] },
+  "script": { "modulo": "Parisienne", "css": "'Parisienne', cursive" },
+  "paleta": { "bg": "#FBF3EA", "alt": "#F3E6DC", "ink": "#3B2A2A", "ink2": "#7A6058", "acc": "#C27C86", "acc2": "#9A7F5E" },
+  "doodles": {
+    "carpeta": "acuarela-corona",
+    "piezas": ["ramo-esquina", "corona", "guirnalda", "mariposa-1", "mariposa-2", "petalo-1", "petalo-2", "petalo-3"],
+    "portada": [
+      { "pieza": "ramo-esquina", "ancho": "40%", "left": "-6%", "top": "-2%", "prioritario": true },
+      { "pieza": "ramo-esquina", "ancho": "33%", "right": "-5%", "bottom": "12%", "transform": "scaleX(-1) rotate(6deg)", "opacity": 0.95, "prioritario": true },
+      { "pieza": "mariposa-1", "ancho": "13%", "right": "14%", "top": "26%", "clase": "ac-flota", "prioritario": true },
+      { "pieza": "mariposa-2", "ancho": "10%", "left": "16%", "top": "46%", "clase": "ac-flota ac-flota--tarde" }
+    ],
+    "frase": { "pieza": "guirnalda", "ancho": 120, "left": "50%", "top": 18, "transform": "translateX(-50%)", "opacity": 0.85 },
+    "cierre": { "pieza": "corona", "ancho": 96, "left": "50%", "top": -30, "transform": "translateX(-50%)" }
+  },
+  "variantes": {
+    "Lavanda": { "etiqueta": "Lavanda", "bg": "#F8F4FA", "alt": "#EDE6F2", "ink": "#2E2838", "ink2": "#6B6278", "acc": "#8E7CC3", "acc2": "#8A7B63" },
+    "Durazno": { "etiqueta": "Durazno", "bg": "#FDF4EB", "alt": "#F6E5D4", "ink": "#3A2A20", "ink2": "#7E6551", "acc": "#E39A6B", "acc2": "#9A7B4E" },
+    "Salvia": { "etiqueta": "Salvia", "bg": "#F6F5EE", "alt": "#E7E9DD", "ink": "#27302A", "ink2": "#5F6B60", "acc": "#7C9A7E", "acc2": "#95835B" },
+    "Noche": { "etiqueta": "Azul noche", "bg": "#F4F5F7", "alt": "#E3E6EC", "ink": "#1C2331", "ink2": "#5A6374", "acc": "#22304A", "acc2": "#8D7C55" }
+  }
+}

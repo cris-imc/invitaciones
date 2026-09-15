@@ -1,0 +1,12 @@
+  /* Acuarela & Corona: el nombre va en una sola línea y en la script, porque
+     es un quince y no una pareja. */
+  .ac-nombres { font-family: ${SCRIPT}; font-weight: 400; font-size: 64px; line-height: 1.1; letter-spacing: 0; text-transform: none; color: ${TINTA}; }
+  .desktop-stage .ac-nombres { font-size: 70px; }
+  .ac-amp { display: none; }
+  .ac-flota--tarde { animation-delay: -3s; }
+  /* El velo de acuarela sobre el forro: la aguada que le da el nombre a la
+     familia. Va encima del rayado y debajo de los ramos. */
+  .ac-sobre-forro::after { content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, ${PAPEL}B8, ${PAPEL}1F);
+    -webkit-mask-image: radial-gradient(120% 80% at 50% 20%, #000 40%, transparent 100%);
+    mask-image: radial-gradient(120% 80% at 50% 20%, #000 40%, transparent 100%); }

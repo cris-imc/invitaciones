@@ -67,6 +67,10 @@ export type Coleccion = "FLAT" | "STORYTELLING" | "PAPER" | "ICONIC";
 export type Subcoleccion = "papeleriaViva" | "papelPrensado" | "capasDePapel" | "tipograficaEditorial";
 
 export const PAPER_TEMPLATE_TIPOS: Record<string, Subcoleccion> = {
+    MEMBRETE: "papeleriaViva",
+    TINTAVINILO: "papeleriaViva",
+    MANUSCRITA: "papeleriaViva",
+    ACUARELACORONA: "papeleriaViva",
     SOBRESELLO: "papeleriaViva",
     HERBARIO: "papelPrensado",
     TRAZO: "papelPrensado",

@@ -1,0 +1,18 @@
+{
+  "codigo": "MANUSCRITA",
+  "etiqueta": "Manuscrita",
+  "archivo": "ManuscritaTemplate",
+  "componente": "ManuscritaTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papeleriaViva",
+  "acento": "#7A2F3A",
+  "eventos": ["quinceYCasamiento"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Bordó", "color": "#7A2F3A" },
+    { "id": "Oliva", "nombre": "Oliva", "color": "#6E7A52" },
+    { "id": "Azul", "nombre": "Azul lavado", "color": "#4A6572" },
+    { "id": "Ciruela", "nombre": "Ciruela", "color": "#6E4459" },
+    { "id": "Ladrillo", "nombre": "Ladrillo", "color": "#A4573B" }
+  ]
+}

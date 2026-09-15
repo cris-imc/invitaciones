@@ -1,0 +1,18 @@
+{
+  "codigo": "MEMBRETE",
+  "etiqueta": "Membrete",
+  "archivo": "MembreteTemplate",
+  "componente": "MembreteTemplate",
+  "coleccion": "PAPER",
+  "subcoleccion": "papeleriaViva",
+  "acento": "#1F4E79",
+  "eventos": ["soloCumpleanos"],
+  "despuesDe": "PRENSA",
+  "variantes": [
+    { "id": "default", "nombre": "Azul institucional", "color": "#1F4E79" },
+    { "id": "Verde", "nombre": "Verde institucional", "color": "#1E6B52" },
+    { "id": "Borgona", "nombre": "Borgoña", "color": "#7B2B3A" },
+    { "id": "Grafito", "nombre": "Grafito", "color": "#3A3F45" },
+    { "id": "Ocre", "nombre": "Ocre", "color": "#9A6B1F" }
+  ]
+}

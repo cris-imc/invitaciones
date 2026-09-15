@@ -1,0 +1,20 @@
+{
+  "esBase": true,
+  "archivo": "SobreSelloTemplate",
+  "prefijo": "ss",
+  "mote": "Sobre",
+  "css": "sobre-sello",
+  "titulo": "Familia 01 \"Sobre & Sello\"",
+  "varianteBase": "Bordó",
+  "nota": "Es la familia base de la sub-colección: se deriva de Prensa con scripts/derivar-sobre-sello.js y NO de sí misma (por eso esBase). Su ficha vive acá para que sus variantes de color salgan del mismo generador que las demás.",
+  "serif": { "modulo": "Cormorant_Garamond", "css": "'Cormorant Garamond', serif", "pesos": ["300", "400"] },
+  "sans": { "modulo": "Jost", "css": "'Jost', sans-serif", "pesos": ["300", "400", "500"] },
+  "script": { "modulo": "Pinyon_Script", "css": "'Pinyon Script', cursive" },
+  "paleta": { "bg": "#F4EBE2", "alt": "#EAE0D4", "ink": "#2A2320", "ink2": "#6E5E52", "acc": "#7A2F3A", "acc2": "#A8854E" },
+  "variantes": {
+    "Bosque": { "etiqueta": "Verde bosque", "bg": "#F2EDE4", "alt": "#E5E4D6", "ink": "#23261F", "ink2": "#5F6456", "acc": "#1F5A47", "acc2": "#8E7F53" },
+    "Tinta": { "etiqueta": "Azul tinta", "bg": "#F3F0E9", "alt": "#E4E4DF", "ink": "#1E2430", "ink2": "#5C6472", "acc": "#24344D", "acc2": "#8E7B4C" },
+    "Terracota": { "etiqueta": "Terracota", "bg": "#F7EEE6", "alt": "#EEDFD2", "ink": "#2F241D", "ink2": "#725E4E", "acc": "#B8643C", "acc2": "#83714A" },
+    "Oliva": { "etiqueta": "Oliva", "bg": "#F4F1E6", "alt": "#E7E5D3", "ink": "#262619", "ink2": "#636453", "acc": "#6B6B3A", "acc2": "#957F50" }
+  }
+}

@@ -1,0 +1,15 @@
+  /* Membrete: el ornamento es el membrete mismo -- una regla gruesa arriba
+     del sobre y el nombre del evento centrado abajo, sin una sola imagen. */
+  .mb-nombres { font-family: ${SERIF}; font-weight: 300; font-size: 34px; line-height: 1.2; letter-spacing: .06em; }
+  .desktop-stage .mb-nombres { font-size: 40px; }
+  .mb-amp { font-family: ${SERIF}; font-style: italic; font-size: 26px; color: ${ACENTO}; }
+  .mb-script { font-style: italic; font-size: 26px; }
+  .mb-splash-nombre { font-style: italic; font-size: 34px; }
+  /* El sobre institucional: sin forro a rayas, con una banda de color arriba
+     y el filete fino que la separa del papel. */
+  .mb-sobre-forro { background: ${PAPEL2}; }
+  .mb-sobre-forro::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 10px; background: ${ACENTO}; }
+  .mb-sobre-forro::after { content: ""; position: absolute; left: 8%; right: 8%; top: 34%; height: 1px; background: ${ACENTO2}; }
+  .mb-sobre-filete { border-color: ${ACENTO2}33; }
+  .mb-sobre-filete--interno { display: none; }
+  .mb-sobre-brillo { display: none; }

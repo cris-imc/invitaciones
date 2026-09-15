@@ -233,10 +233,10 @@ Estados: `—` sin empezar · `EN CURSO (detalle)` · `base` (archivo base escri
 | Familia | Código | Estado |
 |---|---|---|
 | Sobre & Sello | SOBRESELLO | `verificada` — base de Papelería Viva, derivada de Prensa con `scripts/derivar-sobre-sello.js`: comparte la ARQUITECTURA (Flat, las mismas 9 secciones, los componentes compartidos, el splash, la pastilla) y no comparte NADA del vestuario. Dos acentos (lacre + dorado) en vez de monocroma, doodles pintados como `<img>` en 10 slots, tarjetas con filete fino y esquina doblada en vez de hojas troqueladas, portada-SOBRE (forro a rayas, doble filete, ramos, lacre) y cuenta regresiva con los días en un anillo que gira una vuelta por minuto. Pinyon Script como firma. 5 variantes que cambian papel Y acentos (Bordó, Verde bosque, Azul tinta, Terracota, Oliva). Verificada en DOM: 2 sobres, doodles cargando (0 rotas), Cormorant 44 px + Pinyon en el &, 4 cabeceras con filete y punto, cero lucide. |
-| Acuarela & Corona | ACUARELACORONA | — |
-| Manuscrita | MANUSCRITA | — |
-| Tinta & Vinilo | TINTAVINILO | — |
-| Membrete | MEMBRETE | — |
+| Acuarela & Corona | ACUARELACORONA | `verificada` — derivada con `scripts/derivar-papeleria.js` (ficha en `papeleria/acuarela.json`): el quince de la sub-colección, con el nombre en Parisienne en una sola línea (no apilado como una pareja), mariposas que flotan sobre el sobre, una guirnalda en la frase y una corona en el cierre. Playfair Display + DM Sans, 5 paletas. Verificada en DOM: Parisienne 70 px, 4 doodles cargando. |
+| Manuscrita | MANUSCRITA | `verificada` — derivada con `derivar-papeleria.js` (`papeleria/manuscrita.json`): el casamiento informal, escrito a mano. Caveat para los nombres, Bodoni Moda para los titulares y Space Mono para el texto; el borde del sobre es un pespunte y sobre el forro pasa una aguada cada 7,5 s. Verificada en DOM: Caveat 72 px, Space Mono en el cuerpo, cupido/olivo/candelabro cargando. |
+| Tinta & Vinilo | TINTAVINILO | `verificada` — derivada con `derivar-papeleria.js` (`papeleria/tinta-vinilo.json`): el cumpleaños de adulto, gráfico en vez de pintado. Abril Fatface, IBM Plex Mono para los datos (como un ticket) e IBM Plex Sans para el texto; el vinilo gira despacio bajo el brazo y los sellos son de goma. Verificada en DOM: Abril Fatface 52 px, `tvGira` andando, 4 doodles cargando. |
+| Membrete | MEMBRETE | `verificada` — derivada con `derivar-papeleria.js` (`papeleria/membrete.json`): la corporativa, sin una sola imagen. Source Serif 4 + Archivo, banda de color arriba del sobre y filete institucional; su firma es la serif en itálica, así que no declara una cuarta fuente. Verificada en DOM: cero imágenes propias, banda de 10 px, Source Serif 40 px. |
 
 ### Icon · Capas de papel
 
@@ -360,3 +360,17 @@ Jardín lleva ficha igual (`capas/jardin.json`, con `esBase: true`): no se
 deriva -- está escrita a mano -- pero sus variantes de color se generan con el
 mismo script que las demás, así no hay dos lugares donde mirar qué es una
 familia.
+
+### Papelería Viva: la misma idea, un nivel más abajo
+
+Papel Prensado se deriva de Prensa; Papelería Viva se deriva de Sobre & Sello,
+que a su vez se deriva de Prensa. La cadena es a propósito: lo que comparten
+las diez familias de Paper (la arquitectura Flat, las nueve secciones, los
+componentes compartidos) vive en un solo lugar, y cada nivel agrega lo suyo.
+
+    Prensa ──▶ Noche, Lumbre, Herbario, Trazo        (mismo registro)
+       └────▶ Sobre & Sello ──▶ Acuarela, Manuscrita, Tinta & Vinilo, Membrete
+
+Para regenerar todo Paper después de tocar Prensa:
+
+    node scripts/derivar-noche.js && node scripts/derivar-lumbre.js       && node scripts/derivar-herbario.js && node scripts/derivar-trazo.js       && node scripts/derivar-sobre-sello.js && node scripts/derivar-papeleria.js       && node scripts/gen-papel-prensado-variants.js       && node scripts/gen-papeleria-viva-variants.js       && node scripts/generar-plantillas-dinamicas.js

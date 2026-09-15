@@ -1,0 +1,38 @@
+{
+  "archivo": "TintaViniloTemplate",
+  "prefijo": "tv",
+  "mote": "Vinilo",
+  "css": "tinta-vinilo",
+  "titulo": "Familia 04 \"Tinta & Vinilo\"",
+  "varianteBase": "Rojo lacre",
+  "resumen": [
+    "El cumpleaños de adulto: la papelería se vuelve gráfica. Abril Fatface",
+    "para los titulares, IBM Plex Mono para los datos (como un ticket) e IBM",
+    "Plex Sans para el texto.",
+    "",
+    "Los doodles son de imprenta, no de acuarela: un vinilo, dos sellos de",
+    "goma y un ticket troquelado. Es la única familia de la sub-colección con",
+    "un TERCER acento, el fluo, que se usa sólo en los sellos."
+  ],
+  "serif": { "modulo": "Abril_Fatface", "css": "'Abril Fatface', serif", "pesos": ["400"], "italica": false },
+  "sans": { "modulo": "IBM_Plex_Sans", "css": "'IBM Plex Sans', sans-serif", "pesos": ["300", "400", "500"] },
+  "script": { "modulo": "IBM_Plex_Mono", "css": "'IBM Plex Mono', monospace" },
+  "paleta": { "bg": "#EFE9DF", "alt": "#E3DCCF", "ink": "#16130F", "ink2": "#5F5A50", "acc": "#B4231F", "acc2": "#7A7466" },
+  "doodles": {
+    "carpeta": "tinta-vinilo",
+    "piezas": ["vinilo", "sello-goma", "sello-tinta", "ticket", "brazo"],
+    "portada": [
+      { "pieza": "vinilo", "ancho": "46%", "right": "-12%", "top": "8%", "clase": "tv-gira", "prioritario": true },
+      { "pieza": "brazo", "ancho": "34%", "right": "-4%", "top": "4%", "prioritario": true },
+      { "pieza": "sello-tinta", "ancho": "26%", "left": "-4%", "bottom": "16%", "transform": "rotate(-12deg)", "opacity": 0.9 }
+    ],
+    "frase": { "pieza": "sello-goma", "ancho": 96, "right": 12, "top": 36, "transform": "rotate(8deg)", "opacity": 0.9 },
+    "cierre": { "pieza": "ticket", "ancho": 128, "left": "50%", "top": -30, "transform": "translateX(-50%) rotate(-3deg)" }
+  },
+  "variantes": {
+    "Klein": { "etiqueta": "Azul klein", "bg": "#EDEBE4", "alt": "#DFDDD6", "ink": "#111218", "ink2": "#585A63", "acc": "#1C31A8", "acc2": "#6F7280" },
+    "Botella": { "etiqueta": "Verde botella", "bg": "#EEEDE3", "alt": "#E0E0D4", "ink": "#0F1512", "ink2": "#545C55", "acc": "#14543E", "acc2": "#6E7A6E" },
+    "Naranja": { "etiqueta": "Naranja quemado", "bg": "#F1ECE2", "alt": "#E5DCCD", "ink": "#171310", "ink2": "#63594E", "acc": "#C2561B", "acc2": "#7C7263" },
+    "Violeta": { "etiqueta": "Violeta tinta", "bg": "#EEEAE6", "alt": "#E0DAD8", "ink": "#141018", "ink2": "#5C5560", "acc": "#4B2E83", "acc2": "#756C7E" }
+  }
+}
