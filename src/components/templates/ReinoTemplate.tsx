@@ -6,20 +6,19 @@
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
  * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
- * Editorial Blanc & Noir y se vuelve a derivar; lo propio de esta familia
- * está en scripts/familias/tipografica/rei.json.
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/rei.jsx, los
+ * estilos en scripts/css/tipografica/rei.css y las caras y la paleta en
+ * scripts/familias/tipografica/rei.json.
  *
- * PROVISORIO: todavía usa el render de Editorial. Falta portar el suyo
- * desde el mockup.
- *
- * El cuento de princesas: Cinzel Decorative con filetes dorados sobre un
- * fondo profundo, y Nunito para el texto. El acento es el rosa de la
- * corona y el dorado el de los filetes.
+ * Cuento de castillo: Cinzel Decorative para el nombre, los números y los
+ * botones, Nunito para el texto. Cielo de noche con estrellas que titilan,
+ * luna de oro, castillo con ventanas encendidas y banderín que flamea; marco
+ * real con gema, ventanas de arco, estandarte con punta y sello de lacre.
  *
  * Sin imágenes propias: son fuentes y CSS.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Cinzel_Decorative, Nunito } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -37,13 +36,13 @@ import { esVistaMiniatura } from "@/lib/miniatura";
 
 const reiSerif = Cinzel_Decorative({
   subsets: ["latin"],
-  weight: ["400", "700"],
+  weight: ["400", "700", "900"],
   display: "swap",
   variable: "--rei-serif",
 });
 const reiSans = Nunito({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "600", "700", "800"],
   display: "swap",
   variable: "--rei-sans",
 });
@@ -69,6 +68,10 @@ const PALETA = {
   hill3: "#FFF4FA",
   night: "#FFF4FA",
   nightInk: "#2B1B4E",
+  castle: "#3F2A6E",
+  castle2: "#33215C",
+  acc2b: "#C99A3E",
+  acc3: "#9BE1FF",
 };
 
 /**
@@ -731,6 +734,10 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-castle": PALETA.castle,
+    "--pp-castle2": PALETA.castle2,
+    "--pp-acc2b": PALETA.acc2b,
+    "--pp-acc3": PALETA.acc3,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -760,6 +767,42 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre dentro del marco real: un renglón en Cinzel Decorative; con
+  // dos personas, uno por renglón y el cuerpo baja a .7em (como en el
+  // mockup con nombres largos).
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(4, ...renglones.map((n) => n.length));
+  const nombreLargo = renglones.length > 1 || renglonMasLargo > 11;
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // La frase: una palabra del medio en el acento y el cierre en oro viejo.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.8)) return "rei-oro-viejo";
+    if (i === Math.min(desdeAcento, n - 1) || i === Math.floor(n * 0.3)) return "rei-acento";
+    return undefined;
+  };
+
+  const esXV = invitation.tipo === "QUINCE_ANOS";
+  const esBoda = invitation.tipo === "CASAMIENTO";
+  const kickerDelEvento = tx(esBoda ? "invitacion.evento.nosCasamos" : esXV ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const nombreDelReino = esXV || !nombre2 ? nombre1.trim().split(/\s+/)[0] : iniciales(nombre1, nombre2);
+  const firma = esXV ? nombre1.trim().split(/\s+/)[0] : iniciales(nombre1, nombre2);
+  const inicial = (nombreInvitado || nombre1).trim().charAt(0).toUpperCase() || "✦";
+  // Cada reino lleva su número romano según el orden real de los paneles.
+  const ROMANOS = ["I", "II", "III", "IV"];
+  const reino = (clave: string) => `${tx("invitacion.saveTheDate.reino")} ${ROMANOS[Math.max(0, panelesLugar.indexOf(clave))]}`;
+  // Las doce estrellas del cielo: posición, tamaño, color y ritmo, como en
+  // el mockup.
+  const ESTRELLAS = [[6, 10, 22], [88, 6, 30], [70, 18, 14], [14, 30, 18], [92, 36, 16], [30, 44, 12], [80, 52, 24], [10, 62, 16], [56, 70, 14], [40, 8, 12], [22, 20, 10], [64, 40, 18]];
+  const Estrellas = ({ blancas = false }: { blancas?: boolean }) => (
+    <div className={`rei-estrellas${blancas ? " rei-estrellas--blancas" : ""}`} aria-hidden="true">
+      {ESTRELLAS.map(([x, y, s], i) => (
+        <svg key={i} viewBox="0 0 40 40" className={`rei-estrella rei-estrella--${i % 4}`} style={{ left: `${x}%`, top: `${y}%`, width: s, height: s, animationDuration: `${(1.8 + (i % 4) * 0.45).toFixed(2)}s`, animationDelay: `${(i * 0.37).toFixed(2)}s` }}><path d="M20 2 C22 14 26 18 38 20 C26 22 22 26 20 38 C18 26 14 22 2 20 C14 18 18 14 20 2 Z" fill="currentColor" /></svg>
+      ))}
+    </div>
+  );
+
   return (
     <div
       ref={raizRef}
@@ -771,32 +814,32 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
 
       <div ref={scrollerRef} className="rei-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
-        <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="rei-section rei-std">
-          <div className="rei-trama rei-trama--media" aria-hidden="true" />
+            El pergamino: sobre crema con puntitos del acento, la fecha en
+            Cinzel centrada y la foto como ventana de arco con marco de oro
+            y una gema arriba. */}
+        <section data-tone="light" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="rei-section rei-std">
+          <span className="rei-puntos-fondo rei-puntos-fondo--arriba" aria-hidden="true" />
+          <div className="rei-folio rei-folio--acento">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha")}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="rei-spread">
-            <div className="rei-pagina">
-              <div className="rei-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
+            <div className="rei-pagina rei-pagina--centrada">
               <div className="rei-fecha">
-                <span data-xin="1" data-dist="-160" className="rei-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="rei-fecha-linea rei-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="rei-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="rei-fecha-linea rei-fecha-linea--dia">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="rei-fecha-linea rei-fecha-linea--mes">{mesLargo}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="rei-fecha-linea rei-fecha-linea--anio">{anio}</span>
               </div>
               <div data-xin="1" data-delay="360" className="rei-fecha-pie">
-                <span>{diaSemana} · {hora} H</span>
+                <span>{diaSemana} · {hora} h</span>
                 <AddToCalendarLink
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="rei-link"
+                  className="rei-pildora rei-pildora--noche"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.agregarAlCalendario")} ✦
                 </AddToCalendarLink>
               </div>
             </div>
@@ -805,47 +848,51 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="rei-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only rei-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="43,27,78" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only rei-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="43,27,78" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --rei-punto. */}
                 <span className="rei-foto-revelado" aria-hidden="true" />
-                <span className="rei-foto-anio">{anio}</span>
-                <span className="rei-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="rei-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="rei-gema rei-gema--foto" aria-hidden="true" />
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="rei-section rei-countdown">
-          <div className="rei-folio">
-            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            El reloj de la torre: cuatro ventanas de arco con una gema
+            arriba, entre una marquesina del acento y un filete de oro. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="rei-section rei-countdown">
+          <div className="rei-folio rei-folio--oro">
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.saveTheDate.antesDeMedianoche")}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
-          <div className="rei-marquesina" aria-hidden="true">
+          <div className="rei-marquesina rei-marquesina--acento" aria-hidden="true">
             <div className="rei-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.cuentaRegresiva.dias")} ✦ {tx("invitacion.cuentaRegresiva.horas")} ✦ {tx("invitacion.cuentaRegresiva.minutos")} ✦ {tx("invitacion.cuentaRegresiva.segundos")} ✦ {diaNum} {tx("invitacion.evento.de")} {mesLargo} ✦&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaReino targetDate={fechaHora} />
-          <div className="rei-marquesina rei-marquesina--contraria" aria-hidden="true">
+          <div className="rei-spread">
+            <div className="rei-pagina rei-pagina--entera">
+              <CuentaReino targetDate={fechaHora} />
+            </div>
+          </div>
+          <div className="rei-marquesina rei-marquesina--filete rei-marquesina--contraria" aria-hidden="true">
             <div className="rei-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -853,38 +900,41 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            El estandarte: sobre el acento con estrellas blancas, la frase
+            en un pendón crema con punta y borde de oro, y una pastilla de
+            noche con la gema que flota. */}
         {hayFrase && (
           <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="rei-section rei-frase-seccion">
+            <Estrellas blancas />
             <div className="rei-folio">
-              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras")}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
-            <div className="rei-spread">
-              <h2 ref={fraseRef} className="rei-frase">
-                {palabras.map((p, i) => (
-                  // El espacio va fuera del span: el motor pone cada palabra
-                  // en inline-block y un espacio adentro se colapsa a cero.
-                  <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "rei-acento" : undefined}>{p}</span>{" "}
-                  </span>
-                ))}
-              </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="rei-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+            <div className="rei-spread rei-spread--centrado">
+              <div className="rei-estandarte">
+                <h2 ref={fraseRef} className="rei-frase">
+                  {palabras.map((p, i) => (
+                    // El espacio va fuera del span: el motor pone cada palabra
+                    // en inline-block y un espacio adentro se colapsa a cero.
+                    <span key={i}>
+                      <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
+                    </span>
+                  ))}
+                </h2>
+              </div>
+              <div data-xin="1" data-delay="900" data-dist="60" className="rei-pastilla">
+                <span className="rei-gema rei-gema--chica" aria-hidden="true" />
+                <span>{tx("invitacion.frase.conAmor")} · {titulo}</span>
               </div>
             </div>
-            <div className="rei-folio rei-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
-            </div>
+            <div className="rei-tres-estrellas" aria-hidden="true"><span>✦</span><span className="rei-oro">✦</span><span>✦</span></div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Los reinos: el castillo sobre la noche, la ceremonia sobre el
+            acento y el cronograma sobre el castillo, con el título
+            centrado y el naipe de arco con su gema. */}
         <div
           id="details"
           data-pan="1"
@@ -895,64 +945,68 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         >
           <div className="rei-pan-fijo">
             <div data-strip="1" className="rei-tira">
-              <div data-tone={TONO} className="rei-panel">
+              <div data-tone="dark" className="rei-panel rei-panel--castillo">
                 <div className="rei-folio">
-                  <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
+                  <span>{nCuando} — {reino("recepcion")}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="rei-spread">
-                  <h2 className="rei-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="rei-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="rei-lineas">
-                    <div className="rei-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
+                  <div className="rei-pagina rei-pagina--titulo">
+                    <span className="rei-panel-sub">{tx("invitacion.saveTheDate.elCastillo")}</span>
+                    <h2 className="rei-panel-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
+                  </div>
+                  <div className="rei-naipe">
+                    <span className="rei-gema rei-gema--naipe" aria-hidden="true" />
+                    <div className="rei-linea"><span>{tx("invitacion.ubicacion.recepcion")}</span><span>{hora} h</span></div>
                     {direccion && <div className="rei-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="rei-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="rei-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="rei-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar")} ✦
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="rei-folio rei-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza")} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="rei-panel">
+                <div id="ceremonia" data-tone="dark" className="rei-panel rei-panel--ceremonia">
                   <div className="rei-folio">
-                    <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
+                    <span>{nCuando} — {reino("ceremonia")}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="rei-spread">
-                    <h2 className="rei-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="rei-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="rei-lineas">
+                    <div className="rei-pagina rei-pagina--titulo">
+                      <span className="rei-panel-sub">{ceremoniaTitulo}</span>
+                      <h2 className="rei-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="rei-naipe">
+                      <span className="rei-gema rei-gema--naipe" aria-hidden="true" />
                       {ceremoniaHora && <div className="rei-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="rei-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="rei-folio rei-folio--pie">
-                    <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <span>{tx("invitacion.ubicacion.ceremoniaCivil")}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza")} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="rei-panel">
+                <div id="location" data-tone="dark" className="rei-panel rei-panel--mapa">
                   <div className="rei-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
+                    <span>{nCuando} — {reino("llegar")}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="rei-spread">
-                    <h2 className="rei-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="rei-lineas">
+                    <div className="rei-pagina rei-pagina--titulo">
+                      <span className="rei-panel-sub">{tx("invitacion.ubicacion.tuUbicacion")}</span>
+                      <h2 className="rei-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="rei-naipe">
+                      <span className="rei-gema rei-gema--naipe" aria-hidden="true" />
                       {embedMapUrl && (
                         <div className="rei-mapa">
                           <iframe
@@ -967,28 +1021,29 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="rei-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="rei-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas")} ✦
                       </a>
                     </div>
                   </div>
                   <div className="rei-folio rei-folio--pie">
-                    <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <span>{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza")} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="rei-panel rei-panel--acento">
+                <div id="schedule" data-tone="dark" className="rei-panel rei-panel--cronograma">
                   <div className="rei-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
+                    <span>{nCuando} — {reino("cronograma")}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="rei-spread">
-                    <h2 className="rei-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="rei-acento rei-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="rei-lineas">
+                    <div className="rei-pagina rei-pagina--titulo">
+                      <span className="rei-panel-sub">{tx("invitacion.ubicacion.cronograma")}</span>
+                      <h2 className="rei-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="rei-naipe">
+                      <span className="rei-gema rei-gema--naipe" aria-hidden="true" />
                       {cronograma.map((item, i) => (
                         <div key={i} className="rei-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -1005,22 +1060,24 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            La invitación real: sobre crema, la tarjeta blanca con doble
+            filete de oro, el nombre en Cinzel y el sello de lacre con la
+            inicial al confirmar. */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="rei-section rei-checkin">
-            <div className="rei-folio">
-              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="rei-section rei-checkin">
+            <span className="rei-puntos-fondo rei-puntos-fondo--abajo" aria-hidden="true" />
+            <div className="rei-folio rei-folio--acento">
+              <span data-xin="1" data-dist="-40">{nCheckin} — {tx("invitacion.saveTheDate.invitacionReal")}</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="rei-spread">
-              <div className="rei-pagina">
+              <div className="rei-pagina rei-pagina--centrada">
                 <h2 data-xin="1" data-dist="-80" className="rei-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="rei-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                  {tx("invitacion.saveTheDate.venis")}<br /><span className="rei-acento">{tx("invitacion.saveTheDate.alBaile")}</span>
                 </h2>
+                <p data-xin="1" data-delay="120" className="rei-parrafo">{tx("invitacion.rsvp.kicker")}.</p>
               </div>
-              <div className="rei-cupon">
-                <span className="rei-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="rei-cupon" style={{ "--rei-inicial": `"${inicial}"` } as React.CSSProperties}>
                 <CheckinReino
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1054,8 +1111,8 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            Galería de retratos: marcos de oro, algunos con arco y uno
+            redondo, sobre el papel neutro. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1065,24 +1122,21 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
             className="rei-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="rei-pan-fijo">
+            <div className="rei-pan-fijo rei-pan-fijo--album">
               <div data-strip="1" className="rei-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="rei-panel rei-panel--album">
-                    <div className="rei-folio">
-                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                  <div key={iHoja} data-tone="light" className={`rei-panel rei-panel--album${iHoja % 2 === 1 ? " rei-panel--album-b" : ""}`}>
+                    <div className="rei-folio rei-folio--gris">
+                      <span>{nAlbum} — {tx("invitacion.saveTheDate.galeriaDeRetratos")}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") })} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="rei-h2 rei-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="rei-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="rei-contactos" data-cantidad={hoja.length}>
+                    <h2 className="rei-h2 rei-h2--album">{tx("invitacion.saveTheDate.retratos")}</h2>
+                    <div className="rei-hoja" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="rei-contacto"
+                          data-sheet="1"
+                          className="rei-foto-hoja"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1090,15 +1144,15 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="rei-contacto-img" />
-                          <span className="rei-contacto-tinta" aria-hidden="true" />
-                          <span className="rei-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="rei-foto-hoja-img" />
+                          <span data-colorwash="1" className={`rei-bano rei-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                          <span className="rei-foto-hoja-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="rei-folio rei-folio--pie">
-                      <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <div className="rei-folio rei-folio--gris rei-folio--pie">
+                      <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length })}</span>
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza")} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1109,20 +1163,21 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            El baile: sobre el castillo, el título con la segunda línea en
+            oro, el ecualizador y la lista en fichas de noche con gema. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="rei-section rei-musica">
-            <div className="rei-folio">
-              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+            <div className="rei-folio rei-folio--oro">
+              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.saveTheDate.elBaile")}</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="rei-spread">
-              <div className="rei-pagina">
+              <div className="rei-pagina rei-pagina--centrada">
                 <h2 data-xin="1" data-dist="-80" className="rei-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "rei-acento")}
+                  {tituloEnDosLineas(tx("invitacion.saveTheDate.preguntaTemaAbreBaile"), "rei-oro")}
                 </h2>
                 <div data-xin="1" data-delay="120" className="rei-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4].map((i) => <span key={i} style={{ animationDelay: `${i * 0.18}s` }} />)}
                 </div>
               </div>
               <div className="rei-pagina">
@@ -1137,17 +1192,18 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            El cofre: sobre crema, fichas blancas con arco y borde de
+            color. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="rei-section rei-regalos">
-            <div className="rei-folio">
-              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="rei-section rei-regalos">
+            <div className="rei-folio rei-folio--acento">
+              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.saveTheDate.elCofre")}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
             </div>
             <div className="rei-spread">
-              <div className="rei-pagina">
+              <div className="rei-pagina rei-pagina--centrada">
                 <h2 data-xin="1" data-dist="-80" className="rei-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="rei-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                  {tx("invitacion.saveTheDate.tuRegalo")}<br /><span className="rei-acento">{tx("invitacion.saveTheDate.esVenir")}</span>
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="rei-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1161,7 +1217,7 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1172,7 +1228,8 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1181,144 +1238,160 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            Espejo, espejo: sobre la gema celeste, chip de noche y opciones
+            en píldoras blancas. */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="rei-section rei-quiz">
+          <section id="quiz" data-tone="light" data-screen-label={triviaTitulo} className="rei-section rei-quiz">
             <div className="rei-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.saveTheDate.espejoEspejo")}</span>
               <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
             </div>
             <div className="rei-spread">
-              <div className="rei-pagina">
-                <h2 data-xin="1" data-dist="-80" className="rei-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="rei-pagina">
-                <TriviaReino
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaReino
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            La llave: sobre la noche con estrellas, el QR en ventana de
+            arco con doble filete, el pase en oro, la mesa en el acento y
+            "Y vivieron felices". */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="rei-section rei-pase">
-          <div className="rei-folio">
-            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+          <Estrellas />
+          <div className="rei-folio rei-folio--oro">
+            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.saveTheDate.laLlave")}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="rei-spread">
             <div data-xin="1" data-dist="-60" className="rei-pagina rei-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="rei-qr">
+                <span className="rei-gema rei-gema--qr" aria-hidden="true" />
+                <QrDeIngreso guest={guest as never} />
+                <span className="rei-qr-etq">{tx("invitacion.pase.tuPase")}</span>
+              </div>
             </div>
             <div className="rei-pagina">
               <div data-xin="1" data-delay="100" className="rei-pase-cabeza">
                 <div className="rei-pase-numero">
-                  <span className="rei-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
+                  <span className="rei-folio-etq">{tx("invitacion.pase.pase")} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="rei-pase-mesa">
+                    <span className="rei-folio-etq">{tx("invitacion.pase.tuMesa")}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="rei-lineas">
-                <div className="rei-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="rei-caja">
+                <div className="rei-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="rei-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="rei-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="rei-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="rei-linea"><span>{tx("invitacion.pase.sector")} · {tx("invitacion.pase.tuMesa")}</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="rei-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="rei-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} h</span></div>
               </div>
               <div className="rei-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="rei-folio rei-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="rei-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="rei-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="rei-pase-pie">
+            <span className="rei-despedida">{tx("invitacion.saveTheDate.yVivieronFelices")} — {firma}</span>
+            <div className="rei-folio rei-folio--oro rei-folio--colofon">
+              <span className="rei-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.acc2} /></span>
+              <span className="rei-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.saveTheDate.volverAlCastillo")} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="rei-riel">
-        <span ref={rielTopRef} className="rei-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="rei-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="rei-riel-linea">
           <span ref={rielBarraRef} className="rei-riel-barra" />
         </div>
-        <span ref={rielEtiquetaRef} className="rei-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+        <span ref={rielEtiquetaRef} className="rei-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha")}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          El castillo de noche: estrellas que titilan, la luna de oro y el
+          castillo con sus ventanas encendidas y el banderín que flamea;
+          en el centro, el marco real con la gema, el nombre en Cinzel y
+          los tres puntos. Es la bienvenida: dice de quién es la fiesta,
+          cuándo, dónde y para cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="rei-portada">
         <div ref={escenaPortadaRef} className="rei-portada-hoja">
-          <div className="rei-trama rei-trama--tapa" aria-hidden="true" />
+          <div className="rei-cielo" aria-hidden="true">
+            <Estrellas />
+            <span data-drift="-6" className="rei-luna" />
+            <svg data-drift="10" viewBox="0 0 430 260" preserveAspectRatio="xMidYMax slice" className="rei-castillo">
+              <g className="rei-castillo-piedra">
+                <rect x="0" y="200" width="430" height="60" />
+                <rect x="40" y="120" width="34" height="90" /><polygon points="40,120 57,84 74,120" />
+                <rect x="96" y="150" width="60" height="60" />
+                <rect x="170" y="70" width="40" height="140" /><polygon points="170,70 190,20 210,70" />
+                <rect x="226" y="140" width="70" height="70" />
+                <rect x="316" y="105" width="34" height="105" /><polygon points="316,105 333,66 350,105" />
+                <rect x="366" y="160" width="40" height="50" />
+              </g>
+              <g className="rei-castillo-ventanas"><rect x="52" y="150" width="8" height="14" /><rect x="185" y="100" width="10" height="16" /><rect x="185" y="140" width="10" height="16" /><rect x="328" y="140" width="8" height="14" /><rect x="120" y="170" width="10" height="14" /><rect x="256" y="160" width="10" height="16" /></g>
+              <g className="rei-castillo-banderin"><polygon points="190,20 190,4 214,12" /></g>
+              <polygon points="57,84 57,72 72,78" className="rei-castillo-bandera" /><polygon points="333,66 333,54 348,60" className="rei-castillo-bandera" />
+              <path d="M0 210 Q215 180 430 210 L430 260 L0 260 Z" className="rei-castillo-colina" />
+            </svg>
+          </div>
 
-          <div data-cl="1" className="rei-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
-            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
+          <div data-cl="1" className="rei-tapa-cabecera">
+            <span>{tx("invitacion.saveTheDate.reinoDe")} {nombreDelReino}</span>
+            <span className="rei-tapa-numero">Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="rei-tapa-centro">
-            <div className="rei-tapa-fila">
-              <span className="rei-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
+            <div className="rei-marco">
+              <div className="rei-marco-gema" aria-hidden="true"><span className="rei-gema rei-gema--marco" /><span className="rei-marco-barra" /></div>
+              <span className="rei-tapa-kicker">{kickerDelEvento}</span>
+              <h1 ref={cartelRef} className={`rei-tapa-nombres${nombreLargo ? " rei-tapa-nombres--largo" : ""}`} style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
+                {renglones.map((r, i) => (
+                  <span key={i} className="rei-tapa-linea"><span data-pieza="1"><Letras texto={r} desde={i === 0 ? 0 : renglones[0].replace(/\s/g, "").length} /></span></span>
+                ))}
+              </h1>
+              <div className="rei-tres-puntos" aria-hidden="true"><span /><span className="rei-tres-puntos--oro" /><span /></div>
             </div>
-            <h1 ref={cartelRef} className="rei-tapa-nombres">
-              {saludaAlInvitado ? (
-                <span className="rei-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
-              ) : (
-                <>
-                  <span className="rei-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
-                  {nombre2 && (
-                    <span className="rei-tapa-linea rei-tapa-linea--sangra">
-                      <span data-pieza="1"><span className="rei-acento">&amp;</span>{nombre2}</span>
-                    </span>
-                  )}
-                </>
-              )}
-            </h1>
-            <div className="rei-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="rei-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <div className="rei-tapa-datos">
+              <span>{diaSemana} {diaNum} · {mesLargo} · {anio}<br /><span className="rei-oro">{[lugarNombre, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="rei-tapa-datos-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br /><span className="rei-oro">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{hora} h<br /><span className="rei-oro">{fechaPuntos}</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="rei-tapa-pie">
-            <span className="rei-regla" aria-hidden="true" />
             <p className="rei-tapa-mensaje">
               {saludaAlInvitado
-                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
-                : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
+                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}, ${String(invitation.portadaMensaje || tx("invitacion.saveTheDate.mensajeReino"))}`
+                : String(invitation.portadaMensaje || tx("invitacion.saveTheDate.mensajeReino"))}
             </p>
             <button type="button" onClick={abrir} className="rei-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              {tx("invitacion.portada.abrirInvitacion")} ✦
             </button>
           </div>
         </div>
       </div>
 
-      <div ref={pistaRef} className="rei-pista">{tx("invitacion.portada.desliza").toUpperCase()} ↓</div>
+      <div ref={pistaRef} className="rei-pista">{tx("invitacion.portada.desliza")} ↓</div>
 
       {fotoAmpliada && (
         <div className="rei-lupa" onClick={() => setFotoAmpliada(null)} onContextMenu={(e) => e.preventDefault()}>
@@ -1347,30 +1420,24 @@ export function ReinoTemplate({ invitation, guest, isPersonalized = false }: Rei
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El nombre letra por letra: cada tanto una "brilla" (crece un 14 % y sube
+ * 6 px) y vuelve rebotando. El CSS escalona el turno de cada letra.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
-  const id = useId().replace(/:/g, "");
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
   return (
-    <div className="rei-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="rei-sello-amp">&amp;</span>}
-    </div>
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="rei-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
   );
 }
 
@@ -1918,13 +1985,15 @@ function TriviaReino({ preguntas, invitationId, guestToken, guestName }: { pregu
 // leen la Bienvenida y el Post-evento compartidos (esperan `rei-section` y
 // `rei-kicker`).
 const CSS_REI = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Reino ────────────────────────────────────────────────────────────
+     Cuento de castillo: Cinzel Decorative para el nombre, los números y
+     los botones, Nunito para el texto. Cielo de noche con estrellas que
+     titilan, luna de oro, castillo con ventanas encendidas y banderín
+     que flamea; marco real con gema, ventanas de arco, estandarte con
+     punta, sello de lacre. Todo CSS. */
   .rei-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--rei-sans), 'Nunito', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--rei-sans), 'Nunito', sans-serif;
+    --rei-castle: ${PALETA.castle}; --rei-castle2: ${PALETA.castle2}; --rei-oro-viejo: ${PALETA.acc2b}; --rei-gema: ${PALETA.acc3}; --rei-sombra: rgba(43,27,78,.25); }
   .rei-raiz a { color: inherit; text-decoration: none; }
   .rei-raiz button { font: inherit; }
 
@@ -1932,298 +2001,378 @@ const CSS_REI = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .rei-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .rei-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .rei-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .rei-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
+  /* Las estrellas de cuatro puntas que titilan. */
+  .rei-estrellas { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+  .rei-estrella { position: absolute; animation: reiTitila 2.4s ease-in-out infinite; }
+  .rei-estrella--0 { color: var(--pp-acc2); } .rei-estrella--1 { color: #FFFFFF; } .rei-estrella--2 { color: var(--rei-gema); } .rei-estrella--3 { color: var(--pp-acc); }
+  .rei-estrellas--blancas .rei-estrella { color: #FFFFFF; opacity: .5; }
+  @keyframes reiTitila { 0%, 100% { opacity: .25; transform: scale(.7); } 50% { opacity: 1; transform: scale(1); } }
+  /* Los puntitos del pergamino. */
+  .rei-puntos-fondo { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .35; background-image: radial-gradient(var(--pp-acc) 1.6px, transparent 1.8px); background-size: 16px 16px; }
+  .rei-puntos-fondo--arriba { -webkit-mask-image: linear-gradient(180deg, #000, transparent 50%); mask-image: linear-gradient(180deg, #000, transparent 50%); }
+  .rei-puntos-fondo--abajo { -webkit-mask-image: linear-gradient(0deg, #000, transparent 50%); mask-image: linear-gradient(0deg, #000, transparent 50%); }
+  /* La gema: un cuadrado rotado 45°. */
+  .rei-gema { display: inline-block; width: 14px; height: 14px; transform: rotate(45deg); background: var(--rei-gema); flex: 0 0 auto; }
+  .rei-gema--chica { width: 14px; height: 14px; }
+  .rei-gema--foto { position: absolute; left: 50%; top: 14px; z-index: 2; width: 22px; height: 22px; transform: translateX(-50%) rotate(45deg); border: 3px solid #FFFFFF; }
+  .rei-gema--naipe { position: absolute; left: 50%; top: -12px; width: 18px; height: 18px; transform: translateX(-50%) rotate(45deg); background: var(--rei-panel-acc, var(--pp-acc2)); border: 3px solid var(--pp-bg2); }
+  .rei-gema--qr { position: absolute; left: 50%; top: 22px; z-index: 2; width: 16px; height: 16px; transform: translateX(-50%) rotate(45deg); border: 3px solid var(--pp-bg); }
+  .rei-gema--marco { width: 30px; height: 30px; border: 3px solid var(--pp-ink); box-shadow: inset -6px -6px 0 var(--rei-sombra); animation: reiGema 2.4s ease-in-out infinite; }
+  @keyframes reiGema { 0%, 100% { transform: rotate(45deg) scale(1); } 50% { transform: rotate(45deg) scale(1.08); } }
 
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .rei-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .rei-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .rei-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 22px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: Nunito 800 con tracking. */
   .rei-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .rei-folio--pie { align-items: center; margin-top: auto; }
-  .rei-folio-etq { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+    font-weight: 800; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; }
+  .rei-folio--oro { color: var(--pp-acc2); }
+  .rei-folio--acento { color: var(--pp-acc); }
+  .rei-folio--gris { color: #8A7A9C; }
+  .rei-folio--pie { align-items: center; margin-top: auto; letter-spacing: .22em; opacity: .8; }
+  .rei-panel > .rei-folio { color: var(--rei-panel-acc, var(--pp-acc2)); }
+  .rei-folio--colofon { align-items: center; border-top: 1px solid color-mix(in srgb, var(--pp-acc2) 35%, transparent); padding-top: 12px; opacity: 1; }
+  .rei-folio-etq { font-weight: 800; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; display: block; color: var(--pp-acc2); }
+  .rei-oro { color: var(--pp-acc2); }
+  .rei-oro-viejo { color: var(--rei-oro-viejo); }
+  .rei-acento { color: var(--pp-acc); }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .rei-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .rei-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .rei-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .rei-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .rei-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .rei-spread--centrado { align-items: center; }
+  .rei-pagina { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .rei-pagina--centrada { align-items: center; text-align: center; }
+  .rei-pagina--titulo { align-items: center; text-align: center; gap: 6px; }
+  @media (min-width: 1024px) {
+    .rei-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .rei-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .rei-spread > *:first-child { justify-self: end; }
+    .rei-spread > *:last-child { justify-self: start; }
+    .rei-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .rei-h2, .rei-panel-titulo, .rei-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--rei-serif), 'Cinzel Decorative', serif;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .rei-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .rei-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .rei-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .rei-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .rei-acento { font-style: italic; color: var(--pp-acc); }
-  .rei-acento--tinta { color: var(--pp-ink); }
-  .rei-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .rei-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .rei-regla { display: block; height: 2px; background: currentColor; }
+  .rei-h2, .rei-panel-titulo, .rei-frase, .rei-fecha-linea, .rei-tapa-nombres { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; }
+  .rei-h2, .rei-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: 1; letter-spacing: .02em; font-size: clamp(34px, 9.5vw, 84px); }
+  .rei-h2--album { font-size: clamp(30px, 8.5vw, 72px); text-align: center; }
+  .rei-panel-sub { font-weight: 800; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--rei-panel-acc, var(--pp-acc2)); }
+  .rei-parrafo { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; max-width: 40ch; }
+  .rei-pildora { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 12px 18px; font-weight: 800; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  .rei-pildora--noche { background: var(--pp-bg); color: var(--pp-bg2); }
+  .rei-cta { margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 999px; padding: 0 16px;
+    color: var(--pp-bg2); background: var(--pp-bg); font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .rei-std { justify-content: center; }
-  .rei-fecha { display: flex; flex-direction: column; font-family: var(--rei-serif), 'Cinzel Decorative', serif;
-    line-height: .82; letter-spacing: -.04em; }
-  .rei-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .rei-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .rei-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .rei-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
-  .rei-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
+  /* ── 01 Guardá la fecha: el pergamino ──────────────────────────────── */
+  .rei-std { background: var(--pp-bg2); color: var(--pp-bg); }
+  .rei-fecha { display: flex; flex-direction: column; line-height: .9; }
+  .rei-fecha-linea { font-size: clamp(34px, 10vw, 80px); letter-spacing: .1em; text-transform: capitalize; }
+  .rei-fecha-linea--dia { font-size: clamp(96px, 30vw, 220px); letter-spacing: 0; color: var(--pp-acc); }
+  .rei-fecha-linea--anio { color: var(--rei-oro-viejo); }
+  .rei-fecha-pie { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 10px; font-weight: 800; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  /* La foto: ventana de arco con marco de oro y filete de noche. */
+  .rei-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 6px solid var(--pp-acc2); border-radius: 200px 200px 18px 18px; box-sizing: border-box; overflow: hidden;
+    box-shadow: 0 0 0 3px var(--pp-bg); background: repeating-linear-gradient(135deg, #5A4470 0 8px, #4A3660 8px 16px); }
+  .rei-foto-capa { position: absolute; inset: 0; overflow: hidden; }
   .rei-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background-image: radial-gradient(var(--pp-ink) calc(var(--rei-punto, 7.2) * 1px), transparent calc(var(--rei-punto, 7.2) * 1px + .6px));
+    background-image: radial-gradient(var(--pp-acc) calc(var(--rei-punto, 7.2) * 1px), transparent calc(var(--rei-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .rei-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--rei-serif), 'Cinzel Decorative', serif;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .rei-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--rei-sans), 'Nunito', sans-serif;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .rei-foto-etq { position: absolute; left: 0; right: 0; bottom: 12px; z-index: 2; text-align: center; font-weight: 800; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #FFFFFF; }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .rei-countdown { justify-content: space-between; }
-  .rei-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .rei-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  /* ── 02 Falta poco: el reloj de la torre ───────────────────────────── */
+  .rei-countdown { justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .rei-countdown > .rei-folio, .rei-countdown > .rei-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .rei-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap; font-weight: 800; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; }
+  .rei-marquesina--acento { background: var(--pp-acc); color: var(--pp-ink); font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 20px; letter-spacing: .12em; text-transform: none; }
+  .rei-marquesina--filete { border-top: 1px solid var(--pp-acc2); border-bottom: 1px solid var(--pp-acc2); color: var(--pp-acc2); }
+  .rei-marquesina-tira { display: flex; width: max-content; animation: reiCorre 16s linear infinite; }
+  .rei-marquesina-tira > span { padding-right: 36px; }
   .rei-marquesina--contraria .rei-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  @keyframes reiCorre { to { transform: translate3d(-50%, 0, 0); } }
+  .rei-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .rei-cuenta-caja { position: relative; background: var(--rei-castle); border: 3px solid var(--pp-acc2); border-radius: 80px 80px 16px 16px; padding: 26px 14px 16px; display: flex; flex-direction: column; align-items: center; gap: 4px; overflow: hidden;
+    --rei-caja-gema: var(--pp-acc); }
+  .rei-cuenta-caja::before { content: ""; position: absolute; left: 50%; top: 10px; width: 10px; height: 10px; transform: translateX(-50%) rotate(45deg); background: var(--rei-caja-gema); }
+  .rei-cuenta-caja--2 { --rei-caja-gema: var(--rei-gema); }
+  .rei-cuenta-caja--3 { --rei-caja-gema: var(--pp-acc2); }
+  .rei-cuenta-num { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: clamp(52px, 16vw, 120px); line-height: .9; color: var(--pp-ink); font-variant-numeric: tabular-nums; }
+  .rei-cuenta-caja--4 .rei-cuenta-num { color: var(--pp-acc2); }
+  .rei-cuenta-num > span { display: inline-block; animation: reiCifra 300ms cubic-bezier(.16,1,.3,1); }
+  @keyframes reiCifra { from { transform: translateY(18%); opacity: .4; } to { transform: none; opacity: 1; } }
+  .rei-cuenta-etq { font-weight: 800; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc2); }
+  .rei-tarjeta--hoy { background: var(--rei-castle); border: 3px solid var(--pp-acc2); border-radius: 80px 80px 16px 16px; padding: 30px 18px 20px; text-align: center; display: flex; flex-direction: column; gap: 6px; align-items: center; }
+  .rei-tarjeta--hoy .rei-tarjeta-kicker { font-weight: 800; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: var(--pp-acc2); }
+  .rei-tarjeta--hoy .rei-tarjeta-titulo { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: clamp(30px, 8vw, 64px); line-height: 1; }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .rei-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .rei-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .rei-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .rei-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .rei-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .rei-cuenta-num, .rei-cuenta-dias, .rei-cifra { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .rei-cuenta-caja:nth-child(4) .rei-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .rei-cuenta-etq { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .rei-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: el estandarte ───────────────────────────────── */
+  .rei-frase-seccion { background: var(--pp-acc); color: var(--pp-ink); justify-content: space-between; gap: 30px; }
+  .rei-estandarte { position: relative; background: var(--pp-bg2); color: var(--pp-bg); padding: 30px 22px 44px; max-width: 520px; width: 100%; box-sizing: border-box;
+    clip-path: polygon(0 0, 100% 0, 100% 88%, 50% 100%, 0 88%); border-top: 8px solid var(--pp-acc2); }
+  .rei-frase { margin: 0; font-weight: 700; font-size: clamp(24px, 6.6vw, 50px); line-height: 1.15; text-align: center; }
+  .rei-pastilla { display: flex; align-items: center; gap: 12px; background: var(--pp-bg); color: var(--pp-ink); border-radius: 999px; padding: 12px 20px; max-width: 320px;
+    font-weight: 700; font-size: 14px; line-height: 1.4; animation: reiFlota 4s ease-in-out infinite; }
+  @keyframes reiFlota { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+  .rei-tres-estrellas { position: relative; z-index: 1; display: flex; justify-content: center; gap: 12px; font-size: 18px; }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .rei-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .rei-frase-seccion .rei-acento { color: var(--pp-bg); font-style: italic; }
-  .rei-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Los reinos ─────────────────────────────────────────────────── */
   .rei-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
   .rei-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .rei-pan-fijo--album { background: #F7F5F0; }
   .rei-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .rei-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .rei-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .rei-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .rei-panel--acento .rei-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--pp-bg); color: var(--pp-ink); }
+  .rei-panel--castillo { --rei-panel-acc: var(--pp-acc2); }
+  .rei-panel--ceremonia { --rei-panel-acc: var(--pp-ink); background: var(--pp-acc); }
+  .rei-panel--mapa { --rei-panel-acc: var(--pp-acc2); background: var(--rei-castle2); }
+  .rei-panel--cronograma { --rei-panel-acc: var(--rei-gema); background: var(--rei-castle); }
   .rei-pan[data-scroll="vertical"] { height: auto; }
   .rei-pan[data-scroll="vertical"] .rei-pan-fijo { position: static; height: auto; overflow: visible; }
   .rei-pan[data-scroll="vertical"] .rei-tira { position: static; display: block; width: 100%; transform: none !important; }
   .rei-pan[data-scroll="vertical"] .rei-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
+  /* El naipe: ventana de arco crema con la gema arriba. */
+  .rei-naipe { position: relative; background: var(--pp-bg2); color: var(--pp-bg); border: 3px solid var(--rei-panel-acc, var(--pp-acc2)); border-radius: 60px 60px 16px 16px; padding: 28px 18px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .rei-linea { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 1px solid var(--rei-sombra); font-size: 15px; line-height: 1.3; }
+  .rei-linea > span:first-child { font-weight: 800; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 2px; }
+  .rei-linea > span:last-child { text-align: right; font-weight: 700; }
+  .rei-mapa { height: 190px; overflow: hidden; border-radius: 12px; border: 2px solid var(--rei-sombra); }
+  /* Los puntos son gemas de oro. */
+  .rei-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 10px; justify-content: center; z-index: 2; color: var(--pp-acc2); }
+  .rei-punto { width: 12px; height: 12px; transform: rotate(45deg); background: currentColor !important; opacity: .25; transition: opacity 300ms ease; display: inline-block; }
+  .rei-punto[data-activo="1"] { opacity: 1; }
 
-  .rei-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .rei-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .rei-linea > span:first-child { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .rei-linea > span:last-child { text-align: right; font-size: 15px; }
-  .rei-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--rei-sans), 'Nunito', sans-serif;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .rei-cta-flecha { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-style: italic; font-size: 22px; }
-  .rei-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
-  .rei-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .rei-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
-
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .rei-checkin { background: var(--pp-bg2); }
-  .rei-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .rei-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .rei-cupon .rei-talon-top { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .2em; }
-  .rei-cupon input, .rei-cupon .rei-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .rei-cupon .rei-contador button { border: 2px solid var(--pp-ink); }
-  .rei-sello, .rei-cupon .rei-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .rei-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .rei-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .rei-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .rei-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .rei-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .rei-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .rei-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--rei-sans), 'Nunito', sans-serif;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .rei-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .rei-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .rei-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .rei-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .rei-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .rei-lista-tema { font-size: 15px; }
-  .rei-lista-quien { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .rei-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .rei-tarjeta + .rei-tarjeta { margin-top: 12px; }
-  .rei-tarjeta-kicker { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .rei-tarjeta-titulo { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-size: 28px; line-height: 1; }
-  .rei-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .rei-tarjeta .rei-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .rei-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .rei-fila--ultima { border-bottom: none; }
-  .rei-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .rei-fila-etq { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .rei-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .rei-fila-valor { text-align: right; }
-  .rei-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .rei-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .rei-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .rei-quiz .rei-acento { color: var(--pp-ink); }
-  .rei-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .rei-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .rei-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .rei-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .rei-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .rei-pagina--qr { align-items: flex-start; }
-  .rei-pagina--qr .qr-ingreso, .rei-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .rei-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .rei-pase-numero { display: flex; flex-direction: column; }
-  .rei-pase-numero > span:last-child { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .rei-info-extra { margin-top: 12px; }
-  .rei-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .rei-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--rei-sans), 'Nunito', sans-serif !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .rei-raiz .ia-icon-box, .rei-raiz svg.lucide { display: none !important; }
-  .rei-replay { cursor: pointer; }
-  .rei-credito { display: flex; justify-content: center; opacity: .6; }
-  .rei-error { margin: 0; font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .rei-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .rei-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .rei-sello-circular text { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .rei-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .rei-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .rei-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .rei-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .rei-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .rei-tapa-fecha { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .rei-tapa-nombres { margin: 0; font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .rei-tapa-linea { overflow: hidden; display: block; }
-  .rei-tapa-linea > span { display: block; }
-  .rei-tapa-linea--sangra { padding-left: 14%; }
-  .rei-tapa-pase { text-align: right; }
-  .rei-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .rei-tapa-mensaje { margin: 0; font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .rei-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .rei-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .rei-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .rei-riel-top, .rei-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--rei-sans), 'Nunito', sans-serif;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .rei-riel-top { color: var(--pp-ink2); }
-  .rei-riel-etiqueta { color: var(--pp-acc); }
-  .rei-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .rei-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .rei-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .rei-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .rei-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .rei-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
-  .rei-campo { display: flex; flex-direction: column; gap: 6px; }
-  .rei-etiqueta { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .rei-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .rei-input:focus { outline: none; border-color: var(--pp-acc); }
-  .rei-contador { display: flex; align-items: center; gap: 12px; }
-  .rei-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
-  .rei-contador button:disabled { opacity: .35; cursor: default; }
-  .rei-contador > span { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .rei-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .rei-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .rei-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .rei-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .rei-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .rei-precio-total { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-size: 28px; line-height: 1; }
-  .rei-precio-detalle { font-family: var(--rei-sans), 'Nunito', sans-serif; font-size: 11px; letter-spacing: .1em; }
-  .rei-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--rei-sans), 'Nunito', sans-serif;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  /* ── 05 Check-in: la invitación real ───────────────────────────────── */
+  .rei-checkin { background: var(--pp-bg2); color: var(--pp-bg); }
+  .rei-cupon { position: relative; background: #FFFFFF; color: var(--pp-bg); border: 3px solid var(--pp-acc2); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+    box-shadow: 0 0 0 3px #FFFFFF, 0 0 0 5px var(--pp-acc2); }
+  .rei-cupon .rei-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .rei-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; border-bottom: 1px solid var(--rei-sombra); padding-bottom: 12px; }
   .rei-talon-estado { transition: color 400ms ease; }
+  .rei-cupon:has(.rei-filas) .rei-talon-estado { color: var(--pp-acc); }
+  .rei-campo { display: flex; flex-direction: column; gap: 6px; }
+  .rei-etiqueta { font-weight: 800; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8; }
+  .rei-input { min-height: 48px; border: 0; border-bottom: 2px solid var(--pp-bg); border-radius: 0; background: transparent; color: var(--pp-bg);
+    font-family: var(--rei-sans), 'Nunito', sans-serif; font-weight: 600; font-size: 15px; padding: 0; outline: none; }
+  .rei-campo:first-of-type .rei-input, .rei-input--serif { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 16px; }
+  .rei-contador { display: flex; align-items: center; border-bottom: 2px solid var(--pp-bg); min-height: 48px; }
+  .rei-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-bg); cursor: pointer; font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-size: 22px; line-height: 1; }
+  .rei-contador button:disabled { opacity: .35; cursor: default; }
+  .rei-contador > span { flex: 1; text-align: center; font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: 26px; line-height: 1; color: var(--pp-acc); }
   .rei-filas { display: flex; flex-direction: column; }
+  .rei-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--rei-sombra); font-size: 15px; }
+  .rei-fila--ultima { border-bottom: 0; }
+  .rei-fila-valor { text-align: right; font-weight: 700; }
+  .rei-precio { display: flex; justify-content: space-between; gap: 12px; font-weight: 800; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; padding-top: 4px; }
+  .rei-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .rei-precio-total { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 20px; line-height: 1; color: var(--pp-acc); }
+  .rei-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .rei-btn-solido { min-height: 54px; border: 0; border-radius: 999px; background: var(--pp-acc); color: #FFFFFF; cursor: pointer;
+    font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 14px; letter-spacing: .12em; padding: 2px 18px 0; transition: background 200ms ease; }
+  @media (hover: hover) { .rei-btn-solido:hover { background: var(--pp-bg); } }
+  .rei-btn-solido:disabled { opacity: .6; cursor: default; }
+  .rei-btn-fantasma { min-height: 48px; border: 2px solid var(--pp-bg); border-radius: 999px; background: transparent; color: var(--pp-bg); cursor: pointer;
+    font-weight: 800; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; padding: 0 18px; }
+  .rei-error { margin: 0; font-weight: 800; font-size: 12px; color: var(--pp-acc); }
+  /* El sello de lacre: la forma irregular del acento, el anillo blanco y
+     la inicial del invitado en el centro. */
+  .rei-cupon .rei-sello { position: absolute; right: 12px; bottom: 78px; width: 126px; aspect-ratio: 1; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    background: var(--pp-acc); border-radius: 48% 52% 50% 46% / 52% 46% 54% 48%;
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 22px; box-sizing: border-box;
+    font-weight: 800; font-size: 7px; letter-spacing: .16em; text-transform: uppercase; color: #FFFFFF; }
+  .rei-cupon .rei-sello::after { content: ""; position: absolute; inset: 14px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.7); }
+  .rei-cupon .rei-sello::before { content: var(--rei-inicial, "✦"); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: 28px; letter-spacing: 0; color: #FFFFFF; }
   .rei-petalos { display: none; }
 
-  /* Reino: filete dorado arriba y abajo de cada titular. */
-  .rei-h2, .rei-panel-titulo { padding: 12px 0; border-top: 1px solid var(--pp-acc2); border-bottom: 1px solid var(--pp-acc2); }
-  .rei-tapa-nombres { letter-spacing: .02em; }
-  .rei-trama { opacity: .16; }
+  /* ── 06 Álbum: galería de retratos ─────────────────────────────────── */
+  .rei-panel--album { background: #F7F5F0; color: #2B1B4E; justify-content: flex-start; gap: 14px; }
+  .rei-panel--album-b { background: #EFEBE3; }
+  .rei-hoja { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .rei-foto-hoja { position: relative; overflow: hidden; min-height: 0; cursor: pointer; border: 4px solid var(--pp-acc2); border-radius: 10px; box-shadow: 0 0 0 2px #2B1B4E;
+    background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .rei-foto-hoja:nth-child(1), .rei-foto-hoja:nth-child(3) { border-radius: 50% 50% 10px 10px; }
+  .rei-foto-hoja:nth-child(4) { border-radius: 50%; }
+  .rei-foto-hoja-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .rei-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .rei-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .rei-bano--2 { background: color-mix(in srgb, var(--rei-gema) 55%, transparent); }
+  .rei-bano--3 { background: color-mix(in srgb, var(--pp-acc2) 60%, transparent); }
+  .rei-bano--4 { background: rgba(90,63,160,.45); }
+  .rei-bano--5 { background: color-mix(in srgb, var(--pp-acc) 40%, transparent); }
+  .rei-foto-hoja-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-weight: 800; font-size: 11px; letter-spacing: .14em; color: #2B1B4E; }
+  .rei-hoja[data-cantidad="5"] .rei-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .rei-hoja[data-cantidad="5"] .rei-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .rei-hoja[data-cantidad="5"] .rei-foto-hoja:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .rei-hoja[data-cantidad="5"] .rei-foto-hoja:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .rei-hoja[data-cantidad="5"] .rei-foto-hoja:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .rei-hoja[data-cantidad="4"] .rei-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .rei-hoja[data-cantidad="4"] .rei-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .rei-hoja[data-cantidad="4"] .rei-foto-hoja:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .rei-hoja[data-cantidad="4"] .rei-foto-hoja:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .rei-hoja[data-cantidad="3"] .rei-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .rei-hoja[data-cantidad="3"] .rei-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .rei-hoja[data-cantidad="3"] .rei-foto-hoja:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .rei-hoja[data-cantidad="2"] .rei-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .rei-hoja[data-cantidad="2"] .rei-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .rei-hoja[data-cantidad="1"] .rei-foto-hoja:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: el baile ───────────────────────────────────────────── */
+  .rei-musica { background: var(--rei-castle); }
+  .rei-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
+  .rei-eq span { width: 8px; height: 100%; background: var(--pp-acc2); border-radius: 4px; transform-origin: bottom; animation: reiEq 1.1s ease-in-out infinite; }
+  .rei-eq span:nth-child(2) { background: var(--pp-acc); }
+  .rei-eq span:nth-child(3) { background: var(--pp-ink); }
+  .rei-eq span:nth-child(4) { background: var(--rei-gema); }
+  @keyframes reiEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .rei-musica form.rei-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .rei-musica .rei-etiqueta { display: none; }
+  .rei-musica .rei-input { min-height: 48px; border: 2px solid var(--pp-acc2); border-radius: 999px; background: transparent; color: var(--pp-ink); font-family: var(--rei-sans), 'Nunito', sans-serif; font-weight: 700; font-size: 15px; padding: 0 16px; min-width: 0; }
+  .rei-musica .rei-input::placeholder { color: color-mix(in srgb, var(--pp-ink) 60%, transparent); }
+  .rei-musica .rei-error { grid-column: 1 / -1; }
+  .rei-musica .rei-btn-solido { grid-column: 1 / -1; min-height: 50px; background: var(--pp-acc2); color: var(--pp-bg); font-size: 13px; }
+  @media (hover: hover) { .rei-musica .rei-btn-solido:hover { background: var(--pp-ink); } }
+  .rei-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .rei-lista-fila { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--pp-bg); border: 1px solid var(--pp-acc2); border-radius: 16px; }
+  .rei-lista-fila::before { content: ""; width: 12px; height: 12px; transform: rotate(45deg); background: var(--rei-gema); flex: 0 0 auto; }
+  .rei-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .rei-lista-tema { font-weight: 800; font-size: 17px; line-height: 1.1; }
+  .rei-lista-quien { font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--pp-acc2); }
+
+  /* ── 08 Regalos: el cofre ──────────────────────────────────────────── */
+  .rei-regalos { background: var(--pp-bg2); color: var(--pp-bg); }
+  .rei-tarjeta--banco { --rei-borde: var(--pp-acc); position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-bg); border: 3px solid var(--rei-borde); border-radius: 40px 40px 16px 16px; padding: 18px;
+    display: flex; flex-direction: column; gap: 10px; transform: none !important; }
+  .rei-tarjeta--der { --rei-borde: var(--pp-bg); }
+  .rei-tarjeta--banco + .rei-tarjeta--banco { margin-top: 14px; }
+  .rei-tarjeta-kicker { font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .rei-tarjeta-mensaje { margin: 0; font-weight: 600; font-size: 14px; line-height: 1.5; opacity: .8; }
+  .rei-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .rei-fila-etq { font-weight: 800; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .rei-fila-dato { font-weight: 800; font-size: 14px; letter-spacing: .04em; overflow-wrap: anywhere; }
+  .rei-fila--copiable:first-child .rei-fila-dato { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 17px; line-height: 1.1; color: var(--rei-borde); }
+  .rei-tarjeta--banco .rei-fila--ultima { border-bottom: 0; font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+  .rei-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: var(--rei-borde); color: #FFFFFF; cursor: pointer;
+    font-weight: 800; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; }
+  .rei-btn-copiar--hecho { background: var(--pp-acc2); color: var(--pp-bg); }
+
+  /* ── 09 Trivia: espejo, espejo ─────────────────────────────────────── */
+  .rei-quiz { background: var(--rei-gema); color: var(--pp-bg); }
+  .rei-quiz .rei-tarjeta { display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; transform: none !important; }
+  .rei-quiz .rei-tarjeta-kicker { background: var(--pp-bg); color: var(--pp-acc2); border-radius: 999px; font-weight: 800; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 8px 16px; opacity: 1; }
+  .rei-quiz .rei-tarjeta-pregunta, .rei-quiz .rei-tarjeta-titulo { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: clamp(28px, 8vw, 68px); line-height: 1.05; max-width: 16ch; }
+  .rei-quiz .rei-tarjeta-mensaje { margin: 0; font-weight: 700; font-size: 15px; opacity: 1; }
+  .rei-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; width: 100%; }
+  .rei-opcion { min-height: 54px; border: 2px solid var(--pp-bg); border-radius: 999px; background: #FFFFFF; color: var(--pp-bg); cursor: pointer; counter-increment: opcion;
+    font-family: var(--rei-sans), 'Nunito', sans-serif; font-weight: 800; font-size: 16px; text-align: left; padding: 0 20px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .rei-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 14px; }
+  .rei-opcion--bien { background: var(--pp-bg); color: #FFFFFF; }
+  .rei-opcion--bien::after { content: "✦ Sí"; }
+  .rei-opcion--mal { background: var(--pp-acc); color: #FFFFFF; }
+  .rei-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .rei-quiz .rei-spread > .rei-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .rei-quiz .rei-tarjeta-kicker { grid-column: 1; justify-self: center; }
+    .rei-quiz .rei-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: center; width: 100%; }
+    .rei-quiz .rei-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: la llave ──────────────────────────────────────────── */
+  .rei-pase { justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .rei-pagina--qr { align-items: center; }
+  .rei-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: var(--pp-bg2); padding: 56px 40px 40px; box-sizing: border-box; border: 5px solid var(--pp-acc2); border-radius: 50% 50% 18px 18px;
+    box-shadow: 0 0 0 3px var(--pp-bg), 0 0 0 6px var(--pp-acc); display: flex; align-items: center; justify-content: center; }
+  .rei-qr .qr-ingreso, .rei-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .rei-qr img, .rei-qr svg, .rei-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .rei-qr-etq { position: absolute; left: 0; right: 0; bottom: 12px; text-align: center; font-weight: 800; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: #8A7A9C; }
+  .rei-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; padding-top: 8px; }
+  .rei-pase-numero, .rei-pase-mesa { display: flex; flex-direction: column; }
+  .rei-pase-mesa { align-items: flex-end; text-align: right; }
+  .rei-pase-numero > span:last-child { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: clamp(56px, 17vw, 130px); line-height: .9; color: var(--pp-acc2); }
+  .rei-pase-mesa > span:last-child { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 900; font-size: clamp(36px, 11vw, 84px); line-height: .9; color: var(--pp-acc); }
+  .rei-caja { display: flex; flex-direction: column; background: var(--rei-castle); border: 1px solid var(--pp-acc2); border-radius: 18px; padding: 6px 16px; }
+  .rei-caja .rei-linea { padding: 10px 0; font-size: 14px; border-bottom-color: color-mix(in srgb, var(--pp-acc2) 35%, transparent); }
+  .rei-caja .rei-linea:last-child { border-bottom: 0; }
+  .rei-caja .rei-linea > span:first-child { color: var(--pp-acc2); opacity: 1; }
+  .rei-caja .rei-linea > span:last-child { font-weight: 600; line-height: 1.35; }
+  .rei-info-extra { margin-top: 4px; }
+  .rei-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .rei-info-extra #ia-trigger-btn { background: transparent !important; color: var(--pp-acc2) !important; border: 2px solid var(--pp-acc2) !important;
+    border-radius: 999px !important; font-weight: 800 !important; letter-spacing: .16em !important; text-transform: uppercase; }
+  .rei-raiz .ia-icon-box, .rei-raiz svg.lucide { display: none !important; }
+  .rei-pase-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; align-items: center; text-align: center; }
+  .rei-despedida { font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: clamp(20px, 5.6vw, 34px); line-height: 1.1; }
+  .rei-folio--colofon { width: 100%; }
+  .rei-replay { cursor: pointer; color: var(--pp-ink); }
+  .rei-credito { display: inline-flex; opacity: .85; }
+
+  /* ── La tapa: el castillo de noche ─────────────────────────────────── */
+  .rei-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
+  .rei-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(16px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom)); }
+  .rei-cielo { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .rei-luna { position: absolute; right: 8%; top: 9%; width: clamp(56px, 14vw, 90px); aspect-ratio: 1; border-radius: 50%; background: var(--pp-acc2); box-shadow: inset -10px -6px 0 var(--rei-sombra); }
+  .rei-castillo { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 42%; opacity: .95; }
+  .rei-castillo-piedra { fill: var(--rei-castle); }
+  .rei-castillo-ventanas { fill: var(--pp-acc2); }
+  .rei-castillo-bandera { fill: var(--pp-acc); }
+  .rei-castillo-banderin { fill: var(--pp-acc); transform-origin: 190px 20px; animation: reiFlamea 2.4s ease-in-out infinite; }
+  @keyframes reiFlamea { 0%, 100% { transform: skewY(0deg); } 50% { transform: skewY(-6deg); } }
+  .rei-castillo-colina { fill: var(--rei-castle2); }
+  .rei-tapa-cabecera { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; font-weight: 800; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--pp-acc2); }
+  .rei-tapa-numero { text-align: right; }
+  .rei-tapa-centro { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 0; }
+  /* El marco real: el acento con doble filete y la gema arriba. */
+  .rei-marco { position: relative; width: 100%; max-width: 520px; border: 3px solid var(--pp-acc2); border-radius: 26px 26px 40px 40px / 26px 26px 60px 60px; padding: 34px 18px 22px; box-sizing: border-box;
+    background: var(--pp-acc); box-shadow: inset 0 0 0 6px var(--pp-acc), inset 0 0 0 8px rgba(255,255,255,.45); display: flex; flex-direction: column; align-items: center; }
+  .rei-marco-gema { position: absolute; left: 50%; top: -26px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; }
+  .rei-marco-barra { width: 90px; height: 3px; background: var(--pp-ink); margin-top: 10px; border-radius: 2px; }
+  .rei-tapa-kicker { display: block; text-align: center; font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: clamp(13px, 3.6vw, 18px); letter-spacing: .14em; color: var(--pp-ink); }
+  /* El nombre: Cinzel 900 con una sombra corta de noche. El más largo manda el cuerpo. */
+  .rei-tapa-nombres { margin: 6px 0 0; text-align: center; line-height: .96; letter-spacing: .02em; display: flex; flex-direction: column; color: var(--pp-ink); text-shadow: 0 3px 0 var(--rei-sombra);
+    font-size: min(clamp(38px, 12vw, 110px), 14vh, calc((min(100vw, 520px) - 60px) / (var(--largo, 9) * 0.78))); }
+  @media (min-width: 1024px) { .rei-tapa-nombres { font-size: min(10vw, 170px, 16vh, calc((520px - 60px) / (var(--largo, 9) * 0.78))); } }
+  .rei-tapa-nombres--largo { font-size: min(clamp(28px, 8.4vw, 77px), 10vh, calc((min(100vw, 520px) - 60px) / (var(--largo, 9) * 0.78))); }
+  .rei-tapa-linea { overflow: hidden; display: block; white-space: nowrap; padding-bottom: 6px; margin-bottom: -6px; }
+  .rei-tapa-linea > span { display: block; }
+  .rei-letra { display: inline-block; animation: reiBrilla calc(var(--n, 9) * 3.4s) cubic-bezier(.34,1.56,.64,1) infinite; animation-delay: calc(var(--i, 0) * -3.4s); }
+  @keyframes reiBrilla { 0%, 99% { transform: none; } 99.3% { transform: translateY(-6px) scale(1.14); } 100% { transform: none; } }
+  .rei-tres-puntos { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+  .rei-tres-puntos span { width: 8px; height: 8px; border-radius: 50%; background: var(--pp-ink); }
+  .rei-tres-puntos .rei-tres-puntos--oro { background: var(--pp-acc2); }
+  .rei-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; font-weight: 700; font-size: 13px; line-height: 1.35; padding-top: 6px; }
+  .rei-tapa-datos-der { text-align: right; }
+  .rei-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; }
+  .rei-tapa-mensaje { margin: 0; font-weight: 700; font-size: clamp(15px, 4.2vw, 19px); line-height: 1.35; max-width: 34ch; }
+  .rei-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 3px solid var(--pp-acc2); border-radius: 999px; background: var(--pp-acc2); color: var(--pp-bg); cursor: pointer;
+    font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 15px; letter-spacing: .12em; padding: 2px 22px 0;
+    display: flex; align-items: center; justify-content: center; gap: 12px; transition: background 200ms ease, border-color 200ms ease; }
+  @media (hover: hover) { .rei-tapa-btn:hover { background: var(--pp-ink); border-color: var(--pp-ink); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .rei-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--pp-acc2) !important; border-left: 1px solid currentColor !important; }
+  .rei-riel-top { writing-mode: vertical-rl; font-family: var(--rei-serif), 'Cinzel Decorative', serif; font-weight: 700; font-size: 12px; letter-spacing: .2em; color: inherit !important; }
+  .rei-riel-etiqueta { writing-mode: vertical-rl; font-weight: 800; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: inherit; }
+  .rei-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .rei-riel-barra { position: absolute; left: -2px; top: 0; width: 4px; height: 0%; background: var(--pp-acc); transition: height 200ms linear; display: block; }
+  .rei-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-weight: 800; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--pp-acc2);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: reiPista 2.4s ease-in-out infinite; }
+  @keyframes reiPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .rei-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(43,27,78,.94);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .rei-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-acc2); border-radius: 50%;
+    background: var(--pp-bg); color: var(--pp-acc2); font-size: 18px; line-height: 1; cursor: pointer; }
+  .rei-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 5px solid var(--pp-acc2); border-radius: 18px; }
 
   @media (prefers-reduced-motion: reduce) {
     .rei-raiz * { animation: none !important; }
     .rei-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .rei-foto { --rei-punto: 0; }
   }
 `;

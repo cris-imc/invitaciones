@@ -5,16 +5,18 @@
   "titulo": "REINO",
   "varianteBase": "Medianoche",
   "resumen": [
-    "El cuento de princesas: Cinzel Decorative con filetes dorados sobre un",
-    "fondo profundo, y Nunito para el texto. El acento es el rosa de la",
-    "corona y el dorado el de los filetes."
+    "Cuento de castillo: Cinzel Decorative para el nombre, los números y los",
+    "botones, Nunito para el texto. Cielo de noche con estrellas que titilan,",
+    "luna de oro, castillo con ventanas encendidas y banderín que flamea; marco",
+    "real con gema, ventanas de arco, estandarte con punta y sello de lacre."
   ],
   "serif": {
     "modulo": "Cinzel_Decorative",
     "css": "'Cinzel Decorative', serif",
     "pesos": [
       "400",
-      "700"
+      "700",
+      "900"
     ]
   },
   "sans": {
@@ -22,7 +24,9 @@
     "css": "'Nunito', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "600",
+      "700",
+      "800"
     ]
   },
   "mono": {
@@ -30,7 +34,9 @@
     "css": "'Nunito', sans-serif",
     "pesos": [
       "400",
-      "500"
+      "600",
+      "700",
+      "800"
     ]
   },
   "paleta": {
@@ -39,14 +45,12 @@
     "ink": "#FFF4FA",
     "ink2": "#FFF4FA",
     "acc": "#E24BA0",
-    "acc2": "#F5C26B"
+    "acc2": "#F5C26B",
+    "castle": "#3F2A6E",
+    "castle2": "#33215C",
+    "acc2b": "#C99A3E",
+    "acc3": "#9BE1FF"
   },
-  "cssExtra": [
-    "/* Reino: filete dorado arriba y abajo de cada titular. */",
-    ".rei-h2, .rei-panel-titulo { padding: 12px 0; border-top: 1px solid var(--pp-acc2); border-bottom: 1px solid var(--pp-acc2); }",
-    ".rei-tapa-nombres { letter-spacing: .02em; }",
-    ".rei-trama { opacity: .16; }"
-  ],
   "variantes": {
     "Rosa": {
       "etiqueta": "Rosa",
@@ -55,7 +59,11 @@
       "ink": "#FFF4FA",
       "ink2": "#FFF4FA",
       "acc": "#5A1E8A",
-      "acc2": "#FFD98A"
+      "acc2": "#FFD98A",
+      "castle": "#C23A85",
+      "castle2": "#A11B63",
+      "acc2b": "#C99A3E",
+      "acc3": "#BFEFFF"
     },
     "Esmeralda": {
       "etiqueta": "Esmeralda",
@@ -64,7 +72,11 @@
       "ink": "#F4FBF7",
       "ink2": "#F4FBF7",
       "acc": "#F0587A",
-      "acc2": "#F5C26B"
+      "acc2": "#F5C26B",
+      "castle": "#1D544E",
+      "castle2": "#17483F",
+      "acc2b": "#B8892E",
+      "acc3": "#9BE1FF"
     },
     "Zafiro": {
       "etiqueta": "Zafiro",
@@ -73,7 +85,11 @@
       "ink": "#F3F6FF",
       "ink2": "#F3F6FF",
       "acc": "#FF6FAE",
-      "acc2": "#F5C26B"
+      "acc2": "#F5C26B",
+      "castle": "#213680",
+      "castle2": "#1A2C6E",
+      "acc2b": "#C99A3E",
+      "acc3": "#8DF0D2"
     },
     "Lila": {
       "etiqueta": "Lila",
@@ -82,7 +98,19 @@
       "ink": "#FBF6FF",
       "ink2": "#FBF6FF",
       "acc": "#FF7DBE",
-      "acc2": "#FFE08A"
+      "acc2": "#FFE08A",
+      "castle": "#6D50B8",
+      "castle2": "#5A3FA0",
+      "acc2b": "#C99A3E",
+      "acc3": "#9BE1FF"
     }
-  }
+  },
+  "extras": [
+    "castle",
+    "castle2",
+    "acc2b",
+    "acc3"
+  ],
+  "render": "rei.jsx",
+  "css": "rei.css"
 }
