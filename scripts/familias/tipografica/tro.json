@@ -3,10 +3,12 @@
   "prefijo": "tro",
   "mote": "Tropical",
   "titulo": "TROPICAL",
-  "varianteBase": "Sandía",
+  "varianteBase": "Sandia",
   "resumen": [
-    "La isla: Lilita One sobre arena y mar, con Quicksand para el texto. El",
-    "acento es el de la fruta y el segundo el verde de las palmeras."
+    "Etiqueta de bebida en la playa: Lilita One blanca con trazo de tinta y",
+    "sombra plana de color, Quicksand para el texto. Cielo, sol, mar con olas",
+    "que corren, arena, palmera que se mece, estrella de mar, sandía y un",
+    "radiocasete con parlantes girando para la cuenta regresiva."
   ],
   "serif": {
     "modulo": "Lilita_One",
@@ -19,67 +21,92 @@
     "modulo": "Quicksand",
     "css": "'Quicksand', sans-serif",
     "pesos": [
-      "400",
-      "500"
+      "500",
+      "600",
+      "700"
     ]
   },
   "mono": {
     "modulo": "Quicksand",
     "css": "'Quicksand', sans-serif",
     "pesos": [
-      "400",
-      "500"
+      "500",
+      "600",
+      "700"
     ]
   },
   "paleta": {
-    "bg": "#FBEBD0",
-    "bg2": "#7FD8FF",
+    "bg": "#7FD8FF",
+    "bg2": "#FBEBD0",
     "ink": "#2C3A4A",
-    "ink2": "#2C3A4A",
+    "ink2": "#6E6A78",
     "acc": "#FF5E7A",
-    "acc2": "#2E9E6B"
+    "acc2": "#2EB8C9",
+    "sun": "#FFD166",
+    "leaf": "#2E9E6B",
+    "leaf2": "#1E7A55",
+    "trunk": "#B07A4A"
   },
-  "cssExtra": [
-    "/* Tropical: titulares redondos y sol de fondo. */",
-    ".tro-tapa-nombres, .tro-h2, .tro-panel-titulo, .tro-fecha-linea { letter-spacing: 0; }",
-    ".tro-trama { opacity: .16; background-image: radial-gradient(currentColor 1px, transparent 1.2px); background-size: 18px 18px; }"
-  ],
   "variantes": {
     "Flamenco": {
       "etiqueta": "Flamenco",
-      "bg": "#FFF4E0",
-      "bg2": "#FFD9E8",
+      "bg": "#FFD9E8",
+      "bg2": "#FFF4E0",
       "ink": "#3A2C4A",
-      "ink2": "#3A2C4A",
+      "ink2": "#7A6E86",
       "acc": "#FF7BAC",
-      "acc2": "#3FBF9F"
+      "acc2": "#7FD8FF",
+      "sun": "#FFE08A",
+      "leaf": "#3FBF9F",
+      "leaf2": "#2A8F76",
+      "trunk": "#B07A4A"
     },
     "Coco": {
       "etiqueta": "Coco",
-      "bg": "#F7EBD5",
-      "bg2": "#BDEFFF",
+      "bg": "#BDEFFF",
+      "bg2": "#F7EBD5",
       "ink": "#2C3A4A",
-      "ink2": "#2C3A4A",
+      "ink2": "#6E6A78",
       "acc": "#FF8A3D",
-      "acc2": "#2E9E6B"
+      "acc2": "#1FA7A0",
+      "sun": "#FFD166",
+      "leaf": "#2E9E6B",
+      "leaf2": "#1E7A55",
+      "trunk": "#8C5A34"
     },
     "Lima": {
       "etiqueta": "Lima",
-      "bg": "#FFF6DC",
-      "bg2": "#DFFBE6",
+      "bg": "#DFFBE6",
+      "bg2": "#FFF6DC",
       "ink": "#233A2E",
-      "ink2": "#233A2E",
+      "ink2": "#6B7A70",
       "acc": "#9BD83A",
-      "acc2": "#1E7A55"
+      "acc2": "#2EB8C9",
+      "sun": "#FFE08A",
+      "leaf": "#1E7A55",
+      "leaf2": "#155C40",
+      "trunk": "#B07A4A"
     },
     "Atardecer": {
       "etiqueta": "Atardecer",
-      "bg": "#FBE3C8",
-      "bg2": "#FFB27A",
+      "bg": "#FFB27A",
+      "bg2": "#FBE3C8",
       "ink": "#3A2340",
-      "ink2": "#3A2340",
+      "ink2": "#7A6478",
       "acc": "#FF4F7A",
-      "acc2": "#2E7A5A"
+      "acc2": "#6C4FBF",
+      "sun": "#FFD166",
+      "leaf": "#2E7A5A",
+      "leaf2": "#1E5A42",
+      "trunk": "#7A4A3A"
     }
-  }
+  },
+  "extras": [
+    "sun",
+    "leaf",
+    "leaf2",
+    "trunk"
+  ],
+  "render": "tro.jsx",
+  "css": "tro.css"
 }

@@ -9,19 +9,19 @@
  *
  * GENERADO por scripts/derivar-tipografica.js a partir de
  * EditorialBlancNoirTemplate.tsx — no editar a mano: el motor se arregla en
- * Editorial Blanc & Noir y se vuelve a derivar; lo propio de esta familia
- * está en scripts/familias/tipografica/tro.json.
+ * Editorial Blanc & Noir; el render en scripts/jsx/tipografica/tro.jsx, los
+ * estilos en scripts/css/tipografica/tro.css y las caras y la paleta en
+ * scripts/familias/tipografica/tro.json.
  *
- * PROVISORIO: todavía usa el render de Editorial. Falta portar el suyo
- * desde el mockup.
- *
- * La isla: Lilita One sobre arena y mar, con Quicksand para el texto. El
- * acento es el de la fruta y el segundo el verde de las palmeras.
+ * Etiqueta de bebida en la playa: Lilita One blanca con trazo de tinta y
+ * sombra plana de color, Quicksand para el texto. Cielo, sol, mar con olas
+ * que corren, arena, palmera que se mece, estrella de mar, sandía y un
+ * radiocasete con parlantes girando para la cuenta regresiva.
  *
  * Sin imágenes propias: son fuentes y CSS.
  */
 
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Lilita_One, Quicksand } from "next/font/google";
 import { LogoFooterCredit } from "@/components/ui/Logo";
@@ -45,7 +45,7 @@ const troSerif = Lilita_One({
 });
 const troSans = Quicksand({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["500", "600", "700"],
   display: "swap",
   variable: "--tro-sans",
 });
@@ -58,19 +58,23 @@ const troSans = Quicksand({
 // las escenas leen var(--pp-…), así que un cambio acá repinta cerros, cielo,
 // sol y figuras de una sola vez.
 const PALETA = {
-  bg: "#FFF6DC",
-  bg2: "#DFFBE6",
+  bg: "#DFFBE6",
+  bg2: "#FFF6DC",
   ink: "#233A2E",
-  ink2: "#233A2E",
+  ink2: "#6B7A70",
   acc: "#9BD83A",
-  acc2: "#1E7A55",
-  sky1: "#FFF6DC",
-  sky2: "#DFFBE6",
-  hill1: "#DFFBE6",
-  hill2: "#233A2E",
+  acc2: "#2EB8C9",
+  sky1: "#DFFBE6",
+  sky2: "#FFF6DC",
+  hill1: "#FFF6DC",
+  hill2: "#6B7A70",
   hill3: "#233A2E",
   night: "#233A2E",
-  nightInk: "#FFF6DC",
+  nightInk: "#DFFBE6",
+  sun: "#FFE08A",
+  leaf: "#1E7A55",
+  leaf2: "#155C40",
+  trunk: "#B07A4A",
 };
 
 /**
@@ -733,6 +737,10 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
     "--pp-night-ink": PALETA.nightInk,
     "--pp-btn-bg": PALETA.ink,
     "--pp-btn-fg": tintaSobre(PALETA.ink),
+    "--pp-sun": PALETA.sun,
+    "--pp-leaf": PALETA.leaf,
+    "--pp-leaf2": PALETA.leaf2,
+    "--pp-trunk": PALETA.trunk,
   } as React.CSSProperties;
 
   // ── Después de la fiesta ───────────────────────────────────────────────
@@ -762,6 +770,40 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
   const totalPliegos = cuenta;
   const folio = (n: string) => `${n} / ${String(totalPliegos).padStart(2, "0")}`;
 
+  // El nombre como etiqueta de bebida: un renglón en Lilita One, centrado;
+  // con dos personas, uno por renglón y el cuerpo baja a .72em.
+  const renglones = saludaAlInvitado ? [nombreInvitado] : [nombre1, ...(nombre2 ? [nombre2] : [])];
+  const renglonMasLargo = Math.max(4, ...renglones.map((n) => n.length));
+  const nombreLargo = renglones.length > 1 || renglonMasLargo > 11;
+  const totalLetras = Math.max(1, renglones.join("").replace(/\s/g, "").length);
+
+  // La frase: una palabra del medio en el acento y el cierre en el sol.
+  const tonoDePalabra = (i: number) => {
+    const n = palabras.length;
+    if (i >= Math.ceil(n * 0.8)) return "tro-sol";
+    if (i === Math.min(desdeAcento, n - 1) || i === Math.floor(n * 0.3)) return "tro-acento";
+    return undefined;
+  };
+
+  const esXV = invitation.tipo === "QUINCE_ANOS";
+  const esBoda = invitation.tipo === "CASAMIENTO";
+  const kickerDelEvento = tx(esBoda ? "invitacion.evento.nosCasamos" : esXV ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos");
+  const cintaDelEvento = esXV ? `15 ${tx("invitacion.saveTheDate.anios")} ☼ ${tx("invitacion.saveTheDate.tropical")}` : `${anio} ☼ ${tx("invitacion.saveTheDate.tropical")}`;
+  const firma = esXV ? nombre1.trim().split(/\s+/)[0] : iniciales(nombre1, nombre2);
+  // Cada lugar es un parador numerado según el orden real de los paneles.
+  const parador = (clave: string) => `${tx("invitacion.saveTheDate.parador")} ${Math.max(0, panelesLugar.indexOf(clave)) + 1}`;
+  // Las olas: un path de 120×22 repetido al doble de ancho que corre 120 px
+  // y vuelve a empezar sin costura.
+  const Ola = ({ clase, arriba = false }: { clase: string; arriba?: boolean }) => (
+    <span className={`tro-ola ${clase}`} aria-hidden="true">
+      <svg viewBox="0 0 120 22" preserveAspectRatio="none"><path d={arriba ? "M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V0 H0 Z" : "M0 11 Q15 0 30 11 T60 11 T90 11 T120 11 T150 11 T180 11 T210 11 T240 11 V22 H0 Z"} /></svg>
+    </span>
+  );
+  const FRONDA = "M0,0 C 10,-14 30,-14 46,-4 C 58,4 64,16 62,30 C 52,20 40,14 28,12 C 34,20 36,26 34,30 C 22,22 10,12 0,0 Z";
+  const NERVIO = "M2,-1 C 20,-6 40,-2 58,20";
+  const FRONDAS: [number, number][] = [[-158, 0.94], [-128, 1.01], [-98, 1.08], [-68, 1.15], [-38, 1.08], [-8, 1.01], [22, 0.94]];
+  const ESTRELLA = "30,2 37,22 58,23 41,36 47,57 30,45 13,57 19,36 2,23 23,22";
+
   return (
     <div
       ref={raizRef}
@@ -773,32 +815,32 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
 
       <div ref={scrollerRef} className="tro-scroller">
         {/* ── 01 Guardá la fecha ─────────────────────────────────────────
-            El pliego se invierte: tinta sobre crema. La fecha ocupa la
-            página izquierda en tres renglones que se cruzan, y la foto va
-            enmarcada en la derecha. */}
-        <section data-tone="dark" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="tro-section tro-std">
-          <div className="tro-trama tro-trama--media" aria-hidden="true" />
+            Etiqueta de botella: sobre arena con la ola del mar arriba, la
+            fecha en Lilita a tres colores y la foto con marco blanco,
+            sombra de mar y el código de barras en la esquina. */}
+        <section data-tone="light" data-screen-label={tx("invitacion.saveTheDate.guardaLaFecha")} className="tro-section tro-std">
+          <Ola clase="tro-ola--std" arriba />
+          <div className="tro-folio tro-folio--acento">
+            <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha")}</span>
+            <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
+          </div>
           <div className="tro-spread">
             <div className="tro-pagina">
-              <div className="tro-folio">
-                <span data-xin="1" data-dist="-40">{nSaveTheDate} — {tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
-                <span data-xin="1" data-dist="40">{folio(nSaveTheDate)}</span>
-              </div>
               <div className="tro-fecha">
-                <span data-xin="1" data-dist="-160" className="tro-fecha-linea">{diaNum}</span>
-                <span data-xin="1" data-dist="160" data-delay="120" className="tro-fecha-linea tro-fecha-linea--acc">{mesLargo.slice(0, 3)}</span>
-                <span data-xin="1" data-dist="-160" data-delay="240" className="tro-fecha-linea">{anio}</span>
+                <span data-xin="1" data-dist="-160" className="tro-fecha-linea tro-fecha-linea--dia">{diaNum}</span>
+                <span data-xin="1" data-dist="160" data-delay="120" className="tro-fecha-linea tro-fecha-linea--mes">{mesLargo}</span>
+                <span data-xin="1" data-dist="-160" data-delay="240" className="tro-fecha-linea tro-fecha-linea--anio">{anio}</span>
               </div>
               <div data-xin="1" data-delay="360" className="tro-fecha-pie">
-                <span>{diaSemana} · {hora} H</span>
+                <span>{diaSemana} · {hora} h</span>
                 <AddToCalendarLink
                   eventName={titulo}
                   targetDate={fechaHora}
                   location={[lugarNombre, direccion].filter(Boolean).join(", ")}
-                  className="tro-link"
+                  className="tro-pildora tro-pildora--tinta"
                   showIcon={false}
                 >
-                  {tx("invitacion.saveTheDate.agregarAlCalendario").toUpperCase()} ↗
+                  {tx("invitacion.saveTheDate.agregarAlCalendario")} ☼
                 </AddToCalendarLink>
               </div>
             </div>
@@ -807,47 +849,60 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
               <div ref={ventanaRef} data-xin="1" data-delay="200" data-dist="0" className="tro-foto">
                 {fotoMobile && (
                   <div className="acp-mobile-only tro-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoMobile} tint={false} effect="enfoque" scrimColorRgb="44,58,74" />
                   </div>
                 )}
                 {fotoDesktop && (
                   <div className="acp-desktop-only tro-foto-capa">
-                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="20,20,20" />
+                    <AnimatedCoverPhoto photoSrc={fotoDesktop} tint={false} effect="enfoque" scrimColorRgb="44,58,74" />
                   </div>
                 )}
                 {/* La trama que tapa la foto y se disuelve al subir: el radio
                     del punto lo mueve el motor en --tro-punto. */}
                 <span className="tro-foto-revelado" aria-hidden="true" />
-                <span className="tro-foto-anio">{anio}</span>
-                <span className="tro-foto-pie">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="tro-foto-etq">{tx("invitacion.album.nuestraFoto").toUpperCase()}</span>
+                <span className="tro-barras" aria-hidden="true">
+                  {[2, 1, 3, 1, 2, 3, 1, 2, 1, 3, 2, 1].map((w, i) => <span key={i} style={{ width: w }} />)}
+                </span>
               </div>
             )}
           </div>
         </section>
 
         {/* ── 02 Falta poco ──────────────────────────────────────────────
-            Dos marquesinas que corren en sentidos opuestos y, entre ellas,
-            las cuatro cifras. */}
-        <section data-tone={TONO} data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="tro-section tro-countdown">
+            El radiocasete: sobre el mar, la caja de tinta con asa, cuatro
+            displays de color y dos parlantes girando, entre dos
+            marquesinas inclinadas. */}
+        <section data-tone="dark" data-screen-label={tx("invitacion.cuentaRegresiva.kicker")} className="tro-section tro-countdown">
           <div className="tro-folio">
-            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan").toUpperCase()}</span>
+            <span data-xin="1" data-dist="-40">{nCountdown} — {tx("invitacion.cuentaRegresiva.faltan")}</span>
             <span data-xin="1" data-dist="40">{folio(nCountdown)}</span>
           </div>
-          <div className="tro-marquesina" aria-hidden="true">
+          <div className="tro-marquesina tro-marquesina--sol" aria-hidden="true">
             <div className="tro-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[tx("invitacion.cuentaRegresiva.dias"), tx("invitacion.cuentaRegresiva.horas"), tx("invitacion.cuentaRegresiva.minutos"), tx("invitacion.cuentaRegresiva.segundos")].join(" · ")} · {fechaPuntos} ·&nbsp;
+                  {tx("invitacion.cuentaRegresiva.dias")} ☼ {tx("invitacion.cuentaRegresiva.horas")} ☼ {tx("invitacion.cuentaRegresiva.minutos")} ☼ {tx("invitacion.cuentaRegresiva.segundos")} ☼ {diaNum} {tx("invitacion.evento.de")} {mesLargo} ☼&nbsp;
                 </span>
               ))}
             </div>
           </div>
-          <CuentaTropical targetDate={fechaHora} />
-          <div className="tro-marquesina tro-marquesina--contraria" aria-hidden="true">
+          <div className="tro-spread">
+            <div className="tro-pagina tro-pagina--entera">
+              <div className="tro-radio">
+                <span className="tro-radio-asa" aria-hidden="true" />
+                <CuentaTropical targetDate={fechaHora} />
+                <div className="tro-radio-pie" aria-hidden="true">
+                  <span className="tro-parlante" /><span className="tro-radio-etq">Play ▶ {tx("invitacion.saveTheDate.hastaLaFiesta")}</span><span className="tro-parlante" />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="tro-marquesina tro-marquesina--blanca tro-marquesina--contraria" aria-hidden="true">
             <div className="tro-marquesina-tira">
               {[0, 1].map((i) => (
                 <span key={i}>
-                  {[lugarNombre, ciudad, hora ? `${hora} H` : "", dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
+                  {[lugarNombre, ciudad, `${hora} h`, dressCode].filter(Boolean).join(" · ").toUpperCase()} ·&nbsp;
                 </span>
               ))}
             </div>
@@ -855,12 +910,13 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         </section>
 
         {/* ── 03 Unas palabras ───────────────────────────────────────────
-            El pliego del acento: la frase entra palabra por palabra y al
-            lado va el sello con la firma. */}
+            Escrito en la arena: grano de arena de fondo, la frase en Lilita
+            con sombra de mar y la pastilla con la estrella de mar. */}
         {hayFrase && (
-          <section data-tone="dark" data-screen-label={tx("invitacion.frase.etiqueta")} className="tro-section tro-frase-seccion">
-            <div className="tro-folio">
-              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.frase.unasPalabras").toUpperCase()}</span>
+          <section data-tone="light" data-screen-label={tx("invitacion.frase.etiqueta")} className="tro-section tro-frase-seccion">
+            <span className="tro-grano" aria-hidden="true" />
+            <div className="tro-folio tro-folio--acento">
+              <span data-xin="1" data-dist="-40">{nFrase} — {tx("invitacion.saveTheDate.escritoEnLaArena")}</span>
               <span data-xin="1" data-dist="40">{folio(nFrase)}</span>
             </div>
             <div className="tro-spread">
@@ -869,24 +925,25 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
                   // El espacio va fuera del span: el motor pone cada palabra
                   // en inline-block y un espacio adentro se colapsa a cero.
                   <span key={i}>
-                    <span data-w="1" className={i >= desdeAcento ? "tro-acento" : undefined}>{p}</span>{" "}
+                    <span data-w="1" className={tonoDePalabra(i)}>{p}</span>{" "}
                   </span>
                 ))}
               </h2>
-              <div data-xin="1" data-delay="900" data-dist="60" className="tro-sello">
-                <span>{tx("invitacion.frase.conAmor")}</span>
+              <div data-xin="1" data-delay="900" data-dist="60" className="tro-pastilla">
+                <svg viewBox="0 0 60 60" className="tro-pastilla-estrella" aria-hidden="true"><polygon points={ESTRELLA} /></svg>
+                <span>{tx("invitacion.frase.conAmor")} · {titulo}</span>
               </div>
             </div>
             <div className="tro-folio tro-folio--pie">
-              <span>{titulo.toUpperCase()}</span>
-              <span>{fechaPuntos}</span>
+              <span>{titulo}{esXV ? " · XV" : ""}</span>
+              <span className="tro-barra" aria-hidden="true" />
             </div>
           </section>
         )}
 
         {/* ── 04 Cuándo y dónde ──────────────────────────────────────────
-            Un pliego por lugar. Cada uno se lleva su tono: el salón sobre
-            crema, la ceremonia sobre tinta y el cronograma sobre el acento. */}
+            Los paradores: cielo, arena y mar, cada uno con su ola abajo,
+            el título en Lilita con sombra de color y la ficha blanca. */}
         <div
           id="details"
           data-pan="1"
@@ -897,64 +954,68 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         >
           <div className="tro-pan-fijo">
             <div data-strip="1" className="tro-tira">
-              <div data-tone={TONO} className="tro-panel">
+              <div data-tone="light" className="tro-panel tro-panel--cielo">
+                <Ola clase="tro-ola--panel" />
                 <div className="tro-folio">
-                  <span>{nCuando} — {tx("invitacion.ubicacion.fiestaSalon").toUpperCase()}</span><span>{deLugar("recepcion")}</span>
+                  <span>{nCuando} — {tx("invitacion.ubicacion.elSalon")}</span><span>{deLugar("recepcion")}</span>
                 </div>
                 <div className="tro-spread">
-                  <h2 className="tro-panel-titulo">
-                    {(lugarNombre || tx("invitacion.ubicacion.elLugar")).split(" ")[0]}
-                    <br /><span className="tro-acento">{(lugarNombre || "").split(" ").slice(1).join(" ") || ciudad}</span>
-                  </h2>
-                  <div className="tro-lineas">
-                    <div className="tro-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{hora} h</span></div>
+                  <div className="tro-pagina tro-pagina--titulo">
+                    <span className="tro-panel-sub">{parador("recepcion")}</span>
+                    <h2 className="tro-panel-titulo">{lugarNombre || tx("invitacion.ubicacion.elLugar")}</h2>
+                  </div>
+                  <div className="tro-ficha">
+                    <div className="tro-linea"><span>{tx("invitacion.ubicacion.recepcion")}</span><span>{hora} h</span></div>
                     {direccion && <div className="tro-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{direccion}</span></div>}
                     {dressCode && <div className="tro-linea"><span>{tx("invitacion.ubicacion.dressCode")}</span><span>{dressCode}</span></div>}
                     {mapUrl && (
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="tro-cta">
-                        {tx("invitacion.ubicacion.comoLlegar")}<span className="tro-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.comoLlegar")}<span>→</span>
                       </a>
                     )}
                   </div>
                 </div>
                 <div className="tro-folio tro-folio--pie">
-                  <span>{(ciudad || direccion).toUpperCase()}</span>
-                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                  <span>{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+                  {!scrollVertical && panelesLugar.length > 1 && <span>{tx("invitacion.portada.desliza")} →</span>}
                 </div>
               </div>
 
               {ceremoniaHabilitada && (
-                <div id="ceremonia" data-tone="dark" className="tro-panel">
+                <div id="ceremonia" data-tone="light" className="tro-panel tro-panel--arena">
+                  <Ola clase="tro-ola--panel" />
                   <div className="tro-folio">
-                    <span>{nCuando} — {ceremoniaTitulo.toUpperCase()}</span><span>{deLugar("ceremonia")}</span>
+                    <span>{nCuando} — {ceremoniaTitulo}</span><span>{deLugar("ceremonia")}</span>
                   </div>
                   <div className="tro-spread">
-                    <h2 className="tro-panel-titulo">
-                      {(ceremoniaNombre || ceremoniaTitulo).split(" ")[0]}
-                      <br /><span className="tro-acento">{(ceremoniaNombre || "").split(" ").slice(1).join(" ") || ceremoniaTitulo}</span>
-                    </h2>
-                    <div className="tro-lineas">
+                    <div className="tro-pagina tro-pagina--titulo">
+                      <span className="tro-panel-sub">{parador("ceremonia")}</span>
+                      <h2 className="tro-panel-titulo">{ceremoniaNombre || ceremoniaTitulo}</h2>
+                    </div>
+                    <div className="tro-ficha">
                       {ceremoniaHora && <div className="tro-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{ceremoniaHora} h</span></div>}
                       {ceremoniaDireccion && <div className="tro-linea"><span>{tx("invitacion.ubicacion.direccion")}</span><span>{ceremoniaDireccion}</span></div>}
                     </div>
                   </div>
                   <div className="tro-folio tro-folio--pie">
-                    <span>{tx("invitacion.ubicacion.ceremoniaCivil").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <span>{tx("invitacion.ubicacion.ceremoniaCivil")}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza")} →</span>}
                   </div>
                 </div>
               )}
 
               {hayComoLlegar && (
-                <div id="location" data-tone={TONO} className="tro-panel">
+                <div id="location" data-tone="light" className="tro-panel tro-panel--cielo tro-panel--mapa">
+                  <Ola clase="tro-ola--panel" />
                   <div className="tro-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar").toUpperCase()}</span><span>{deLugar("llegar")}</span>
+                    <span>{nCuando} — {tx("invitacion.ubicacion.comoLlegar")}</span><span>{deLugar("llegar")}</span>
                   </div>
                   <div className="tro-spread">
-                    <h2 className="tro-panel-titulo">
-                      {tx("invitacion.ubicacion.comoLlegar")}
-                    </h2>
-                    <div className="tro-lineas">
+                    <div className="tro-pagina tro-pagina--titulo">
+                      <span className="tro-panel-sub">{parador("llegar")}</span>
+                      <h2 className="tro-panel-titulo">{tx("invitacion.ubicacion.comoLlegar")}</h2>
+                    </div>
+                    <div className="tro-ficha">
                       {embedMapUrl && (
                         <div className="tro-mapa">
                           <iframe
@@ -969,28 +1030,29 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
                         </div>
                       )}
                       <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="tro-cta">
-                        {tx("invitacion.ubicacion.abrirEnMapas")}<span className="tro-cta-flecha">↗</span>
+                        {tx("invitacion.ubicacion.abrirEnMapas")}<span>→</span>
                       </a>
                     </div>
                   </div>
                   <div className="tro-folio tro-folio--pie">
-                    <span>{[direccion, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-                    {!scrollVertical && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <span>{[direccion, ciudad].filter(Boolean).join(" · ")}</span>
+                    {!scrollVertical && <span>{tx("invitacion.portada.desliza")} →</span>}
                   </div>
                 </div>
               )}
 
               {cronograma.length > 0 && (
-                <div id="schedule" data-tone="dark" className="tro-panel tro-panel--acento">
+                <div id="schedule" data-tone="dark" className="tro-panel tro-panel--mar">
+                  <Ola clase="tro-ola--panel" />
                   <div className="tro-folio">
-                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma").toUpperCase()}</span><span>{deLugar("cronograma")}</span>
+                    <span>{nCuando} — {tx("invitacion.ubicacion.cronograma")}</span><span>{deLugar("cronograma")}</span>
                   </div>
                   <div className="tro-spread">
-                    <h2 className="tro-panel-titulo">
-                      {tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}
-                      <br /><span className="tro-acento tro-acento--tinta">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",").slice(1).join(",").trim()}</span>
-                    </h2>
-                    <div className="tro-lineas">
+                    <div className="tro-pagina tro-pagina--titulo">
+                      <span className="tro-panel-sub">{parador("cronograma")}</span>
+                      <h2 className="tro-panel-titulo">{tx("invitacion.ubicacion.laNochePasoAPaso").split(",")[0]}</h2>
+                    </div>
+                    <div className="tro-ficha">
                       {cronograma.map((item, i) => (
                         <div key={i} className="tro-linea"><span>{item.time || ""}</span><span>{item.title}</span></div>
                       ))}
@@ -1007,22 +1069,23 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         </div>
 
         {/* ── 05 Check-in ────────────────────────────────────────────────
-            El cupón: papel blanco con borde grueso, línea de corte punteada
-            y el estado arriba a la derecha. */}
+            La pulsera de playa: sobre el acento con lunares blancos, la
+            tarjeta blanca con sombra de tinta y la estrella "¡Sí!". */}
         {rsvpHabilitado && (
-          <section id="rsvp" data-tone={TONO} data-screen-label={tx("invitacion.rsvp.confirmar")} className="tro-section tro-checkin">
-            <div className="tro-folio">
-              <span data-xin="1" data-dist="-40">{nCheckin} — CHECK-IN</span>
+          <section id="rsvp" data-tone="light" data-screen-label={tx("invitacion.rsvp.confirmar")} className="tro-section tro-checkin">
+            <span className="tro-lunares" aria-hidden="true" />
+            <div className="tro-folio tro-folio--blanco">
+              <span data-xin="1" data-dist="-40">{nCheckin} — {tx("invitacion.pase.checkIn")}</span>
               <span data-xin="1" data-dist="40">{folio(nCheckin)}</span>
             </div>
             <div className="tro-spread">
               <div className="tro-pagina">
-                <h2 data-xin="1" data-dist="-80" className="tro-h2">
-                  {tx("invitacion.rsvp.confirmaLinea1")}<br /><span className="tro-acento">{tx("invitacion.rsvp.confirmaLinea2")}</span>
+                <h2 data-xin="1" data-dist="-80" className="tro-h2 tro-h2--sombra-tinta">
+                  {tx("invitacion.saveTheDate.venis")}<br /><span className="tro-sol">{tx("invitacion.saveTheDate.aLaPlaya")}</span>
                 </h2>
+                <p data-xin="1" data-delay="120" className="tro-parrafo tro-parrafo--blanco">{tx("invitacion.rsvp.kicker")}.</p>
               </div>
-              <div className="tro-cupon">
-                <span className="tro-cupon-corte" aria-hidden="true" />
+              <div data-xin="1" data-delay="160" data-dist="80" className="tro-cupon">
                 <CheckinTropical
                   invitationId={String(invitation.id ?? "")}
                   guestToken={guest?.uniqueToken}
@@ -1056,8 +1119,8 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         )}
 
         {/* ── 06 Álbum ───────────────────────────────────────────────────
-            Hoja de contactos: la grilla de seis columnas de una plancha de
-            fotografía, con la tinta del acento por encima. */}
+            Postales: marcos blancos gruesos con filete de tinta, apenas
+            torcidos, sobre el papel neutro. */}
         {todasLasFotos.length > 0 && (
           <div
             id="album"
@@ -1067,24 +1130,21 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
             className="tro-pan"
             style={{ "--st-pasos": Math.max(0, hojasDeFotos.length - 1) } as React.CSSProperties}
           >
-            <div className="tro-pan-fijo">
+            <div className="tro-pan-fijo tro-pan-fijo--album">
               <div data-strip="1" className="tro-tira">
                 {hojasDeFotos.map((hoja, iHoja) => (
-                  <div key={iHoja} data-tone={TONO} className="tro-panel tro-panel--album">
-                    <div className="tro-folio">
-                      <span>{nAlbum} — {tx("invitacion.album.titulo").toUpperCase()}</span>
-                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") }).toUpperCase()}</span>
+                  <div key={iHoja} data-tone="light" className={`tro-panel tro-panel--album${iHoja % 2 === 1 ? " tro-panel--album-b" : ""}`}>
+                    <div className="tro-folio tro-folio--gris">
+                      <span>{nAlbum} — {tx("invitacion.album.titulo")}</span>
+                      <span>{tx("invitacion.album.hojaDeTotal", { n: String(iHoja + 1).padStart(2, "0"), total: String(hojasDeFotos.length).padStart(2, "0") })} · {folio(nAlbum)}</span>
                     </div>
-                    {iHoja === 0 && (
-                      <h2 className="tro-h2 tro-h2--album">
-                        {tx("invitacion.album.titulo")} <span className="tro-acento">{tx("invitacion.album.deFotos")}</span>
-                      </h2>
-                    )}
-                    <div className="tro-contactos" data-cantidad={hoja.length}>
+                    <h2 className="tro-h2 tro-h2--album">{tx("invitacion.saveTheDate.postales")}</h2>
+                    <div className="tro-hoja" data-cantidad={hoja.length}>
                       {hoja.map((url, i) => (
                         <div
                           key={i}
-                          className="tro-contacto"
+                          data-sheet="1"
+                          className="tro-foto-hoja"
                           role="button"
                           tabIndex={0}
                           onClick={() => setFotoAmpliada(url)}
@@ -1092,15 +1152,15 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
                           aria-label={tx("invitacion.album.ampliarFoto", { n: i + 1 })}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={url} alt="" loading="lazy" className="tro-contacto-img" />
-                          <span className="tro-contacto-tinta" aria-hidden="true" />
-                          <span className="tro-contacto-n">{String(i + 1).padStart(2, "0")}</span>
+                          <img src={url} alt="" loading="lazy" className="tro-foto-hoja-img" />
+                          <span data-colorwash="1" className={`tro-bano tro-bano--${(i % 5) + 1}`} aria-hidden="true" />
+                          <span className="tro-foto-hoja-n">FOTO {String(i + 1).padStart(2, "0")}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="tro-folio tro-folio--pie">
-                      <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length }).toUpperCase()}</span>
-                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.segui").toUpperCase()} →</span>}
+                    <div className="tro-folio tro-folio--gris tro-folio--pie">
+                      <span>{tx("invitacion.album.fotosSubidas", { n: todasLasFotos.length })}</span>
+                      {!scrollVertical && hojasDeFotos.length > 1 && <span>{tx("invitacion.portada.desliza")} →</span>}
                     </div>
                   </div>
                 ))}
@@ -1111,20 +1171,22 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         )}
 
         {/* ── 07 Música ──────────────────────────────────────────────────
-            Pliego de tinta, con el ecualizador como única ilustración. */}
+            El parlante de playa: sobre tinta, el título con la segunda
+            línea al sol, el ecualizador de colores y la lista en fichas
+            blancas. */}
         {sugerenciaMusicaHabilitada && (
           <section id="songs" data-tone="dark" data-screen-label={tx("invitacion.musica.titulo")} className="tro-section tro-musica">
-            <div className="tro-folio">
-              <span data-xin="1" data-dist="-40">{nMusica} — {tx("invitacion.musica.titulo").toUpperCase()}</span>
+            <div className="tro-folio tro-folio--sol">
+              <span data-xin="1" data-dist="-40">{nMusica} — Playlist</span>
               <span data-xin="1" data-dist="40">{folio(nMusica)}</span>
             </div>
             <div className="tro-spread">
               <div className="tro-pagina">
-                <h2 data-xin="1" data-dist="-80" className="tro-h2">
-                  {tituloEnDosLineas(tx("invitacion.sabor.preguntaCancionFaltar"), "tro-acento")}
+                <h2 data-xin="1" data-dist="-80" className="tro-h2 tro-h2--plano">
+                  {tituloEnDosLineas(tx("invitacion.saveTheDate.preguntaTemaSuena"), "tro-sol")}
                 </h2>
                 <div data-xin="1" data-delay="120" className="tro-eq" aria-hidden="true">
-                  {[0, 1, 2, 3, 4, 5, 6].map((i) => <span key={i} style={{ animationDelay: `${i * 0.12}s` }} />)}
+                  {[0, 1, 2, 3, 4].map((i) => <span key={i} style={{ animationDelay: `${i * 0.18}s` }} />)}
                 </div>
               </div>
               <div className="tro-pagina">
@@ -1139,17 +1201,17 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         )}
 
         {/* ── 08 Regalos ─────────────────────────────────────────────────
-            Las tarjetas bancarias son fichas blancas con borde grueso. */}
+            Sobre arena, fichas blancas con sombra de color. */}
         {hayRegalos && (
-          <section id="banco" data-tone={TONO} data-screen-label={tx("invitacion.regalos.titulo")} className="tro-section tro-regalos">
-            <div className="tro-folio">
-              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo").toUpperCase()}</span>
+          <section id="banco" data-tone="light" data-screen-label={tx("invitacion.regalos.titulo")} className="tro-section tro-regalos">
+            <div className="tro-folio tro-folio--acento">
+              <span data-xin="1" data-dist="-40">{nRegalos} — {tx("invitacion.regalos.titulo")}</span>
               <span data-xin="1" data-dist="40">{folio(nRegalos)}</span>
             </div>
             <div className="tro-spread">
               <div className="tro-pagina">
-                <h2 data-xin="1" data-dist="-80" className="tro-h2">
-                  {tx("invitacion.regalos.siQueresLinea1")}<br /><span className="tro-acento">{tx("invitacion.regalos.siQueresLinea2")}</span>
+                <h2 data-xin="1" data-dist="-80" className="tro-h2 tro-h2--sombra-sol">
+                  {tx("invitacion.saveTheDate.tuRegalo")}<br />{tx("invitacion.saveTheDate.esVenir")}
                 </h2>
                 {Boolean(invitation.regaloMensaje) && (
                   <p data-xin="1" data-delay="120" className="tro-parrafo">{String(invitation.regaloMensaje)}</p>
@@ -1163,7 +1225,7 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
                     cbu={String(invitation.regaloCbu || "")}
                     banco={String(invitation.regaloBanco || "")}
                     titular={String(invitation.regaloTitular || "")}
-                    retraso={180}
+                    retraso={160}
                   />
                 )}
                 {pagoTarjetaHabilitado && (
@@ -1174,7 +1236,8 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
                     cbu={String(invitation.pagoTarjetaCbu || "")}
                     banco={String(invitation.pagoTarjetaBanco || "")}
                     titular={String(invitation.pagoTarjetaTitular || "")}
-                    retraso={260}
+                    retraso={240}
+                    inclinada
                   />
                 )}
               </div>
@@ -1183,144 +1246,161 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
         )}
 
         {/* ── 09 Trivia ──────────────────────────────────────────────────
-            El único pliego que va entero en el acento. */}
+            Sobre el sol con la ola del mar abajo, chip de tinta y opciones
+            en píldoras blancas con sombra. */}
         {quizHabilitado && (
-          <section id="quiz" data-tone="dark" data-screen-label="Quiz" className="tro-section tro-quiz">
+          <section id="quiz" data-tone="light" data-screen-label={triviaTitulo} className="tro-section tro-quiz">
+            <Ola clase="tro-ola--quiz" />
             <div className="tro-folio">
-              <span data-xin="1" data-dist="-40">{nQuiz} — {tx("invitacion.quiz.kicker").toUpperCase()}</span>
+              <span data-xin="1" data-dist="-40">{nQuiz} — Trivia</span>
               <span data-xin="1" data-dist="40">{folio(nQuiz)}</span>
             </div>
             <div className="tro-spread">
-              <div className="tro-pagina">
-                <h2 data-xin="1" data-dist="-80" className="tro-h2">{triviaTitulo}</h2>
-              </div>
-              <div className="tro-pagina">
-                <TriviaTropical
-                  preguntas={triviaPreguntas}
-                  invitationId={String(invitation.id ?? "")}
-                  guestToken={guest?.uniqueToken}
-                  guestName={nombreInvitado || tx("invitacion.evento.invitado")}
-                />
-              </div>
+              <TriviaTropical
+                preguntas={triviaPreguntas}
+                invitationId={String(invitation.id ?? "")}
+                guestToken={guest?.uniqueToken}
+                guestName={nombreInvitado || tx("invitacion.evento.invitado")}
+              />
             </div>
           </section>
         )}
 
         {/* ── 10 Tu pase ─────────────────────────────────────────────────
-            La contratapa: el QR grande a la izquierda y los datos del pase
-            a la derecha, con el sello girando. */}
+            Pulsera y QR: sobre el mar con la arena abajo y su ola, el QR
+            con marco de tinta y sombra del acento, el pase gigante, la
+            mesa al sol y "¡Nos vemos en la arena!". */}
         <section data-tone="dark" data-screen-label={tx("invitacion.pase.tuPase")} className="tro-section tro-pase">
+          <span className="tro-pase-arena" aria-hidden="true" />
+          <Ola clase="tro-ola--pase" />
           <div className="tro-folio">
-            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase").toUpperCase()}</span>
+            <span data-xin="1" data-dist="-40">{nPase} — {tx("invitacion.pase.tuPase")}</span>
             <span data-xin="1" data-dist="40">{folio(nPase)}</span>
           </div>
           <div className="tro-spread">
             <div data-xin="1" data-dist="-60" className="tro-pagina tro-pagina--qr">
-              <QrDeIngreso guest={guest as never} />
+              <div className="tro-qr">
+                <QrDeIngreso guest={guest as never} />
+                <span className="tro-qr-etq">{tx("invitacion.pase.tuPase")}</span>
+              </div>
             </div>
             <div className="tro-pagina">
               <div data-xin="1" data-delay="100" className="tro-pase-cabeza">
                 <div className="tro-pase-numero">
-                  <span className="tro-folio-etq">{tx("invitacion.pase.pase").toUpperCase()} Nº</span>
+                  <span className="tro-folio-etq">{tx("invitacion.pase.pase")} Nº</span>
                   <span>{pase}</span>
                 </div>
-                <Sello texto={`${titulo} · ${fechaPuntos} · `} />
+                {guest?.mesas && guest.mesas.length > 0 && (
+                  <div className="tro-pase-mesa">
+                    <span className="tro-folio-etq">{tx("invitacion.pase.tuMesa")}</span>
+                    <span>{guest.mesas[0]}</span>
+                  </div>
+                )}
               </div>
-              <div className="tro-lineas">
-                <div className="tro-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara").toUpperCase() : tx("invitacion.evento.invitado").toUpperCase()}</span><span>{nombreInvitado || titulo}</span></div>
+              <div data-xin="1" data-delay="160" className="tro-caja">
+                <div className="tro-linea"><span>{saludaAlInvitado ? tx("invitacion.pase.reservadoPara") : tx("invitacion.evento.invitado")}</span><span>{nombreInvitado || titulo}</span></div>
                 {lugaresDelPase > 0 && (
-                  <div className="tro-linea"><span>{tx("invitacion.pase.lugares").toUpperCase()}</span><span>{lugaresDelPase}</span></div>
+                  <div className="tro-linea"><span>{tx("invitacion.pase.lugares")}</span><span>{lugaresDelPase}</span></div>
                 )}
                 {guest?.mesas && guest.mesas.length > 0 && (
-                  <div className="tro-linea"><span>{tx("invitacion.pase.tuMesa").toUpperCase()}</span><span>{guest.mesas.join(" · ")}</span></div>
+                  <div className="tro-linea"><span>{tx("invitacion.pase.sector")} · {tx("invitacion.pase.tuMesa")}</span><span>{guest.mesas.join(" · ")}</span></div>
                 )}
-                <div className="tro-linea"><span>{tx("invitacion.ubicacion.horario").toUpperCase()}</span><span>{fechaPuntos} · {hora} H</span></div>
+                <div className="tro-linea"><span>{tx("invitacion.ubicacion.horario")}</span><span>{fechaPuntos} · {hora} h</span></div>
               </div>
               <div className="tro-info-extra">
                 <InfoAdicionalSection invitation={invitation} />
               </div>
             </div>
           </div>
-          <div className="tro-folio tro-folio--pie">
-            <span>{tx("invitacion.pase.noTransferible").toUpperCase()}</span>
-            <span className="tro-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
-              {tx("invitacion.portada.verAperturaOtraVez").toUpperCase()} ↺
-            </span>
-          </div>
-          <div className="tro-credito">
-            <LogoFooterCredit bgColor="transparent" textColor={PALETA.bg} />
+          <div data-xin="1" data-delay="220" className="tro-pase-pie">
+            <span className="tro-despedida">{tx("invitacion.saveTheDate.nosVemosEnLaArena")} — {firma}</span>
+            <div className="tro-folio tro-folio--colofon">
+              <span className="tro-credito"><LogoFooterCredit bgColor="transparent" textColor={PALETA.ink} /></span>
+              <span className="tro-replay" role="button" tabIndex={0} onClick={volverAVerla} onKeyDown={(e) => { if (e.key === "Enter") volverAVerla(); }}>
+                {tx("invitacion.saveTheDate.volverALaPlaya")} ↺
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
       {/* ── Riel de progreso ───────────────────────────────────────────── */}
       <div ref={rielRef} className="tro-riel">
-        <span ref={rielTopRef} className="tro-riel-top">{tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}</span>
+        <span ref={rielTopRef} className="tro-riel-top">{pase}</span>
         <div ref={rielLineaRef} className="tro-riel-linea">
           <span ref={rielBarraRef} className="tro-riel-barra" />
         </div>
-        <span ref={rielEtiquetaRef} className="tro-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha").toUpperCase()}</span>
+        <span ref={rielEtiquetaRef} className="tro-riel-etiqueta">{tx("invitacion.saveTheDate.guardaLaFecha")}</span>
       </div>
 
-      {/* ── La portada ──────────────────────────────────────────────────
-          Es la tapa de la revista y, a la vez, la bienvenida: dice de quién
-          es la fiesta, cuándo, dónde y para cuántos. Por eso esta
-          sub-colección no monta además la sección de Bienvenida: sería
-          decir dos veces lo mismo, una arriba de la otra. */}
+      {/* ── La tapa ─────────────────────────────────────────────────────
+          La playa: cielo con sol y nubes, mar con olas, arena; la palmera
+          que se mece, la estrella de mar que flota y la sandía. En el
+          centro el nombre en Lilita blanca con trazo y la cinta del
+          evento. Es la bienvenida: dice de quién es la fiesta, cuándo,
+          dónde y para cuántos. */}
       <div ref={portadaRef} data-tone={TONO} className="tro-portada">
         <div ref={escenaPortadaRef} className="tro-portada-hoja">
-          <div className="tro-trama tro-trama--tapa" aria-hidden="true" />
+          <div className="tro-playa" aria-hidden="true">
+            <span data-drift="-6" className="tro-sol-disco" />
+            <span data-drift="4" className="tro-nube tro-nube--grande" />
+            <span data-drift="6" className="tro-nube tro-nube--chica" />
+            <span className="tro-mar" />
+            <Ola clase="tro-ola--mar" />
+            <Ola clase="tro-ola--espuma" />
+            <span className="tro-arena" />
+            <Ola clase="tro-ola--arena" />
+            <svg data-drift="10" viewBox="0 0 160 200" className="tro-palmera">
+              <path d="M66 200 C 70 160, 74 120, 78 76 L 90 78 C 88 120, 86 160, 88 200 Z" className="tro-tronco" />
+              <g className="tro-anillos"><path d="M70 104 Q78 100 88 103" /><path d="M69 128 Q78 124 87 127" /><path d="M68 152 Q78 148 87 151" /><path d="M67 176 Q78 172 87 175" /></g>
+              {FRONDAS.map(([rot, esc], i) => (
+                <g key={i} transform={`rotate(${rot} 80 68) translate(80 68) scale(${esc})`} className={i % 2 === 0 ? "tro-fronda" : "tro-fronda tro-fronda--oscura"}>
+                  <path d={FRONDA} /><path d={NERVIO} className="tro-nervio" />
+                </g>
+              ))}
+              <g className="tro-cocos"><circle cx="76" cy="76" r="7" /><circle cx="90" cy="78" r="7" /><circle cx="83" cy="86" r="6" /></g>
+            </svg>
+            <svg data-drift="8" viewBox="0 0 60 60" className="tro-estrella-mar"><polygon points={ESTRELLA} /></svg>
+            <svg data-drift="5" viewBox="0 0 80 50" className="tro-sandia"><path d="M4 46 A36 36 0 0 1 76 46 Z" className="tro-sandia-pulpa" /><path d="M4 46 A36 36 0 0 1 76 46" className="tro-sandia-cascara" /><circle cx="30" cy="34" r="2.5" /><circle cx="44" cy="28" r="2.5" /><circle cx="54" cy="38" r="2.5" /></svg>
+          </div>
 
-          <div data-cl="1" className="tro-folio">
-            <span>{tx(invitation.tipo === "CASAMIENTO" ? "invitacion.evento.nosCasamos" : invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.teInvitamos").toUpperCase()}</span>
-            <span>Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
+          <div data-cl="1" className="tro-tapa-cabecera">
+            <span className="tro-chip tro-chip--tinta">{kickerDelEvento}</span>
+            <span className="tro-chip tro-chip--blanco">Nº 00 / {String(totalPliegos).padStart(2, "0")}</span>
           </div>
 
           <div data-cl="2" className="tro-tapa-centro">
-            <div className="tro-tapa-fila">
-              <span className="tro-tapa-fecha">{diaSemana} {diaNum} · {mesLargo.toUpperCase()} · {anio}</span>
-              <Sello texto={`${tx(invitation.tipo === "QUINCE_ANOS" ? "invitacion.evento.misQuinceAnos" : "invitacion.evento.nosCasamos")} · ${fechaPuntos} · `} amp />
-            </div>
-            <h1 ref={cartelRef} className="tro-tapa-nombres">
-              {saludaAlInvitado ? (
-                <span className="tro-tapa-linea"><span data-pieza="1">{nombreInvitado}</span></span>
-              ) : (
-                <>
-                  <span className="tro-tapa-linea"><span data-pieza="1">{nombre1}</span></span>
-                  {nombre2 && (
-                    <span className="tro-tapa-linea tro-tapa-linea--sangra">
-                      <span data-pieza="1"><span className="tro-acento">&amp;</span>{nombre2}</span>
-                    </span>
-                  )}
-                </>
-              )}
+            <span className="tro-chip tro-chip--blanco tro-tapa-kicker">{diaSemana} {diaNum} · {mesLargo} · {anio}</span>
+            <h1 ref={cartelRef} className={`tro-tapa-nombres${nombreLargo ? " tro-tapa-nombres--largo" : ""}`} style={{ "--largo": renglonMasLargo, "--n": totalLetras } as React.CSSProperties}>
+              {renglones.map((r, i) => (
+                <span key={i} className="tro-tapa-linea"><span data-pieza="1"><Letras texto={r} desde={i === 0 ? 0 : renglones[0].replace(/\s/g, "").length} /></span></span>
+              ))}
             </h1>
-            <div className="tro-folio">
-              <span>{[lugarNombre, ciudad].filter(Boolean).join(" · ").toUpperCase()}</span>
-              {isPersonalized && guest && (
-                <span className="tro-tapa-pase">
-                  {tx("invitacion.pase.numeroPase", { n: pase }).toUpperCase()}<br />
-                  {tx("invitacion.bienvenida.paraVarios", { cantidad: String(lugaresDelPase) }).toUpperCase()}
-                </span>
-              )}
+            <span className="tro-cinta">{cintaDelEvento}</span>
+            <div className="tro-tapa-datos">
+              <span>{lugarNombre || kickerDelEvento}<br /><span className="tro-acento">{[direccion, ciudad].filter(Boolean).join(" · ")}</span></span>
+              <span className="tro-tapa-datos-der">
+                {isPersonalized && guest
+                  ? <>{tx("invitacion.pase.pase")} Nº {pase}<br /><span className="tro-acento">{lugaresDelPase} {tx(lugaresDelPase === 1 ? "invitacion.bienvenida.persona" : "invitacion.bienvenida.personas")}</span></>
+                  : <>{hora} h<br /><span className="tro-acento">{fechaPuntos}</span></>}
+              </span>
             </div>
           </div>
 
           <div data-cl="3" className="tro-tapa-pie">
-            <span className="tro-regla" aria-hidden="true" />
             <p className="tro-tapa-mensaje">
               {saludaAlInvitado
-                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}. ${String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}`
-                : String(invitation.portadaMensaje || tx("invitacion.sabor.mensajeLoContamosNosotros"))}
+                ? `${tx("invitacion.bienvenida.hola", { nombre: nombreInvitado })}, ${String(invitation.portadaMensaje || tx("invitacion.saveTheDate.mensajeTropical"))}`
+                : String(invitation.portadaMensaje || tx("invitacion.saveTheDate.mensajeTropical"))}
             </p>
             <button type="button" onClick={abrir} className="tro-tapa-btn">
-              {tx("invitacion.portada.abrirInvitacion").toUpperCase()}
+              <span>{tx("invitacion.portada.abrirInvitacion")}</span><span>→</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div ref={pistaRef} className="tro-pista">{tx("invitacion.portada.desliza").toUpperCase()} ↓</div>
+      <div ref={pistaRef} className="tro-pista">{tx("invitacion.portada.desliza")} ↓</div>
 
       {fotoAmpliada && (
         <div className="tro-lupa" onClick={() => setFotoAmpliada(null)} onContextMenu={(e) => e.preventDefault()}>
@@ -1349,30 +1429,24 @@ export function TropicalTemplateLima({ invitation, guest, isPersonalized = false
   );
 }
 
+/** "V & T": las iniciales de la despedida. */
+function iniciales(a: string, b: string): string {
+  const i = (s: string) => (s.trim()[0] || "").toUpperCase();
+  return b ? `${i(a)} & ${i(b)}` : i(a);
+}
+
 /**
- * El sello circular: dos anillos y el texto siguiendo la circunferencia,
- * girando una vuelta cada 26 segundos. Es el único elemento de la
- * sub-colección que no es tipografía plana, y aparece dos veces: en la tapa
- * (con el & en el centro) y en la contratapa.
+ * El nombre letra por letra: cada tanto una "flota" (sube 14 px y gira
+ * 6°) y vuelve rebotando. El CSS escalona el turno de cada letra.
  */
-function Sello({ texto, amp = false }: { texto: string; amp?: boolean }) {
-  // El id del arco tiene que ser único por instancia: dos <textPath> que
-  // apuntan al mismo id hacen que el segundo no se dibuje.
-  const id = useId().replace(/:/g, "");
+function Letras({ texto, desde }: { texto: string; desde: number }) {
+  let k = desde;
   return (
-    <div className="tro-sello-circular" aria-hidden="true">
-      <svg viewBox="0 0 100 100">
-        <defs>
-          <path id={`arc-${id}`} d="M50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="none" />
-        </defs>
-        <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" strokeWidth="2.5" />
-        <circle cx="50" cy="50" r="27" fill="none" stroke="currentColor" strokeWidth="2" />
-        <text>
-          <textPath href={`#arc-${id}`}>{texto.toUpperCase().repeat(2).slice(0, 64)}</textPath>
-        </text>
-      </svg>
-      {amp && <span className="tro-sello-amp">&amp;</span>}
-    </div>
+    <>
+      {Array.from(texto).map((ch, i) =>
+        ch === " " ? " " : <span key={i} className="tro-letra" style={{ "--i": k++ } as React.CSSProperties}>{ch}</span>
+      )}
+    </>
   );
 }
 
@@ -1920,13 +1994,15 @@ function TriviaTropical({ preguntas, invitationId, guestToken, guestName }: { pr
 // leen la Bienvenida y el Post-evento compartidos (esperan `tro-section` y
 // `tro-kicker`).
 const CSS_TRO = `
-  /* ── Tipográfica Editorial ────────────────────────────────────────────
-     Acá no hay dibujo: hay tipografía, filetes y trama. Cada sección es un
-     pliego de revista -- folio arriba, spread de dos páginas, titular que
-     ocupa lo que quiera -- y el color aparece como fondo de página entera o
-     en una palabra, nunca como adorno. */
+  /* ── Tropical ─────────────────────────────────────────────────────────
+     Etiqueta de bebida en la playa: Lilita One blanca con trazo de tinta
+     y sombra plana de color, Quicksand para el texto. Cielo, sol, mar con
+     olas que corren, arena, palmera que se mece, estrella de mar,
+     sandía, radiocasete con parlantes girando. Todo CSS + SVG inline. */
   .tro-raiz { position: fixed; inset: 0; width: 100%; height: calc(var(--vh, 1vh) * 100); overflow: hidden;
-    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--tro-sans), 'Quicksand', sans-serif; }
+    background: var(--pp-bg); color: var(--pp-ink); font-family: var(--tro-sans), 'Quicksand', sans-serif;
+    --tro-cielo: var(--pp-bg); --tro-arena: var(--pp-bg2); --tro-mar: var(--pp-acc2);
+    --tro-sol: ${PALETA.sun}; --tro-hoja: ${PALETA.leaf}; --tro-hoja2: ${PALETA.leaf2}; --tro-tronco: ${PALETA.trunk}; }
   .tro-raiz a { color: inherit; text-decoration: none; }
   .tro-raiz button { font: inherit; }
 
@@ -1934,297 +2010,404 @@ const CSS_TRO = `
     transition: opacity 900ms ease 260ms; scrollbar-width: none; }
   .tro-scroller::-webkit-scrollbar { width: 0; height: 0; }
 
-  /* La trama de semitono: puntos de imprenta. Es la única textura de la
-     sub-colección, y es un gradiente -- no pesa nada y escala sola. */
-  .tro-trama { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .16; color: currentColor;
-    background-image: radial-gradient(currentColor 1.1px, transparent 1.2px); background-size: 9px 9px; }
-  .tro-trama--media { opacity: .14; bottom: 45%; background-size: 12px 12px; }
-  .tro-trama--tapa { -webkit-mask-image: linear-gradient(180deg, transparent 30%, #000 100%);
-    mask-image: linear-gradient(180deg, transparent 30%, #000 100%); }
+  /* Las olas: el path corre 120 px y vuelve a empezar sin costura. */
+  .tro-ola { position: absolute; left: 0; right: 0; height: 22px; overflow: hidden; pointer-events: none; z-index: 0; }
+  .tro-ola svg { position: absolute; left: 0; top: 0; width: 200%; height: 100%; animation: troOla 4s linear infinite; }
+  .tro-ola path { fill: var(--tro-ola-color, var(--tro-mar)); }
+  @keyframes troOla { to { transform: translate3d(-120px, 0, 0); } }
+  .tro-ola--std { top: 0; --tro-ola-color: var(--tro-mar); }
+  .tro-ola--std svg { animation: none; }
+  .tro-ola--panel { bottom: 0; --tro-ola-color: var(--tro-panel-ola, var(--tro-mar)); }
+  .tro-ola--quiz { bottom: 0; --tro-ola-color: var(--tro-mar); }
+  .tro-ola--pase { bottom: 26%; margin-bottom: -11px; --tro-ola-color: var(--tro-arena); }
+  .tro-ola--pase svg { animation-duration: 5s; }
+  /* El grano de arena y los lunares. */
+  .tro-grano { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .5;
+    background-image: radial-gradient(#C9A87A 1px, transparent 1.2px), radial-gradient(#C9A87A 1px, transparent 1.2px); background-size: 14px 14px; background-position: 3px 4px, 10px 11px; }
+  .tro-lunares { position: absolute; inset: 0; pointer-events: none; z-index: 0; opacity: .25; background-image: radial-gradient(#FFFFFF 3px, transparent 3.2px); background-size: 16px 16px;
+    -webkit-mask-image: linear-gradient(90deg, #000, transparent 60%); mask-image: linear-gradient(90deg, #000, transparent 60%); }
 
   /* ── El pliego ─────────────────────────────────────────────────────── */
-  .tro-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 26px;
-    padding: 64px max(22px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .tro-section[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
+  .tro-section { position: relative; z-index: 1; min-height: calc(var(--vh, 1vh) * 100); box-sizing: border-box; overflow: hidden;
+    display: flex; flex-direction: column; gap: 22px;
+    padding: 60px max(20px, calc((100% - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
 
-  /* El folio: el renglón de arriba y el de abajo de cada pliego. */
+  /* El folio: Quicksand 700 con tracking. */
   .tro-folio { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-  .tro-folio--pie { align-items: center; margin-top: auto; }
-  .tro-folio-etq { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .22em;
-    color: color-mix(in srgb, currentColor 62%, transparent); display: block; }
+    font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; }
+  .tro-folio--acento { color: var(--pp-acc); }
+  .tro-folio--sol { color: var(--tro-sol); }
+  .tro-folio--blanco { color: #FFFFFF; }
+  .tro-folio--gris { color: #6E6A78; }
+  .tro-folio--pie { align-items: center; margin-top: auto; letter-spacing: .22em; }
+  .tro-folio--colofon { align-items: center; border-top: 3px solid var(--pp-ink); padding-top: 12px; color: var(--pp-ink); }
+  .tro-folio-etq { font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; display: block; }
+  .tro-barra { width: 40%; height: 4px; background: var(--pp-ink); border-radius: 2px; }
+  .tro-acento { color: var(--pp-acc); }
+  .tro-sol { color: var(--tro-sol); }
 
-  /* El spread: dos páginas. En el teléfono van una abajo de la otra; desde
-     900 px se abren de verdad, como una revista apoyada. */
-  .tro-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 24px; }
-  .tro-pagina { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  @media (min-width: 900px) {
-    .tro-spread { flex-direction: row; align-items: flex-start; gap: 40px; }
-    .tro-spread > * { flex: 1 1 0; min-width: 0; }
+  /* El spread: dos páginas; desde 1024 px se abren de verdad. */
+  .tro-spread { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 22px; }
+  .tro-pagina { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+  .tro-pagina--titulo { gap: 6px; }
+  @media (min-width: 1024px) {
+    .tro-spread { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 72px; }
+    .tro-spread > * { max-width: 560px; width: 100%; min-width: 0; }
+    .tro-spread > *:first-child { justify-self: end; }
+    .tro-spread > *:last-child { justify-self: start; }
+    .tro-pagina--entera { grid-column: 1 / -1; max-width: none; justify-self: stretch; }
   }
 
   /* ── Tipos ─────────────────────────────────────────────────────────── */
-  .tro-h2, .tro-panel-titulo, .tro-frase {
-    position: relative; z-index: 1; margin: 0; font-family: var(--tro-serif), 'Lilita One', cursive;
-    font-weight: 400; line-height: .94; letter-spacing: -.035em; }
-  .tro-h2 { font-size: clamp(40px, 12vw, 96px); }
-  .tro-h2--album { font-size: clamp(34px, 9vw, 64px); }
-  .tro-panel-titulo { font-size: clamp(48px, 15vw, 130px); }
-  .tro-frase { font-size: clamp(30px, 8vw, 68px); line-height: 1.04; text-wrap: pretty; }
-  .tro-acento { font-style: italic; color: var(--pp-acc); }
-  .tro-acento--tinta { color: var(--pp-ink); }
-  .tro-parrafo { margin: 0; font-size: 15px; line-height: 1.5; max-width: 34ch;
-    color: color-mix(in srgb, currentColor 72%, transparent); }
-  .tro-link { display: inline-flex; align-items: center; min-height: 28px; border-bottom: 2px solid var(--pp-acc); padding-bottom: 2px; }
-  .tro-regla { display: block; height: 2px; background: currentColor; }
+  .tro-h2, .tro-panel-titulo, .tro-frase, .tro-fecha-linea, .tro-tapa-nombres { font-family: var(--tro-serif), 'Lilita One', cursive; font-weight: 400; }
+  /* El título: blanco con trazo de tinta y sombra plana de color. */
+  .tro-h2, .tro-panel-titulo { position: relative; z-index: 1; margin: 0; line-height: .92; font-size: clamp(48px, 14vw, 120px);
+    color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--pp-acc); }
+  .tro-h2--album { font-size: clamp(44px, 12vw, 100px); text-shadow: 4px 5px 0 var(--tro-mar); -webkit-text-stroke: 2px #2C3A4A; }
+  .tro-h2--sombra-tinta { text-shadow: 5px 6px 0 var(--pp-ink); }
+  .tro-h2--sombra-sol { text-shadow: 5px 6px 0 var(--tro-sol); }
+  .tro-h2--plano { -webkit-text-stroke: 0; text-shadow: 5px 6px 0 var(--tro-mar); }
+  .tro-panel-titulo { text-shadow: 5px 6px 0 var(--tro-panel-acc, var(--pp-acc)); }
+  .tro-panel-sub { font-weight: 700; font-size: 12px; letter-spacing: .22em; text-transform: uppercase; }
+  .tro-parrafo { margin: 0; font-weight: 700; font-size: 15px; line-height: 1.5; max-width: 40ch; }
+  .tro-parrafo--blanco { color: #FFFFFF; }
+  .tro-pildora { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 12px 18px; font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  .tro-pildora--tinta { background: var(--pp-ink); color: #FFFFFF; }
+  .tro-chip { display: inline-block; padding: 6px 12px; border-radius: 999px; font-weight: 700; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; white-space: nowrap; }
+  .tro-chip--tinta { background: var(--pp-ink); color: #FFFFFF; }
+  .tro-chip--blanco { background: #FFFFFF; color: var(--pp-ink); }
+  .tro-cta { margin-top: 6px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; border-radius: 999px; padding: 0 18px;
+    color: #FFFFFF; background: var(--pp-ink); font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 18px; letter-spacing: .04em; }
 
-  /* ── 01 Guardá la fecha ────────────────────────────────────────────── */
-  .tro-std { justify-content: center; }
-  .tro-fecha { display: flex; flex-direction: column; font-family: var(--tro-serif), 'Lilita One', cursive;
-    line-height: .82; letter-spacing: -.04em; }
-  .tro-fecha-linea { font-size: clamp(64px, 22vw, 180px); text-transform: lowercase; }
-  .tro-fecha-linea--acc { font-style: italic; color: var(--pp-acc); text-align: right; }
-  .tro-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 13px; letter-spacing: .12em; }
-  /* La foto va enmarcada como una foto de tapa, con el año encima. */
-  .tro-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 3px solid currentColor; box-sizing: border-box;
-    overflow: hidden; background: repeating-linear-gradient(135deg, color-mix(in srgb, currentColor 12%, transparent) 0 8px, transparent 8px 16px); }
-  .tro-foto-capa { position: absolute; inset: 0; }
-  /* La trama que tapa la foto y se disuelve: el punto arranca en 7,2 (tapa
-     entera, porque la baldosa es de 10) y el motor lo lleva a 0 al subir. */
+  /* ── 01 Guardá la fecha: etiqueta de botella ───────────────────────── */
+  .tro-std { background: var(--tro-arena); }
+  .tro-fecha { display: flex; flex-direction: column; line-height: .9; }
+  .tro-fecha-linea { font-size: clamp(56px, 18vw, 150px); -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; }
+  .tro-fecha-linea--dia { font-size: clamp(96px, 32vw, 240px); color: var(--pp-acc); text-shadow: 6px 6px 0 #FFFFFF; }
+  .tro-fecha-linea--mes { text-align: right; color: var(--tro-mar); }
+  .tro-fecha-linea--anio { color: var(--tro-sol); }
+  .tro-fecha-pie { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 12px; letter-spacing: .16em; text-transform: uppercase; }
+  /* La foto: marco blanco, filete de tinta y sombra de mar. */
+  .tro-foto { position: relative; width: 100%; aspect-ratio: 4 / 5; border: 4px solid #FFFFFF; border-radius: 22px; box-sizing: border-box; overflow: hidden;
+    box-shadow: 0 0 0 3px var(--pp-ink), 8px 8px 0 var(--tro-mar); background: repeating-linear-gradient(135deg, #C9BFAE 0 8px, #D9D0C0 8px 16px); }
+  .tro-foto-capa { position: absolute; inset: 0; overflow: hidden; }
   .tro-foto-revelado { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background-image: radial-gradient(var(--pp-ink) calc(var(--tro-punto, 7.2) * 1px), transparent calc(var(--tro-punto, 7.2) * 1px + .6px));
+    background-image: radial-gradient(var(--tro-mar) calc(var(--tro-punto, 7.2) * 1px), transparent calc(var(--tro-punto, 7.2) * 1px + .6px));
     background-size: 10px 10px; }
-  .tro-foto-anio { position: absolute; right: 12px; top: 8px; z-index: 2; font-family: var(--tro-serif), 'Lilita One', cursive;
-    font-style: italic; font-size: 34px; line-height: 1; color: var(--pp-acc); }
-  .tro-foto-pie { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-family: var(--tro-sans), 'Quicksand', sans-serif;
-    font-size: 11px; letter-spacing: .2em; color: color-mix(in srgb, currentColor 80%, transparent); }
+  .tro-foto-etq { position: absolute; left: 14px; bottom: 12px; z-index: 2; font-weight: 700; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #FFFFFF; background: var(--pp-ink); padding: 4px 10px; border-radius: 999px; }
+  .tro-barras { position: absolute; right: 12px; top: 12px; z-index: 2; display: flex; gap: 2px; align-items: flex-end; background: #FFFFFF; padding: 6px 8px; border-radius: 6px; }
+  .tro-barras span { display: block; height: 26px; background: #2C3A4A; }
 
-  /* ── 02 Falta poco: dos marquesinas y cuatro cifras ────────────────── */
-  .tro-countdown { justify-content: space-between; }
-  .tro-marquesina { position: relative; z-index: 1; overflow: hidden; border-top: 2px solid currentColor; border-bottom: 2px solid currentColor;
-    padding: 8px 0; font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-  .tro-marquesina-tira { display: flex; width: max-content; animation: ebnCorre 26s linear infinite; }
+  /* ── 02 Falta poco: el radiocasete ─────────────────────────────────── */
+  .tro-countdown { background: var(--tro-mar); color: #FFFFFF; justify-content: space-between; padding-left: 0; padding-right: 0; }
+  .tro-countdown > .tro-folio, .tro-countdown > .tro-spread { margin-left: max(20px, calc((100% - 1100px) / 2)); margin-right: max(20px, calc((100% - 1100px) / 2)); }
+  .tro-marquesina { position: relative; z-index: 1; overflow: hidden; padding: 8px 0; white-space: nowrap; color: var(--pp-ink);
+    border-top: 3px solid var(--pp-ink); border-bottom: 3px solid var(--pp-ink); font-weight: 700; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; }
+  .tro-marquesina--sol { background: var(--tro-sol); transform: rotate(-2deg) scale(1.04); padding: 6px 0;
+    font-family: var(--tro-serif), 'Lilita One', cursive; font-weight: 400; font-size: 26px; letter-spacing: .06em; text-transform: none; }
+  .tro-marquesina--blanca { background: #FFFFFF; transform: rotate(2deg) scale(1.04); }
+  .tro-marquesina-tira { display: flex; width: max-content; animation: troCorre 16s linear infinite; }
+  .tro-marquesina-tira > span { padding-right: 32px; }
   .tro-marquesina--contraria .tro-marquesina-tira { animation-direction: reverse; }
-  @keyframes ebnCorre { to { transform: translateX(-50%); } }
+  @keyframes troCorre { to { transform: translate3d(-50%, 0, 0); } }
+  .tro-radio { position: relative; background: var(--pp-ink); border-radius: 26px; padding: 18px 14px 16px; display: flex; flex-direction: column; gap: 14px; border: 4px solid #FFFFFF; box-shadow: 8px 8px 0 rgba(44,58,74,.35); margin-top: 22px; }
+  .tro-radio-asa { position: absolute; left: 50%; top: -26px; transform: translateX(-50%); width: 46%; height: 18px; border: 4px solid #FFFFFF; border-bottom: 0; border-radius: 12px 12px 0 0; background: var(--pp-ink); box-sizing: border-box; }
+  .tro-cuenta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .tro-cuenta-caja { position: relative; background: #FFFFFF; color: var(--pp-ink); border-radius: 16px; padding: 14px 12px 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; overflow: hidden; }
+  .tro-cuenta-caja--1 { background: var(--pp-acc); }
+  .tro-cuenta-caja--2 { background: var(--tro-sol); }
+  .tro-cuenta-caja--3 { background: var(--tro-arena); }
+  .tro-cuenta-num { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(56px, 17vw, 130px); line-height: .9; font-variant-numeric: tabular-nums; }
+  .tro-cuenta-num > span { display: inline-block; animation: troCifra 300ms cubic-bezier(.16,1,.3,1); }
+  @keyframes troCifra { from { transform: translateY(18%); opacity: .4; } to { transform: none; opacity: 1; } }
+  .tro-cuenta-etq { font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+  .tro-radio-pie { display: flex; justify-content: space-between; align-items: center; padding: 0 6px; }
+  .tro-parlante { width: 44px; height: 44px; border-radius: 50%; border: 5px solid var(--tro-arena); border-top-color: var(--pp-acc); box-sizing: border-box; animation: troGira 3s linear infinite; }
+  @keyframes troGira { to { transform: rotate(360deg); } }
+  .tro-radio-etq { font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--tro-arena); }
+  .tro-tarjeta--hoy { background: var(--tro-sol); color: var(--pp-ink); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 6px; align-items: center; text-align: center; }
+  .tro-tarjeta--hoy .tro-tarjeta-kicker { font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; }
+  .tro-tarjeta--hoy .tro-tarjeta-titulo { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(40px, 11vw, 90px); line-height: .9; color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--pp-acc); }
 
-  /* Las cuatro cifras en dos por dos, con una cruz de filetes entre ellas:
-     la primera lleva filete a la derecha y abajo, la segunda sólo abajo, la
-     tercera sólo a la derecha y la cuarta ninguno. Los segundos van en
-     itálica y en el acento, que es lo único que se mueve de la página. */
-  .tro-cuenta { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; }
-  .tro-cuenta-caja { display: flex; flex-direction: column; gap: 6px; padding: 18px 14px 20px; overflow: hidden; }
-  .tro-cuenta-caja:nth-child(1) { border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; }
-  .tro-cuenta-caja:nth-child(2) { border-bottom: 2px solid currentColor; }
-  .tro-cuenta-caja:nth-child(3) { border-right: 2px solid currentColor; }
-  .tro-cuenta-num, .tro-cuenta-dias, .tro-cifra { font-family: var(--tro-serif), 'Lilita One', cursive; font-weight: 400;
-    font-size: clamp(64px, 20vw, 150px); line-height: .82; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
-  .tro-cuenta-caja:nth-child(4) .tro-cuenta-num { font-style: italic; color: var(--pp-acc); }
-  .tro-cuenta-etq { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .24em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .tro-cuenta-aviso { display: flex; flex-direction: column; gap: 8px; }
+  /* ── 03 Unas palabras: escrito en la arena ─────────────────────────── */
+  .tro-frase-seccion { background: var(--tro-arena); justify-content: space-between; gap: 30px; }
+  .tro-frase { margin: 0; font-size: clamp(34px, 9.5vw, 80px); line-height: 1.02; max-width: 15ch; color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--tro-mar); }
+  .tro-pastilla { align-self: flex-end; display: flex; align-items: center; gap: 12px; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 999px; padding: 12px 20px; max-width: 320px;
+    font-weight: 700; font-size: 14px; line-height: 1.4; box-shadow: 4px 5px 0 var(--pp-acc); animation: troFlota 4s ease-in-out infinite; }
+  .tro-pastilla-estrella { width: 26px; height: 26px; flex: 0 0 auto; fill: var(--pp-acc); stroke: var(--pp-ink); stroke-width: 3; stroke-linejoin: round; }
+  @keyframes troFlota { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
 
-  /* ── 03 Unas palabras ──────────────────────────────────────────────── */
-  .tro-frase-seccion { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .tro-frase-seccion .tro-acento { color: var(--pp-bg); font-style: italic; }
-  .tro-sello { align-self: flex-start; border: 2px solid currentColor; padding: 10px 16px; transform: rotate(-3deg);
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 12px; letter-spacing: .2em; text-transform: uppercase; }
-
-  /* ── Paneles ───────────────────────────────────────────────────────── */
+  /* ── 04 Los paradores ──────────────────────────────────────────────── */
   .tro-pan { position: relative; z-index: 1; height: calc(100vh + var(--st-pasos, 2) * 90vh); }
-  .tro-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--pp-bg); }
+  .tro-pan-fijo { position: sticky; top: 0; height: calc(var(--vh, 1vh) * 100); overflow: hidden; background: var(--tro-cielo); }
+  .tro-pan-fijo--album { background: #F7F5F0; }
   .tro-tira { position: absolute; top: 0; left: 0; height: 100%; display: flex; will-change: transform; }
   .tro-panel { flex: 0 0 100vw; min-width: 0; height: 100%; box-sizing: border-box; position: relative; overflow: hidden;
-    display: flex; flex-direction: column; justify-content: space-between; gap: 24px;
-    padding: 64px max(22px, calc((100vw - 1100px) / 2)) 80px; background: var(--pp-bg); color: var(--pp-ink); }
-  .tro-panel[data-tone="dark"] { background: var(--pp-ink); color: var(--pp-bg); }
-  .tro-panel--acento { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .tro-panel--acento .tro-acento { color: var(--pp-ink); }
+    display: flex; flex-direction: column; justify-content: space-between; gap: 18px;
+    padding: 60px max(20px, calc((100vw - 1100px) / 2)) 92px; background: var(--tro-cielo); color: var(--pp-ink); }
+  .tro-panel--cielo { --tro-panel-acc: var(--pp-acc); --tro-panel-ola: var(--tro-mar); }
+  .tro-panel--arena { --tro-panel-acc: var(--tro-mar); --tro-panel-ola: var(--tro-cielo); background: var(--tro-arena); }
+  .tro-panel--mapa { --tro-panel-acc: var(--tro-hoja); }
+  .tro-panel--mar { --tro-panel-acc: var(--tro-sol); --tro-panel-ola: var(--tro-arena); background: var(--tro-mar); color: #FFFFFF; }
   .tro-pan[data-scroll="vertical"] { height: auto; }
   .tro-pan[data-scroll="vertical"] .tro-pan-fijo { position: static; height: auto; overflow: visible; }
   .tro-pan[data-scroll="vertical"] .tro-tira { position: static; display: block; width: 100%; transform: none !important; }
   .tro-pan[data-scroll="vertical"] .tro-panel { height: auto; min-height: calc(var(--vh, 1vh) * 100); }
+  .tro-ficha { background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 20px; padding: 14px 16px; box-shadow: 6px 7px 0 var(--tro-panel-acc, var(--pp-acc)); display: flex; flex-direction: column; gap: 8px; }
+  .tro-linea { display: flex; justify-content: space-between; gap: 14px; padding: 8px 0; border-bottom: 2px dotted var(--pp-ink); font-size: 15px; line-height: 1.3; }
+  .tro-linea > span:first-child { font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .7; flex: 0 0 auto; padding-top: 2px; }
+  .tro-linea > span:last-child { text-align: right; font-weight: 700; }
+  .tro-mapa { height: 190px; overflow: hidden; border-radius: 12px; border: 3px solid var(--pp-ink); }
+  .tro-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; color: var(--pp-ink); }
+  .tro-punto { width: 14px; height: 14px; border-radius: 50%; background: currentColor !important; opacity: .3; transition: opacity 300ms ease; display: inline-block; }
+  .tro-punto[data-activo="1"] { opacity: 1; }
 
-  .tro-lineas { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .tro-linea { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .tro-linea > span:first-child { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 12px; letter-spacing: .14em;
-    text-transform: uppercase; color: color-mix(in srgb, currentColor 66%, transparent); flex: 0 0 auto; }
-  .tro-linea > span:last-child { text-align: right; font-size: 15px; }
-  .tro-cta { margin-top: 14px; min-height: 48px; display: flex; align-items: center; justify-content: space-between;
-    border: 2px solid currentColor; padding: 0 16px; font-family: var(--tro-sans), 'Quicksand', sans-serif;
-    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; }
-  .tro-cta-flecha { font-family: var(--tro-serif), 'Lilita One', cursive; font-style: italic; font-size: 22px; }
-  .tro-mapa { height: 190px; border: 2px solid currentColor; overflow: hidden; margin-top: 14px; }
-  .tro-puntos { position: absolute; left: 0; right: 40px; bottom: 30px; display: flex; gap: 8px; justify-content: center; z-index: 2; }
-  .tro-punto { width: 28px; height: 3px; transition: background 300ms ease; display: inline-block; }
-
-  /* ── 05 Check-in: el cupón ─────────────────────────────────────────── */
-  .tro-checkin { background: var(--pp-bg2); }
-  .tro-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 26px 18px 18px; display: flex; flex-direction: column; gap: 14px; }
-  .tro-cupon-corte { position: absolute; left: -3px; right: -3px; top: 52px; border-top: 2px dashed var(--pp-ink); }
-  .tro-cupon .tro-talon-top { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .2em; }
-  .tro-cupon input, .tro-cupon .tro-input { border: 2px solid var(--pp-ink); border-radius: 0; background: transparent; }
-  .tro-cupon .tro-contador button { border: 2px solid var(--pp-ink); }
-  .tro-sello, .tro-cupon .tro-sello { color: inherit; }
-
-  /* ── 06 Álbum: hoja de contactos ───────────────────────────────────── */
-  .tro-panel--album { background: color-mix(in srgb, var(--pp-bg) 92%, var(--pp-ink)); }
-  .tro-contactos { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: 1fr; gap: 10px; }
-  @media (min-width: 900px) { .tro-contactos { grid-template-columns: repeat(6, 1fr); } }
-  .tro-contacto { position: relative; overflow: hidden; border: 1px solid color-mix(in srgb, currentColor 30%, transparent); cursor: pointer; }
-  .tro-contacto-img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.1); }
-  .tro-contacto-tinta { position: absolute; inset: 0; background: var(--pp-acc); mix-blend-mode: multiply; opacity: .18; }
-  .tro-contacto-n { position: absolute; left: 6px; bottom: 4px; font-family: var(--tro-sans), 'Quicksand', sans-serif;
-    font-size: 10px; letter-spacing: .14em; color: #FFFFFF; mix-blend-mode: difference; }
-
-  /* ── 07 Música ─────────────────────────────────────────────────────── */
-  .tro-eq { display: flex; align-items: flex-end; gap: 6px; height: 40px; }
-  .tro-eq span { width: 6px; height: 100%; background: currentColor; transform-origin: bottom; animation: ebnEq 1.1s ease-in-out infinite; }
-  @keyframes ebnEq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-  .tro-lista { display: flex; flex-direction: column; border-top: 2px solid currentColor; }
-  .tro-lista-fila { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid color-mix(in srgb, currentColor 30%, transparent); }
-  .tro-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .tro-lista-tema { font-size: 15px; }
-  .tro-lista-quien { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .12em;
-    color: color-mix(in srgb, currentColor 62%, transparent); }
-
-  /* ── 08 Regalos: fichas blancas ────────────────────────────────────── */
-  .tro-tarjeta { position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink);
-    padding: 18px; display: flex; flex-direction: column; gap: 12px; transform: none !important; box-shadow: none; }
-  .tro-tarjeta + .tro-tarjeta { margin-top: 12px; }
-  .tro-tarjeta-kicker { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
-  .tro-tarjeta-titulo { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 28px; line-height: 1; }
-  .tro-tarjeta-mensaje { margin: 0; font-size: 14px; line-height: 1.5; color: var(--pp-ink2); }
-  .tro-tarjeta .tro-fila { border-bottom: 1px solid color-mix(in srgb, var(--pp-ink) 22%, transparent); }
-  .tro-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; }
-  .tro-fila--ultima { border-bottom: none; }
-  .tro-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .tro-fila-etq { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .18em; color: var(--pp-ink2); }
-  .tro-fila-dato { font-size: 15px; overflow-wrap: anywhere; }
-  .tro-fila-valor { text-align: right; }
-  .tro-btn-copiar { flex-shrink: 0; min-height: 44px; padding: 0 14px; border: 2px solid var(--pp-ink); background: transparent;
-    color: var(--pp-ink); font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .14em;
-    text-transform: uppercase; cursor: pointer; }
-  .tro-btn-copiar--hecho { background: var(--pp-ink); color: #FFFFFF; }
-
-  /* ── 09 Trivia: el pliego del acento ───────────────────────────────── */
-  .tro-quiz { background: var(--pp-acc) !important; color: var(--pp-bg); }
-  .tro-quiz .tro-acento { color: var(--pp-ink); }
-  .tro-opciones { display: flex; flex-direction: column; gap: 10px; }
-  .tro-opcion { min-height: 52px; text-align: left; padding: 0 16px; border: 2px solid currentColor; background: transparent;
-    color: inherit; font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 15px; cursor: pointer;
-    transition: background 200ms ease, color 200ms ease; }
-  .tro-opcion--bien { background: var(--pp-bg); color: var(--pp-ink); }
-  .tro-opcion--mal { opacity: .55; }
-
-  /* ── 10 Tu pase ────────────────────────────────────────────────────── */
-  .tro-pase { background: var(--pp-ink); color: var(--pp-bg); }
-  .tro-pagina--qr { align-items: flex-start; }
-  .tro-pagina--qr .qr-ingreso, .tro-pagina--qr section { background: transparent !important; border: none !important; padding: 0 !important; }
-  .tro-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
-  .tro-pase-numero { display: flex; flex-direction: column; }
-  .tro-pase-numero > span:last-child { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(44px, 12vw, 86px); line-height: .9; }
-  .tro-info-extra { margin-top: 12px; }
-  .tro-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
-  .tro-info-extra #ia-trigger-btn { background: transparent !important; color: inherit !important; border: 2px solid currentColor !important;
-    border-radius: 0 !important; font-family: var(--tro-sans), 'Quicksand', sans-serif !important; letter-spacing: .18em !important; }
-  /* Los íconos de los componentes compartidos no entran: acá el dibujo es la
-     tipografía. */
-  .tro-raiz .ia-icon-box, .tro-raiz svg.lucide { display: none !important; }
-  .tro-replay { cursor: pointer; }
-  .tro-credito { display: flex; justify-content: center; opacity: .6; }
-  .tro-error { margin: 0; font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 12px; }
-
-  /* ── El sello circular ─────────────────────────────────────────────── */
-  .tro-sello-circular { position: relative; width: clamp(72px, 18vw, 96px); aspect-ratio: 1; flex: 0 0 auto; color: var(--pp-acc); }
-  .tro-sello-circular svg { position: absolute; inset: 0; animation: ebnGira 26s linear infinite; }
-  .tro-sello-circular text { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 9.2px; letter-spacing: 1.4px; fill: currentColor; }
-  .tro-sello-amp { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    font-family: var(--tro-serif), 'Lilita One', cursive; font-style: italic; font-size: 30px; color: var(--pp-acc); }
-  @keyframes ebnGira { to { transform: rotate(360deg); } }
-
-  /* ── La tapa ───────────────────────────────────────────────────────── */
-  .tro-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--pp-bg); color: var(--pp-ink); }
-  .tro-portada-hoja { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between;
-    padding: calc(18px + env(safe-area-inset-top)) max(22px, calc((100% - 1100px) / 2)) calc(22px + env(safe-area-inset-bottom)); }
-  .tro-tapa-centro { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(8px, 2vh, 20px); }
-  .tro-tapa-fila { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .tro-tapa-fecha { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .22em;
-    text-transform: uppercase; color: var(--pp-acc); }
-  .tro-tapa-nombres { margin: 0; font-family: var(--tro-serif), 'Lilita One', cursive; font-weight: 400;
-    font-size: min(clamp(56px, 20vw, 180px), 15vh); line-height: .84; letter-spacing: -.035em; display: flex; flex-direction: column; }
-  .tro-tapa-linea { overflow: hidden; display: block; }
-  .tro-tapa-linea > span { display: block; }
-  .tro-tapa-linea--sangra { padding-left: 14%; }
-  .tro-tapa-pase { text-align: right; }
-  .tro-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; }
-  .tro-tapa-mensaje { margin: 0; font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(20px, 5.4vw, 26px);
-    line-height: 1.2; max-width: 34ch; }
-  .tro-tapa-btn { min-height: 52px; border: 2px solid var(--pp-ink); background: var(--pp-ink); color: var(--pp-bg);
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .2em;
-    text-transform: uppercase; padding: 0 22px; cursor: pointer; transition: background 200ms ease, color 200ms ease; }
-  @media (hover: hover) { .tro-tapa-btn:hover { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); } }
-
-  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
-  .tro-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 34px; z-index: 4; display: flex; flex-direction: column;
-    align-items: center; justify-content: space-between; padding: 20px 0 calc(20px + env(safe-area-inset-bottom));
-    opacity: 0; transition: opacity 700ms ease; pointer-events: none; border-left: 1px solid color-mix(in srgb, var(--pp-ink) 20%, transparent); }
-  .tro-riel-top, .tro-riel-etiqueta { writing-mode: vertical-rl; font-family: var(--tro-sans), 'Quicksand', sans-serif;
-    font-size: 10px; letter-spacing: .28em; transition: color 500ms ease; }
-  .tro-riel-top { color: var(--pp-ink2); }
-  .tro-riel-etiqueta { color: var(--pp-acc); }
-  .tro-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: color-mix(in srgb, var(--pp-ink) 20%, transparent); position: relative; }
-  .tro-riel-barra { position: absolute; left: -1px; top: 0; width: 3px; height: 0%; background: var(--pp-acc); transition: height 260ms linear; display: block; }
-  .tro-pista { position: absolute; left: 0; right: 34px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .28em; color: var(--pp-ink2);
-    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: ebnPista 2.4s ease-in-out infinite; }
-  @keyframes ebnPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
-
-  .tro-lupa { position: fixed; inset: 0; z-index: 200; background: color-mix(in srgb, var(--pp-ink) 94%, transparent);
-    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
-  .tro-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 2px solid var(--pp-bg);
-    background: transparent; color: var(--pp-bg); font-size: 18px; line-height: 1; cursor: pointer; }
-  .tro-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 3px solid var(--pp-bg); }
-
-  /* ── Formularios (check-in y canciones) ────────────────────────────── */
-  .tro-campo { display: flex; flex-direction: column; gap: 6px; }
-  .tro-etiqueta { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
-    color: color-mix(in srgb, currentColor 66%, transparent); }
-  .tro-input { min-height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 16px; padding: 0 12px; border-radius: 0; }
-  .tro-input:focus { outline: none; border-color: var(--pp-acc); }
-  .tro-contador { display: flex; align-items: center; gap: 12px; }
-  .tro-contador button { width: 48px; height: 48px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-size: 20px; line-height: 1; cursor: pointer; }
-  .tro-contador button:disabled { opacity: .35; cursor: default; }
-  .tro-contador > span { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 36px; min-width: 40px; text-align: center; line-height: 1; }
-  .tro-btn-solido { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: currentColor; color: var(--pp-bg);
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .tro-btn-solido--tinta { background: var(--pp-acc); border-color: var(--pp-acc); color: var(--pp-bg); }
-  .tro-btn-fantasma { min-height: 48px; padding: 0 22px; border: 2px solid currentColor; background: transparent; color: inherit;
-    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
-  .tro-precio { display: flex; justify-content: space-between; gap: 12px; border-top: 2px solid currentColor; padding-top: 12px; }
-  .tro-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-  .tro-precio-total { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 28px; line-height: 1; }
-  .tro-precio-detalle { font-family: var(--tro-sans), 'Quicksand', sans-serif; font-size: 11px; letter-spacing: .1em; }
-  .tro-talon-top { display: flex; justify-content: space-between; gap: 10px; font-family: var(--tro-sans), 'Quicksand', sans-serif;
-    font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+  /* ── 05 Check-in: la pulsera de playa ──────────────────────────────── */
+  .tro-checkin { background: var(--pp-acc); }
+  .tro-cupon { position: relative; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 22px; padding: 20px; display: flex; flex-direction: column; gap: 14px; overflow: hidden;
+    box-shadow: 7px 8px 0 var(--pp-ink); }
+  .tro-cupon .tro-tarjeta { position: relative; display: flex; flex-direction: column; gap: 14px; background: transparent; border: 0; padding: 0; transform: none !important; }
+  .tro-talon-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; border-bottom: 3px dotted var(--pp-ink); padding-bottom: 12px; }
   .tro-talon-estado { transition: color 400ms ease; }
+  .tro-cupon:has(.tro-filas) .tro-talon-estado { color: var(--pp-acc); }
+  .tro-campo { display: flex; flex-direction: column; gap: 6px; }
+  .tro-etiqueta { font-weight: 700; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; opacity: .8; }
+  .tro-input { min-height: 48px; border: 0; border-bottom: 3px solid var(--pp-ink); border-radius: 0; background: transparent; color: var(--pp-ink);
+    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-weight: 600; font-size: 15px; padding: 0; outline: none; }
+  .tro-campo:first-of-type .tro-input, .tro-input--serif { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 18px; }
+  .tro-contador { display: flex; align-items: center; border-bottom: 3px solid var(--pp-ink); min-height: 48px; }
+  .tro-contador button { width: 44px; min-height: 44px; border: 0; background: transparent; color: var(--pp-ink); cursor: pointer; font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 24px; line-height: 1; }
+  .tro-contador button:disabled { opacity: .35; cursor: default; }
+  .tro-contador > span { flex: 1; text-align: center; font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 28px; line-height: 1; color: var(--pp-acc); }
   .tro-filas { display: flex; flex-direction: column; }
+  .tro-fila { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 2px dotted var(--pp-ink); font-size: 15px; }
+  .tro-fila--ultima { border-bottom: 0; }
+  .tro-fila-valor { text-align: right; font-weight: 700; }
+  .tro-precio { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; padding-top: 4px; }
+  .tro-precio-valor { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+  .tro-precio-total { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 22px; line-height: 1; color: var(--pp-acc); }
+  .tro-precio-detalle { font-size: 11px; letter-spacing: .1em; }
+  .tro-btn-solido { min-height: 54px; border: 3px solid var(--pp-ink); border-radius: 999px; background: var(--tro-sol); color: var(--pp-ink); cursor: pointer;
+    font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 20px; letter-spacing: .04em; padding: 2px 18px 0; box-shadow: 4px 5px 0 var(--pp-ink); transition: background 200ms ease, color 200ms ease; }
+  @media (hover: hover) { .tro-btn-solido:hover { background: var(--tro-mar); color: #FFFFFF; } }
+  .tro-btn-solido:disabled { opacity: .6; cursor: default; }
+  .tro-btn-fantasma { min-height: 48px; border: 3px solid var(--pp-ink); border-radius: 999px; background: transparent; color: var(--pp-ink); cursor: pointer;
+    font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 18px; padding: 2px 18px 0; }
+  .tro-error { margin: 0; font-weight: 700; font-size: 12px; color: var(--pp-acc); }
+  /* La estrella "¡Sí!": diez puntas del acento. */
+  .tro-cupon .tro-sello { position: absolute; right: 12px; bottom: 78px; width: 134px; aspect-ratio: 1; pointer-events: none;
+    opacity: 0; transform: rotate(18deg) scale(1.9) translateY(-120px);
+    background: var(--pp-acc); clip-path: polygon(50% 3%, 62% 36%, 97% 38%, 69% 59%, 79% 94%, 50% 74%, 21% 94%, 31% 59%, 3% 38%, 38% 36%);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 30px; box-sizing: border-box;
+    font-weight: 700; font-size: 7px; letter-spacing: .14em; text-transform: uppercase; color: #FFFFFF; }
+  .tro-cupon .tro-sello::before { content: "¡Sí!"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 26px; letter-spacing: 0; color: #FFFFFF; -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; }
   .tro-petalos { display: none; }
 
-  /* Tropical: titulares redondos y sol de fondo. */
-  .tro-tapa-nombres, .tro-h2, .tro-panel-titulo, .tro-fecha-linea { letter-spacing: 0; }
-  .tro-trama { opacity: .16; background-image: radial-gradient(currentColor 1px, transparent 1.2px); background-size: 18px 18px; }
+  /* ── 06 Álbum: postales ────────────────────────────────────────────── */
+  .tro-panel--album { background: #F7F5F0; color: #2C3A4A; justify-content: flex-start; gap: 14px; }
+  .tro-panel--album-b { background: #EFEBE3; }
+  .tro-hoja { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(3, 1fr); gap: 10px; max-width: 900px; }
+  .tro-foto-hoja { position: relative; overflow: hidden; min-height: 0; cursor: pointer; border: 5px solid #FFFFFF; border-radius: 12px; box-shadow: 0 0 0 2px #2C3A4A;
+    background: repeating-linear-gradient(135deg, #D7D1C4 0 8px, #E6E1D6 8px 16px); }
+  .tro-foto-hoja:nth-child(1) { transform: rotate(-1.5deg); }
+  .tro-foto-hoja:nth-child(2) { transform: rotate(1.5deg); }
+  .tro-foto-hoja:nth-child(3) { transform: rotate(-1deg); }
+  .tro-foto-hoja:nth-child(4) { transform: rotate(2deg); }
+  .tro-foto-hoja:nth-child(5) { transform: rotate(.5deg); }
+  .tro-foto-hoja-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tro-bano { position: absolute; inset: 0; mix-blend-mode: multiply; opacity: 0; transition: opacity 200ms linear; }
+  .tro-bano--1 { background: color-mix(in srgb, var(--pp-acc) 50%, transparent); }
+  .tro-bano--2 { background: color-mix(in srgb, var(--tro-mar) 50%, transparent); }
+  .tro-bano--3 { background: color-mix(in srgb, var(--tro-sol) 60%, transparent); }
+  .tro-bano--4 { background: color-mix(in srgb, var(--tro-hoja) 45%, transparent); }
+  .tro-bano--5 { background: color-mix(in srgb, var(--tro-cielo) 60%, transparent); }
+  .tro-foto-hoja-n { position: absolute; left: 8px; bottom: 6px; z-index: 1; font-weight: 700; font-size: 11px; letter-spacing: .14em; color: #2C3A4A; }
+  .tro-hoja[data-cantidad="5"] .tro-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .tro-hoja[data-cantidad="5"] .tro-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .tro-hoja[data-cantidad="5"] .tro-foto-hoja:nth-child(3) { grid-column: 4 / 6; grid-row: 2 / 3; }
+  .tro-hoja[data-cantidad="5"] .tro-foto-hoja:nth-child(4) { grid-column: 6 / 7; grid-row: 2 / 3; }
+  .tro-hoja[data-cantidad="5"] .tro-foto-hoja:nth-child(5) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .tro-hoja[data-cantidad="4"] .tro-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 3; }
+  .tro-hoja[data-cantidad="4"] .tro-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 2; }
+  .tro-hoja[data-cantidad="4"] .tro-foto-hoja:nth-child(3) { grid-column: 4 / 7; grid-row: 2 / 3; }
+  .tro-hoja[data-cantidad="4"] .tro-foto-hoja:nth-child(4) { grid-column: 1 / 7; grid-row: 3 / 4; }
+  .tro-hoja[data-cantidad="3"] .tro-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .tro-hoja[data-cantidad="3"] .tro-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 3; }
+  .tro-hoja[data-cantidad="3"] .tro-foto-hoja:nth-child(3) { grid-column: 4 / 7; grid-row: 3 / 4; }
+  .tro-hoja[data-cantidad="2"] .tro-foto-hoja:nth-child(1) { grid-column: 1 / 4; grid-row: 1 / 4; }
+  .tro-hoja[data-cantidad="2"] .tro-foto-hoja:nth-child(2) { grid-column: 4 / 7; grid-row: 1 / 4; }
+  .tro-hoja[data-cantidad="1"] .tro-foto-hoja:nth-child(1) { grid-column: 1 / 7; grid-row: 1 / 4; }
+
+  /* ── 07 Música: el parlante de playa ───────────────────────────────── */
+  .tro-musica { background: var(--pp-ink); color: #FFFFFF; }
+  .tro-eq { display: flex; align-items: flex-end; gap: 6px; height: 44px; }
+  .tro-eq span { width: 12px; height: 100%; background: var(--tro-mar); border-radius: 6px; transform-origin: bottom; animation: troEq 1.1s ease-in-out infinite; }
+  .tro-eq span:nth-child(2) { background: var(--pp-acc); }
+  .tro-eq span:nth-child(3) { background: var(--tro-sol); }
+  .tro-eq span:nth-child(4) { background: var(--tro-hoja); }
+  .tro-eq span:nth-child(5) { background: #FFFFFF; }
+  @keyframes troEq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .tro-musica form.tro-tarjeta { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; transform: none !important; }
+  .tro-musica .tro-etiqueta { display: none; }
+  .tro-musica .tro-input { min-height: 48px; border: 3px solid #FFFFFF; border-radius: 14px; background: transparent; color: #FFFFFF; font-family: var(--tro-sans), 'Quicksand', sans-serif; font-weight: 700; font-size: 15px; padding: 0 14px; min-width: 0; }
+  .tro-musica .tro-input::placeholder { color: rgba(255,255,255,.6); }
+  .tro-musica .tro-error { grid-column: 1 / -1; }
+  .tro-musica .tro-btn-solido { grid-column: 1 / -1; min-height: 50px; border-color: #FFFFFF; background: var(--tro-sol); color: var(--pp-ink); font-size: 19px; box-shadow: none; }
+  @media (hover: hover) { .tro-musica .tro-btn-solido:hover { background: var(--pp-acc); color: #FFFFFF; } }
+  .tro-lista { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .tro-lista-fila { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #FFFFFF; color: var(--pp-ink); border-radius: 16px; }
+  .tro-lista-fila::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--pp-acc); flex: 0 0 auto; }
+  .tro-lista-fila:nth-child(3n+2)::before { background: var(--tro-mar); }
+  .tro-lista-fila:nth-child(3n)::before { background: var(--tro-hoja); }
+  .tro-lista-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .tro-lista-tema { font-weight: 700; font-size: 17px; line-height: 1.1; }
+  .tro-lista-quien { font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+
+  /* ── 08 Regalos ────────────────────────────────────────────────────── */
+  .tro-regalos { background: var(--tro-arena); }
+  .tro-tarjeta--banco { --tro-sombra: var(--pp-acc); position: relative; z-index: 1; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 20px; padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px; box-shadow: 6px 7px 0 var(--tro-sombra); transform: none !important; }
+  .tro-tarjeta--der { --tro-sombra: var(--tro-mar); }
+  .tro-tarjeta--banco + .tro-tarjeta--banco { margin-top: 14px; }
+  .tro-tarjeta-kicker { font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .tro-tarjeta-mensaje { margin: 0; font-weight: 600; font-size: 14px; line-height: 1.5; opacity: .8; }
+  .tro-fila-texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .tro-fila-etq { font-weight: 700; font-size: 10px; letter-spacing: .2em; text-transform: uppercase; opacity: .7; }
+  .tro-fila-dato { font-weight: 700; font-size: 14px; letter-spacing: .04em; overflow-wrap: anywhere; }
+  .tro-fila--copiable:first-child .tro-fila-dato { font-family: var(--tro-serif), 'Lilita One', cursive; font-weight: 400; font-size: 22px; line-height: 1; color: var(--tro-sombra); -webkit-text-stroke: 1px var(--pp-ink); paint-order: stroke fill; }
+  .tro-tarjeta--banco .tro-fila--ultima { border-bottom: 0; font-weight: 700; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; opacity: .7; }
+  .tro-btn-copiar { flex: 0 0 auto; min-height: 44px; padding: 0 14px; border: 3px solid var(--pp-ink); border-radius: 999px; background: var(--tro-sombra); color: #FFFFFF; cursor: pointer;
+    font-weight: 700; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; }
+  .tro-btn-copiar--hecho { background: var(--pp-ink); }
+
+  /* ── 09 Trivia ─────────────────────────────────────────────────────── */
+  .tro-quiz { background: var(--tro-sol); }
+  .tro-quiz .tro-tarjeta { display: flex; flex-direction: column; gap: 12px; transform: none !important; }
+  .tro-quiz .tro-tarjeta-kicker { align-self: flex-start; background: var(--pp-ink); color: #FFFFFF; border-radius: 999px; font-weight: 700; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; padding: 8px 16px; opacity: 1; }
+  .tro-quiz .tro-tarjeta-pregunta, .tro-quiz .tro-tarjeta-titulo { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(38px, 10.5vw, 90px); line-height: .96; max-width: 14ch;
+    color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 4px 5px 0 var(--pp-acc); }
+  .tro-quiz .tro-tarjeta-mensaje { margin: 0; font-weight: 700; font-size: 15px; opacity: 1; }
+  .tro-opciones { display: flex; flex-direction: column; gap: 10px; counter-reset: opcion; }
+  .tro-opcion { min-height: 54px; border: 3px solid var(--pp-ink); border-radius: 999px; background: #FFFFFF; color: var(--pp-ink); cursor: pointer; counter-increment: opcion;
+    font-family: var(--tro-sans), 'Quicksand', sans-serif; font-weight: 700; font-size: 16px; text-align: left; padding: 0 20px; box-shadow: 4px 5px 0 var(--pp-ink);
+    display: flex; justify-content: space-between; align-items: center; gap: 12px; transition: background 200ms ease, color 200ms ease; }
+  .tro-opcion::after { content: counter(opcion, upper-alpha); font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 18px; }
+  .tro-opcion--bien { background: var(--tro-mar); color: #FFFFFF; }
+  .tro-opcion--bien::after { content: "☼ ¡Sí!"; }
+  .tro-opcion--mal { background: var(--pp-acc); color: #FFFFFF; }
+  .tro-opcion--mal::after { content: "Casi"; }
+  @media (min-width: 1024px) {
+    .tro-quiz .tro-spread > .tro-tarjeta { grid-column: 1 / -1; max-width: none; justify-self: stretch; display: grid; grid-template-columns: 1fr 1fr; column-gap: 72px; align-items: center; }
+    .tro-quiz .tro-tarjeta-kicker { grid-column: 1; justify-self: end; margin-right: auto; }
+    .tro-quiz .tro-tarjeta-pregunta { grid-column: 1; max-width: 560px; justify-self: end; width: 100%; }
+    .tro-quiz .tro-opciones { grid-column: 2; grid-row: 1 / span 2; max-width: 560px; width: 100%; }
+  }
+
+  /* ── 10 Tu pase: pulsera y QR ──────────────────────────────────────── */
+  .tro-pase { background: var(--tro-mar); color: #FFFFFF; justify-content: space-between; padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
+  .tro-pase-arena { position: absolute; left: 0; right: 0; bottom: 0; height: 26%; background: var(--tro-arena); pointer-events: none; }
+  .tro-pagina--qr { align-items: flex-start; }
+  .tro-qr { position: relative; width: min(100%, 300px); aspect-ratio: 1; background: #FFFFFF; padding: 16px; box-sizing: border-box; border: 3px solid var(--pp-ink); border-radius: 22px;
+    box-shadow: 8px 8px 0 var(--pp-acc); margin-bottom: 28px; }
+  .tro-qr .qr-ingreso, .tro-qr section { background: transparent !important; border: none !important; padding: 0 !important; }
+  .tro-qr img, .tro-qr svg, .tro-qr canvas { width: 100% !important; height: auto !important; display: block; }
+  .tro-qr-etq { position: absolute; left: 0; right: 0; bottom: -24px; text-align: center; font-weight: 700; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: #FFFFFF; }
+  .tro-pase-cabeza { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; padding-top: 12px; }
+  .tro-pase-numero, .tro-pase-mesa { display: flex; flex-direction: column; }
+  .tro-pase-mesa { align-items: flex-end; text-align: right; }
+  .tro-pase-numero > span:last-child { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(72px, 22vw, 160px); line-height: .88; color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--pp-acc); }
+  .tro-pase-mesa > span:last-child { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(44px, 13vw, 96px); line-height: .9; color: var(--tro-sol); -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; }
+  .tro-caja { display: flex; flex-direction: column; background: #FFFFFF; color: var(--pp-ink); border: 3px solid var(--pp-ink); border-radius: 18px; padding: 6px 16px; }
+  .tro-caja .tro-linea { padding: 10px 0; font-size: 14px; }
+  .tro-caja .tro-linea:last-child { border-bottom: 0; }
+  .tro-caja .tro-linea > span:last-child { font-weight: 600; line-height: 1.35; }
+  .tro-info-extra { margin-top: 4px; }
+  .tro-info-extra #info-adicional { background: transparent !important; padding: 0 !important; }
+  .tro-info-extra #ia-trigger-btn { background: #FFFFFF !important; color: var(--pp-ink) !important; border: 3px solid var(--pp-ink) !important;
+    border-radius: 999px !important; font-weight: 700 !important; letter-spacing: .14em !important; text-transform: uppercase; box-shadow: 3px 4px 0 var(--pp-acc); }
+  .tro-raiz .ia-icon-box, .tro-raiz svg.lucide { display: none !important; }
+  .tro-pase-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; color: var(--pp-ink); }
+  .tro-despedida { font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(28px, 7.5vw, 48px); line-height: 1; color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 3px 4px 0 var(--pp-acc); }
+  .tro-replay { cursor: pointer; color: var(--pp-acc); }
+  .tro-credito { display: inline-flex; opacity: .85; }
+
+  /* ── La tapa: la playa ─────────────────────────────────────────────── */
+  .tro-portada { position: absolute; inset: 0; z-index: 5; overflow: hidden; background: var(--tro-cielo); color: var(--pp-ink); }
+  .tro-portada-hoja { position: absolute; inset: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; box-sizing: border-box;
+    padding: calc(16px + env(safe-area-inset-top)) max(18px, calc((100% - 1100px) / 2)) calc(16px + env(safe-area-inset-bottom)); }
+  .tro-playa { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .tro-sol-disco { position: absolute; right: 10%; top: 8%; width: clamp(90px, 24vw, 150px); aspect-ratio: 1; border-radius: 50%; background: var(--tro-sol); box-shadow: 0 0 0 14px color-mix(in srgb, var(--tro-sol) 25%, transparent); }
+  .tro-nube { position: absolute; border-radius: 999px; background: #FFFFFF; opacity: .9; }
+  .tro-nube--grande { left: 6%; top: 14%; width: 26vw; max-width: 200px; height: 30px; }
+  .tro-nube--chica { left: 12%; top: 11%; width: 16vw; max-width: 120px; height: 26px; }
+  .tro-mar { position: absolute; left: 0; right: 0; top: 46%; height: 30%; background: var(--tro-mar); }
+  .tro-ola--mar { top: 46%; margin-top: -11px; --tro-ola-color: var(--tro-mar); }
+  .tro-ola--mar svg { animation-duration: 3s; }
+  .tro-ola--espuma { top: 58%; --tro-ola-color: #FFFFFF; }
+  .tro-ola--espuma svg { animation-duration: 4.2s; animation-direction: reverse; opacity: .7; }
+  .tro-arena { position: absolute; left: 0; right: 0; top: 72%; bottom: 0; background: var(--tro-arena); }
+  .tro-ola--arena { top: 72%; margin-top: -11px; --tro-ola-color: var(--tro-arena); }
+  .tro-ola--arena svg { animation-duration: 5s; }
+  /* La palmera: tronco con anillos, siete frondas alternando dos verdes y tres cocos; se mece desde la base. */
+  .tro-palmera { position: absolute; right: 2%; top: 30%; width: clamp(120px, 30vw, 220px); transform-origin: 50% 100%; animation: troMece 5s ease-in-out infinite; overflow: visible; }
+  @keyframes troMece { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
+  .tro-tronco { fill: var(--tro-tronco); stroke: var(--pp-ink); stroke-width: 2; stroke-linejoin: round; }
+  .tro-anillos path { fill: none; stroke: var(--pp-ink); stroke-width: 1.5; opacity: .6; }
+  .tro-fronda path { fill: var(--tro-hoja); stroke: var(--pp-ink); stroke-width: 2.2; stroke-linejoin: round; }
+  .tro-fronda--oscura path { fill: var(--tro-hoja2); }
+  .tro-fronda .tro-nervio { fill: none; stroke-width: 1.2; opacity: .4; }
+  .tro-cocos circle { fill: var(--tro-tronco); stroke: var(--pp-ink); stroke-width: 2; }
+  .tro-estrella-mar { position: absolute; left: 6%; bottom: 9%; width: clamp(40px, 11vw, 64px); fill: var(--pp-acc); stroke: var(--pp-ink); stroke-width: 3; stroke-linejoin: round; animation: troFlota 4s ease-in-out infinite; }
+  .tro-sandia { position: absolute; left: 28%; bottom: 5%; width: clamp(52px, 14vw, 84px); }
+  .tro-sandia-pulpa { fill: var(--pp-acc); stroke: var(--pp-ink); stroke-width: 3; stroke-linejoin: round; }
+  .tro-sandia-cascara { fill: none; stroke: var(--tro-hoja); stroke-width: 8; }
+  .tro-sandia circle { fill: var(--pp-ink); }
+  .tro-tapa-cabecera { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .tro-tapa-centro { position: relative; z-index: 1; align-self: center; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 0; text-align: center; }
+  .tro-tapa-kicker { font-size: 12px; letter-spacing: .26em; padding: 6px 14px; }
+  /* El nombre: Lilita blanca con trazo de tinta y sombra del acento. El más largo manda el cuerpo. */
+  .tro-tapa-nombres { margin: 0; line-height: .9; letter-spacing: .01em; display: flex; flex-direction: column; align-items: center;
+    color: #FFFFFF; -webkit-text-stroke: 2px var(--pp-ink); paint-order: stroke fill; text-shadow: 5px 6px 0 var(--pp-acc);
+    font-size: min(clamp(60px, 20vw, 180px), 18vh, calc((100vw - 60px) / (var(--largo, 9) * 0.56))); }
+  @media (min-width: 1024px) { .tro-tapa-nombres { font-size: min(13vw, 220px, 22vh, calc((min(100vw, 1100px) - 60px) / (var(--largo, 9) * 0.56))); } }
+  .tro-tapa-nombres--largo { font-size: min(clamp(43px, 14.4vw, 130px), 13vh, calc((100vw - 60px) / (var(--largo, 9) * 0.56))); }
+  .tro-tapa-linea { overflow: hidden; display: block; white-space: nowrap; padding: 0 10px 10px; margin: 0 -10px -10px; }
+  .tro-tapa-linea > span { display: block; }
+  .tro-letra { display: inline-block; animation: troLetra calc(var(--n, 9) * 3.4s) cubic-bezier(.34,1.56,.64,1) infinite; animation-delay: calc(var(--i, 0) * -3.4s); }
+  @keyframes troLetra { 0%, 99% { transform: none; } 99.3% { transform: translateY(-14px) rotate(6deg); } 100% { transform: none; } }
+  .tro-cinta { display: inline-flex; align-items: center; gap: 10px; background: var(--pp-acc); color: #FFFFFF; border-radius: 999px; padding: 8px 18px; font-family: var(--tro-serif), 'Lilita One', cursive; font-size: clamp(18px, 5vw, 26px); letter-spacing: .06em; border: 3px solid var(--pp-ink); }
+  .tro-tapa-datos { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; width: 100%; max-width: 520px; font-weight: 700; font-size: 13px; line-height: 1.35; text-align: left; background: rgba(255,255,255,.9); padding: 10px 14px; border-radius: 14px; box-sizing: border-box; }
+  .tro-tapa-datos-der { text-align: right; }
+  .tro-tapa-pie { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; }
+  .tro-tapa-mensaje { margin: 0; font-weight: 700; font-size: clamp(15px, 4.2vw, 19px); line-height: 1.35; max-width: 34ch; background: rgba(255,255,255,.9); padding: 8px 14px; border-radius: 14px; }
+  .tro-tapa-btn { min-height: 54px; width: 100%; max-width: 360px; border: 3px solid var(--pp-ink); border-radius: 999px; background: var(--pp-ink); color: #FFFFFF; cursor: pointer;
+    font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 20px; letter-spacing: .06em; padding: 2px 22px 0;
+    display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 4px 5px 0 var(--pp-acc); transition: background 200ms ease; }
+  @media (hover: hover) { .tro-tapa-btn:hover { background: var(--pp-acc); } }
+
+  /* ── Riel, pista y lupa ────────────────────────────────────────────── */
+  .tro-riel { position: absolute; right: 0; top: 0; bottom: 0; width: 40px; z-index: 4; display: flex; flex-direction: column;
+    align-items: center; justify-content: space-between; padding: calc(16px + env(safe-area-inset-top)) 0 calc(16px + env(safe-area-inset-bottom));
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; color: var(--pp-ink); border-left: 3px solid currentColor !important; }
+  .tro-riel-top { writing-mode: vertical-rl; font-family: var(--tro-serif), 'Lilita One', cursive; font-size: 14px; letter-spacing: .2em; color: inherit !important; }
+  .tro-riel-etiqueta { writing-mode: vertical-rl; font-weight: 700; font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: inherit; }
+  .tro-riel-linea { flex: 1; width: 1px; margin: 16px 0; background: transparent !important; position: relative; }
+  .tro-riel-barra { position: absolute; left: -3px; top: 0; width: 6px; height: 0%; background: var(--pp-acc); border-radius: 3px; transition: height 200ms linear; display: block; }
+  .tro-pista { position: absolute; left: 0; right: 40px; bottom: calc(18px + env(safe-area-inset-bottom)); z-index: 6; text-align: center;
+    font-weight: 700; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: var(--pp-ink);
+    opacity: 0; transition: opacity 600ms ease; pointer-events: none; animation: troPista 2.4s ease-in-out infinite; }
+  @keyframes troPista { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+  .tro-lupa { position: fixed; inset: 0; z-index: 200; background: rgba(44,58,74,.94);
+    display: flex; align-items: center; justify-content: center; padding: 24px; cursor: zoom-out; }
+  .tro-lupa-cerrar { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: 3px solid var(--pp-ink); border-radius: 50%;
+    background: var(--tro-sol); color: var(--pp-ink); font-size: 18px; line-height: 1; cursor: pointer; box-shadow: 3px 4px 0 var(--pp-acc); }
+  .tro-lupa-img { max-width: 100%; max-height: 88vh; object-fit: contain; cursor: default; border: 5px solid #FFFFFF; border-radius: 12px; box-shadow: 0 0 0 2px var(--pp-ink), 8px 8px 0 var(--pp-acc); }
 
   @media (prefers-reduced-motion: reduce) {
     .tro-raiz * { animation: none !important; }
     .tro-scroller [data-xin] { opacity: 1 !important; transform: none !important; }
-    /* Sin movimiento no hay revelado: la foto se ve, sin la trama encima. */
     .tro-foto { --tro-punto: 0; }
   }
 `;
